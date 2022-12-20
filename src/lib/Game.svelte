@@ -4,8 +4,18 @@
 <script lang="ts">
 
   import { onMount } from 'svelte'
+  import { wrap } from './math'
+  import { drawShip, updateSpaceObject } from './render'
+  import type { SpaceObject } from './types';
+  import { createSpaceObject, getScreenRect } from './utils';
+  import { wrapSpaceObject } from './mechanics';
+  import { spaceObjectKeyController, arrowControl } from './input'
 
   onMount(() => {
+
+    console.log("adds event listeners")
+    document.addEventListener("keydown", (event) => arrowControl(event, true))
+    document.addEventListener("keyup", (event) => arrowControl(event, false))
 
     function clearScreen(ctx: CanvasRenderingContext2D) {
       ctx.fillStyle = "#000"
@@ -15,34 +25,21 @@
     const c: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("root")
     const ctx = c.getContext("2d")
 
-    ctx.canvas.width = 1280 * 1
-    ctx.canvas.height = 720 * 1
-
-    interface SpaceObject {
-      x: number,
-      y: number,
-      width: number,
-      height: number,
-      color: string,
-    }
-
-    const ship: SpaceObject = {
-      x: 0,
-      y: 0,
-      width: 20,
-      height: 20,
-      color: '#f00',
-    }
+    ctx.canvas.width = 960 * 1
+    ctx.canvas.height = 960 * 1
 
     let time_ms: number
 
+    const ship: SpaceObject = createSpaceObject(ctx)
+
     const renderFrame = (ctx: CanvasRenderingContext2D): void => {
-      ctx.fillStyle = ship.color
-      ctx.fillRect(ship.x, ship.y, ship.width, ship.height)
+      drawShip(ship, ctx)
     }
 
     const nextFrame = (ctx: CanvasRenderingContext2D): void => {
-      ship.x += 0.2
+      wrapSpaceObject(ship, getScreenRect(ctx))
+      spaceObjectKeyController(ship)
+      updateSpaceObject(ship)
     }
 
     function renderLoop(
