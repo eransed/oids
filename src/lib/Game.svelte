@@ -5,25 +5,67 @@
 
   import { onMount } from 'svelte'
 
-  function clearScreen(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = "#000"
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  }
+  onMount(() => {
 
-  onMount( () => {
+    function clearScreen(ctx: CanvasRenderingContext2D) {
+      ctx.fillStyle = "#000"
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    }
+
     const c: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("root")
     const ctx = c.getContext("2d")
 
     ctx.canvas.width = 1280 * 1
     ctx.canvas.height = 720 * 1
 
-    clearScreen(ctx)
+    interface SpaceObject {
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      color: string,
+    }
 
-    ctx.fillStyle = '#f00'
-    ctx.fillRect(0, 0, 20, 20)
+    const ship: SpaceObject = {
+      x: 0,
+      y: 0,
+      width: 20,
+      height: 20,
+      color: '#f00',
+    }
 
-    console.log ('test123')
-  });
+    let time_ms: number
+
+    const renderFrame = (ctx: CanvasRenderingContext2D): void => {
+      ctx.fillStyle = ship.color
+      ctx.fillRect(ship.x, ship.y, ship.width, ship.height)
+    }
+
+    const nextFrame = (ctx: CanvasRenderingContext2D): void => {
+      ship.x += 0.2
+    }
+
+    function renderLoop(
+        ctx: CanvasRenderingContext2D, 
+        renderFrame: (ctx: CanvasRenderingContext2D) => void, 
+        nextFrame: (ctx: CanvasRenderingContext2D) => void
+      ){
+      
+      function update(time_ms) {
+        clearScreen(ctx)
+        renderFrame(ctx)
+        requestAnimationFrame(update)
+        nextFrame(ctx)
+      }
+  
+      update(time_ms)
+
+    }
+    renderLoop(ctx, renderFrame, nextFrame)
+
+  }); //End of onMount
+
+  
 
 
 
