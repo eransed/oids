@@ -1,5 +1,5 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { wrap } from "./math"
+import { scalarMultiply } from "./math"
 
 export function applyEngine(so: SpaceObject): number {
   if (so.fuel > 0) {
@@ -30,4 +30,9 @@ export function wrapSpaceObject(so: SpaceObject, screen: Vec2d) {
   if (so.position.y > screen.y) {
     so.position.y = 0
   }
+}
+
+
+export function friction(so: SpaceObject, friction: number) {
+  scalarMultiply(so.velocity, friction)
 }

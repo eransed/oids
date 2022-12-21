@@ -3,8 +3,8 @@
 </script>
 
 <main>
-  <h1>oids</h1>
-  <div class="card">
+  <!-- <h2>oids</h2> -->
+  <div>
     <Game />
   </div>
 </main>

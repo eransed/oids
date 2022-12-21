@@ -1,5 +1,5 @@
 //imports
-import type { Vec2d, SpaceObject } from "./types"
+import type { SpaceObject } from "./types"
 import { add } from "./math"
 import { applyEngine, applySteer } from "./mechanics"
 
@@ -92,12 +92,10 @@ export function arrowControl(e: any, value: boolean) {
     // wtf code...
     spacePressed = value
   }
-  //   if (e.key === "b" && value) {
-  //     bounce = !bounce
-  //     console.log({ bounce })
-  //   }
-  //   if (e.key === "i") {
-  //     console.log({ allSpaceObjects })
-  //     console.log({ myShip })
-  //   }
+}
+
+export function initKeyControllers(): void {
+  console.log("adds event listeners")
+  document.addEventListener("keydown", (event) => arrowControl(event, true))
+  document.addEventListener("keyup", (event) => arrowControl(event, false))
 }

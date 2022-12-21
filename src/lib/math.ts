@@ -35,3 +35,10 @@ export function round2dec(num: number, dec: number = 2): number {
   const exp = Math.pow(10, dec)
   return Math.round((num + Number.EPSILON) * exp) / exp
 }
+
+
+export function scalarMultiply(v: Vec2d, s: number): Vec2d {
+  v.x *= s
+  v.y *= s
+  return v
+}

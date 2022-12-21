@@ -1,8 +1,6 @@
 import type { SpaceObject, Vec2d } from "./types"
 import { rndi, rndf } from "./math"
-
-//Max random speed of default spaceObject
-const maxSpeed = 10
+import { scaleFactor } from "./constants"
 
 export function createSpaceObject(ctx: CanvasRenderingContext2D): SpaceObject {
   const initPos: Vec2d = {
@@ -55,4 +53,12 @@ export function createSpaceObject(ctx: CanvasRenderingContext2D): SpaceObject {
 
 export const getScreenRect = (ctx: CanvasRenderingContext2D): Vec2d => {
   return { x: ctx.canvas.width, y: ctx.canvas.height }
+}
+
+export function setCanvasSize(ctx: CanvasRenderingContext2D): void {
+  const vw: number = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+  const vh: number = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+  ctx.canvas.width = vw * scaleFactor
+  ctx.canvas.height = vh * scaleFactor
+  console.log ({vw, vh})
 }

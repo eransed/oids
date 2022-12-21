@@ -1,5 +1,6 @@
 import type { SpaceObject } from "./types"
 import { add, round2dec } from "./math"
+import { canvasBackgroundColor } from "./constants"
 
 export function drawShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   let scale: number = 2
@@ -42,4 +43,9 @@ export function drawShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
 export const updateSpaceObject = (so: SpaceObject) => {
   add(so.position, so.velocity)
   add(so.velocity, so.acceleration)
+}
+
+export function clearScreen(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = canvasBackgroundColor
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
