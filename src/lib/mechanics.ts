@@ -1,5 +1,8 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { scalarMultiply } from "./math"
+import { scalarMultiply, mirrorWrap, wrap, degToRad, radToDeg, sub, magnitude, rndf, add, rndi, copy } from "./math"
+import { randomGreen } from "./color"
+import { createSpaceObject } from "./utils"
+import { heading } from "./physics"
 
 export function applyEngine(so: SpaceObject): number {
   if (so.fuel > 0) {
@@ -16,23 +19,96 @@ export function applySteer(so: SpaceObject): number {
 }
 
 export function wrapSpaceObject(so: SpaceObject, screen: Vec2d) {
-  //wrap(so.position, screen)
-  //To do: Make it appear where it entered..
-  if (so.position.x < 0) {
-    so.position.x = screen.x
-  }
-  if (so.position.x > screen.x) {
-    so.position.x = 0
-  }
-  if (so.position.y < 0) {
-    so.position.y = screen.y
-  }
-  if (so.position.y > screen.y) {
-    so.position.y = 0
-  }
+  // To do: Make it appear where it entered...
+  // wrap(so.position, screen)
+  mirrorWrap(so.position, screen)
 }
 
+export function fire(so: SpaceObject) {
+  if (so.ammo < 1) {
+    console.log(so.name + " is out of ammo")
+    return
+  }
+  if (so.canonOverHeat) {
+    return
+  }
+  so.canonCoolDown += so.canonHeatAddedPerShot
+  so.ammo--
+  let shot: SpaceObject = createSpaceObject()
+  shot.damage = so.missileDamage
+  shot.size = { x: rndi(2, 3), y: rndi(30, 45) }
+  shot.color = randomGreen()
+  let head: Vec2d = copy(so.position)
+  const aimError = 8
+  const headError = 0.019
+  const speedError = 1.8
 
-export function friction(so: SpaceObject, friction: number) {
-  scalarMultiply(so.velocity, friction)
+  head = add(head, scalarMultiply(heading(so), 15))
+
+  head = add(head, {
+    x: rndi(-aimError, aimError),
+    y: rndi(-aimError, aimError),
+  })
+
+  shot.velocity = scalarMultiply(
+    heading(so),
+    so.missileSpeed + rndf(0, speedError)
+  )
+
+  shot.velocity = add(shot.velocity, {
+    x: rndf(-headError, headError),
+    y: rndf(-headError, headError),
+  })
+  
+  shot.position = head
+  shot.angleDegree = so.angleDegree
+  so.shotsInFlight.push(shot)
+}
+
+export function ofScreen(v: Vec2d, screen: Vec2d) {
+  if (v.x > screen.x) return true
+  if (v.x < 0) return true
+  if (v.y > screen.y) return true
+  if (v.y < 0) return true
+  return false
+}
+
+export function decayDeadSpaceObjects(so: SpaceObject[]): SpaceObject[] {
+  let out = so.filter(function (e) {
+    return e.health > 0
+  })
+  return out
+}
+
+export function bounceSpaceObject(
+  so: SpaceObject,
+  screen: Vec2d,
+  energyFactor: number = 1,
+  gap: number = 1,
+  damageDeltaFactor: number
+) {
+  if (so.position.x < gap) {
+    so.velocity.x = -so.velocity.x * energyFactor
+    so.position.x = gap
+    so.bounceCount++
+    so.damage = so.damage * damageDeltaFactor
+  }
+  if (so.position.x >= screen.x) {
+    so.velocity.x = -so.velocity.x * energyFactor
+    so.position.x = screen.x - gap
+    so.bounceCount++
+    so.damage = so.damage * damageDeltaFactor
+  }
+  if (so.position.y < gap) {
+    so.velocity.y = -so.velocity.y * energyFactor
+    so.position.y = gap
+    so.bounceCount++
+    so.damage = so.damage * damageDeltaFactor
+  }
+  if (so.position.y >= screen.y) {
+    so.velocity.y = -so.velocity.y * energyFactor
+    so.position.y = screen.y - gap
+    so.bounceCount++
+    so.damage = so.damage * damageDeltaFactor
+  }
 }

@@ -1,32 +1,34 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { rndi, rndf } from "./math"
-import { scaleFactor } from "./constants"
+import { rndi, rndf, floor } from "./math"
+import { scaleFactor, maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
 
-export function createSpaceObject(ctx: CanvasRenderingContext2D): SpaceObject {
+export function createSpaceObject(): SpaceObject {
+
+  const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2d = {
-    x: rndi(0, ctx.canvas.width),
-    y: rndi(0, ctx.canvas.height),
+    x: rndi(0, 100),
+    y: rndi(0, 100),
   }
 
-  const initVel: Vec2d = {
-    x: 0,
-    y: 0,
-  }
+  // const initVel: Vec2d = {x: 0, y: 0}
+  // const initPos: Vec2d = {
+  //   x: rndi(0, ctx.canvas.width),
+  //   y: rndi(0, ctx.canvas.height),
+  // }
 
   const spaceObject: SpaceObject = {
     lastPosition: initPos,
     mass: 1,
     size: { x: 24, y: 24 },
-    color: "#f00",
+    color: "#fff",
     position: initPos,
-    //velocity: { x: rndf(-maxSpeed, maxSpeed), y: rndf(-maxSpeed, maxSpeed) },
     velocity: initVel,
     acceleration: { x: 0, y: 0 },
     name: "SpaceObject",
     angleDegree: -90,
     health: 100,
     killCount: 0,
-    fuel: 500,
+    fuel: 50000,
     enginePower: 0.25,
     steeringPower: 2.5,
     ammo: 10,
@@ -60,5 +62,9 @@ export function setCanvasSize(ctx: CanvasRenderingContext2D): void {
   const vh: number = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
   ctx.canvas.width = vw * scaleFactor
   ctx.canvas.height = vh * scaleFactor
-  console.log ({vw, vh})
+  console.log({ vw, vh })
+}
+
+export function getScreenCenterPosition(ctx: CanvasRenderingContext2D): Vec2d {
+  return floor({ x: ctx.canvas.width/2, y: ctx.canvas.height/2 })
 }

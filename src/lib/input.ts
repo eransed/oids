@@ -17,7 +17,7 @@ export function spaceObjectKeyController(so: SpaceObject) {
     //so.afterBurnerEnabled = true
     let angleRadians: number = (so.angleDegree * Math.PI) / 180
     let engine = applyEngine(so)
-    add(so.velocity, {
+    so.velocity = add(so.velocity, {
       x: engine * Math.cos(angleRadians),
       y: engine * Math.sin(angleRadians),
     })
@@ -26,7 +26,7 @@ export function spaceObjectKeyController(so: SpaceObject) {
   if (downPressed) {
     let angleRadians: number = (so.angleDegree * Math.PI) / 180
     let engine = applyEngine(so)
-    add(so.velocity, {
+    so.velocity = add(so.velocity, {
       x: -engine * Math.cos(angleRadians),
       y: -engine * Math.sin(angleRadians),
     })
@@ -35,7 +35,7 @@ export function spaceObjectKeyController(so: SpaceObject) {
   if (leftStrafePressed) {
     let angleRadians: number = ((so.angleDegree - 90) * Math.PI) / 180
     let engine = applyEngine(so)
-    add(so.velocity, {
+    so.velocity = add(so.velocity, {
       x: engine * Math.cos(angleRadians),
       y: engine * Math.sin(angleRadians),
     })
@@ -44,7 +44,7 @@ export function spaceObjectKeyController(so: SpaceObject) {
   if (rightStrafePressed) {
     let angleRadians: number = ((so.angleDegree + 90) * Math.PI) / 180
     let engine = applyEngine(so)
-    add(so.velocity, {
+    so.velocity = add(so.velocity, {
       x: engine * Math.cos(angleRadians),
       y: engine * Math.sin(angleRadians),
     })
