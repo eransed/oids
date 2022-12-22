@@ -4,7 +4,7 @@
 <script lang="ts">
   
   import { onMount } from 'svelte'
-  import { oids_game } from './game';
+  import { oids_game } from '../lib/game';
 
   onMount(() => {
     const canvasElement: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("game_canvas")

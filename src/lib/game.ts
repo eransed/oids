@@ -3,9 +3,10 @@ import type { SpaceObject } from "./types"
 import { frictionFactor } from "./constants"
 import { initKeyControllers, spaceObjectKeyController } from "./input"
 import { wrapSpaceObject } from "./mechanics"
-import { clearScreen, drawMoon, drawShip } from "./render"
+import { clearScreen, renderMoon, renderShip } from "./render"
 import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from "./utils"
 import { friction, gravity, updateSpaceObject } from "./physics"
+import { add } from "./math"
 
 export function oids_game(ctx: CanvasRenderingContext2D) {
 
@@ -16,11 +17,12 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
   const ship: SpaceObject = createSpaceObject()
   const moon: SpaceObject = createSpaceObject()
 
-  ship.position = getScreenCenterPosition(ctx)
+  ship.position = add(getScreenCenterPosition(ctx), {x: 70, y: 70})
+  moon.position = getScreenCenterPosition(ctx)
 
   const renderFrame = (ctx: CanvasRenderingContext2D): void => {
-    drawShip(ship, ctx)
-    drawMoon(moon, ctx)
+    renderShip(ship, ctx)
+    renderMoon(moon, ctx)
   }
 
   const nextFrame = (ctx: CanvasRenderingContext2D): void => {

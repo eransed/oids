@@ -1,5 +1,5 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { scalarMultiply, mirrorWrap, wrap, degToRad, radToDeg, sub, magnitude, rndf, add, rndi, copy } from "./math"
+import { scalarMultiply, mirrorWrap, wrap, rndf, add, rndi, copy } from "./math"
 import { randomGreen } from "./color"
 import { createSpaceObject } from "./utils"
 import { heading } from "./physics"
@@ -20,8 +20,8 @@ export function applySteer(so: SpaceObject): number {
 
 export function wrapSpaceObject(so: SpaceObject, screen: Vec2d) {
   // To do: Make it appear where it entered...
-  // wrap(so.position, screen)
-  mirrorWrap(so.position, screen)
+  wrap(so.position, screen)
+  // mirrorWrap(so.position, screen)
 }
 
 export function fire(so: SpaceObject) {

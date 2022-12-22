@@ -8,7 +8,7 @@ export function clearScreen(ctx: CanvasRenderingContext2D) {
 }
 
 
-export function drawVector(
+export function renderVector(
   v: Vec2d,
   origin: Vec2d,
   ctx: CanvasRenderingContext2D,
@@ -27,7 +27,7 @@ export function drawVector(
   ctx.restore()
 }
 
-export function drawShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   let scale: number = 2
   let shipSize = { x: 40, y: 80 }
   ctx.save()
@@ -65,7 +65,7 @@ export function drawShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   ctx.restore()
 }
 
-export function drawShot(so: SpaceObject, ctx: any) {
+export function renderShot(so: SpaceObject, ctx: any) {
   for (let shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
@@ -88,6 +88,12 @@ export function drawShot(so: SpaceObject, ctx: any) {
   }
 }
 
-export function drawMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
-  
+export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
+  ctx.save()
+  ctx.translate(s.position.x, s.position.y)
+  ctx.beginPath()
+  ctx.fillStyle = s.color
+  ctx.arc(0, 0, 20, 0, Math.PI * 2, false)
+  ctx.fill();
+  ctx.restore()
 }
