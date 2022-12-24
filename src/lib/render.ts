@@ -1,5 +1,5 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { add, round2dec } from "./math"
+import { round2dec } from "./math"
 import { canvasBackgroundColor } from "./constants"
 
 export function clearScreen(ctx: CanvasRenderingContext2D) {
@@ -12,8 +12,8 @@ export function renderVector(
   v: Vec2d,
   origin: Vec2d,
   ctx: CanvasRenderingContext2D,
+  scale: number = 10000,
   color: string = '#fff',
-  scale: number = 1,
   offset: Vec2d = { x: 0, y: 0 }
 ) {
   ctx.save()

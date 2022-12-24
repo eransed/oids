@@ -1,7 +1,6 @@
-//imports
+
 import type { SpaceObject } from "./types"
-import { add } from "./math"
-import { applyEngine, applySteer } from "./mechanics"
+import { applyEngineThrust, applySteer } from "./mechanics"
 
 let upPressed: boolean = false
 let downPressed: boolean = false
@@ -11,59 +10,7 @@ let leftStrafePressed = false
 let leftPressed: boolean = false
 let spacePressed: boolean = false
 
-export function spaceObjectKeyController(so: SpaceObject) {
-  //so.afterBurnerEnabled = false
-  if (upPressed) {
-    //so.afterBurnerEnabled = true
-    let angleRadians: number = (so.angleDegree * Math.PI) / 180
-    let engine = applyEngine(so)
-    so.velocity = add(so.velocity, {
-      x: engine * Math.cos(angleRadians),
-      y: engine * Math.sin(angleRadians),
-    })
-  }
-
-  if (downPressed) {
-    let angleRadians: number = (so.angleDegree * Math.PI) / 180
-    let engine = applyEngine(so)
-    so.velocity = add(so.velocity, {
-      x: -engine * Math.cos(angleRadians),
-      y: -engine * Math.sin(angleRadians),
-    })
-  }
-
-  if (leftStrafePressed) {
-    let angleRadians: number = ((so.angleDegree - 90) * Math.PI) / 180
-    let engine = applyEngine(so)
-    so.velocity = add(so.velocity, {
-      x: engine * Math.cos(angleRadians),
-      y: engine * Math.sin(angleRadians),
-    })
-  }
-
-  if (rightStrafePressed) {
-    let angleRadians: number = ((so.angleDegree + 90) * Math.PI) / 180
-    let engine = applyEngine(so)
-    so.velocity = add(so.velocity, {
-      x: engine * Math.cos(angleRadians),
-      y: engine * Math.sin(angleRadians),
-    })
-  }
-
-  if (leftPressed) {
-    so.angleDegree -= applySteer(so)
-  }
-
-  if (rightPressed) {
-    so.angleDegree += applySteer(so)
-  }
-
-  //   if (spacePressed) {
-  //     fire(so)
-  //   }
-}
-
-export function arrowControl(e: any, value: boolean) {
+function arrowControl(e: any, value: boolean) {
   if (e.key === "ArrowUp") {
     upPressed = value
   }
@@ -92,6 +39,39 @@ export function arrowControl(e: any, value: boolean) {
     // wtf code...
     spacePressed = value
   }
+}
+
+export function spaceObjectKeyController(so: SpaceObject) {
+  //so.afterBurnerEnabled = false
+
+  if (leftPressed) {
+    so.angleDegree -= applySteer(so)
+  }
+
+  if (rightPressed) {
+    so.angleDegree += applySteer(so)
+  }
+
+  if (upPressed) {
+    //so.afterBurnerEnabled = true
+    applyEngineThrust(so, 0)
+  }
+
+  if (downPressed) {
+    applyEngineThrust(so, 180)
+  }
+
+  if (leftStrafePressed) {
+    applyEngineThrust(so, -90)
+  }
+
+  if (rightStrafePressed) {
+    applyEngineThrust(so, 90)
+  }
+
+  //   if (spacePressed) {
+  //     fire(so)
+  //   }
 }
 
 export function initKeyControllers(): void {

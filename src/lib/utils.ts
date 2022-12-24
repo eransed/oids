@@ -1,6 +1,6 @@
 import type { SpaceObject, Vec2d } from "./types"
 import { rndi, rndf, floor } from "./math"
-import { scaleFactor, maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
+import { scaleFactor, maxRandomDefaultSpaceObjectVelocity as maxVel, frictionFactor } from "./constants"
 
 export function createSpaceObject(): SpaceObject {
 
@@ -29,7 +29,7 @@ export function createSpaceObject(): SpaceObject {
     health: 100,
     killCount: 0,
     fuel: 50000,
-    enginePower: 0.25,
+    enginePower: 0.2,
     steeringPower: 2.5,
     ammo: 10,
     shotsInFlight: [],
@@ -48,6 +48,7 @@ export function createSpaceObject(): SpaceObject {
     didHit: false,
     shotBlowFrame: 16,
     afterBurnerEnabled: false,
+    frictionFactor: frictionFactor,
   }
 
   return spaceObject

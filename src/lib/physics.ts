@@ -1,9 +1,18 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { add, degToRad, magnitude, radToDeg, scalarMultiply, sub } from "./math"
+import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, sub, vec2d } from "./math"
 
 export function updateSpaceObject(so: SpaceObject): void {
   so.position = add(so.position, so.velocity)
   so.velocity = add(so.velocity, so.acceleration)
+  so.acceleration = {x: 0, y: 0}
+  // so.velocity = limitv(so.velocity, {x: 0.1, y: 0.1})
+  so.acceleration = limitv(so.acceleration, {x: 0.005, y: 0.005})
+}
+
+export function updateSpaceObjects(sos: SpaceObject[]): void {
+  sos.forEach((so) => {
+    updateSpaceObject(so)
+  })
 }
 
 export function gravity(from: SpaceObject, to: SpaceObject, G: number = 1): void {
@@ -13,11 +22,16 @@ export function gravity(from: SpaceObject, to: SpaceObject, G: number = 1): void
   const r: number = magnitude(v01)
   const r2: number = Math.pow(r, 2)
   const F: number = G * ((m0 * m1) / r2)
-  const gvec: Vec2d = scalarMultiply(v01, F)
-  to.acceleration = gvec
+  const gvec: Vec2d = scalarMultiply(v01, F * 3)
+  to.acceleration = add(to.acceleration, gvec)
+  // to.acceleration = gvec
 }
 
-export function friction(so: SpaceObject, friction: number) {
+export function friction(so: SpaceObject) {
+  so.velocity = scalarMultiply(so.velocity, so.frictionFactor)
+}
+
+export function applyFriction(so: SpaceObject, friction: number) {
   so.velocity = scalarMultiply(so.velocity, friction)
 }
 

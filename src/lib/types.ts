@@ -35,4 +35,5 @@ export interface SpaceObject {
   didHit: boolean
   shotBlowFrame: number
   afterBurnerEnabled: boolean
+  frictionFactor: number
 }

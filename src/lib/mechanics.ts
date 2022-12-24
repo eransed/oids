@@ -1,5 +1,5 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { scalarMultiply, mirrorWrap, wrap, rndf, add, rndi, copy } from "./math"
+import { scalarMultiply, mirrorWrap, wrap, rndf, add, rndi, copy, degToRad } from "./math"
 import { randomGreen } from "./color"
 import { createSpaceObject } from "./utils"
 import { heading } from "./physics"
@@ -16,6 +16,20 @@ export function applyEngine(so: SpaceObject): number {
 
 export function applySteer(so: SpaceObject): number {
   return so.steeringPower
+}
+
+export function getThrustVector(so: SpaceObject, dirAng: number): Vec2d {
+  const angleRadians: number = degToRad(so.angleDegree + dirAng)
+  const engine: number = applyEngine(so)
+  return {
+    x: engine * Math.cos(angleRadians),
+    y: engine * Math.sin(angleRadians),
+  }
+}
+
+export function applyEngineThrust(so: SpaceObject, directionDeg: number): void {
+  so.velocity = add(so.velocity, getThrustVector(so, directionDeg))
+  // so.acceleration = add(so.acceleration, getThrustVector(so, directionDeg))
 }
 
 export function wrapSpaceObject(so: SpaceObject, screen: Vec2d) {

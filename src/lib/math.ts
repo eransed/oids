@@ -1,8 +1,7 @@
 import type { Vec2d } from "./types"
 
 export function vec2d(): Vec2d {
-  let v: Vec2d = { x: 0, y: 0 }
-  return v
+  return { x: 0, y: 0 }
 }
 
 export function copy(from: Vec2d): Vec2d {
@@ -46,6 +45,19 @@ export function rndi(min: number, max: number): number {
   min = Math.ceil(min)
   max = Math.floor(max)
   return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+export function rndfVec2d(min: number, max: number): Vec2d {
+  return { x: rndf(min, max), y: rndf(min, max) }
+}
+
+
+export function limit(n: number, max: number): number {
+  return (n >= Math.abs(max) ? max : n)
+}
+
+export function limitv(v: Vec2d, max: Vec2d): Vec2d {
+  return {x: limit(v.x, max.x), y: limit(v.y, max.y)}
 }
 
 export function wrap(vector: Vec2d, screen: Vec2d) {
