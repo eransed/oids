@@ -4,10 +4,25 @@ import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, sub, vec2d 
 export function updateSpaceObject(so: SpaceObject): void {
   so.position = add(so.position, so.velocity)
   so.velocity = add(so.velocity, so.acceleration)
+
+  // coolDown(so)
+  for (let shot of so.shotsInFlight) {
+    shot.position = add(shot.position, shot.velocity)
+    shot.velocity = add(shot.velocity, shot.acceleration)
+    shot.armedDelay--
+    // bounceSpaceObject(shot, screen, 1, 0, 0.7)
+    alignHeadingToVelocity(shot)
+    // handleHittingShot(shot, ctx)
+  }
+  // decayShots(so, screen)
+  // decayDeadShots(so)
+  // removeShotsAfterBounces(so, 2)
+
   so.acceleration = {x: 0, y: 0}
   // so.velocity = limitv(so.velocity, {x: 0.1, y: 0.1})
   so.acceleration = limitv(so.acceleration, {x: 0.005, y: 0.005})
 }
+
 
 export function updateSpaceObjects(sos: SpaceObject[]): void {
   sos.forEach((so) => {

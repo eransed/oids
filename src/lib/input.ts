@@ -1,6 +1,6 @@
 
 import type { SpaceObject } from "./types"
-import { applyEngineThrust, applySteer } from "./mechanics"
+import { applyEngineThrust, applySteer, fire } from "./mechanics"
 
 let upPressed: boolean = false
 let downPressed: boolean = false
@@ -44,14 +44,6 @@ function arrowControl(e: any, value: boolean) {
 export function spaceObjectKeyController(so: SpaceObject) {
   //so.afterBurnerEnabled = false
 
-  if (leftPressed) {
-    so.angleDegree -= applySteer(so)
-  }
-
-  if (rightPressed) {
-    so.angleDegree += applySteer(so)
-  }
-
   if (upPressed) {
     //so.afterBurnerEnabled = true
     applyEngineThrust(so, 0)
@@ -69,9 +61,17 @@ export function spaceObjectKeyController(so: SpaceObject) {
     applyEngineThrust(so, 90)
   }
 
-  //   if (spacePressed) {
-  //     fire(so)
-  //   }
+  if (leftPressed) {
+    so.angleDegree -= applySteer(so)
+  }
+
+  if (rightPressed) {
+    so.angleDegree += applySteer(so)
+  }
+
+  if (spacePressed) {
+    fire(so)
+  }
 }
 
 export function initKeyControllers(): void {

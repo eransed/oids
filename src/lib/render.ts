@@ -38,7 +38,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void
   ctx.lineWidth = 5
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
 
-  // hull
+  // Hull
   ctx.strokeStyle = so.colliding ? "#f00" : so.color
   ctx.fillStyle = so.colliding ? "#f00" : so.color
   ctx.moveTo(0, (-shipSize.y / 2) * scale)
@@ -46,7 +46,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void
   ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo(0, (-shipSize.y / 2) * scale)
 
-  // canons
+  // Canons
   const cannonWidth: number = 10
   const cannonStart: number = 15
   const cannonEnd: number = 40
@@ -56,13 +56,16 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void
   ctx.lineTo(-cannonWidth, -cannonEnd)
   ctx.stroke()
 
-  // tower
+  // Tower
   ctx.beginPath()
   ctx.arc(0, 20, 16, 0, Math.PI * 2)
   ctx.fill()
 
-  //Restore drawing
+  // Restore drawing
   ctx.restore()
+
+  // Draw shots
+  renderShot(so, ctx)
 }
 
 export function renderShot(so: SpaceObject, ctx: any) {

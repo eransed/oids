@@ -31,9 +31,9 @@ export function createSpaceObject(): SpaceObject {
     fuel: 50000,
     enginePower: 0.2,
     steeringPower: 2.5,
-    ammo: 10,
+    ammo: 50000,
     shotsInFlight: [],
-    missileSpeed: 5, // 30
+    missileSpeed: 20, // 30
     missileDamage: 10,
     canonCoolDown: 0,
     canonOverHeat: false,
