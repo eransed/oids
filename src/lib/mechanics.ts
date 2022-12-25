@@ -27,8 +27,8 @@ export function getThrustVector(so: SpaceObject, dirAng: number): Vec2d {
   }
 }
 
-export function applyEngineThrust(so: SpaceObject, directionDeg: number): void {
-  so.velocity = add(so.velocity, getThrustVector(so, directionDeg))
+export function applyEngineThrust(so: SpaceObject, directionDeg: number, boostFactor: number = 1): void {
+  so.velocity = add(so.velocity, scalarMultiply(getThrustVector(so, directionDeg), boostFactor))
   // so.acceleration = add(so.acceleration, getThrustVector(so, directionDeg))
 }
 

@@ -2,6 +2,7 @@
 import type { SpaceObject } from "./types"
 import { applyEngineThrust, applySteer, fire } from "./mechanics"
 
+let boost: boolean = false
 let upPressed: boolean = false
 let downPressed: boolean = false
 let rightPressed: boolean = false
@@ -39,10 +40,18 @@ function arrowControl(e: any, value: boolean) {
     // wtf code...
     spacePressed = value
   }
+  if (e.code === 'b') {
+    boost = value
+  }
 }
 
 export function spaceObjectKeyController(so: SpaceObject) {
   //so.afterBurnerEnabled = false
+
+  if (boost) {
+    //so.afterBurnerEnabled = true
+    applyEngineThrust(so, 0, 2)
+  }
 
   if (upPressed) {
     //so.afterBurnerEnabled = true
