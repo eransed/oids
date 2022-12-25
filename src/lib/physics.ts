@@ -1,7 +1,8 @@
 import type { SpaceObject, Vec2d } from "./types"
 import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, sub, vec2d } from "./math"
+import { getScreenFromCanvas } from "./utils"
 
-export function updateSpaceObject(so: SpaceObject): void {
+export function updateSpaceObject(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   so.position = add(so.position, so.velocity)
   so.velocity = add(so.velocity, so.acceleration)
 
@@ -9,25 +10,54 @@ export function updateSpaceObject(so: SpaceObject): void {
   for (let shot of so.shotsInFlight) {
     shot.position = add(shot.position, shot.velocity)
     shot.velocity = add(shot.velocity, shot.acceleration)
+    shot.acceleration = {x: 0, y: 0}
+
     shot.armedDelay--
     // bounceSpaceObject(shot, screen, 1, 0, 0.7)
     alignHeadingToVelocity(shot)
     // handleHittingShot(shot, ctx)
   }
-  // decayShots(so, screen)
+  decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), 1.5)
   // decayDeadShots(so)
   // removeShotsAfterBounces(so, 2)
 
   so.acceleration = {x: 0, y: 0}
   // so.velocity = limitv(so.velocity, {x: 0.1, y: 0.1})
-  so.acceleration = limitv(so.acceleration, {x: 0.005, y: 0.005})
+  // so.acceleration = limitv(so.acceleration, {x: 0.005, y: 0.005})
 }
 
-
-export function updateSpaceObjects(sos: SpaceObject[]): void {
+export function updateSpaceObjects(sos: SpaceObject[], ctx: CanvasRenderingContext2D): void {
   sos.forEach((so) => {
-    updateSpaceObject(so)
+    updateSpaceObject(so, ctx)
   })
+}
+
+export function decayOffScreenShots(so: SpaceObject, screen: Vec2d) {
+  so.shotsInFlight = so.shotsInFlight.filter(function (e) {
+    return !offScreen(e.position, screen)
+  })
+}
+
+export function decayOffScreenShotsPadded(so: SpaceObject, screen: Vec2d, padFac: number = 1) {
+  so.shotsInFlight = so.shotsInFlight.filter(function (e) {
+    return !offScreen_mm(e.position, scalarMultiply(screen, -padFac), scalarMultiply(screen, padFac))
+  })
+}
+
+export function offScreen(v: Vec2d, screen: Vec2d) {
+  if (v.x > screen.x) return true
+  if (v.x < 0) return true
+  if (v.y > screen.y) return true
+  if (v.y < 0) return true
+  return false
+}
+
+export function offScreen_mm(v: Vec2d, screen_min: Vec2d, screen_max: Vec2d) {
+  if (v.x > screen_max.x) return true
+  if (v.x < screen_min.x) return true
+  if (v.y > screen_max.y) return true
+  if (v.y < screen_min.y) return true
+  return false
 }
 
 export function gravity(from: SpaceObject, to: SpaceObject, G: number = 1): void {
@@ -39,7 +69,6 @@ export function gravity(from: SpaceObject, to: SpaceObject, G: number = 1): void
   const F: number = G * ((m0 * m1) / r2)
   const gvec: Vec2d = scalarMultiply(v01, F * 3)
   to.acceleration = add(to.acceleration, gvec)
-  // to.acceleration = gvec
 }
 
 export function friction(so: SpaceObject) {

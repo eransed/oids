@@ -38,6 +38,10 @@ export function wrapSpaceObject(so: SpaceObject, screen: Vec2d) {
   // mirrorWrap(so.position, screen)
 }
 
+export function decayDeadShots(so: SpaceObject) {
+  so.shotsInFlight = decayDeadSpaceObjects(so.shotsInFlight)
+}
+
 export function fire(so: SpaceObject) {
   if (so.ammo < 1) {
     console.log(so.name + " is out of ammo")
@@ -49,6 +53,7 @@ export function fire(so: SpaceObject) {
   so.canonCoolDown += so.canonHeatAddedPerShot
   so.ammo--
   let shot: SpaceObject = createSpaceObject()
+  shot.mass = 5
   shot.damage = so.missileDamage
   shot.size = { x: rndi(2, 3), y: rndi(30, 45) }
   shot.color = randomGreen()

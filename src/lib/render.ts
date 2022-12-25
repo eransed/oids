@@ -1,6 +1,7 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { round2dec } from "./math"
+import { round2dec, scalarMultiply } from "./math"
 import { canvasBackgroundColor } from "./constants"
+import { to_string } from "./utils"
 
 export function clearScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = canvasBackgroundColor
@@ -46,20 +47,29 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void
   ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo(0, (-shipSize.y / 2) * scale)
 
-  // Canons
-  const cannonWidth: number = 10
-  const cannonStart: number = 15
-  const cannonEnd: number = 40
-  ctx.moveTo(cannonWidth, cannonStart)
-  ctx.lineTo(cannonWidth, -cannonEnd)
-  ctx.moveTo(-cannonWidth, cannonStart)
-  ctx.lineTo(-cannonWidth, -cannonEnd)
+  // // Canons
+  // const cannonWidth: number = 10
+  // const cannonStart: number = 15
+  // const cannonEnd: number = 40
+  // ctx.moveTo(cannonWidth, cannonStart)
+  // ctx.lineTo(cannonWidth, -cannonEnd)
+  // ctx.moveTo(-cannonWidth, cannonStart)
+  // ctx.lineTo(-cannonWidth, -cannonEnd)
   ctx.stroke()
 
-  // Tower
-  ctx.beginPath()
-  ctx.arc(0, 20, 16, 0, Math.PI * 2)
-  ctx.fill()
+  // // Tower
+  // ctx.beginPath()
+  // ctx.arc(0, 20, 16, 0, Math.PI * 2)
+  // ctx.fill()
+
+  ctx.font = "30px courier"
+  ctx.fillStyle = "#ccc"
+  ctx.fillText("SIF: " + so.shotsInFlight.length, 40, -120)
+  ctx.fillText('P' + to_string(so.position), 40, -80)
+  ctx.fillText('V' + to_string(so.velocity, 2), 40, -40)
+  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1), 3), 40, 0)
+  ctx.fillText('-', 40, 40)
+  ctx.fillText('-', 40, 80)
 
   // Restore drawing
   ctx.restore()

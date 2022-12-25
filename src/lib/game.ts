@@ -1,7 +1,7 @@
 import type { SpaceObject } from "./types"
 
 import { initKeyControllers, spaceObjectKeyController } from "./input"
-import { wrapSpaceObject } from "./mechanics"
+import { fire, wrapSpaceObject } from "./mechanics"
 import { clearScreen, renderMoon, renderShip, renderVector } from "./render"
 import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from "./utils"
 import { friction, gravity, updateSpaceObject, updateSpaceObjects } from "./physics"
@@ -23,9 +23,9 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
 
   const bodies: SpaceObject[] = []
   bodies.push(moon)
-  bodies.push(star)
-  bodies.push(planet)
-  for (let n = 0; n < 3; n++) {
+  // bodies.push(star)
+  // bodies.push(planet)
+  for (let n = 0; n < 2; n++) {
     const s = createSpaceObject()
     s.color = randomBlue()
     s.mass = 4
@@ -38,15 +38,16 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
   planet.color = '#f88'
   star.color = '#fff'
 
-  star.frictionFactor = 0.1
+  // star.frictionFactor = 0.1
+  // moon.frictionFactor = 0.01
 
-  ship.mass = 0.4
+  ship.mass = 0.2
   moon.mass = 4
   planet.mass = 4
-  star.mass = 1
+  star.mass = 4
 
 
-  moon.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
+  moon.position = add(getScreenCenterPosition(ctx), rndfVec2d(-50, 50))
   ship.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
   star.position = add(getScreenCenterPosition(ctx), rndfVec2d(-20, 20))
   planet.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
@@ -75,7 +76,12 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
         }
       })
       gravity(body, ship)
-      gravity(ship, body)
+      // gravity(ship, body)
+
+      ship.shotsInFlight.forEach((shot) => {
+        gravity(body, shot)
+      })
+
       friction(body)
       wrapSpaceObject(body, getScreenRect(ctx))
     })
@@ -93,8 +99,8 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
     function update(time_ms: number): void {
       clearScreen(ctx)
       renderFrame(ctx)
-      updateSpaceObject(ship)
-      updateSpaceObjects(bodies)
+      updateSpaceObject(ship, ctx)
+      updateSpaceObjects(bodies, ctx)
       requestAnimationFrame(update)
       nextFrame(ctx)
     }
@@ -102,6 +108,9 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
     update(time_ms)
 
   }
+
+  ship.angleDegree = -120
+  for (let i = 0; i < 10; i++) {fire(ship)}
 
   renderLoop(ctx, renderFrame, nextFrame)
 }

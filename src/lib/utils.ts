@@ -1,5 +1,5 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { rndi, rndf, floor } from "./math"
+import { rndi, rndf, floor, round2dec } from "./math"
 import { scaleFactor, maxRandomDefaultSpaceObjectVelocity as maxVel, frictionFactor } from "./constants"
 
 export function createSpaceObject(): SpaceObject {
@@ -68,4 +68,12 @@ export function setCanvasSize(ctx: CanvasRenderingContext2D): void {
 
 export function getScreenCenterPosition(ctx: CanvasRenderingContext2D): Vec2d {
   return floor({ x: ctx.canvas.width/2, y: ctx.canvas.height/2 })
+}
+
+export function getScreenFromCanvas(ctx: CanvasRenderingContext2D): Vec2d {
+  return {x: ctx.canvas.width, y: ctx.canvas.height}
+}
+
+export function to_string(v: Vec2d, dec: number = 0): string {
+  return "(" + round2dec(v.x, dec) + ", " + round2dec(v.y, dec) + ")"
 }
