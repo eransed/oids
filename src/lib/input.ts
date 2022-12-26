@@ -36,11 +36,11 @@ function arrowControl(e: any, value: boolean) {
   if (e.key === "d") {
     rightStrafePressed = value
   }
-  if (e.code === "Space") {
+  if (e.code === "Space" || e.key === 'n') {
     // wtf code...
     spacePressed = value
   }
-  if (e.code === 'b') {
+  if (e.key === 'b') {
     boost = value
   }
 }
@@ -50,7 +50,7 @@ export function spaceObjectKeyController(so: SpaceObject) {
 
   if (boost) {
     //so.afterBurnerEnabled = true
-    applyEngineThrust(so, 0, 2)
+    applyEngineThrust(so, 0, 5)
   }
 
   if (upPressed) {
@@ -70,16 +70,18 @@ export function spaceObjectKeyController(so: SpaceObject) {
     applyEngineThrust(so, 90)
   }
 
-  if (leftPressed) {
-    so.angleDegree -= applySteer(so)
+  if (rightPressed) {
+    applySteer(so, 1)
   }
 
-  if (rightPressed) {
-    so.angleDegree += applySteer(so)
+  if (leftPressed) {
+    applySteer(so, -1)
   }
 
   if (spacePressed) {
-    fire(so)
+    for(let i = 0; i < 2; i++) {
+      fire(so)
+    }
   }
 }
 

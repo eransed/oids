@@ -1,5 +1,5 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { round2dec, scalarMultiply } from "./math"
+import { add, magnitude, rndi, round2dec, scalarMultiply } from "./math"
 import { canvasBackgroundColor } from "./constants"
 import { to_string } from "./utils"
 
@@ -68,14 +68,49 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void
   ctx.fillText('P' + to_string(so.position), 40, -80)
   ctx.fillText('V' + to_string(so.velocity, 2), 40, -40)
   ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1), 3), 40, 0)
-  ctx.fillText('-', 40, 40)
-  ctx.fillText('-', 40, 80)
+  ctx.fillText(so.health + 'hp', 40, 40)
+  ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', 40, 80)
 
   // Restore drawing
   ctx.restore()
 
   // Draw shots
   renderShot(so, ctx)
+}
+
+export function renderExplosionFrame(pos: Vec2d, ctx: any) {
+  let offset: number = 7
+  let minSize: number = 1
+  let maxSize: number = 14
+  ctx.save()
+  ctx.translate(pos.x, pos.y)
+  for (let c of [
+    "#ff0",
+    "#f00",
+    "#ee0",
+    "#e00",
+    "#dd0",
+    "#d00",
+    "#008",
+    "#000",
+    "#444",
+    "#fee",
+    "#f66,",
+    "#f99",
+    "#fbb",
+  ]) {
+    let center = add(
+      { x: 0, y: 0 },
+      { x: rndi(-offset, offset), y: rndi(-offset, offset) }
+    )
+    let size = add(
+      { x: 0, y: 0 },
+      { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) }
+    )
+    ctx.fillStyle = c
+    ctx.fillRect(center.x, center.y, size.x, size.y)
+  }
+  ctx.restore()
 }
 
 export function renderShot(so: SpaceObject, ctx: any) {

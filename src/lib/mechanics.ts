@@ -3,6 +3,7 @@ import { scalarMultiply, mirrorWrap, wrap, rndf, add, rndi, copy, degToRad } fro
 import { randomGreen } from "./color"
 import { createSpaceObject } from "./utils"
 import { heading } from "./physics"
+import { renderExplosionFrame } from "./render"
 
 export function applyEngine(so: SpaceObject): number {
   if (so.fuel > 0) {
@@ -14,8 +15,8 @@ export function applyEngine(so: SpaceObject): number {
   return 0
 }
 
-export function applySteer(so: SpaceObject): number {
-  return so.steeringPower
+export function applySteer(so: SpaceObject, dir: number): void {
+  so.angleDegree += dir * so.steeringPower
 }
 
 export function getThrustVector(so: SpaceObject, dirAng: number): Vec2d {
@@ -55,12 +56,12 @@ export function fire(so: SpaceObject) {
   let shot: SpaceObject = createSpaceObject()
   shot.mass = 5
   shot.damage = so.missileDamage
-  shot.size = { x: rndi(2, 3), y: rndi(30, 45) }
+  shot.size = { x: rndi(3, 4), y: rndi(18, 24) }
   shot.color = randomGreen()
   let head: Vec2d = copy(so.position)
-  const aimError = 8
-  const headError = 0.019
-  const speedError = 1.8
+  const aimError = 4 // 8
+  const headError = 0.001 // 0.019
+  const speedError = 1.1 // 1.8
 
   head = add(head, scalarMultiply(heading(so), 15))
 
@@ -84,7 +85,18 @@ export function fire(so: SpaceObject) {
   so.shotsInFlight.push(shot)
 }
 
-export function ofScreen(v: Vec2d, screen: Vec2d) {
+export function handleHittingShot(shot: SpaceObject, ctx: any) {
+  if (shot.didHit) {
+    shot.shotBlowFrame--
+    shot.velocity = scalarMultiply(shot.velocity, -0.8)
+    renderExplosionFrame(shot.position, ctx)
+    if (shot.shotBlowFrame < 0) {
+      shot.health = 0
+    }
+  }
+}
+
+export function offScreen(v: Vec2d, screen: Vec2d) {
   if (v.x > screen.x) return true
   if (v.x < 0) return true
   if (v.y > screen.y) return true

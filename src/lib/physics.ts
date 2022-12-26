@@ -1,27 +1,16 @@
 import type { SpaceObject, Vec2d } from "./types"
-import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, sub, vec2d } from "./math"
+import { add, degToRad, magnitude, radToDeg, rndi, scalarMultiply, sub } from "./math"
 import { getScreenFromCanvas } from "./utils"
+import { renderExplosionFrame } from "./render"
+import { decayDeadShots, handleHittingShot } from "./mechanics"
 
 export function updateSpaceObject(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   so.position = add(so.position, so.velocity)
   so.velocity = add(so.velocity, so.acceleration)
-
-  // coolDown(so)
-  for (let shot of so.shotsInFlight) {
-    shot.position = add(shot.position, shot.velocity)
-    shot.velocity = add(shot.velocity, shot.acceleration)
-    shot.acceleration = {x: 0, y: 0}
-
-    shot.armedDelay--
-    // bounceSpaceObject(shot, screen, 1, 0, 0.7)
-    alignHeadingToVelocity(shot)
-    // handleHittingShot(shot, ctx)
-  }
-  decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), 1.5)
-  // decayDeadShots(so)
-  // removeShotsAfterBounces(so, 2)
-
   so.acceleration = {x: 0, y: 0}
+
+  updateShots(so, ctx)
+
   // so.velocity = limitv(so.velocity, {x: 0.1, y: 0.1})
   // so.acceleration = limitv(so.acceleration, {x: 0.005, y: 0.005})
 }
@@ -30,6 +19,24 @@ export function updateSpaceObjects(sos: SpaceObject[], ctx: CanvasRenderingConte
   sos.forEach((so) => {
     updateSpaceObject(so, ctx)
   })
+}
+
+export function updateShots(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+  decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), 1.2)
+  decayDeadShots(so)
+
+  // coolDown(so)
+  for (let shot of so.shotsInFlight) {
+    shot.position = add(shot.position, shot.velocity)
+    shot.velocity = add(shot.velocity, shot.acceleration)
+    shot.acceleration = {x: 0, y: 0}
+    shot.armedDelay--
+    alignHeadingToVelocity(shot)
+
+    // bounceSpaceObject(shot, screen, 1, 0, 0.7)
+    handleHittingShot(shot, ctx)
+  }
+  // removeShotsAfterBounces(so, 2)
 }
 
 export function decayOffScreenShots(so: SpaceObject, screen: Vec2d) {
@@ -107,4 +114,79 @@ export function isColliding(so0: SpaceObject, so1: SpaceObject): boolean {
     return true
   }
   return false
+}
+
+
+export function edgeBounceSpaceObject(
+  so: SpaceObject,
+  screen: Vec2d,
+  energyFactor: number = 1,
+  gap: number = 1,
+  damageDeltaFactor: number
+) {
+  if (so.position.x < gap) {
+    so.velocity.x = -so.velocity.x * energyFactor
+    so.position.x = gap
+    so.bounceCount++
+    so.damage = so.damage * damageDeltaFactor
+  }
+  if (so.position.x >= screen.x) {
+    so.velocity.x = -so.velocity.x * energyFactor
+    so.position.x = screen.x - gap
+    so.bounceCount++
+    so.damage = so.damage * damageDeltaFactor
+  }
+  if (so.position.y < gap) {
+    so.velocity.y = -so.velocity.y * energyFactor
+    so.position.y = gap
+    so.bounceCount++
+    so.damage = so.damage * damageDeltaFactor
+  }
+  if (so.position.y >= screen.y) {
+    so.velocity.y = -so.velocity.y * energyFactor
+    so.position.y = screen.y - gap
+    so.bounceCount++
+    so.damage = so.damage * damageDeltaFactor
+  }
+}
+
+
+export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D) {
+  resetCollisions(spaceObjects)
+  for (let so0 of spaceObjects) {
+    for (let so1 of spaceObjects) {
+      if (isColliding(so0, so1) && so0.name !== so1.name) {
+        so0.colliding = true
+        so1.colliding = true
+        so0.collidingWith.push(so1)
+        so1.collidingWith.push(so0)
+        so0.health -= 25
+        so1.health -= 25
+        renderExplosionFrame(so0.position, ctx)
+        renderExplosionFrame(so1.position, ctx)
+      }
+      for (let shot of so0.shotsInFlight) {
+        if (shot.armedDelay < 0) {
+          const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), 6)
+          if (isColliding(shot, so0) && shot.didHit === false) {
+            so0.health -= shot.damage
+            so0.position = add(so0.position, heading)
+            shot.didHit = true
+          }
+          if (isColliding(shot, so1) && shot.didHit === false) {
+            so1.health -= shot.damage
+            so1.position = add(so1.position, heading)
+            shot.didHit = true
+          }
+        }
+      }
+    }
+  }
+}
+
+export function resetCollisions(spaceObjects: SpaceObject[]) {
+  for (let so of spaceObjects) {
+    so.colliding = false
+    so.collidingWith = []
+  }
 }

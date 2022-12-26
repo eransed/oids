@@ -51,7 +51,6 @@ export function rndfVec2d(min: number, max: number): Vec2d {
   return { x: rndf(min, max), y: rndf(min, max) }
 }
 
-
 export function limit(n: number, max: number): number {
   return (n >= Math.abs(max) ? max : n)
 }
