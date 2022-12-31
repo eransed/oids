@@ -1,13 +1,36 @@
 import type { SpaceObject, Vec2d } from "./types"
 import { add, magnitude, rndi, round2dec, scalarMultiply } from "./math"
-import { canvasBackgroundColor } from "./constants"
-import { to_string } from "./utils"
+import { canvasBackgroundColor, timeDuration } from "./constants"
+import { getScreenFromCanvas, to_string } from "./utils"
 
 export function clearScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = canvasBackgroundColor
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
 
+export function renderFrameInfo(fps: number, frameTimeMs: number, ctx: CanvasRenderingContext2D) {
+  const xpos: number = 25
+  ctx.font = "bold 40px courier"
+  ctx.fillStyle = "#ccc"
+  ctx.fillText('FPS: ' + fps, xpos, 50)
+  ctx.fillText('DT:  ' +  frameTimeMs + 'ms', xpos, 100)
+  ctx.fillText('DTS: ' +  frameTimeMs * timeDuration, xpos, 150)
+}
+
+export function renderSpaceObjectStatusBar(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+  const screen: Vec2d = getScreenFromCanvas(ctx)
+  const ypos: number = screen.y - 20
+  const offset: number = 600
+  ctx.font = 'bold 40px courier'
+  ctx.fillStyle = '#ccc'
+  ctx.fillText("SIF: " + so.shotsInFlight.length, 25 + offset * 0, ypos)
+  ctx.fillText(so.health + 'hp', 25 + offset * 0.5, ypos)
+  ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', 25 + offset * 0.9, ypos)
+  ctx.fillText('P' + to_string(so.position, 0), 25 + offset * 1.5, ypos)
+  ctx.fillText('V' + to_string(so.velocity, 1), 25 + offset * 2.2, ypos)
+  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), 25 + offset * 2.9, ypos)
+  console.log()
+}
 
 export function renderVector(
   v: Vec2d,
@@ -62,14 +85,14 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void
   // ctx.arc(0, 20, 16, 0, Math.PI * 2)
   // ctx.fill()
 
-  ctx.font = "30px courier"
-  ctx.fillStyle = "#ccc"
-  ctx.fillText("SIF: " + so.shotsInFlight.length, 40, -120)
-  ctx.fillText('P' + to_string(so.position), 40, -80)
-  ctx.fillText('V' + to_string(so.velocity, 2), 40, -40)
-  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1), 3), 40, 0)
-  ctx.fillText(so.health + 'hp', 40, 40)
-  ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', 40, 80)
+  // ctx.font = "30px courier"
+  // ctx.fillStyle = "#ccc"
+  // ctx.fillText("SIF: " + so.shotsInFlight.length, 40, -120)
+  // ctx.fillText('P' + to_string(so.position), 40, -80)
+  // ctx.fillText('V' + to_string(so.velocity, 2), 40, -40)
+  // ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1), 3), 40, 0)
+  // ctx.fillText(so.health + 'hp', 40, 40)
+  // ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', 40, 80)
 
   // Restore drawing
   ctx.restore()

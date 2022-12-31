@@ -3,21 +3,23 @@ import { add, degToRad, magnitude, radToDeg, rndi, scalarMultiply, sub } from ".
 import { getScreenFromCanvas } from "./utils"
 import { renderExplosionFrame } from "./render"
 import { decayDeadShots, handleHittingShot } from "./mechanics"
+import { timeDuration } from "./constants"
 
-export function updateSpaceObject(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
-  so.position = add(so.position, so.velocity)
-  so.velocity = add(so.velocity, so.acceleration)
+export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
+  // If assigning nan to so.velocity, position or acceleration it will stay nan for ever
+  if (isNaN(dt)) return
+  const deltaTime: number = dt * timeDuration
+  const v: Vec2d = scalarMultiply(so.velocity, deltaTime)
+  const a: Vec2d = scalarMultiply(so.acceleration, deltaTime)
+  so.velocity = add(so.velocity, a)
+  so.position = add(so.position, v)
   so.acceleration = {x: 0, y: 0}
-
   updateShots(so, ctx)
-
-  // so.velocity = limitv(so.velocity, {x: 0.1, y: 0.1})
-  // so.acceleration = limitv(so.acceleration, {x: 0.005, y: 0.005})
 }
 
-export function updateSpaceObjects(sos: SpaceObject[], ctx: CanvasRenderingContext2D): void {
+export function updateSpaceObjects(sos: SpaceObject[], frameTimeMs: number, ctx: CanvasRenderingContext2D): void {
   sos.forEach((so) => {
-    updateSpaceObject(so, ctx)
+    updateSpaceObject(so, frameTimeMs, ctx)
   })
 }
 
@@ -68,13 +70,14 @@ export function offScreen_mm(v: Vec2d, screen_min: Vec2d, screen_max: Vec2d) {
 }
 
 export function gravity(from: SpaceObject, to: SpaceObject, G: number = 1): void {
+  // F = G((m0 * m1)/r^2)
   const m0: number = from.mass
   const m1: number = to.mass
   const v01: Vec2d = sub(from.position, to.position)
   const r: number = magnitude(v01)
   const r2: number = Math.pow(r, 2)
   const F: number = G * ((m0 * m1) / r2)
-  const gvec: Vec2d = scalarMultiply(v01, F * 3)
+  const gvec: Vec2d = scalarMultiply(v01, F)
   to.acceleration = add(to.acceleration, gvec)
 }
 
@@ -160,22 +163,22 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
         so1.colliding = true
         so0.collidingWith.push(so1)
         so1.collidingWith.push(so0)
-        so0.health -= 25
-        so1.health -= 25
+        so0.health -= 250
+        so1.health -= 250
         renderExplosionFrame(so0.position, ctx)
         renderExplosionFrame(so1.position, ctx)
       }
       for (let shot of so0.shotsInFlight) {
         if (shot.armedDelay < 0) {
-          const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), 6)
+          const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), 0.1)
           if (isColliding(shot, so0) && shot.didHit === false) {
             so0.health -= shot.damage
-            so0.position = add(so0.position, heading)
+            so0.velocity = add(so0.velocity, heading)
             shot.didHit = true
           }
           if (isColliding(shot, so1) && shot.didHit === false) {
             so1.health -= shot.damage
-            so1.position = add(so1.position, heading)
+            so1.velocity = add(so1.velocity, heading)
             shot.didHit = true
           }
         }

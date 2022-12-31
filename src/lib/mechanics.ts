@@ -63,7 +63,7 @@ export function fire(so: SpaceObject) {
   const headError = 0.001 // 0.019
   const speedError = 1.1 // 1.8
 
-  head = add(head, scalarMultiply(heading(so), 15))
+  head = add(head, scalarMultiply(heading(so), 0))
 
   head = add(head, {
     x: rndi(-aimError, aimError),
