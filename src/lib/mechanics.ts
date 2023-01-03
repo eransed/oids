@@ -6,10 +6,11 @@ import { getHeading } from "./physics"
 import { renderExplosionFrame } from "./render"
 import type { Steerable } from "./traits/Steerable"
 
-export function applyEngine(so: Thrustable): number {
+export function applyEngine(so: Thrustable, boost: number): number {
+  const consumption: number = so.enginePower * boost
   if (so.fuel > 0) {
-    so.fuel -= so.enginePower
-    return so.enginePower
+    so.fuel -= consumption
+    return consumption
   }
   so.fuel = 0
   return 0
@@ -20,9 +21,9 @@ export function applySteer(so: Steerable, dir: number): void {
   // so.angularVelocity += dir * so.steeringPower
 }
 
-export function getThrustVector(so: Thrustable & Steerable, dirAng: number): Vec2d {
+export function getThrustVector(so: Thrustable & Steerable, dirAng: number, boost: number): Vec2d {
   const angleRadians: number = degToRad(so.angleDegree + dirAng)
-  const engine: number = applyEngine(so)
+  const engine: number = applyEngine(so, boost)
   return {
     x: engine * Math.cos(angleRadians),
     y: engine * Math.sin(angleRadians),
@@ -30,7 +31,7 @@ export function getThrustVector(so: Thrustable & Steerable, dirAng: number): Vec
 }
 
 export function applyEngineThrust(so: Thrustable & Steerable, directionDeg: number, boostFactor: number = 1): void {
-  so.velocity = add(so.velocity, scalarMultiply(getThrustVector(so, directionDeg), boostFactor))
+  so.velocity = add(so.velocity, getThrustVector(so, directionDeg, boostFactor))
   // so.acceleration = add(so.acceleration, getThrustVector(so, directionDeg))
 }
 

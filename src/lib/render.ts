@@ -41,6 +41,8 @@ export function renderSpaceObjectStatusBar(so: SpaceObject, ctx: CanvasRendering
   renderProgressBar({x: 25 + offset * 4.5, y: ypos - 120}, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
   renderProgressBar({x: 25 + offset * 4.5, y: ypos - 190}, 'Ammo', so.ammo, 50000, ctx, 5000)
   renderProgressBar({x: 25 + offset * 4.5, y: ypos - 260}, 'Speed', magnitude(so.velocity), 20, ctx, -15)
+  renderProgressBar({x: 25 + offset * 4.5, y: ypos - 330}, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
+  renderProgressBar({x: 25 + offset * 4.5, y: ypos - 400}, 'Fuel', so.fuel, 5000, ctx, 500)
 }
 
 export function renderVector(

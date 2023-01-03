@@ -8,8 +8,13 @@ import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObje
 import { add, rndfVec2d, round2dec } from "./math"
 import { randomBlue, randomGreen } from "./color"
 import { fpsCounter, getFrameTimeMs } from "./time"
+import { test } from "./test"
 
 export function oids_game(ctx: CanvasRenderingContext2D) {
+
+  if (!test()) {
+    return
+  }
 
   console.log('Starting oids...')
   setCanvasSize(ctx)

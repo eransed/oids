@@ -28,7 +28,7 @@ export function createSpaceObject(): SpaceObject {
     angularVelocity: 0,
     health: 100,
     killCount: 0,
-    fuel: 50000,
+    fuel: 5000,
     enginePower: 0.2,
     steeringPower: 2.5,
     ammo: 25000,

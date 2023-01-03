@@ -6,4 +6,4 @@ export const linearFriction: Vec2d = {x: 0.996, y: 0.99}
 export const angularFriction: number = 0.995
 export const canvasBackgroundColor: string = '#000'
 export const maxRandomDefaultSpaceObjectVelocity: number = 1
-export const timeScale: number = 0.08
+export const timeScale: number = 0.09

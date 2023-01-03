@@ -1,6 +1,7 @@
 import type { Vec2d } from "../types"
 import { angularFriction, linearFriction, timeScale } from "../constants"
 import { sub, magnitude, scalarMultiply, add, smul, degToRad, radToDeg, withinBounds, limitv } from "../math"
+import type { Testable, TestFunction, TestModule } from "./Testable"
 
 export interface Positionable {
   position: Vec2d
@@ -10,7 +11,7 @@ export interface Sizeable {
   size: Vec2d
 }
 
-export class Physical implements Positionable {
+export class Physical implements Positionable, Testable {
   mass: number = 1
   size: Vec2d = {x: 10, y: 10}
   position: Vec2d = {x: 0, y: 0}
@@ -22,6 +23,7 @@ export class Physical implements Positionable {
   constructor() {
 
   }
+
 
   update(deltaTime: number): void {
     if (isNaN(deltaTime)) {
@@ -70,4 +72,22 @@ export class Physical implements Positionable {
     attractee.acceleration = add(attractee.acceleration, gvec)
   }
 
+  testUpdate(): boolean {
+    return true
+  }
+
+  testOnScreen(): boolean {
+    return true
+  }
+
+  getTestModule(): TestModule {
+    return {
+      name: 'Physical',
+      moduleTestFunctions: [
+        {desc: 'Test of the Physical.update method', func: this.testUpdate},
+        {desc: 'Test of the Physical.onScreen method', func: this.testOnScreen},
+      ],
+    }
+  }
+ 
 }
