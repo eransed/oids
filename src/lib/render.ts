@@ -1,7 +1,7 @@
 import type { SpaceObject, Vec2d } from "./types"
 import { add, magnitude, rndi, round2dec, scalarMultiply } from "./math"
-import { canvasBackgroundColor, timeDuration } from "./constants"
-import { getScreenFromCanvas, to_string } from "./utils"
+import { canvasBackgroundColor, frontVersion, screenScale, timeScale } from "./constants"
+import { getScreenFromCanvas, getScreenRect, to_string } from "./utils"
 
 export function clearScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = canvasBackgroundColor
@@ -10,11 +10,18 @@ export function clearScreen(ctx: CanvasRenderingContext2D) {
 
 export function renderFrameInfo(fps: number, frameTimeMs: number, ctx: CanvasRenderingContext2D) {
   const xpos: number = 25
+  const dec: number = 1
+  const screen: Vec2d = getScreenRect(ctx)
+  const ratio: number = round2dec(screen.x/screen.y, 2)
   ctx.font = "bold 40px courier"
   ctx.fillStyle = "#ccc"
-  ctx.fillText('FPS: ' + fps, xpos, 50)
-  ctx.fillText('DT:  ' +  frameTimeMs + 'ms', xpos, 100)
-  ctx.fillText('DTS: ' +  frameTimeMs * timeDuration, xpos, 150)
+  ctx.fillText('FPS: ' + round2dec(fps, dec), xpos, 50)
+  ctx.fillText('DT:  ' +  round2dec(frameTimeMs, dec) + 'ms', xpos, 100)
+  ctx.fillText('DTS: ' +  round2dec(frameTimeMs * timeScale, dec), xpos, 150)
+  ctx.fillText('RES: ' +  screen.x + 'x' + screen.y + ' (x' + screenScale + ', ' + ratio + ')', xpos, 200)
+  renderProgressBar({x: xpos, y: 250}, 'Load', frameTimeMs, 50, ctx, -40)
+  ctx.fillStyle = "#444"
+  ctx.fillText('' + frontVersion, screen.x - (frontVersion.length * 27), 50)
 }
 
 export function renderSpaceObjectStatusBar(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
@@ -23,13 +30,17 @@ export function renderSpaceObjectStatusBar(so: SpaceObject, ctx: CanvasRendering
   const offset: number = 600
   ctx.font = 'bold 40px courier'
   ctx.fillStyle = '#ccc'
-  ctx.fillText("SIF: " + so.shotsInFlight.length, 25 + offset * 0, ypos)
+  ctx.fillText('SIF: ' + so.shotsInFlight.length, 25 + offset * 0, ypos)
   ctx.fillText(so.health + 'hp', 25 + offset * 0.5, ypos)
-  ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', 25 + offset * 0.9, ypos)
-  ctx.fillText('P' + to_string(so.position, 0), 25 + offset * 1.5, ypos)
-  ctx.fillText('V' + to_string(so.velocity, 1), 25 + offset * 2.2, ypos)
-  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), 25 + offset * 2.9, ypos)
-  console.log()
+  ctx.fillText('Ammo: ' + so.ammo, 25 + offset * 0.9, ypos)
+  ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', 25 + offset * 1.5, ypos)
+  ctx.fillText('P' + to_string(so.position, 0), 25 + offset * 2.1, ypos)
+  ctx.fillText('V' + to_string(so.velocity, 1), 25 + offset * 2.8, ypos)
+  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), 25 + offset * 3.5, ypos)
+  renderProgressBar({x: 25 + offset * 4.5, y: ypos - 50}, 'Health',  so.health, 1200, ctx, 200)
+  renderProgressBar({x: 25 + offset * 4.5, y: ypos - 120}, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
+  renderProgressBar({x: 25 + offset * 4.5, y: ypos - 190}, 'Ammo', so.ammo, 50000, ctx, 5000)
+  renderProgressBar({x: 25 + offset * 4.5, y: ypos - 260}, 'Speed', magnitude(so.velocity), 20, ctx, -15)
 }
 
 export function renderVector(
@@ -166,5 +177,45 @@ export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void 
   ctx.fillStyle = s.color
   ctx.arc(0, 0, 20, 0, Math.PI * 2, false)
   ctx.fill();
+  ctx.restore()
+}
+
+export function renderProgressBar(pos: Vec2d, label: string, amount: number, max: number, ctx: CanvasRenderingContext2D, redLevel: number = 60): void {
+  ctx.save()
+  ctx.translate(pos.x, pos.y)
+  const linew: number = 8
+  const w: number = 500
+  const h: number = 50
+  ctx.lineWidth = linew
+  ctx.strokeStyle = '#fff'
+  ctx.fillStyle = '#fff'
+  
+  if (amount < redLevel || (redLevel < 0 && amount > Math.abs(redLevel))) {
+    ctx.fillStyle = '#f22'
+    
+  } else if (redLevel < 0 && amount < Math.abs(redLevel)) {
+    ctx.fillStyle = '#2f2'
+  }
+  const percent: string = round2dec(100*amount/max, 0) + '%'
+  
+  if (amount < 0) {
+    amount = 0
+  }
+  
+  let p: number = (w*amount/max) - linew
+  if (p < 0) p = 0
+  if (p > w) {
+    ctx.fillStyle = '#f22'
+  }
+  
+  ctx.strokeRect(0, 0, w, h)
+
+  ctx.fillRect(Math.floor(linew/2), Math.floor(linew/2), p, h - linew)
+
+  ctx.font = 'bold 30px courier'
+  ctx.fillStyle = '#35f'
+  ctx.fillText(percent, w/2 - 10*percent.length, linew + Math.floor(h/2) + 1)
+  ctx.fillText(label, linew*2, linew + Math.floor(h/2) + 1)
+
   ctx.restore()
 }

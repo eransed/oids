@@ -9,21 +9,28 @@ export function copy(from: Vec2d): Vec2d {
 }
 
 export function add(to: Vec2d, from: Vec2d): Vec2d {
-  let tmp: Vec2d = copy(to)
+  const tmp: Vec2d = copy(to)
   tmp.x += from.x
   tmp.y += from.y
   return tmp
 }
 
 export function sub(to: Vec2d, from: Vec2d): Vec2d {
-  let tmp: Vec2d = copy(to)
+  const tmp: Vec2d = copy(to)
   tmp.x -= from.x
   tmp.y -= from.y
   return tmp
 }
 
+export function mul(to: Vec2d, from: Vec2d): Vec2d {
+  const tmp: Vec2d = copy(from)
+  tmp.x = to.x * from.x
+  tmp.y = to.y * from.y
+  return tmp
+}
+
 export function round(v: Vec2d, decimals: number): Vec2d {
-  let tmp = copy(v)
+  const tmp = copy(v)
   tmp.x = round2dec(tmp.x, decimals)
   tmp.y = round2dec(tmp.y, decimals)
   return tmp
@@ -99,7 +106,14 @@ export function round2dec(num: number, dec: number = 2): number {
 }
 
 export function scalarMultiply(v: Vec2d, s: number): Vec2d {
-  let tmp: Vec2d = copy(v)
+  const tmp: Vec2d = copy(v)
+  tmp.x *= s
+  tmp.y *= s
+  return tmp
+}
+
+export function smul(v: Vec2d, s: number): Vec2d {
+  const tmp: Vec2d = copy(v)
   tmp.x *= s
   tmp.y *= s
   return tmp
@@ -111,4 +125,12 @@ export function degToRad(deg: number): number {
 
 export function radToDeg(rad: number): number {
   return rad * (180 / Math.PI)
+}
+
+export function withinBounds(v: Vec2d, maxBound: Vec2d, minBound: Vec2d = {x: 0, y: 0}) {
+  if (v.x > minBound.x) return false
+  if (v.x < maxBound.x) return false
+  if (v.y > minBound.y) return false
+  if (v.y < maxBound.y) return false
+  return true
 }

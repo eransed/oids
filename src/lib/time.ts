@@ -1,5 +1,7 @@
 import { round2dec } from "./math"
 import { renderFrameInfo } from "./render"
+import type { Vec2d } from "./types"
+import { getScreenRect } from "./utils"
 
 const fps_list_max_entries: number = 12
 let prevTimestamp: number

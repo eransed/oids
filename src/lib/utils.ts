@@ -1,6 +1,6 @@
-import type { SpaceObject, Vec2d } from "./types"
+import type {SpaceObject, Vec2d } from "./types"
 import { rndi, rndf, floor, round2dec } from "./math"
-import { scaleFactor, maxRandomDefaultSpaceObjectVelocity as maxVel, frictionFactor } from "./constants"
+import { screenScale, maxRandomDefaultSpaceObjectVelocity as maxVel, linearFriction } from "./constants"
 
 export function createSpaceObject(): SpaceObject {
 
@@ -17,7 +17,6 @@ export function createSpaceObject(): SpaceObject {
   // }
 
   const spaceObject: SpaceObject = {
-    lastPosition: initPos,
     mass: 1,
     size: { x: 24, y: 24 },
     color: "#fff",
@@ -26,20 +25,20 @@ export function createSpaceObject(): SpaceObject {
     acceleration: { x: 0, y: 0 },
     name: "SpaceObject",
     angleDegree: -90,
+    angularVelocity: 0,
     health: 100,
     killCount: 0,
     fuel: 50000,
     enginePower: 0.2,
     steeringPower: 2.5,
-    ammo: 50000,
+    ammo: 25000,
     shotsInFlight: [],
-    missileSpeed: 20, // 30
+    missileSpeed: 20,
     missileDamage: 10,
     canonCoolDown: 0,
     canonOverHeat: false,
     canonHeatAddedPerShot: 25,
     canonCoolDownSpeed: 8,
-    shieldPower: 100,
     colliding: false,
     collidingWith: [],
     damage: 5,
@@ -47,8 +46,9 @@ export function createSpaceObject(): SpaceObject {
     bounceCount: 0,
     didHit: false,
     shotBlowFrame: 16,
-    afterBurnerEnabled: false,
-    frictionFactor: frictionFactor,
+    steer: function (direction: number, deltaTime: number): void {
+      throw new Error("Function not implemented.")
+    }
   }
 
   return spaceObject
@@ -61,8 +61,8 @@ export const getScreenRect = (ctx: CanvasRenderingContext2D): Vec2d => {
 export function setCanvasSize(ctx: CanvasRenderingContext2D): void {
   const vw: number = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
   const vh: number = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
-  ctx.canvas.width = vw * scaleFactor
-  ctx.canvas.height = vh * scaleFactor
+  ctx.canvas.width = vw * screenScale
+  ctx.canvas.height = vh * screenScale
   console.log({ vw, vh })
 }
 

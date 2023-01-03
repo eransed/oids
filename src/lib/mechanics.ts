@@ -1,25 +1,26 @@
-import type { SpaceObject, Vec2d } from "./types"
+import type { Bounceable, Damageable, Damager, Fireable, Physical, Positionable, SpaceObject, Thrustable, Vec2d } from "./types"
 import { scalarMultiply, mirrorWrap, wrap, rndf, add, rndi, copy, degToRad } from "./math"
 import { randomGreen } from "./color"
 import { createSpaceObject } from "./utils"
-import { heading } from "./physics"
+import { getHeading } from "./physics"
 import { renderExplosionFrame } from "./render"
+import type { Steerable } from "./traits/Steerable"
 
-export function applyEngine(so: SpaceObject): number {
+export function applyEngine(so: Thrustable): number {
   if (so.fuel > 0) {
     so.fuel -= so.enginePower
     return so.enginePower
   }
   so.fuel = 0
-  console.log(so.name + " has no more fuel!", so)
   return 0
 }
 
-export function applySteer(so: SpaceObject, dir: number): void {
+export function applySteer(so: Steerable, dir: number): void {
   so.angleDegree += dir * so.steeringPower
+  // so.angularVelocity += dir * so.steeringPower
 }
 
-export function getThrustVector(so: SpaceObject, dirAng: number): Vec2d {
+export function getThrustVector(so: Thrustable & Steerable, dirAng: number): Vec2d {
   const angleRadians: number = degToRad(so.angleDegree + dirAng)
   const engine: number = applyEngine(so)
   return {
@@ -28,24 +29,23 @@ export function getThrustVector(so: SpaceObject, dirAng: number): Vec2d {
   }
 }
 
-export function applyEngineThrust(so: SpaceObject, directionDeg: number, boostFactor: number = 1): void {
+export function applyEngineThrust(so: Thrustable & Steerable, directionDeg: number, boostFactor: number = 1): void {
   so.velocity = add(so.velocity, scalarMultiply(getThrustVector(so, directionDeg), boostFactor))
   // so.acceleration = add(so.acceleration, getThrustVector(so, directionDeg))
 }
 
-export function wrapSpaceObject(so: SpaceObject, screen: Vec2d) {
+export function wrapSpaceObject(so: Positionable, screen: Vec2d): void {
   // To do: Make it appear where it entered...
   wrap(so.position, screen)
   // mirrorWrap(so.position, screen)
 }
 
 export function decayDeadShots(so: SpaceObject) {
-  so.shotsInFlight = decayDeadSpaceObjects(so.shotsInFlight)
+  so.shotsInFlight = <SpaceObject[]> decayDeadSpaceObjects(so.shotsInFlight)
 }
 
-export function fire(so: SpaceObject) {
+export function fire(so: SpaceObject): void {
   if (so.ammo < 1) {
-    console.log(so.name + " is out of ammo")
     return
   }
   if (so.canonOverHeat) {
@@ -54,7 +54,8 @@ export function fire(so: SpaceObject) {
   so.canonCoolDown += so.canonHeatAddedPerShot
   so.ammo--
   let shot: SpaceObject = createSpaceObject()
-  shot.mass = 5
+  shot.mass = 10
+  // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
   shot.size = { x: rndi(3, 4), y: rndi(18, 24) }
   shot.color = randomGreen()
@@ -63,7 +64,7 @@ export function fire(so: SpaceObject) {
   const headError = 0.001 // 0.019
   const speedError = 1.1 // 1.8
 
-  head = add(head, scalarMultiply(heading(so), 0))
+  head = add(head, scalarMultiply(getHeading(so), 0))
 
   head = add(head, {
     x: rndi(-aimError, aimError),
@@ -71,7 +72,7 @@ export function fire(so: SpaceObject) {
   })
 
   shot.velocity = scalarMultiply(
-    heading(so),
+    getHeading(so),
     so.missileSpeed + rndf(0, speedError)
   )
 
@@ -85,7 +86,7 @@ export function fire(so: SpaceObject) {
   so.shotsInFlight.push(shot)
 }
 
-export function handleHittingShot(shot: SpaceObject, ctx: any) {
+export function handleHittingShot(shot: SpaceObject, ctx: CanvasRenderingContext2D): void {
   if (shot.didHit) {
     shot.shotBlowFrame--
     shot.velocity = scalarMultiply(shot.velocity, -0.8)
@@ -96,7 +97,7 @@ export function handleHittingShot(shot: SpaceObject, ctx: any) {
   }
 }
 
-export function offScreen(v: Vec2d, screen: Vec2d) {
+export function offScreen(v: Vec2d, screen: Vec2d): boolean {
   if (v.x > screen.x) return true
   if (v.x < 0) return true
   if (v.y > screen.y) return true
@@ -104,15 +105,15 @@ export function offScreen(v: Vec2d, screen: Vec2d) {
   return false
 }
 
-export function decayDeadSpaceObjects(so: SpaceObject[]): SpaceObject[] {
-  let out = so.filter(function (e) {
+export function decayDeadSpaceObjects(so: Damageable[]): Damageable[] {
+  const out: Damageable[] = so.filter(function (e) {
     return e.health > 0
   })
   return out
 }
 
 export function bounceSpaceObject(
-  so: SpaceObject,
+  so: Physical & Damager & Bounceable,
   screen: Vec2d,
   energyFactor: number = 1,
   gap: number = 1,

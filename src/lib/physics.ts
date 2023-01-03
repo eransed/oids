@@ -1,20 +1,22 @@
-import type { SpaceObject, Vec2d } from "./types"
-import { add, degToRad, magnitude, radToDeg, rndi, scalarMultiply, sub } from "./math"
+import type { Bounceable, Damageable, Damager, Physical, Positionable, Rotatable, SpaceObject, Vec2d } from "./types"
+import { add, degToRad, limitv, magnitude, mul, radToDeg, rndi, scalarMultiply, smul, sub } from "./math"
 import { getScreenFromCanvas } from "./utils"
 import { renderExplosionFrame } from "./render"
 import { decayDeadShots, handleHittingShot } from "./mechanics"
-import { timeDuration } from "./constants"
+import { angularFriction, linearFriction, timeScale } from "./constants"
 
 export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
   // If assigning nan to so.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) return
-  const deltaTime: number = dt * timeDuration
+  const deltaTime: number = dt * timeScale
   const v: Vec2d = scalarMultiply(so.velocity, deltaTime)
   const a: Vec2d = scalarMultiply(so.acceleration, deltaTime)
   so.velocity = add(so.velocity, a)
   so.position = add(so.position, v)
   so.acceleration = {x: 0, y: 0}
-  updateShots(so, ctx)
+  so.velocity = limitv(so.velocity, {x: 250, y:250})
+  // so.angleDegree += so.angularVelocity * deltaTime
+  updateShots(so, deltaTime, ctx)
 }
 
 export function updateSpaceObjects(sos: SpaceObject[], frameTimeMs: number, ctx: CanvasRenderingContext2D): void {
@@ -23,17 +25,25 @@ export function updateSpaceObjects(sos: SpaceObject[], frameTimeMs: number, ctx:
   })
 }
 
-export function updateShots(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingContext2D): void {
+
+  if (isNaN(dts)) return
+
   decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), 1.2)
   decayDeadShots(so)
 
   // coolDown(so)
   for (let shot of so.shotsInFlight) {
-    shot.position = add(shot.position, shot.velocity)
-    shot.velocity = add(shot.velocity, shot.acceleration)
+    const v: Vec2d = scalarMultiply(shot.velocity, dts)
+    const a: Vec2d = scalarMultiply(shot.acceleration, dts)
+    shot.velocity = add(shot.velocity, a)
+    shot.position = add(shot.position, v)
+    shot.angleDegree += shot.angularVelocity * dts
+    // alignVelocityToHeading(shot)
+    alignHeadingToVelocity(shot)
+    
     shot.acceleration = {x: 0, y: 0}
     shot.armedDelay--
-    alignHeadingToVelocity(shot)
 
     // bounceSpaceObject(shot, screen, 1, 0, 0.7)
     handleHittingShot(shot, ctx)
@@ -69,7 +79,7 @@ export function offScreen_mm(v: Vec2d, screen_min: Vec2d, screen_max: Vec2d) {
   return false
 }
 
-export function gravity(from: SpaceObject, to: SpaceObject, G: number = 1): void {
+export function gravity(from: Physical, to: Physical, G: number = 1): void {
   // F = G((m0 * m1)/r^2)
   const m0: number = from.mass
   const m1: number = to.mass
@@ -81,18 +91,21 @@ export function gravity(from: SpaceObject, to: SpaceObject, G: number = 1): void
   to.acceleration = add(to.acceleration, gvec)
 }
 
-export function friction(so: SpaceObject) {
-  so.velocity = scalarMultiply(so.velocity, so.frictionFactor)
+export function friction(p: Physical & Rotatable) {
+  // const head: Vec2d = getHeading(p)
+  // const fric: Vec2d = mul(head, linearFriction)
+  p.velocity = smul(p.velocity, linearFriction.x)
+  p.angularVelocity = p.angularVelocity * angularFriction
 }
 
-export function applyFriction(so: SpaceObject, friction: number) {
+export function applyFriction(so: Physical, friction: number) {
   so.velocity = scalarMultiply(so.velocity, friction)
 }
 
-export function heading(so: SpaceObject): Vec2d {
+export function getHeading(p: Physical & Rotatable): Vec2d {
   return {
-    x: Math.cos(degToRad(so.angleDegree)),
-    y: Math.sin(degToRad(so.angleDegree)),
+    x: Math.cos(degToRad(p.angleDegree)),
+    y: Math.sin(degToRad(p.angleDegree)),
   }
 }
 
@@ -103,58 +116,60 @@ export function headingFromAngle(angleDegree: number): Vec2d {
   }
 }
 
-export function alignHeadingToVelocity(so: SpaceObject) {
-  so.angleDegree = radToDeg(Math.atan2(so.velocity.y, so.velocity.x))
+export function alignHeadingToVelocity(p: Physical & Rotatable): void {
+  p.angleDegree = radToDeg(Math.atan2(p.velocity.y, p.velocity.x))
 }
 
-export function isColliding(so0: SpaceObject, so1: SpaceObject): boolean {
+export function alignVelocityToHeading(p: Physical): void {
+  // p.velocity = scalarMultiply(headingFromAngle(p.angleDegree), magnitude(p.velocity))
+}
+
+export function isColliding(p0: Physical, p1: Physical): boolean {
   if (
-    so0.position.x < so1.position.x + so1.size.x &&
-    so0.position.x + so0.size.x > so1.position.x &&
-    so0.position.y < so1.position.y + so1.size.y &&
-    so0.position.y + so0.size.y > so1.position.y
+    p0.position.x < p1.position.x + p1.size.x &&
+    p0.position.x + p0.size.x > p1.position.x &&
+    p0.position.y < p1.position.y + p1.size.y &&
+    p0.position.y + p0.size.y > p1.position.y
   ) {
     return true
   }
   return false
 }
 
-
 export function edgeBounceSpaceObject(
-  so: SpaceObject,
+  p: Physical & Damager & Bounceable,
   screen: Vec2d,
   energyFactor: number = 1,
   gap: number = 1,
   damageDeltaFactor: number
 ) {
-  if (so.position.x < gap) {
-    so.velocity.x = -so.velocity.x * energyFactor
-    so.position.x = gap
-    so.bounceCount++
-    so.damage = so.damage * damageDeltaFactor
+  if (p.position.x < gap) {
+    p.velocity.x = -p.velocity.x * energyFactor
+    p.position.x = gap
+    p.bounceCount++
+    p.damage = p.damage * damageDeltaFactor
   }
-  if (so.position.x >= screen.x) {
-    so.velocity.x = -so.velocity.x * energyFactor
-    so.position.x = screen.x - gap
-    so.bounceCount++
-    so.damage = so.damage * damageDeltaFactor
+  if (p.position.x >= screen.x) {
+    p.velocity.x = -p.velocity.x * energyFactor
+    p.position.x = screen.x - gap
+    p.bounceCount++
+    p.damage = p.damage * damageDeltaFactor
   }
-  if (so.position.y < gap) {
-    so.velocity.y = -so.velocity.y * energyFactor
-    so.position.y = gap
-    so.bounceCount++
-    so.damage = so.damage * damageDeltaFactor
+  if (p.position.y < gap) {
+    p.velocity.y = -p.velocity.y * energyFactor
+    p.position.y = gap
+    p.bounceCount++
+    p.damage = p.damage * damageDeltaFactor
   }
-  if (so.position.y >= screen.y) {
-    so.velocity.y = -so.velocity.y * energyFactor
-    so.position.y = screen.y - gap
-    so.bounceCount++
-    so.damage = so.damage * damageDeltaFactor
+  if (p.position.y >= screen.y) {
+    p.velocity.y = -p.velocity.y * energyFactor
+    p.position.y = screen.y - gap
+    p.bounceCount++
+    p.damage = p.damage * damageDeltaFactor
   }
 }
 
-
-export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D) {
+export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D): void {
   resetCollisions(spaceObjects)
   for (let so0 of spaceObjects) {
     for (let so1 of spaceObjects) {

@@ -11,5 +11,5 @@ body {
 
 #game_canvas {
   width: 100%;
-  cursor: none;
+  /* cursor: none; */
 }
