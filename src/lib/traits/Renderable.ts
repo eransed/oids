@@ -1,7 +1,7 @@
-import type { Positionable, Sizeable } from "./Physical";
-import type { Damager, Vec2d } from "../types";
-import type { Steerable } from "./Steerable";
-import { steerImpl } from "./Steerable";
+import type { Positionable, Sizeable } from './Physical'
+import type { Damager, Vec2d } from '../types'
+import type { Steerable } from './Steerable'
+import { steerImpl } from './Steerable'
 
 export interface Renderable extends Positionable, Sizeable {
   color: string
@@ -32,19 +32,19 @@ export interface Renderable extends Positionable, Sizeable {
 //     const linew: number = 4
 //     this.ctx.lineWidth = linew
 //     this.ctx.strokeStyle = '#ccc'
-    
+
 //     if (amount > w || amount < redLevel) {
 //       this.ctx.fillStyle = '#f00'
 //     } else if (redLevel < 0 && amount < Math.abs(redLevel)) {
 //       this.ctx.fillStyle = '#0f0'
 //     }
-  
+
 //     if (amount < 0) {
 //       amount = 0
 //     }
-  
+
 //     const p: number = w*amount/max
-    
+
 //     this.ctx.strokeRect(0, 0, w, h)
 //     this.ctx.fillStyle = '#f00'
 //     this.ctx.fillRect(Math.floor(linew/2), Math.floor(linew/2), p - linew, h - linew)
@@ -53,13 +53,13 @@ export interface Renderable extends Positionable, Sizeable {
 
 // }
 
-export class PhotonMissile implements Renderable, Steerable, Damager  {
-  position: Vec2d = {x: 0, y: 0}
+export class PhotonMissile implements Renderable, Steerable, Damager {
+  position: Vec2d = { x: 0, y: 0 }
   steeringPower: number = 1
   angleDegree: number = 120
   angularVelocity: number = 0
   color: string = '#fff'
-  size: Vec2d = {x: 10, y: 10}
+  size: Vec2d = { x: 10, y: 10 }
   damage: number = 1
   armedDelay: number = 20
   didHit: boolean = false
@@ -67,23 +67,23 @@ export class PhotonMissile implements Renderable, Steerable, Damager  {
 
   readonly ctx: CanvasRenderingContext2D
 
-  constructor (cc: CanvasRenderingContext2D) {
+  constructor(cc: CanvasRenderingContext2D) {
     this.ctx = cc
   }
-  
+
   steer(direction: number, deltaTime: number): void {
     steerImpl(this, direction, deltaTime)
   }
 
   render(): void {
     if (Math.random() > 0.99) {
-      this.ctx.fillStyle = this.armedDelay < 0 ? "#00f" : "#fff"
+      this.ctx.fillStyle = this.armedDelay < 0 ? '#00f' : '#fff'
     } else if (Math.random() > 0.985) {
-      this.ctx.fillStyle = this.armedDelay < 0 ? "#ff0" : "#fff"
+      this.ctx.fillStyle = this.armedDelay < 0 ? '#ff0' : '#fff'
     } else if (Math.random() > 0.975) {
-      this.ctx.fillStyle = this.armedDelay < 0 ? "#f00" : "#fff"
+      this.ctx.fillStyle = this.armedDelay < 0 ? '#f00' : '#fff'
     } else {
-      this.ctx.fillStyle = this.armedDelay < 0 ? this.color : "#fff"
+      this.ctx.fillStyle = this.armedDelay < 0 ? this.color : '#fff'
     }
 
     this.ctx.save()

@@ -1,7 +1,7 @@
-import { round2dec } from "./math"
-import { renderFrameInfo } from "./render"
-import type { Vec2d } from "./types"
-import { getScreenRect } from "./utils"
+import { round2dec } from './math'
+import { renderFrameInfo } from './render'
+import type { Vec2d } from './types'
+import { getScreenRect } from './utils'
 
 const fps_list_max_entries: number = 12
 let prevTimestamp: number
@@ -15,7 +15,7 @@ export function getFrameTimeMs(timestamp: number): number {
 }
 
 export function fpsCounter(frameTimeMs: number, ctx: CanvasRenderingContext2D): void {
-  const fps = round2dec(1000/frameTimeMs, 0)
+  const fps = round2dec(1000 / frameTimeMs, 0)
   const dt = round2dec(frameTimeMs, 0)
   fps_list.push(fps)
   if (fps_list.length >= fps_list_max_entries) {

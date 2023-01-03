@@ -1,25 +1,26 @@
-import type { SpaceObject } from "./types"
+import type { SpaceObject } from './types'
 
-import { initKeyControllers, spaceObjectKeyController } from "./input"
-import { fire, wrapSpaceObject } from "./mechanics"
-import { clearScreen, renderFrameInfo, renderMoon, renderShip, renderSpaceObjectStatusBar, renderVector } from "./render"
-import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from "./utils"
-import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from "./physics"
-import { add, rndfVec2d, round2dec } from "./math"
-import { randomBlue, randomGreen } from "./color"
-import { fpsCounter, getFrameTimeMs } from "./time"
-import { test } from "./test"
+import { initKeyControllers, spaceObjectKeyController } from './input'
+import { fire, wrapSpaceObject } from './mechanics'
+import { clearScreen, renderFrameInfo, renderMoon, renderShip, renderSpaceObjectStatusBar, renderVector } from './render'
+import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
+import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
+import { add, rndfVec2d, round2dec } from './math'
+import { randomBlue, randomGreen } from './color'
+import { fpsCounter, getFrameTimeMs } from './time'
+import { test } from './test'
+import { initMultiplayer } from './multiplayer'
 
-export function oids_game(ctx: CanvasRenderingContext2D) {
-
+export function game(ctx: CanvasRenderingContext2D) {
   if (!test()) {
     return
   }
 
   console.log('Starting oids...')
+  initMultiplayer()
   setCanvasSize(ctx)
   initKeyControllers()
-  
+
   const offset: number = 500
 
   const ship: SpaceObject = createSpaceObject()
@@ -28,11 +29,12 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
   ship.angleDegree = -120
   ship.health = 1200
   // ship.steeringPower = 0.04
-  for (let i = 0; i < 10; i++) {fire(ship)}
+  for (let i = 0; i < 10; i++) {
+    fire(ship)
+  }
 
   const bodies: SpaceObject[] = []
-  
-  
+
   for (let n = 0; n < 3; n++) {
     const s = createSpaceObject()
     s.color = randomGreen()
@@ -40,7 +42,7 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
     s.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
     bodies.push(s)
   }
-  
+
   let all: SpaceObject[] = []
   all = all.concat(bodies)
   all.push(ship)
@@ -55,9 +57,7 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
     })
   }
 
-
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
-
     spaceObjectKeyController(ship, dt)
     friction(ship)
     wrapSpaceObject(ship, getScreenRect(ctx))
@@ -80,17 +80,14 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
     })
 
     handleCollisions(all, ctx)
-
   }
 
-
-  function renderLoop (
+  function renderLoop(
     ctx: CanvasRenderingContext2D,
     renderFrame: (ctx: CanvasRenderingContext2D) => void,
     nextFrame: (ctx: CanvasRenderingContext2D, dt: number) => void
   ) {
-
-    function update (timestamp: number): void {
+    function update(timestamp: number): void {
       const dt: number = getFrameTimeMs(timestamp)
       clearScreen(ctx)
       renderFrame(ctx)
@@ -102,9 +99,7 @@ export function oids_game(ctx: CanvasRenderingContext2D) {
     }
 
     update(0)
-
   }
 
   renderLoop(ctx, renderFrame, nextFrame)
 }
-

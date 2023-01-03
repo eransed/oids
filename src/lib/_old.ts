@@ -77,7 +77,7 @@ function rndfVec_mm(min: number, max: number): Vec2d {
 }
 
 function to_string(v: Vec2d): string {
-  return "(" + round2dec(v.x, 0) + ", " + round2dec(v.y, 0) + ")"
+  return '(' + round2dec(v.x, 0) + ', ' + round2dec(v.y, 0) + ')'
 }
 
 function scalarMultiply(v: Vec2d, s: number): Vec2d {
@@ -158,13 +158,7 @@ function isColliding(so0: SpaceObject, so1: SpaceObject): boolean {
   return false
 }
 
-function bounceSpaceObject(
-  so: SpaceObject,
-  screen: Vec2d,
-  energyFactor: number = 1,
-  gap: number = 1,
-  damageDeltaFactor: number
-) {
+function bounceSpaceObject(so: SpaceObject, screen: Vec2d, energyFactor: number = 1, gap: number = 1, damageDeltaFactor: number) {
   if (so.position.x < gap) {
     so.velocity.x = -so.velocity.x * energyFactor
     so.position.x = gap
@@ -251,11 +245,11 @@ function createDefaultSpaceObject(): SpaceObject {
     shape: Shape.Triangle,
     mass: 1,
     size: { x: 24, y: 24 },
-    color: "#fff",
+    color: '#fff',
     position: { x: rndi(0, 1000), y: rndi(0, 900) },
     velocity: { x: rndf(-maxSpeed, maxSpeed), y: rndf(-maxSpeed, maxSpeed) },
     acceleration: { x: 0, y: 0 },
-    name: "SpaceObject",
+    name: 'SpaceObject',
     angleDegree: 0,
     health: 100,
     killCount: 0,
@@ -293,56 +287,51 @@ function drawSpaceObject(so: SpaceObject, ctx: any) {
       drawAsteroid(so, ctx)
       break
     default:
-      console.error("Unknown Shape", so.shape)
+      console.error('Unknown Shape', so.shape)
   }
 }
 
 function drawAsteroid(so: SpaceObject, ctx: any) {
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
-  ctx.fillStyle = so.colliding === true ? "#f00" : so.color
+  ctx.fillStyle = so.colliding === true ? '#f00' : so.color
   // ctx.fillRect(-so.size.x / 2, -so.size.y / 2, so.size.x, so.size.y)
   ctx.fillRect(0, 0, so.size.x, so.size.y)
-  ctx.font = "22px courier"
-  ctx.fillStyle = "#000"
+  ctx.font = '22px courier'
+  ctx.fillStyle = '#000'
   ctx.fillText(round2dec(so.health, 0), 5, 8 + so.size.y / 2)
   ctx.restore()
 }
 
 function randomColor(r: string, g: string, b: string): string {
-  return (
-    "#" +
-    r[Math.floor(Math.random() * r.length)] +
-    g[Math.floor(Math.random() * g.length)] +
-    b[Math.floor(Math.random() * b.length)]
-  )
+  return '#' + r[Math.floor(Math.random() * r.length)] + g[Math.floor(Math.random() * g.length)] + b[Math.floor(Math.random() * b.length)]
 }
 
 function randomGreen(): string {
-  const r = "012345"
-  const g = "6789ABCDEF"
-  const b = "012345"
+  const r = '012345'
+  const g = '6789ABCDEF'
+  const b = '012345'
   return randomColor(r, g, b)
 }
 
 function randomBlue(): string {
-  const r = "012345"
-  const g = "012345"
-  const b = "6789ABCDEF"
+  const r = '012345'
+  const g = '012345'
+  const b = '6789ABCDEF'
   return randomColor(r, g, b)
 }
 
 function randomRed(): string {
-  const r = "6789ABCDEF"
-  const g = "012345"
-  const b = "012345"
+  const r = '6789ABCDEF'
+  const g = '012345'
+  const b = '012345'
   return randomColor(r, g, b)
 }
 
 function randomAnyColor(): string {
-  const r = "0123456789ABCDEF"
-  const g = "0123456789ABCDEF"
-  const b = "0123456789ABCDEF"
+  const r = '0123456789ABCDEF'
+  const g = '0123456789ABCDEF'
+  const b = '0123456789ABCDEF'
   return randomColor(r, g, b)
 }
 
@@ -350,13 +339,13 @@ function drawShot(so: SpaceObject, ctx: any) {
   for (let shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
-      ctx.fillStyle = shot.armedDelay < 0 ? "#00f" : "#fff"
+      ctx.fillStyle = shot.armedDelay < 0 ? '#00f' : '#fff'
     } else if (Math.random() > 0.985) {
-      ctx.fillStyle = shot.armedDelay < 0 ? "#ff0" : "#fff"
+      ctx.fillStyle = shot.armedDelay < 0 ? '#ff0' : '#fff'
     } else if (Math.random() > 0.975) {
-      ctx.fillStyle = shot.armedDelay < 0 ? "#f00" : "#fff"
+      ctx.fillStyle = shot.armedDelay < 0 ? '#f00' : '#fff'
     } else {
-      ctx.fillStyle = shot.armedDelay < 0 ? shot.color : "#fff"
+      ctx.fillStyle = shot.armedDelay < 0 ? shot.color : '#fff'
     }
     ctx.save()
     ctx.translate(shot.position.x, shot.position.y)
@@ -374,33 +363,29 @@ function drawShip(so: SpaceObject, ctx: any) {
   let shipSize = { x: 40, y: 80 }
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
-  ctx.fillStyle = "#fff"
-  ctx.font = "22px courier"
-  if (so.fuel < 250) ctx.fillStyle = "#ff0"
-  if (so.fuel < 150) ctx.fillStyle = "#f00"
+  ctx.fillStyle = '#fff'
+  ctx.font = '22px courier'
+  if (so.fuel < 250) ctx.fillStyle = '#ff0'
+  if (so.fuel < 150) ctx.fillStyle = '#f00'
   let xtext: number = 200
-  ctx.fillText("fuel: " + round2dec(so.fuel, 1), xtext, -50)
-  ctx.fillStyle = "#fff"
+  ctx.fillText('fuel: ' + round2dec(so.fuel, 1), xtext, -50)
+  ctx.fillStyle = '#fff'
   ctx.fillText(so.name, xtext, -200)
   ctx.fillText(to_string(so.velocity), xtext, -150)
   ctx.fillText(to_string(so.position), xtext, -100)
-  ctx.fillText("sif: " + so.shotsInFlight.length, xtext, 0)
-  ctx.fillText("ammo: " + so.ammo, xtext, 50)
-  ctx.fillText("health: " + round2dec(so.health, 1), xtext, 100)
-  ctx.fillText("heat: " + round2dec(so.canonCoolDown, 1), xtext, 150)
-  ctx.fillText(
-    "angle: " + round2dec(Math.abs(so.angleDegree % 360)),
-    xtext,
-    200
-  )
+  ctx.fillText('sif: ' + so.shotsInFlight.length, xtext, 0)
+  ctx.fillText('ammo: ' + so.ammo, xtext, 50)
+  ctx.fillText('health: ' + round2dec(so.health, 1), xtext, 100)
+  ctx.fillText('heat: ' + round2dec(so.canonCoolDown, 1), xtext, 150)
+  ctx.fillText('angle: ' + round2dec(Math.abs(so.angleDegree % 360)), xtext, 200)
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
   ctx.beginPath()
   ctx.strokeStyle = so.color
   ctx.lineWidth = 5
 
   // hull
-  ctx.strokeStyle = so.colliding ? "#f00" : so.color
-  ctx.fillStyle = so.colliding ? "#f00" : so.color
+  ctx.strokeStyle = so.colliding ? '#f00' : so.color
+  ctx.fillStyle = so.colliding ? '#f00' : so.color
   ctx.moveTo(0, (-shipSize.y / 2) * scale)
   ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
@@ -437,13 +422,7 @@ function drawShip(so: SpaceObject, ctx: any) {
   drawShot(so, ctx)
 
   if (so.afterBurnerEnabled) {
-    renderAfterBurnerFrame(
-      addc(
-        so.position,
-        scalarMultiply(headingFromAngle(so.angleDegree - 180), 60)
-      ),
-      ctx
-    )
+    renderAfterBurnerFrame(addc(so.position, scalarMultiply(headingFromAngle(so.angleDegree - 180), 60)), ctx)
   }
 
   // ctx.lineWidth = 2
@@ -451,17 +430,11 @@ function drawShip(so: SpaceObject, ctx: any) {
   // ctx.strokeRect(so.position.x, so.position.y, so.size.x, so.size.y)
 }
 
-function drawVector(
-  v: Vec2d,
-  position: Vec2d,
-  scale: number = 2,
-  ctx: any,
-  offset: Vec2d = { x: 0, y: 0 }
-) {
+function drawVector(v: Vec2d, position: Vec2d, scale: number = 2, ctx: any, offset: Vec2d = { x: 0, y: 0 }) {
   ctx.save()
   ctx.translate(position.x + offset.x, position.y + offset.y)
   ctx.beginPath()
-  ctx.strokeStyle = "#fff"
+  ctx.strokeStyle = '#fff'
   ctx.lineWidth = 5
   ctx.moveTo(0, 0)
   ctx.lineTo(scale * v.x, scale * v.y)
@@ -479,39 +452,39 @@ let spacePressed: boolean = false
 let bounce: boolean = true
 
 function arrowControl(e: any, value: boolean) {
-  if (e.key === "ArrowUp") {
+  if (e.key === 'ArrowUp') {
     upPressed = value
   }
-  if (e.key === "w") {
+  if (e.key === 'w') {
     upPressed = value
   }
-  if (e.key === "ArrowDown") {
+  if (e.key === 'ArrowDown') {
     downPressed = value
   }
-  if (e.key === "s") {
+  if (e.key === 's') {
     downPressed = value
   }
-  if (e.key === "ArrowLeft") {
+  if (e.key === 'ArrowLeft') {
     leftPressed = value
   }
-  if (e.key === "ArrowRight") {
+  if (e.key === 'ArrowRight') {
     rightPressed = value
   }
-  if (e.key === "a") {
+  if (e.key === 'a') {
     leftStrafePressed = value
   }
-  if (e.key === "d") {
+  if (e.key === 'd') {
     rightStrafePressed = value
   }
-  if (e.code === "Space") {
+  if (e.code === 'Space') {
     // wtf code...
     spacePressed = value
   }
-  if (e.key === "b" && value) {
+  if (e.key === 'b' && value) {
     bounce = !bounce
     console.log({ bounce })
   }
-  if (e.key === "i") {
+  if (e.key === 'i') {
     console.log({ allSpaceObjects })
     console.log({ myShip })
   }
@@ -523,13 +496,13 @@ function applyEngine(so: SpaceObject): number {
     return so.enginePower
   }
   so.fuel = 0
-  console.log(so.name + " has no more fuel!", so)
+  console.log(so.name + ' has no more fuel!', so)
   return 0
 }
 
 function fire(so: SpaceObject) {
   if (so.ammo < 1) {
-    console.log(so.name + " is out of ammo")
+    console.log(so.name + ' is out of ammo')
     return
   }
   if (so.canonOverHeat) {
@@ -550,10 +523,7 @@ function fire(so: SpaceObject) {
     x: rndi(-aimError, aimError),
     y: rndi(-aimError, aimError),
   })
-  shot.velocity = scalarMultiply(
-    heading(so),
-    so.missileSpeed + rndf(0, speedError)
-  )
+  shot.velocity = scalarMultiply(heading(so), so.missileSpeed + rndf(0, speedError))
   add(shot.velocity, {
     x: rndf(-headError, headError),
     y: rndf(-headError, headError),
@@ -590,29 +560,9 @@ function renderExplosionFrame(pos: Vec2d, ctx: any) {
   let maxSize: number = 12
   ctx.save()
   ctx.translate(pos.x, pos.y)
-  for (let c of [
-    "#ff0",
-    "#f00",
-    "#ee0",
-    "#e00",
-    "#dd0",
-    "#d00",
-    "#008",
-    "#000",
-    "#444",
-    "#fee",
-    "#f66,",
-    "#f99",
-    "#fbb",
-  ]) {
-    let center = add(
-      { x: 0, y: 0 },
-      { x: rndi(-offset, offset), y: rndi(-offset, offset) }
-    )
-    let size = add(
-      { x: 0, y: 0 },
-      { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) }
-    )
+  for (let c of ['#ff0', '#f00', '#ee0', '#e00', '#dd0', '#d00', '#008', '#000', '#444', '#fee', '#f66,', '#f99', '#fbb']) {
+    let center = add({ x: 0, y: 0 }, { x: rndi(-offset, offset), y: rndi(-offset, offset) })
+    let size = add({ x: 0, y: 0 }, { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) })
     ctx.fillStyle = c
     ctx.fillRect(center.x, center.y, size.x, size.y)
   }
@@ -625,25 +575,9 @@ function renderAfterBurnerFrame(pos: Vec2d, ctx: any) {
   let maxSize: number = 9
   ctx.save()
   ctx.translate(pos.x, pos.y)
-  for (let c of [
-    "#ff0",
-    "#00f",
-    "#ee0",
-    "#e00",
-    "#ccc",
-    "#ccc",
-    "#aaa",
-    "#999",
-    "#888",
-  ]) {
-    let center = add(
-      { x: 0, y: 0 },
-      { x: rndi(-offset, offset), y: rndi(-offset, offset) }
-    )
-    let size = add(
-      { x: 0, y: 0 },
-      { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) }
-    )
+  for (let c of ['#ff0', '#00f', '#ee0', '#e00', '#ccc', '#ccc', '#aaa', '#999', '#888']) {
+    let center = add({ x: 0, y: 0 }, { x: rndi(-offset, offset), y: rndi(-offset, offset) })
+    let size = add({ x: 0, y: 0 }, { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) })
     ctx.fillStyle = c
     ctx.fillRect(center.x, center.y, size.x, size.y)
   }
@@ -808,7 +742,7 @@ let myShip: SpaceObject = createDefaultSpaceObject()
 let allSpaceObjects: SpaceObject[] = []
 
 function init(cid: number, ctx: any) {
-  myShip.name = "Slayer" + cid
+  myShip.name = 'Slayer' + cid
   myShip.shape = Shape.Ship
   myShip.health = 9000
   myShip.fuel = 400
@@ -820,20 +754,20 @@ function init(cid: number, ctx: any) {
   myShip.size = { x: 50, y: 50 }
   myShip.steeringPower = 0.88
   myShip.enginePower = 0.055
-  myShip.color = "#fff"
+  myShip.color = '#fff'
   myShip.position = { x: 700, y: 600 }
   myShip.velocity = { x: 0.4, y: -0.6 }
 
   allSpaceObjects.push(myShip)
 
-  console.log("adds event listeners")
-  document.addEventListener("keydown", (event) => arrowControl(event, true))
-  document.addEventListener("keyup", (event) => arrowControl(event, false))
+  console.log('adds event listeners')
+  document.addEventListener('keydown', (event) => arrowControl(event, true))
+  document.addEventListener('keyup', (event) => arrowControl(event, false))
   const edge: number = 10
   for (let i = 0; i < numberOfAsteroids; i++) {
     let a: SpaceObject = createDefaultSpaceObject()
     a.shape = Shape.Asteroid
-    a.name = "Asteroid #" + i
+    a.name = 'Asteroid #' + i
     a.health = rndi(7000, 9999)
     a.size = rndiVec_mm(60, 120)
     a.position = {
@@ -910,7 +844,7 @@ function renderWatch(pos: Vec2d, size: number, ctx: any, da: number) {
   // save current state of the context
   ctx.save()
   ctx.translate(pos.x, pos.y)
-  ctx.strokeStyle = "#f00"
+  ctx.strokeStyle = '#f00'
   ctx.lineWidth = 3
   ctx.beginPath()
   // ctx.moveTo(0, 0)
@@ -929,19 +863,10 @@ function renderWatch(pos: Vec2d, size: number, ctx: any, da: number) {
   const da2: number = 3.5 * da
   const adt: number = 30
 
-  ctx.moveTo(
-    startx * size * Math.cos(degToRad(0)),
-    starty * size * Math.sin(degToRad(0))
-  )
+  ctx.moveTo(startx * size * Math.cos(degToRad(0)), starty * size * Math.sin(degToRad(0)))
   for (let i = 0 - da; i < 360; i += adt) {
-    ctx.moveTo(
-      startx * size * Math.cos(degToRad(i)),
-      starty * size * Math.sin(degToRad(i))
-    )
-    ctx.lineTo(
-      stopx * size * Math.cos(degToRad(i)),
-      stopy * size * Math.sin(degToRad(i))
-    )
+    ctx.moveTo(startx * size * Math.cos(degToRad(i)), starty * size * Math.sin(degToRad(i)))
+    ctx.lineTo(stopx * size * Math.cos(degToRad(i)), stopy * size * Math.sin(degToRad(i)))
   }
 
   ctx.moveTo(size * Math.cos(degToRad(da2)), size * Math.sin(degToRad(da2)))

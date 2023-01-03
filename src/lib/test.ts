@@ -1,6 +1,5 @@
-import { Physical } from "./traits/Physical"
-import { testModule, TestModuleResults, testSummary, type TestModule } from "./traits/Testable"
-
+import { Physical } from './traits/Physical'
+import { testModule, TestModuleResults, testSummary, type TestModule } from './traits/Testable'
 
 export function test(): boolean {
   const results: TestModuleResults[] = [
@@ -9,6 +8,4 @@ export function test(): boolean {
   ]
 
   return testSummary(results)
-
 }
-

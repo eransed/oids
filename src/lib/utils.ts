@@ -1,9 +1,8 @@
-import type {SpaceObject, Vec2d } from "./types"
-import { rndi, rndf, floor, round2dec } from "./math"
-import { screenScale, maxRandomDefaultSpaceObjectVelocity as maxVel, linearFriction } from "./constants"
+import type { SpaceObject, Vec2d } from './types'
+import { rndi, rndf, floor, round2dec } from './math'
+import { screenScale, maxRandomDefaultSpaceObjectVelocity as maxVel, linearFriction } from './constants'
 
 export function createSpaceObject(): SpaceObject {
-
   const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2d = {
     x: rndi(0, 100),
@@ -19,11 +18,11 @@ export function createSpaceObject(): SpaceObject {
   const spaceObject: SpaceObject = {
     mass: 1,
     size: { x: 24, y: 24 },
-    color: "#fff",
+    color: '#fff',
     position: initPos,
     velocity: initVel,
     acceleration: { x: 0, y: 0 },
-    name: "SpaceObject",
+    name: 'SpaceObject',
     angleDegree: -90,
     angularVelocity: 0,
     health: 100,
@@ -47,8 +46,8 @@ export function createSpaceObject(): SpaceObject {
     didHit: false,
     shotBlowFrame: 16,
     steer: function (direction: number, deltaTime: number): void {
-      throw new Error("Function not implemented.")
-    }
+      throw new Error('Function not implemented.')
+    },
   }
 
   return spaceObject
@@ -67,13 +66,13 @@ export function setCanvasSize(ctx: CanvasRenderingContext2D): void {
 }
 
 export function getScreenCenterPosition(ctx: CanvasRenderingContext2D): Vec2d {
-  return floor({ x: ctx.canvas.width/2, y: ctx.canvas.height/2 })
+  return floor({ x: ctx.canvas.width / 2, y: ctx.canvas.height / 2 })
 }
 
 export function getScreenFromCanvas(ctx: CanvasRenderingContext2D): Vec2d {
-  return {x: ctx.canvas.width, y: ctx.canvas.height}
+  return { x: ctx.canvas.width, y: ctx.canvas.height }
 }
 
 export function to_string(v: Vec2d, dec: number = 0): string {
-  return "(" + round2dec(v.x, dec) + ", " + round2dec(v.y, dec) + ")"
+  return '(' + round2dec(v.x, dec) + ', ' + round2dec(v.y, dec) + ')'
 }

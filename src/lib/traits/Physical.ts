@@ -1,7 +1,7 @@
-import type { Vec2d } from "../types"
-import { angularFriction, linearFriction, timeScale } from "../constants"
-import { sub, magnitude, scalarMultiply, add, smul, degToRad, radToDeg, withinBounds, limitv } from "../math"
-import type { Testable, TestFunction, TestModule } from "./Testable"
+import type { Vec2d } from '../types'
+import { angularFriction, linearFriction, timeScale } from '../constants'
+import { sub, magnitude, scalarMultiply, add, smul, degToRad, radToDeg, withinBounds, limitv } from '../math'
+import type { Testable, TestFunction, TestModule } from './Testable'
 
 export interface Positionable {
   position: Vec2d
@@ -13,17 +13,14 @@ export interface Sizeable {
 
 export class Physical implements Positionable, Testable {
   mass: number = 1
-  size: Vec2d = {x: 10, y: 10}
-  position: Vec2d = {x: 0, y: 0}
-  velocity: Vec2d = {x: 0, y: 0}
-  acceleration: Vec2d = {x: 0, y: 0}
+  size: Vec2d = { x: 10, y: 10 }
+  position: Vec2d = { x: 0, y: 0 }
+  velocity: Vec2d = { x: 0, y: 0 }
+  acceleration: Vec2d = { x: 0, y: 0 }
   angleDegree: number = 120
   angularVelocity: number = 0
 
-  constructor() {
-
-  }
-
+  constructor() {}
 
   update(deltaTime: number): void {
     if (isNaN(deltaTime)) {
@@ -34,16 +31,16 @@ export class Physical implements Positionable, Testable {
     const a: Vec2d = scalarMultiply(this.acceleration, dts)
     this.velocity = add(this.velocity, a)
     this.position = add(this.position, v)
-    this.acceleration = {x: 0, y: 0}
-    this.velocity = limitv(this.velocity, {x: 100, y:100})
+    this.acceleration = { x: 0, y: 0 }
+    this.velocity = limitv(this.velocity, { x: 100, y: 100 })
     this.angleDegree += this.angularVelocity * dts
   }
-  
+
   alignHeadingToVelocity(): void {
     this.angleDegree = radToDeg(Math.atan2(this.velocity.y, this.velocity.x))
   }
 
-  onScreen(max: Vec2d, min: Vec2d = {x: 0, y: 0}): boolean {
+  onScreen(max: Vec2d, min: Vec2d = { x: 0, y: 0 }): boolean {
     return withinBounds(this.position, max, min)
   }
 
@@ -60,7 +57,7 @@ export class Physical implements Positionable, Testable {
     this.velocity = smul(this.velocity, linearFriction.x)
     this.angularVelocity = this.angularVelocity * angularFriction
   }
-  
+
   gravityAttract(attractee: Physical, G: number = 1): void {
     const m0: number = this.mass
     const m1: number = attractee.mass
@@ -84,10 +81,9 @@ export class Physical implements Positionable, Testable {
     return {
       name: 'Physical',
       moduleTestFunctions: [
-        {desc: 'Test of the Physical.update method', func: this.testUpdate},
-        {desc: 'Test of the Physical.onScreen method', func: this.testOnScreen},
+        { desc: 'Test of the Physical.update method', func: this.testUpdate },
+        { desc: 'Test of the Physical.onScreen method', func: this.testOnScreen },
       ],
     }
   }
- 
 }

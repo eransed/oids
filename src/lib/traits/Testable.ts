@@ -1,4 +1,3 @@
-
 export interface TestFunction {
   func: () => boolean
   desc: string
@@ -37,7 +36,7 @@ export function testModule(testModule: TestModule): TestModuleResults {
     mfr.push({
       desc: tf.desc,
       func: tf.func,
-      result: result
+      result: result,
     })
   }
   return new TestModuleResults(testModule.name, mfr)

@@ -4,12 +4,16 @@
 <script lang="ts">
   
   import { onMount } from 'svelte'
-  import { oids_game } from '../lib/game';
+  import { game } from '../lib/game';
 
   onMount(() => {
     const canvasElement: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("game_canvas")
-    const ctx = canvasElement.getContext("2d")
-    oids_game(ctx)
+    const ctx: CanvasRenderingContext2D | null = canvasElement.getContext("2d")
+    if (ctx === null){
+      console.error('ctx is null')
+    } else {
+      game(ctx)
+    }
   });
 
 </script>

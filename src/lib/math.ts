@@ -1,4 +1,4 @@
-import type { Vec2d } from "./types"
+import type { Vec2d } from './types'
 
 export function vec2d(): Vec2d {
   return { x: 0, y: 0 }
@@ -59,11 +59,11 @@ export function rndfVec2d(min: number, max: number): Vec2d {
 }
 
 export function limit(n: number, max: number): number {
-  return (n >= Math.abs(max) ? max : n)
+  return n >= Math.abs(max) ? max : n
 }
 
 export function limitv(v: Vec2d, max: Vec2d): Vec2d {
-  return {x: limit(v.x, max.x), y: limit(v.y, max.y)}
+  return { x: limit(v.x, max.x), y: limit(v.y, max.y) }
 }
 
 export function wrap(vector: Vec2d, screen: Vec2d) {
@@ -127,7 +127,7 @@ export function radToDeg(rad: number): number {
   return rad * (180 / Math.PI)
 }
 
-export function withinBounds(v: Vec2d, maxBound: Vec2d, minBound: Vec2d = {x: 0, y: 0}) {
+export function withinBounds(v: Vec2d, maxBound: Vec2d, minBound: Vec2d = { x: 0, y: 0 }) {
   if (v.x > minBound.x) return false
   if (v.x < maxBound.x) return false
   if (v.y > minBound.y) return false

@@ -1,9 +1,9 @@
-import type { Bounceable, Damageable, Damager, Physical, Positionable, Rotatable, SpaceObject, Vec2d } from "./types"
-import { add, degToRad, limitv, magnitude, mul, radToDeg, rndi, scalarMultiply, smul, sub } from "./math"
-import { getScreenFromCanvas } from "./utils"
-import { renderExplosionFrame } from "./render"
-import { decayDeadShots, handleHittingShot } from "./mechanics"
-import { angularFriction, linearFriction, timeScale } from "./constants"
+import type { Bounceable, Damageable, Damager, Physical, Positionable, Rotatable, SpaceObject, Vec2d } from './types'
+import { add, degToRad, limitv, magnitude, mul, radToDeg, rndi, scalarMultiply, smul, sub } from './math'
+import { getScreenFromCanvas } from './utils'
+import { renderExplosionFrame } from './render'
+import { decayDeadShots, handleHittingShot } from './mechanics'
+import { angularFriction, linearFriction, timeScale } from './constants'
 
 export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
   // If assigning nan to so.velocity, position or acceleration it will stay nan for ever
@@ -13,8 +13,8 @@ export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRender
   const a: Vec2d = scalarMultiply(so.acceleration, deltaTime)
   so.velocity = add(so.velocity, a)
   so.position = add(so.position, v)
-  so.acceleration = {x: 0, y: 0}
-  so.velocity = limitv(so.velocity, {x: 250, y:250})
+  so.acceleration = { x: 0, y: 0 }
+  so.velocity = limitv(so.velocity, { x: 250, y: 250 })
   // so.angleDegree += so.angularVelocity * deltaTime
   updateShots(so, deltaTime, ctx)
 }
@@ -26,7 +26,6 @@ export function updateSpaceObjects(sos: SpaceObject[], frameTimeMs: number, ctx:
 }
 
 export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingContext2D): void {
-
   if (isNaN(dts)) return
 
   decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), 1.2)
@@ -41,8 +40,8 @@ export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingCo
     shot.angleDegree += shot.angularVelocity * dts
     // alignVelocityToHeading(shot)
     alignHeadingToVelocity(shot)
-    
-    shot.acceleration = {x: 0, y: 0}
+
+    shot.acceleration = { x: 0, y: 0 }
     shot.armedDelay--
 
     // bounceSpaceObject(shot, screen, 1, 0, 0.7)
@@ -136,13 +135,7 @@ export function isColliding(p0: Physical, p1: Physical): boolean {
   return false
 }
 
-export function edgeBounceSpaceObject(
-  p: Physical & Damager & Bounceable,
-  screen: Vec2d,
-  energyFactor: number = 1,
-  gap: number = 1,
-  damageDeltaFactor: number
-) {
+export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2d, energyFactor: number = 1, gap: number = 1, damageDeltaFactor: number) {
   if (p.position.x < gap) {
     p.velocity.x = -p.velocity.x * energyFactor
     p.position.x = gap

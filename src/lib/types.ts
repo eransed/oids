@@ -1,4 +1,4 @@
-import type { Steerable } from "./traits/Steerable"
+import type { Steerable } from './traits/Steerable'
 
 export interface Vec2d {
   x: number
