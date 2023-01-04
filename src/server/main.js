@@ -1,13 +1,21 @@
 import WebSocket, { WebSocketServer } from 'ws'
 
-const wss = new WebSocketServer({
+const server = new WebSocketServer({
   port: 5000,
 })
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function message(data) {
-    console.log('received: %s', data)
-  })
+let clients = []
 
-  ws.send('from server')
+const broadcastToClients = (connectedClients, data) => {
+  for (let client of connectedClients) {
+    client.send(JSON.stringify(data))
+  }
+}
+
+server.on('connection', function connection(clientConnection) {
+  clients.push(clientConnection)
+
+  clientConnection.on('message', function message(data) {
+    broadcastToClients(clients, JSON.parse(data))
+  })
 })

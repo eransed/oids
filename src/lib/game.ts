@@ -5,19 +5,19 @@ import { fire, wrapSpaceObject } from './mechanics'
 import { clearScreen, renderFrameInfo, renderMoon, renderShip, renderSpaceObjectStatusBar, renderVector } from './render'
 import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
-import { add, rndfVec2d, round2dec } from './math'
+import { add, rndfVec2d, rndi, round2dec } from './math'
 import { randomBlue, randomGreen } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
-import { initMultiplayer } from './multiplayer'
+import { initMultiplayer, registerServerUpdate, sendToServer } from './multiplayer'
 
-export function game(ctx: CanvasRenderingContext2D) {
+export async function game(ctx: CanvasRenderingContext2D) {
   if (!test()) {
     return
   }
 
   console.log('Starting oids...')
-  initMultiplayer()
+  await initMultiplayer()
   setCanvasSize(ctx)
   initKeyControllers()
 
@@ -28,6 +28,8 @@ export function game(ctx: CanvasRenderingContext2D) {
   ship.mass = 0.1
   ship.angleDegree = -120
   ship.health = 1200
+  ship.name = 'player' + rndi(0, 100000)
+  sendToServer(ship)
   // ship.steeringPower = 0.04
   for (let i = 0; i < 10; i++) {
     fire(ship)
@@ -47,8 +49,31 @@ export function game(ctx: CanvasRenderingContext2D) {
   all = all.concat(bodies)
   all.push(ship)
 
+  let serverObjects: SpaceObject[] = []
+
+  registerServerUpdate((so: SpaceObject) => {
+    let found = false
+
+    serverObjects.forEach((element) => {
+      if (so.name !== ship.name) {
+        if (so.name === element.name) {
+          element = so
+          found = true
+        }
+      }
+    })
+
+    if (!found) {
+      serverObjects.push(so)
+      console.log('adding new layer' + so.name)
+    }
+  })
+
   const renderFrame = (ctx: CanvasRenderingContext2D): void => {
     renderShip(ship, ctx)
+    serverObjects.forEach((otherPlayer) => {
+      renderShip(otherPlayer, ctx)
+    })
     renderSpaceObjectStatusBar(ship, ctx)
     // renderVector(ship.acceleration, ship.position, ctx, 400)
     // renderVector(ship.velocity, ship.position, ctx, 10)
@@ -79,7 +104,7 @@ export function game(ctx: CanvasRenderingContext2D) {
       wrapSpaceObject(body, getScreenRect(ctx))
     })
 
-    handleCollisions(all, ctx)
+    //handleCollisions(all, ctx)
   }
 
   function renderLoop(
@@ -93,6 +118,8 @@ export function game(ctx: CanvasRenderingContext2D) {
       renderFrame(ctx)
       updateSpaceObject(ship, dt, ctx)
       updateSpaceObjects(bodies, dt, ctx)
+      //Possible optimization send every other frame
+      sendToServer(ship)
       fpsCounter(dt, ctx)
       requestAnimationFrame(update)
       nextFrame(ctx, dt)
