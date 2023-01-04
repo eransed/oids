@@ -73,7 +73,7 @@ export async function game(ctx: CanvasRenderingContext2D) {
       renderShip(so, ctx)
     })
 
-    renderSpaceObjectStatusBar(ship, ctx)
+    renderSpaceObjectStatusBar(serverObjects, ship, ctx)
     // renderVector(ship.acceleration, ship.position, ctx, 400)
     // renderVector(ship.velocity, ship.position, ctx, 10)
     bodies.forEach((body) => {
