@@ -23,27 +23,32 @@ export async function game(ctx: CanvasRenderingContext2D) {
 
   const offset: number = 500
 
+  const randomColor = Math.floor(Math.random() * 16777215).toString(16)
+
   const ship: SpaceObject = createSpaceObject()
   ship.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
   ship.mass = 0.1
   ship.angleDegree = -120
   ship.health = 1200
   ship.name = 'player' + rndi(0, 100000)
+  ship.color = '#' + randomColor
+  console.log('Your ship name is: ' + ship.name + ' And your color is: #' + randomColor)
+
   sendToServer(ship)
   // ship.steeringPower = 0.04
-  for (let i = 0; i < 10; i++) {
-    fire(ship)
-  }
+  // for (let i = 0; i < 10; i++) {
+  //   fire(ship)
+  // }
 
   const bodies: SpaceObject[] = []
 
-  for (let n = 0; n < 3; n++) {
-    const s = createSpaceObject()
-    s.color = randomGreen()
-    s.mass = 5
-    s.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
-    bodies.push(s)
-  }
+  // for (let n = 0; n < 3; n++) {
+  //   const s = createSpaceObject()
+  //   s.color = randomGreen()
+  //   s.mass = 5
+  //   s.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
+  //   bodies.push(s)
+  // }
 
   let all: SpaceObject[] = []
   all = all.concat(bodies)
@@ -52,28 +57,22 @@ export async function game(ctx: CanvasRenderingContext2D) {
   let serverObjects: SpaceObject[] = []
 
   registerServerUpdate((so: SpaceObject) => {
-    let found = false
-
-    serverObjects.forEach((element) => {
-      if (so.name !== ship.name) {
-        if (so.name === element.name) {
-          element = so
-          found = true
-        }
+    for (let i = 0; i < serverObjects.length; i++) {
+      if (so.name === serverObjects[i].name) {
+        serverObjects[i] = so
+        return
       }
-    })
-
-    if (!found) {
-      serverObjects.push(so)
-      console.log('adding new layer' + so.name)
     }
+    if (so.name !== ship.name) serverObjects.push(so)
   })
 
   const renderFrame = (ctx: CanvasRenderingContext2D): void => {
     renderShip(ship, ctx)
-    serverObjects.forEach((otherPlayer) => {
-      renderShip(otherPlayer, ctx)
+
+    serverObjects.forEach((so) => {
+      renderShip(so, ctx)
     })
+
     renderSpaceObjectStatusBar(ship, ctx)
     // renderVector(ship.acceleration, ship.position, ctx, 400)
     // renderVector(ship.velocity, ship.position, ctx, 10)
