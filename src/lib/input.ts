@@ -1,6 +1,6 @@
-import type { Fireable, SpaceObject, Thrustable } from "./types"
-import { applyEngineThrust, applySteer, fire } from "./mechanics"
-import { timeScale } from "./constants"
+import type { Fireable, SpaceObject, Thrustable } from './types'
+import { applyEngineThrust, applySteer, fire } from './mechanics'
+import { timeScale } from './constants'
 
 let boost: boolean = false
 let upPressed: boolean = false
@@ -12,41 +12,41 @@ let leftPressed: boolean = false
 let spacePressed: boolean = false
 
 function arrowControl(e: KeyboardEvent, value: boolean) {
-  if (e.key === "ArrowUp") {
+  if (e.key === 'ArrowUp') {
     upPressed = value
   }
-  if (e.key === "q") {
+  if (e.key === 'q') {
     leftStrafePressed = value
   }
-  if (e.key === "e") {
+  if (e.key === 'e') {
     rightStrafePressed = value
   }
-  if (e.key === "w") {
+  if (e.key === 'w') {
     upPressed = value
   }
-  if (e.key === "ArrowDown") {
+  if (e.key === 'ArrowDown') {
     downPressed = value
   }
-  if (e.key === "s") {
+  if (e.key === 's') {
     downPressed = value
   }
-  if (e.key === "ArrowLeft") {
+  if (e.key === 'ArrowLeft') {
     leftPressed = value
   }
-  if (e.key === "ArrowRight") {
+  if (e.key === 'ArrowRight') {
     rightPressed = value
   }
-  if (e.key === "a") {
+  if (e.key === 'a') {
     leftPressed = value
   }
-  if (e.key === "d") {
+  if (e.key === 'd') {
     rightPressed = value
   }
-  if (e.code === "Space" || e.key === "n") {
+  if (e.code === 'Space' || e.key === 'n') {
     // wtf code...
     spacePressed = value
   }
-  if (e.key === "b") {
+  if (e.key === 'b') {
     boost = value
   }
 }
@@ -94,7 +94,7 @@ export function spaceObjectKeyController(so: SpaceObject, dt: number = 1) {
 }
 
 export function initKeyControllers(): void {
-  console.log("adds event listeners")
-  document.addEventListener("keydown", (event) => arrowControl(event, true))
-  document.addEventListener("keyup", (event) => arrowControl(event, false))
+  console.log('adds event listeners')
+  document.addEventListener('keydown', (event) => arrowControl(event, true))
+  document.addEventListener('keyup', (event) => arrowControl(event, false))
 }
