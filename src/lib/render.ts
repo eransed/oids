@@ -2,6 +2,7 @@ import type { SpaceObject, Vec2d } from './types'
 import { add, magnitude, rndi, round2dec, scalarMultiply } from './math'
 import { canvasBackgroundColor, frontVersion, screenScale, timeScale } from './constants'
 import { getScreenFromCanvas, getScreenRect, to_string } from './utils'
+import { getReadyState, getReadyStateText } from './multiplayer'
 
 export function clearScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = canvasBackgroundColor
@@ -19,17 +20,20 @@ export function renderFrameInfo(fps: number, frameTimeMs: number, ctx: CanvasRen
   ctx.fillText('DT:  ' + round2dec(frameTimeMs, dec) + 'ms', xpos, 100)
   ctx.fillText('DTS: ' + round2dec(frameTimeMs * timeScale, dec), xpos, 150)
   ctx.fillText('RES: ' + screen.x + 'x' + screen.y + ' (x' + screenScale + ', ' + ratio + ')', xpos, 200)
-  renderProgressBar({ x: xpos, y: 250 }, 'Load', frameTimeMs, 50, ctx, -40)
+  ctx.fillText('WS: ' + getReadyStateText(), xpos, 250)
+  renderProgressBar({ x: xpos, y: 300 }, 'Load', frameTimeMs, 50, ctx, -40)
   ctx.fillStyle = '#444'
   ctx.fillText('' + frontVersion, screen.x - frontVersion.length * 27, 50)
 }
 
-export function renderSpaceObjectStatusBar(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   const screen: Vec2d = getScreenFromCanvas(ctx)
   const ypos: number = screen.y - 20
+  const ypos2: number = screen.y - 70
   const offset: number = 600
   ctx.font = 'bold 40px courier'
   ctx.fillStyle = '#ccc'
+  ctx.fillText('# Players: ' + serverObjects.length, 25 + offset * 0, ypos2)
   ctx.fillText('SIF: ' + so.shotsInFlight.length, 25 + offset * 0, ypos)
   ctx.fillText(so.health + 'hp', 25 + offset * 0.5, ypos)
   ctx.fillText('Ammo: ' + so.ammo, 25 + offset * 0.9, ypos)

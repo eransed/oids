@@ -1,6 +1,6 @@
+import { CLOSED, CLOSING, CONNECTING, OPEN } from 'ws'
 import type { SpaceObject } from './types'
 
-// Create WebSocket connection.
 let socket: WebSocket
 
 function connect() {
@@ -20,31 +20,49 @@ export const initMultiplayer = async () => {
 
   try {
     await connect()
-    console.log('connected')
+    console.log('Connected to server')
   } catch (error) {
-    console.error('could not connect', error)
+    console.error('Could not connect', error)
   }
 
-  // Connection opened
-  socket.addEventListener('open', (event) => {
-    socket.send('Hello Server!')
-  })
+  // socket.addEventListener('open', (event) => {
+  //   socket.send('Hello Server!')
+  // })
 
-  // Listen for messages
   // socket.addEventListener('message', (event) => {
   //   console.log('Message from server ', event.data)
   // })
 }
 
+export function getReadyState(): number {
+  return socket.readyState
+}
+
+export function getReadyStateText(): string {
+  const s: number = getReadyState()
+  switch (s) {
+    case CONNECTING:
+      return 'CONNECTING'
+    case CLOSED:
+      return 'CLOSED'
+    case OPEN:
+      return 'OPEN'
+    case CLOSING:
+      return 'CLOSING'
+    default:
+      return '(' + s + ')'
+  }
+}
+
 export const sendToServer = (messageObject: object) => {
   if (!socket) {
-    console.error('socket is undefined')
+    console.error('Socket is undefined')
     return
   }
   if (socket.readyState === 1) {
     socket.send(JSON.stringify(messageObject))
   } else {
-    console.error('socket not open, readyState=' + socket.readyState)
+    console.error('Socket not open, readyState=' + socket.readyState)
   }
 }
 
