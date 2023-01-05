@@ -5,7 +5,7 @@ import { createSpaceObject } from './utils'
 import { getHeading } from './physics'
 import { renderExplosionFrame } from './render'
 import type { Steerable } from './traits/Steerable'
-import { maxHeat } from './constants'
+import { maxHeat, shotHitReversFactor } from './constants'
 
 export function applyEngine(so: Thrustable, boost: number): number {
   const consumption: number = so.enginePower * boost
@@ -103,7 +103,7 @@ export function fire(so: SpaceObject): void {
 export function handleHittingShot(shot: SpaceObject, ctx: CanvasRenderingContext2D): void {
   if (shot.didHit) {
     shot.shotBlowFrame--
-    shot.velocity = scalarMultiply(shot.velocity, -0.8)
+    shot.velocity = scalarMultiply(shot.velocity, shotHitReversFactor)
     renderExplosionFrame(shot.position, ctx)
     if (shot.shotBlowFrame < 0) {
       shot.health = 0

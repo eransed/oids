@@ -1,12 +1,10 @@
 'use strict';
 exports.__esModule = true;
-exports.getLocalIp = void 0;
+exports.ipport = exports.getLocalIp = void 0;
 // import { networkInterfaces } from 'os';
 var networkInterfaces = require('os').networkInterfaces;
-// import { networkInterfaces } = 
 function getLocalIp() {
     var nets = networkInterfaces();
-    // const results = Object.create(null); // Or just '{}', an empty object
     var results = [];
     for (var _i = 0, _a = Object.keys(nets); _i < _a.length; _i++) {
         var name_1 = _a[_i];
@@ -28,3 +26,7 @@ function getLocalIp() {
     return results[0];
 }
 exports.getLocalIp = getLocalIp;
+function ipport(req) {
+    return req.socket.remoteAddress + ':' + req.socket.remotePort;
+}
+exports.ipport = ipport;

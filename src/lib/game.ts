@@ -2,24 +2,28 @@ import type { SpaceObject } from './types'
 
 import { initKeyControllers, spaceObjectKeyController } from './input'
 import { fire, handleHittingShot, wrapSpaceObject } from './mechanics'
-import { clearScreen, renderFrameInfo, renderMoon, renderShip, renderSpaceObjectStatusBar, renderVector } from './render'
+import { clearScreen, loadingText, renderFrameInfo, renderMoon, renderShip, renderSpaceObjectStatusBar, renderVector } from './render'
 import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
 import { add, rndfVec2d, rndi, round2dec } from './math'
 import { randomAnyColor, randomBlue, randomColor, randomGreen } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
-import { initMultiplayer, registerServerUpdate, sendToServer } from './multiplayer'
+import { initMultiplayer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
 
 export async function game(ctx: CanvasRenderingContext2D) {
+
+  
   if (!test()) {
     return
   }
-
+  
   console.log('Starting oids...')
-  await initMultiplayer()
   setCanvasSize(ctx)
+  loadingText('Loading...', ctx)
   initKeyControllers()
+
+  await initMultiplayer()
 
   const offset: number = 500
 
@@ -28,9 +32,10 @@ export async function game(ctx: CanvasRenderingContext2D) {
   ship.mass = 0.1
   ship.angleDegree = -120
   ship.health = 250
-  ship.name = 'player' + rndi(0, 100000)
+  ship.name = `Player-${rndi(0, 900000)}`
   ship.color = randomAnyColor()
-  console.log('Your ship name is: ' + ship.name + ' And your color is: #' + randomColor)
+  ship.isLocal = true
+  console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
 
   sendToServer(ship)
   // ship.steeringPower = 0.04
@@ -55,17 +60,24 @@ export async function game(ctx: CanvasRenderingContext2D) {
   let serverObjects: SpaceObject[] = []
 
   registerServerUpdate((so: SpaceObject) => {
+
     for (let i = 0; i < serverObjects.length; i++) {
       if (so.name === serverObjects[i].name) {
+        if (so.online === false) {
+          console.log(`${so.name} went offline`)
+        }
         serverObjects[i] = so
         return
       }
     }
-    if (so.name !== ship.name) serverObjects.push(so)
+    if (so.name !== ship.name) {
+      serverObjects.push(so)
+      console.log(`New ship online: ${so.name}`)
+    }
   })
 
   const renderFrame = (ctx: CanvasRenderingContext2D): void => {
-    renderShip(ship, ctx)
+    renderShip(ship, ctx, true)
 
     serverObjects.forEach((so) => {
       renderShip(so, ctx)
@@ -101,6 +113,10 @@ export async function game(ctx: CanvasRenderingContext2D) {
       wrapSpaceObject(body, getScreenRect(ctx))
     })
 
+    serverObjects = serverObjects.filter((so) => {
+      return so.online || so.isLocal
+    })
+
     const currentSpaceObjects = all.concat(serverObjects)
 
     handleCollisions(currentSpaceObjects, ctx)
@@ -119,7 +135,7 @@ export async function game(ctx: CanvasRenderingContext2D) {
       updateSpaceObjects(bodies, dt, ctx)
 
       //Possible optimization send every other frame
-      sendToServer(ship)
+      sendSpaceObjectToBroadcastServer(ship)
       fpsCounter(dt, ctx)
       requestAnimationFrame(update)
       nextFrame(ctx, dt)

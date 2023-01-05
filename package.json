@@ -7,11 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "build-server": "npx tsc server/main.ts",
+    "server": "npm run build-server && node server/main.js"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.0",
     "@tsconfig/svelte": "^3.0.0",
+    "@types/node": "^18.11.18",
     "@types/ws": "^8.5.4",
     "svelte": "^3.54.0",
     "svelte-check": "^2.10.0",

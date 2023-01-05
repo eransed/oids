@@ -1,21 +1,8 @@
 {
   "name": "oids-server",
-  "version": "0.1.0",
-  "description": "",
+  "version": "0.2.0",
+  "description": "Object broadcast server",
   "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc main.ts",
-    "start": "npm run build && node main.js"
-  },
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/ws": "^8.5.4",
-    "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "@types/node": "^18.11.18",
-    "ws": "^8.11.0"
-  }
+  "license": "ISC"
 }

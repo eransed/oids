@@ -1,48 +1,173 @@
 import type { IncomingMessage } from 'http'
-import { WebSocketServer } from 'ws'
-import { getLocalIp } from './net'
-
-// import {version, name} from './package.json';
-// const name_ver: string = name + ' ' + version
+import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from 'ws'
+import { getLocalIp, ipport } from './net'
 
 const pack = require('./package.json')
 const name_ver: string = pack.name + ' ' + pack.version
+// const name_ver: string = 'oids 0.1.0'
 
 const PORT: number = 5000
 
-const server = new WebSocketServer({
+const server: WebSocketServer = new WebSocketServer({
   port: PORT,
 })
 
-const clients: WebSocket[] = []
+let globalConnectedClients: Client[] = []
 
-function addNewClientIfNotExisting(clients: WebSocket[], clientConnection: WebSocket) {
+
+class Client {
+  ws: WebSocket
+  req: IncomingMessage
+  name: string
+  dateAdded: Date
+  lastDataObject: any
+  private nameHasBeenUpdated: boolean = false
+  constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded) {
+    this.ws = _ws
+    this.req = _req
+    this.name = _name
+    this.dateAdded = _dateAdded
+    this.addEventListeners()
+  }
+
+  updateNameOnce(newName: string) {
+    if (!this.nameHasBeenUpdated) {
+      const oldName: string = this.name
+      this.name = newName
+      this.nameHasBeenUpdated = true
+      console.log(`Updated name: ${oldName} -> ${this.name}`)
+    } else {
+      console.error(`Multiple name updates for ${this.toString()}: newName="${newName}"`)
+    }
+  }
+
+  addEventListeners(): void {
+    // console.log(`Adding event-listeners for ${this.toString()}`)
+    this.ws.addEventListener('close', () => {
+      // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
+      console.log(`${this.toString()} has been disconnected, sending goodbye message`)
+      const offlineMessage: any = this.lastDataObject
+      offlineMessage.online = false
+      broadcastToClients(this, globalConnectedClients, offlineMessage)
+      globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
+      if (globalConnectedClients.length === 0) {
+        console.log('No clients connected :(')
+      }
+    })
+  
+    this.ws.addEventListener('message', (event: MessageEvent) => {
+      const o: any = JSON.parse(event.data)
+      this.lastDataObject = o
+      if (!this.nameHasBeenUpdated) {
+        globalConnectedClients.forEach((c) => {
+          if (c === this && c.name === this.name) {
+            c.updateNameOnce(o.name)
+          }
+        })
+      }
+      o.online = true
+      broadcastToClients(this, globalConnectedClients, o)
+    })
+  }
+
+  toString(): string {
+    return `${this.name} (${ipport(this.req)}, ${getReadyStateText(this.ws)}, added: ${this.dateAdded.toLocaleTimeString()})`
+  }
+}
+
+function getReadyStateText(ws: WebSocket): string {
+  const s: number = ws.readyState
+  switch (s) {
+    case CONNECTING:
+      return 'CONNECTING'
+    case CLOSED:
+      return 'CLOSED'
+    case OPEN:
+      return 'OPEN'
+    case CLOSING:
+      return 'CLOSING'
+    default:
+      return 'UNKNOWN (' + s + ')'
+  }
+}
+
+
+function addNewClientIfNotExisting(clients: Client[], clientConnection: Client): boolean {
   for (let c of clients) {
-    if (c === clientConnection) {
+    if (c === clientConnection && c.name === clientConnection.name) {
       return false
     }
   }
   clients.push(clientConnection)
+  return true
 }
 
+// This function concept is not working, issues when updating with only one user.
+// Always one closed client left in clients...
+function removeClientIfExisting(clients: Client[], clientConnection: Client): Client[] {
+  const lengthBefore: number = clients.length
+  clients = clients.filter((c: Client) => {
+    return c === clientConnection
+  })
+  const removedCount: number = lengthBefore - clients.length
+  if (removedCount === 1) {
+    console.log(`Removed client: ${clientConnection.toString()}`)
+  } else if (removedCount > 1) {
+    console.error(`Removed ${removedCount} equal clients in list`)
+  }
+  return clients
+}
+
+
+function removeDisconnectedClients(clients: Client[]): Client[] {
+  // const lengthBefore: number = clients.length
+  const disconnectedClients: Client[] = clients.filter((c: Client) => {
+    return c.ws.readyState === CLOSED || c.ws.readyState === CLOSING
+  })
+  
+  const connectedClients: Client[] = clients.filter((c: Client) => {
+    return c.ws.readyState === OPEN || c.ws.readyState === CONNECTING
+  })
+
+  disconnectedClients.forEach((c) => {
+    console.log(`Disconnected: ${c.toString()}`)
+  })
+
+  connectedClients.forEach((c) => {
+    console.log(`Connected: ${c.toString()}`)
+  })
+
+  // const disconClientCount: number = lengthBefore - connectedClients.length
+  // if (disconClientCount > 0) {
+  //   console.log(`Removed ${disconClientCount} disconnected clients`)
+  // }
+  return connectedClients
+}
+
+
 // object is any non-primitive object ie not string, number, boolean, undefined, null etc. added in typescript 2.2
-const broadcastToClients = (skipSourceClient: WebSocket, connectedClients: WebSocket[], data: object) => {
+function broadcastToClients (skipSourceClient: Client, connectedClients: Client[], data: object): void {
   for (let client of connectedClients) {
-    if (skipSourceClient !== client) {
-      client.send(JSON.stringify(data))
+    if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
+      client.ws.send(JSON.stringify(data))
     }
   }
 }
 
-server.on('connection', function connection(clientConnection: WebSocket, req: IncomingMessage) {
 
-  if (addNewClientIfNotExisting(clients, clientConnection)) {
-    console.log('Added new client ' + req.socket.remoteAddress)
+server.on('connection', function connection(clientConnection: WebSocket, req: IncomingMessage) {
+  globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
+
+  const newClient: Client = new Client(clientConnection, req, `Client-${globalConnectedClients.length}`, new Date())
+  if (addNewClientIfNotExisting(globalConnectedClients, newClient)) {
+    console.log(`Storing new client ${newClient.toString()} in broadcast list`)
   }
 
-  clientConnection.addEventListener('message', (event: MessageEvent) => {
-    broadcastToClients(clientConnection, clients, JSON.parse(event.data))
+  console.log(`${globalConnectedClients.length} connected clients:`)
+  globalConnectedClients.forEach((c) => {
+    console.log(`   ${c.toString()}`)
   })
 })
+
 
 console.log('Starting ' + name_ver + ', listening on ws://' + getLocalIp() + ':' + PORT)

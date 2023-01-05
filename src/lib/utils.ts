@@ -1,6 +1,6 @@
 import type { SpaceObject, Vec2d } from './types'
 import { rndi, rndf, floor, round2dec } from './math'
-import { screenScale, maxRandomDefaultSpaceObjectVelocity as maxVel, linearFriction } from './constants'
+import { screenScale, maxRandomDefaultSpaceObjectVelocity as maxVel, linearFriction, maxHeat } from './constants'
 
 export function createSpaceObject(): SpaceObject {
   const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
@@ -27,17 +27,17 @@ export function createSpaceObject(): SpaceObject {
     angularVelocity: 0,
     health: 100,
     killCount: 0,
-    fuel: 5000,
+    fuel: 500,
     enginePower: 0.2,
-    steeringPower: 2.5,
-    ammo: 25000,
+    steeringPower: 1.2,
+    ammo: 1000,
     shotsInFlight: [],
     missileSpeed: 20,
     missileDamage: 10,
     canonCoolDown: 0,
     canonOverHeat: false,
-    canonHeatAddedPerShot: 100,
-    canonCoolDownSpeed: 8,
+    canonHeatAddedPerShot: 2,
+    canonCoolDownSpeed: 0.7,
     colliding: false,
     collidingWith: [],
     damage: 5,
@@ -48,6 +48,10 @@ export function createSpaceObject(): SpaceObject {
     steer: function (direction: number, deltaTime: number): void {
       throw new Error('Function not implemented.')
     },
+    motivatorBroken: false,
+    motivationLevel: 100,
+    online: false,
+    isLocal: false,
   }
 
   return spaceObject

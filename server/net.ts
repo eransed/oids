@@ -1,14 +1,14 @@
 'use strict';
 
+import { IncomingMessage } from "http";
+
 // import { networkInterfaces } from 'os';
 const { networkInterfaces } = require('os');
 
-// import { networkInterfaces } = 
-export function getLocalIp() {
+export function getLocalIp(): string {
 
   const nets = networkInterfaces();
-  // const results = Object.create(null); // Or just '{}', an empty object
-  const results: any[] = []
+  const results: string[] = []
 
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
@@ -26,4 +26,8 @@ export function getLocalIp() {
   }
   // console.log(results)
   return results[0]
+}
+
+export function ipport(req: IncomingMessage): string {
+  return req.socket.remoteAddress + ':' + req.socket.remotePort
 }

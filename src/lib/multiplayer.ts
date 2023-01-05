@@ -41,13 +41,13 @@ export function getReadyState(): number {
 export function getReadyStateText(): string {
   const s: number = getReadyState()
   switch (s) {
-    case CONNECTING:
+    case WebSocket.CONNECTING:
       return 'CONNECTING'
-    case CLOSED:
+    case WebSocket.CLOSED:
       return 'CLOSED'
-    case OPEN:
+    case WebSocket.OPEN:
       return 'OPEN'
-    case CLOSING:
+    case WebSocket.CLOSING:
       return 'CLOSING'
     default:
       return '(' + s + ')'
@@ -62,8 +62,15 @@ export const sendToServer = (messageObject: object) => {
   if (socket.readyState === 1) {
     socket.send(JSON.stringify(messageObject))
   } else {
-    console.error('Socket not open, readyState=' + socket.readyState)
+    // console.error('Socket not open, readyState=' + socket.readyState)
   }
+}
+
+export function sendSpaceObjectToBroadcastServer(so: SpaceObject): void {
+  // Remove array which could containg circular ref
+  so.collidingWith = []
+  so.isLocal = false
+  sendToServer(so)
 }
 
 export const registerServerUpdate = (callback: (newObject: SpaceObject) => void): void => {

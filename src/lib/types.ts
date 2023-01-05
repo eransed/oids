@@ -5,6 +5,19 @@ export interface Vec2d {
   y: number
 }
 
+export interface Motivated {
+  motivatorBroken: boolean
+  motivationLevel: number
+}
+
+export interface Remote {
+  online: boolean
+}
+
+export interface Local {
+  isLocal: boolean
+}
+
 export interface Positionable {
   position: Vec2d
 }
@@ -60,7 +73,7 @@ export interface Damageable extends Positionable {
   health: number
 }
 
-export interface SpaceObject extends Positionable, Physical, Thrustable, Steerable, Damager, Damageable, Fireable, Collidable, Bounceable {
+export interface SpaceObject extends Positionable, Motivated, Remote, Local, Physical, Thrustable, Steerable, Damager, Damageable, Fireable, Collidable, Bounceable {
   name: string
   color: string
   shotsInFlight: SpaceObject[]

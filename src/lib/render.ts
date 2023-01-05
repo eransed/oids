@@ -20,20 +20,39 @@ export function renderFrameInfo(fps: number, frameTimeMs: number, ctx: CanvasRen
   ctx.fillText('DT:  ' + round2dec(frameTimeMs, dec) + 'ms', xpos, 100)
   ctx.fillText('DTS: ' + round2dec(frameTimeMs * timeScale, dec), xpos, 150)
   ctx.fillText('RES: ' + screen.x + 'x' + screen.y + ' (x' + screenScale + ', ' + ratio + ')', xpos, 200)
-  ctx.fillText('WS: ' + getReadyStateText(), xpos, 250)
+  ctx.fillText('WS:  ' + getReadyStateText(), xpos, 250)
   renderProgressBar({ x: xpos, y: 300 }, 'Load', frameTimeMs, 50, ctx, -40)
   ctx.fillStyle = '#444'
   ctx.fillText('' + frontVersion, screen.x - frontVersion.length * 27, 50)
 }
 
+export function loadingText(text: string, ctx: CanvasRenderingContext2D) {
+  ctx.font = 'bold 80px courier'
+  ctx.fillStyle = '#ccc'
+  const ppt: number = 15
+  ctx.fillText(text, getScreenRect(ctx).x/2 - text.length * ppt, getScreenRect(ctx).y/2)
+}
+
+export function getNamesAsString(sos: SpaceObject[], label: string = ''): string {
+  const arr: string[] = []
+  sos.forEach((e) => {
+    arr.push(e.name)
+  })
+  return label + arr.join(', ')
+}
+
 export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   const screen: Vec2d = getScreenFromCanvas(ctx)
   const ypos: number = screen.y - 20
-  const ypos2: number = screen.y - 70
+  const yrow2: number = screen.y - 70
+  const yrow3: number = yrow2 - 50
+  const yrow4: number = yrow3 - 50
   const offset: number = 600
   ctx.font = 'bold 40px courier'
   ctx.fillStyle = '#ccc'
-  ctx.fillText('# Players: ' + serverObjects.length, 25 + offset * 0, ypos2)
+  ctx.fillText(`My name: ${so.name}`, 25 + offset * 0, yrow4)
+  ctx.fillText('# Calculations per frame: ' + 31222, 25 + offset * 0, yrow3)
+  ctx.fillText(getNamesAsString(serverObjects, `Remotes (${serverObjects.length}): `), 25 + offset * 0, yrow2)
   ctx.fillText('SIF: ' + so.shotsInFlight.length, 25 + offset * 0, ypos)
   ctx.fillText(so.health + 'hp', 25 + offset * 0.5, ypos)
   ctx.fillText('Ammo: ' + so.ammo, 25 + offset * 0.9, ypos)
@@ -41,12 +60,14 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   ctx.fillText('P' + to_string(so.position, 0), 25 + offset * 2.1, ypos)
   ctx.fillText('V' + to_string(so.velocity, 1), 25 + offset * 2.8, ypos)
   ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), 25 + offset * 3.5, ypos)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 50 }, 'Health', so.health, 1200, ctx, 200)
+  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 50 }, 'Health', so.health, 250, ctx, 75)
   renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 120 }, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 190 }, 'Ammo', so.ammo, 50000, ctx, 5000)
+  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 190 }, 'Ammo', so.ammo, 1000, ctx, 200)
   renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 260 }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
   renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 330 }, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 400 }, 'Fuel', so.fuel, 5000, ctx, 500)
+  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 400 }, 'Fuel', so.fuel, 500, ctx, 100)
+  const cstate: string = (so.canonOverHeat ? 'OVERHEATED!': 'Heat')
+  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 470 }, cstate, so.canonCoolDown, 100, ctx, -80)
 }
 
 export function renderVector(
@@ -68,7 +89,7 @@ export function renderVector(
   ctx.restore()
 }
 
-export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer: boolean = false): void {
   let scale: number = 2
   let shipSize = { x: 40, y: 80 }
   ctx.save()
@@ -95,7 +116,19 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void
   // ctx.lineTo(cannonWidth, -cannonEnd)
   // ctx.moveTo(-cannonWidth, cannonStart)
   // ctx.lineTo(-cannonWidth, -cannonEnd)
-  ctx.stroke()
+
+  if (renderAsLocalPlayer) {
+    ctx.stroke()
+  } else {
+    ctx.fill()
+  }
+
+  if (!so.online && !renderAsLocalPlayer) {
+    ctx.font = "bold 30px courier"
+    ctx.fillStyle = "#f00"
+    ctx.fillText(so.name, -1.2 * so.size.x/2, -20)
+    ctx.fillText('offline', -1.2 * so.size.x/2, 20)
+  }
 
   // // Tower
   // ctx.beginPath()
@@ -119,9 +152,9 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D): void
 }
 
 export function renderExplosionFrame(pos: Vec2d, ctx: any) {
-  let offset: number = 7
+  let offset: number = 20
   let minSize: number = 1
-  let maxSize: number = 14
+  let maxSize: number = 30
   ctx.save()
   ctx.translate(pos.x, pos.y)
   for (let c of ['#ff0', '#f00', '#ee0', '#e00', '#dd0', '#d00', '#008', '#000', '#444', '#fee', '#f66,', '#f99', '#fbb']) {
