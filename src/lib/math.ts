@@ -100,7 +100,7 @@ export function mirrorWrap(vector: Vec2d, screen: Vec2d) {
   }
 }
 
-export function round2dec(num: number, dec: number = 2): number {
+export function round2dec(num: number, dec = 2): number {
   const exp = Math.pow(10, dec)
   return Math.round((num + Number.EPSILON) * exp) / exp
 }

@@ -1,5 +1,5 @@
 import { Physical } from './traits/Physical'
-import { testModule, TestModuleResults, testSummary, type TestModule } from './traits/Testable'
+import { testModule, TestModuleResults, testSummary } from './traits/Testable'
 
 export function test(): boolean {
   const results: TestModuleResults[] = [

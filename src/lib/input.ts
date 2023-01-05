@@ -1,15 +1,15 @@
-import type { Fireable, SpaceObject, Thrustable } from './types'
+import type { SpaceObject } from './types'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
 
-let boost: boolean = false
-let upPressed: boolean = false
-let downPressed: boolean = false
-let rightPressed: boolean = false
+let boost = false
+let upPressed = false
+let downPressed = false
+let rightPressed = false
 let rightStrafePressed = false
 let leftStrafePressed = false
-let leftPressed: boolean = false
-let spacePressed: boolean = false
+let leftPressed = false
+let spacePressed = false
 
 function arrowControl(e: KeyboardEvent, value: boolean) {
   if (e.key === 'ArrowUp') {
@@ -51,7 +51,7 @@ function arrowControl(e: KeyboardEvent, value: boolean) {
   }
 }
 
-export function spaceObjectKeyController(so: SpaceObject, dt: number = 1) {
+export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   //so.afterBurnerEnabled = false
 
   const dts: number = dt * timeScale
@@ -88,7 +88,6 @@ export function spaceObjectKeyController(so: SpaceObject, dt: number = 1) {
 
   if (spacePressed) {
     fire(so)
-    // for (let i = 0; i < 1; i++) {}
   }
 }
 

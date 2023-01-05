@@ -1,11 +1,12 @@
-import type { Bounceable, Damageable, Damager, Fireable, Physical, Positionable, SpaceObject, Thrustable, Vec2d } from './types'
-import { scalarMultiply, mirrorWrap, wrap, rndf, add, rndi, copy, degToRad } from './math'
-import { randomGreen } from './color'
+import type { Bounceable, Damageable, Damager, Physical, Positionable, SpaceObject, Thrustable, Vec2d } from './types'
+import type { Steerable } from './traits/Steerable'
+
+import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from './math'
+import { maxHeat, shotHitReversFactor } from './constants'
+import { renderExplosionFrame } from './render'
 import { createSpaceObject } from './utils'
 import { getHeading } from './physics'
-import { renderExplosionFrame } from './render'
-import type { Steerable } from './traits/Steerable'
-import { maxHeat, shotHitReversFactor } from './constants'
+import { randomGreen } from './color'
 
 export function applyEngine(so: Thrustable, boost: number): number {
   const consumption: number = so.enginePower * boost
@@ -31,7 +32,7 @@ export function getThrustVector(so: Thrustable & Steerable, dirAng: number, boos
   }
 }
 
-export function applyEngineThrust(so: Thrustable & Steerable, directionDeg: number, boostFactor: number = 1): void {
+export function applyEngineThrust(so: Thrustable & Steerable, directionDeg: number, boostFactor = 1): void {
   so.velocity = add(so.velocity, getThrustVector(so, directionDeg, boostFactor))
   // so.acceleration = add(so.acceleration, getThrustVector(so, directionDeg))
 }
@@ -70,7 +71,7 @@ export function fire(so: SpaceObject): void {
     return
   }
   so.ammo--
-  let shot: SpaceObject = createSpaceObject()
+  const shot: SpaceObject = createSpaceObject()
   shot.mass = 10
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
@@ -126,7 +127,7 @@ export function decayDeadSpaceObjects(so: Damageable[]): Damageable[] {
   return out
 }
 
-export function bounceSpaceObject(so: Physical & Damager & Bounceable, screen: Vec2d, energyFactor: number = 1, gap: number = 1, damageDeltaFactor: number) {
+export function bounceSpaceObject(so: Physical & Damager & Bounceable, screen: Vec2d, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
   if (so.position.x < gap) {
     so.velocity.x = -so.velocity.x * energyFactor
     so.position.x = gap

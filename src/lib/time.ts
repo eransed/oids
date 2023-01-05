@@ -1,11 +1,9 @@
 import { round2dec } from './math'
 import { renderFrameInfo } from './render'
-import type { Vec2d } from './types'
-import { getScreenRect } from './utils'
 
-const fps_list_max_entries: number = 12
+const fps_list_max_entries = 12
 let prevTimestamp: number
-let fps_list: number[] = []
+const fps_list: number[] = []
 
 export function getFrameTimeMs(timestamp: number): number {
   // todo: make sure not to return nan

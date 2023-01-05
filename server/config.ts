@@ -1,2 +1,2 @@
 
-export const OIDS_FRONTEND_PATH: string = '../oids'
+export const OIDS_WS_PORT = 5000

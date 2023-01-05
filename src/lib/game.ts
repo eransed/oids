@@ -25,7 +25,7 @@ export async function game(ctx: CanvasRenderingContext2D) {
 
   await initMultiplayer()
 
-  const offset: number = 500
+  const offset = 500
 
   const ship: SpaceObject = createSpaceObject()
   ship.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))

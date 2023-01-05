@@ -38,9 +38,6 @@ export interface Collidable extends Positionable {
   colliding: boolean
 }
 
-// export interface Renderable extends Positionable, Physical, Collidable {
-//   color: string
-// }
 
 export interface Thrustable extends Positionable, Physical {
   fuel: number

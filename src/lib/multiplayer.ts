@@ -1,4 +1,4 @@
-import { CLOSED, CLOSING, CONNECTING, OPEN } from 'ws'
+
 import type { SpaceObject } from './types'
 
 let socket: WebSocket
@@ -24,14 +24,6 @@ export const initMultiplayer = async () => {
   } catch (error) {
     console.error('Could not connect', error)
   }
-
-  // socket.addEventListener('open', (event) => {
-  //   socket.send('Hello Server!')
-  // })
-
-  // socket.addEventListener('message', (event) => {
-  //   console.log('Message from server ', event.data)
-  // })
 }
 
 export function getReadyState(): number {
@@ -50,7 +42,7 @@ export function getReadyStateText(): string {
     case WebSocket.CLOSING:
       return 'CLOSING'
     default:
-      return '(' + s + ')'
+      return `UNKNOWN (${s})`
   }
 }
 

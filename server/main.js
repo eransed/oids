@@ -1,11 +1,11 @@
 "use strict";
 exports.__esModule = true;
 var ws_1 = require("ws");
+var config_1 = require("./config");
 var net_1 = require("./net");
 var pack = require('./package.json');
 var name_ver = pack.name + ' ' + pack.version;
-// const name_ver: string = 'oids 0.1.0'
-var PORT = 5000;
+var PORT = config_1.OIDS_WS_PORT;
 var server = new ws_1.WebSocketServer({
     port: PORT
 });

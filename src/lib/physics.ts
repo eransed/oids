@@ -33,7 +33,7 @@ export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingCo
 
   coolDown(so)
 
-  for (let shot of so.shotsInFlight) {
+  for (const shot of so.shotsInFlight) {
     const v: Vec2d = scalarMultiply(shot.velocity, dts)
     const a: Vec2d = scalarMultiply(shot.acceleration, dts)
     shot.velocity = add(shot.velocity, a)
@@ -57,7 +57,7 @@ export function decayOffScreenShots(so: SpaceObject, screen: Vec2d) {
   })
 }
 
-export function decayOffScreenShotsPadded(so: SpaceObject, screen: Vec2d, padFac: number = 1) {
+export function decayOffScreenShotsPadded(so: SpaceObject, screen: Vec2d, padFac = 1) {
   so.shotsInFlight = so.shotsInFlight.filter(function (e) {
     return !offScreen_mm(e.position, scalarMultiply(screen, -padFac), scalarMultiply(screen, padFac))
   })
@@ -79,7 +79,7 @@ export function offScreen_mm(v: Vec2d, screen_min: Vec2d, screen_max: Vec2d) {
   return false
 }
 
-export function gravity(from: Physical, to: Physical, G: number = 1): void {
+export function gravity(from: Physical, to: Physical, G = 1): void {
   // F = G((m0 * m1)/r^2)
   const m0: number = from.mass
   const m1: number = to.mass
@@ -136,7 +136,7 @@ export function isColliding(p0: Physical, p1: Physical): boolean {
   return false
 }
 
-export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2d, energyFactor: number = 1, gap: number = 1, damageDeltaFactor: number) {
+export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2d, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
   if (p.position.x < gap) {
     p.velocity.x = -p.velocity.x * energyFactor
     p.position.x = gap
@@ -165,8 +165,8 @@ export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen
 
 export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D): void {
   resetCollisions(spaceObjects)
-  for (let so0 of spaceObjects) {
-    for (let so1 of spaceObjects) {
+  for (const so0 of spaceObjects) {
+    for (const so1 of spaceObjects) {
       if (isColliding(so0, so1) && so0.name !== so1.name) {
         so0.colliding = true
         so1.colliding = true
@@ -177,7 +177,7 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
         renderExplosionFrame(so0.position, ctx)
         renderExplosionFrame(so1.position, ctx)
       }
-      for (let shot of so0.shotsInFlight) {
+      for (const shot of so0.shotsInFlight) {
         if (shot.armedDelay < 0) {
           const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), 0.1)
           if (isColliding(shot, so0) && shot.didHit === false) {
@@ -199,7 +199,7 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
 }
 
 export function resetCollisions(spaceObjects: SpaceObject[]) {
-  for (let so of spaceObjects) {
+  for (const so of spaceObjects) {
     so.colliding = false
     so.collidingWith = []
   }

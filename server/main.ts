@@ -1,12 +1,12 @@
 import type { IncomingMessage } from 'http'
 import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from 'ws'
+import { OIDS_WS_PORT } from './config'
 import { getLocalIp, ipport } from './net'
 
 const pack = require('./package.json')
 const name_ver: string = pack.name + ' ' + pack.version
-// const name_ver: string = 'oids 0.1.0'
 
-const PORT: number = 5000
+const PORT = OIDS_WS_PORT
 
 const server: WebSocketServer = new WebSocketServer({
   port: PORT,
@@ -21,7 +21,7 @@ class Client {
   name: string
   dateAdded: Date
   lastDataObject: any
-  private nameHasBeenUpdated: boolean = false
+  private nameHasBeenUpdated = false
   constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded) {
     this.ws = _ws
     this.req = _req
@@ -93,7 +93,7 @@ function getReadyStateText(ws: WebSocket): string {
 
 
 function addNewClientIfNotExisting(clients: Client[], clientConnection: Client): boolean {
-  for (let c of clients) {
+  for (const c of clients) {
     if (c === clientConnection && c.name === clientConnection.name) {
       return false
     }
@@ -147,7 +147,7 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
 
 // object is any non-primitive object ie not string, number, boolean, undefined, null etc. added in typescript 2.2
 function broadcastToClients (skipSourceClient: Client, connectedClients: Client[], data: object): void {
-  for (let client of connectedClients) {
+  for (const client of connectedClients) {
     if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
       client.ws.send(JSON.stringify(data))
     }

@@ -10,8 +10,8 @@ export function clearScreen(ctx: CanvasRenderingContext2D) {
 }
 
 export function renderFrameInfo(fps: number, frameTimeMs: number, ctx: CanvasRenderingContext2D) {
-  const xpos: number = 25
-  const dec: number = 1
+  const xpos = 25
+  const dec = 1
   const screen: Vec2d = getScreenRect(ctx)
   const ratio: number = round2dec(screen.x / screen.y, 2)
   ctx.font = 'bold 40px courier'
@@ -29,11 +29,11 @@ export function renderFrameInfo(fps: number, frameTimeMs: number, ctx: CanvasRen
 export function loadingText(text: string, ctx: CanvasRenderingContext2D) {
   ctx.font = 'bold 80px courier'
   ctx.fillStyle = '#ccc'
-  const ppt: number = 15
+  const ppt = 15
   ctx.fillText(text, getScreenRect(ctx).x/2 - text.length * ppt, getScreenRect(ctx).y/2)
 }
 
-export function getNamesAsString(sos: SpaceObject[], label: string = ''): string {
+export function getNamesAsString(sos: SpaceObject[], label = ''): string {
   const arr: string[] = []
   sos.forEach((e) => {
     arr.push(e.name)
@@ -47,7 +47,7 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const yrow2: number = screen.y - 70
   const yrow3: number = yrow2 - 50
   const yrow4: number = yrow3 - 50
-  const offset: number = 600
+  const offset = 600
   ctx.font = 'bold 40px courier'
   ctx.fillStyle = '#ccc'
   ctx.fillText(`My name: ${so.name}`, 25 + offset * 0, yrow4)
@@ -74,8 +74,8 @@ export function renderVector(
   v: Vec2d,
   origin: Vec2d,
   ctx: CanvasRenderingContext2D,
-  scale: number = 10000,
-  color: string = '#fff',
+  scale = 10000,
+  color = '#fff',
   offset: Vec2d = { x: 0, y: 0 }
 ) {
   ctx.save()
@@ -89,9 +89,9 @@ export function renderVector(
   ctx.restore()
 }
 
-export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer: boolean = false): void {
-  let scale: number = 2
-  let shipSize = { x: 40, y: 80 }
+export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false): void {
+  const scale = 2
+  const shipSize: Vec2d = { x: 40, y: 80 }
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
   ctx.fillStyle = '#fff'
@@ -152,14 +152,14 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
 }
 
 export function renderExplosionFrame(pos: Vec2d, ctx: any) {
-  let offset: number = 20
-  let minSize: number = 1
-  let maxSize: number = 30
+  const offset = 20
+  const minSize = 1
+  const maxSize = 30
   ctx.save()
   ctx.translate(pos.x, pos.y)
-  for (let c of ['#ff0', '#f00', '#ee0', '#e00', '#dd0', '#d00', '#008', '#000', '#444', '#fee', '#f66,', '#f99', '#fbb']) {
-    let center = add({ x: 0, y: 0 }, { x: rndi(-offset, offset), y: rndi(-offset, offset) })
-    let size = add({ x: 0, y: 0 }, { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) })
+  for (const c of ['#ff0', '#f00', '#ee0', '#e00', '#dd0', '#d00', '#008', '#000', '#444', '#fee', '#f66,', '#f99', '#fbb']) {
+    const center = add({ x: 0, y: 0 }, { x: rndi(-offset, offset), y: rndi(-offset, offset) })
+    const size = add({ x: 0, y: 0 }, { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) })
     ctx.fillStyle = c
     ctx.fillRect(center.x, center.y, size.x, size.y)
   }
@@ -167,7 +167,7 @@ export function renderExplosionFrame(pos: Vec2d, ctx: any) {
 }
 
 export function renderShot(so: SpaceObject, ctx: any) {
-  for (let shot of so.shotsInFlight) {
+  for (const shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
       ctx.fillStyle = shot.armedDelay < 0 ? '#00f' : '#fff'
@@ -199,12 +199,12 @@ export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void 
   ctx.restore()
 }
 
-export function renderProgressBar(pos: Vec2d, label: string, amount: number, max: number, ctx: CanvasRenderingContext2D, redLevel: number = 60): void {
+export function renderProgressBar(pos: Vec2d, label: string, amount: number, max: number, ctx: CanvasRenderingContext2D, redLevel = 60): void {
   ctx.save()
   ctx.translate(pos.x, pos.y)
-  const linew: number = 8
-  const w: number = 500
-  const h: number = 50
+  const linew = 8
+  const w = 500
+  const h = 50
   ctx.lineWidth = linew
   ctx.strokeStyle = '#fff'
   ctx.fillStyle = '#fff'
