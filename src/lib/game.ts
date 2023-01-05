@@ -1,12 +1,12 @@
 import type { SpaceObject } from './types'
 
 import { initKeyControllers, spaceObjectKeyController } from './input'
-import { fire, wrapSpaceObject } from './mechanics'
+import { fire, handleHittingShot, wrapSpaceObject } from './mechanics'
 import { clearScreen, renderFrameInfo, renderMoon, renderShip, renderSpaceObjectStatusBar, renderVector } from './render'
 import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
 import { add, rndfVec2d, rndi, round2dec } from './math'
-import { randomBlue, randomGreen } from './color'
+import { randomAnyColor, randomBlue, randomColor, randomGreen } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
 import { initMultiplayer, registerServerUpdate, sendToServer } from './multiplayer'
@@ -23,15 +23,13 @@ export async function game(ctx: CanvasRenderingContext2D) {
 
   const offset: number = 500
 
-  const randomColor = Math.floor(Math.random() * 16777215).toString(16)
-
   const ship: SpaceObject = createSpaceObject()
   ship.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
   ship.mass = 0.1
   ship.angleDegree = -120
-  ship.health = 1200
+  ship.health = 250
   ship.name = 'player' + rndi(0, 100000)
-  ship.color = '#' + randomColor
+  ship.color = randomAnyColor()
   console.log('Your ship name is: ' + ship.name + ' And your color is: #' + randomColor)
 
   sendToServer(ship)
@@ -103,7 +101,9 @@ export async function game(ctx: CanvasRenderingContext2D) {
       wrapSpaceObject(body, getScreenRect(ctx))
     })
 
-    //handleCollisions(all, ctx)
+    const currentSpaceObjects = all.concat(serverObjects)
+
+    handleCollisions(currentSpaceObjects, ctx)
   }
 
   function renderLoop(
@@ -117,6 +117,7 @@ export async function game(ctx: CanvasRenderingContext2D) {
       renderFrame(ctx)
       updateSpaceObject(ship, dt, ctx)
       updateSpaceObjects(bodies, dt, ctx)
+
       //Possible optimization send every other frame
       sendToServer(ship)
       fpsCounter(dt, ctx)

@@ -2,7 +2,7 @@ import type { Bounceable, Damageable, Damager, Physical, Positionable, Rotatable
 import { add, degToRad, limitv, magnitude, mul, radToDeg, rndi, scalarMultiply, smul, sub } from './math'
 import { getScreenFromCanvas } from './utils'
 import { renderExplosionFrame } from './render'
-import { decayDeadShots, handleHittingShot } from './mechanics'
+import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
 import { angularFriction, linearFriction, timeScale } from './constants'
 
 export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
@@ -31,7 +31,8 @@ export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingCo
   decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), 1.2)
   decayDeadShots(so)
 
-  // coolDown(so)
+  coolDown(so)
+
   for (let shot of so.shotsInFlight) {
     const v: Vec2d = scalarMultiply(shot.velocity, dts)
     const a: Vec2d = scalarMultiply(shot.acceleration, dts)
@@ -45,7 +46,7 @@ export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingCo
     shot.armedDelay--
 
     // bounceSpaceObject(shot, screen, 1, 0, 0.7)
-    handleHittingShot(shot, ctx)
+    //handleHittingShot(shot, ctx)
   }
   // removeShotsAfterBounces(so, 2)
 }
@@ -190,6 +191,8 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
             shot.didHit = true
           }
         }
+
+        handleHittingShot(shot, ctx)
       }
     }
   }

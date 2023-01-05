@@ -58,7 +58,7 @@ export function spaceObjectKeyController(so: SpaceObject, dt: number = 1) {
 
   if (boost) {
     //so.afterBurnerEnabled = true
-    applyEngineThrust(so, 0, 5)
+    applyEngineThrust(so, 0, 4)
   }
 
   if (upPressed) {
@@ -87,9 +87,8 @@ export function spaceObjectKeyController(so: SpaceObject, dt: number = 1) {
   }
 
   if (spacePressed) {
-    for (let i = 0; i < 40; i++) {
-      fire(so)
-    }
+    fire(so)
+    // for (let i = 0; i < 1; i++) {}
   }
 }
 

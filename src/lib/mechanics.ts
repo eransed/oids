@@ -5,6 +5,7 @@ import { createSpaceObject } from './utils'
 import { getHeading } from './physics'
 import { renderExplosionFrame } from './render'
 import type { Steerable } from './traits/Steerable'
+import { maxHeat } from './constants'
 
 export function applyEngine(so: Thrustable, boost: number): number {
   const consumption: number = so.enginePower * boost
@@ -45,6 +46,18 @@ export function decayDeadShots(so: SpaceObject) {
   so.shotsInFlight = <SpaceObject[]>decayDeadSpaceObjects(so.shotsInFlight)
 }
 
+export function coolDown(so: SpaceObject) {
+  if (so.canonCoolDown >= maxHeat) {
+    so.canonOverHeat = true
+  }
+
+  so.canonCoolDown -= so.canonCoolDownSpeed
+  if (so.canonCoolDown < 1) {
+    so.canonCoolDown = 0
+    so.canonOverHeat = false
+  }
+}
+
 export function fire(so: SpaceObject): void {
   if (so.ammo < 1) {
     return
@@ -53,6 +66,9 @@ export function fire(so: SpaceObject): void {
     return
   }
   so.canonCoolDown += so.canonHeatAddedPerShot
+  if (so.canonCoolDown > maxHeat) {
+    return
+  }
   so.ammo--
   let shot: SpaceObject = createSpaceObject()
   shot.mass = 10

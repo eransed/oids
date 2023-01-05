@@ -17,7 +17,7 @@ export function createSpaceObject(): SpaceObject {
 
   const spaceObject: SpaceObject = {
     mass: 1,
-    size: { x: 24, y: 24 },
+    size: { x: 100, y: 100 },
     color: '#fff',
     position: initPos,
     velocity: initVel,
@@ -36,12 +36,12 @@ export function createSpaceObject(): SpaceObject {
     missileDamage: 10,
     canonCoolDown: 0,
     canonOverHeat: false,
-    canonHeatAddedPerShot: 25,
+    canonHeatAddedPerShot: 100,
     canonCoolDownSpeed: 8,
     colliding: false,
     collidingWith: [],
     damage: 5,
-    armedDelay: 1,
+    armedDelay: 8,
     bounceCount: 0,
     didHit: false,
     shotBlowFrame: 16,

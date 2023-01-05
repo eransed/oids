@@ -7,3 +7,4 @@ export const angularFriction: number = 0.995
 export const canvasBackgroundColor: string = '#000'
 export const maxRandomDefaultSpaceObjectVelocity: number = 1
 export const timeScale: number = 0.09
+export const maxHeat: number = 100
