@@ -2,20 +2,20 @@ import type { SpaceObject, Vec2d } from './types'
 import { add, magnitude, rndi, round2dec, scalarMultiply } from './math'
 import { canvasBackgroundColor, frontVersion, screenScale, timeScale } from './constants'
 import { getScreenFromCanvas, getScreenRect, to_string } from './utils'
-import { getReadyState, getReadyStateText } from './multiplayer'
+import { getReadyStateText } from './multiplayer'
 
 export function clearScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = canvasBackgroundColor
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
 
-export function renderFrameInfo(fps: number, frameTimeMs: number, ctx: CanvasRenderingContext2D) {
-  const xpos = 25
+export function renderFrameInfo(fps: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D) {
+  const xpos = 27
   const dec = 1
   const screen: Vec2d = getScreenRect(ctx)
   const ratio: number = round2dec(screen.x / screen.y, 2)
   ctx.font = 'bold 40px courier'
-  ctx.fillStyle = '#ccc'
+  ctx.fillStyle = '#fff'
   ctx.fillText('FPS: ' + round2dec(fps, dec), xpos, 50)
   ctx.fillText('DT:  ' + round2dec(frameTimeMs, dec) + 'ms', xpos, 100)
   ctx.fillText('DTS: ' + round2dec(frameTimeMs * timeScale, dec), xpos, 150)
@@ -23,12 +23,12 @@ export function renderFrameInfo(fps: number, frameTimeMs: number, ctx: CanvasRen
   ctx.fillText('WS:  ' + getReadyStateText(), xpos, 250)
   renderProgressBar({ x: xpos, y: 300 }, 'Load', frameTimeMs, 50, ctx, -40)
   ctx.fillStyle = '#444'
-  ctx.fillText('' + frontVersion, screen.x - frontVersion.length * 27, 50)
+  ctx.fillText('' + ver, screen.x - ver.length * 27, 50)
 }
 
 export function loadingText(text: string, ctx: CanvasRenderingContext2D) {
   ctx.font = 'bold 80px courier'
-  ctx.fillStyle = '#ccc'
+  ctx.fillStyle = '#fff'
   const ppt = 15
   ctx.fillText(text, getScreenRect(ctx).x/2 - text.length * ppt, getScreenRect(ctx).y/2)
 }
@@ -36,38 +36,40 @@ export function loadingText(text: string, ctx: CanvasRenderingContext2D) {
 export function getNamesAsString(sos: SpaceObject[], label = ''): string {
   const arr: string[] = []
   sos.forEach((e) => {
-    arr.push(e.name)
+    arr.push(`(${e.name}, ${e.health}hp)`)
   })
   return label + arr.join(', ')
 }
 
 export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   const screen: Vec2d = getScreenFromCanvas(ctx)
-  const ypos: number = screen.y - 20
-  const yrow2: number = screen.y - 70
-  const yrow3: number = yrow2 - 50
-  const yrow4: number = yrow3 - 50
+  const ypos: number = screen.y - 30
+  const ydiff = 60
+  const yrow2: number = screen.y - ydiff - 30
+  const yrow3: number = yrow2 - ydiff
+  const yrow4: number = yrow3 - ydiff
   const offset = 600
+  const xpos = 27
   ctx.font = 'bold 40px courier'
-  ctx.fillStyle = '#ccc'
-  ctx.fillText(`My name: ${so.name}`, 25 + offset * 0, yrow4)
-  ctx.fillText('# Calculations per frame: ' + 31222, 25 + offset * 0, yrow3)
-  ctx.fillText(getNamesAsString(serverObjects, `Remotes (${serverObjects.length}): `), 25 + offset * 0, yrow2)
-  ctx.fillText('SIF: ' + so.shotsInFlight.length, 25 + offset * 0, ypos)
-  ctx.fillText(so.health + 'hp', 25 + offset * 0.5, ypos)
-  ctx.fillText('Ammo: ' + so.ammo, 25 + offset * 0.9, ypos)
-  ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', 25 + offset * 1.5, ypos)
-  ctx.fillText('P' + to_string(so.position, 0), 25 + offset * 2.1, ypos)
-  ctx.fillText('V' + to_string(so.velocity, 1), 25 + offset * 2.8, ypos)
-  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), 25 + offset * 3.5, ypos)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 50 }, 'Health', so.health, 250, ctx, 75)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 120 }, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 190 }, 'Ammo', so.ammo, 1000, ctx, 200)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 260 }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 330 }, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 400 }, 'Fuel', so.fuel, 500, ctx, 100)
+  ctx.fillStyle = '#fff'
+  ctx.fillText(`Local: ${so.name}`, xpos, yrow3)
+  ctx.fillText(`---------------------`, xpos, yrow4)
+  ctx.fillText(getNamesAsString(serverObjects, `Remotes (${serverObjects.length}): `), xpos, yrow2)
+  ctx.fillText('SIF: ' + so.shotsInFlight.length, xpos, ypos)
+  ctx.fillText(so.health + 'hp', xpos + offset * 0.5, ypos)
+  ctx.fillText('Ammo: ' + so.ammo, xpos + offset * 0.9, ypos)
+  ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', xpos + offset * 1.5, ypos)
+  ctx.fillText('P' + to_string(so.position, 0), xpos + offset * 2.1, ypos)
+  ctx.fillText('V' + to_string(so.velocity, 1), xpos + offset * 2.8, ypos)
+  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), xpos + offset * 3.5, ypos)
+  renderProgressBar({ x: xpos, y: ypos - 300 }, 'Health', so.health, 250, ctx, 75)
+  renderProgressBar({ x: xpos, y: ypos - 400 }, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
+  renderProgressBar({ x: xpos, y: ypos - 500 }, 'Ammo', so.ammo, 1000, ctx, 200)
+  renderProgressBar({ x: xpos, y: ypos - 600 }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
+  renderProgressBar({ x: xpos, y: ypos - 700 }, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
+  renderProgressBar({ x: xpos, y: ypos - 800 }, 'Fuel', so.fuel, 500, ctx, 100)
   const cstate: string = (so.canonOverHeat ? 'OVERHEATED!': 'Heat')
-  renderProgressBar({ x: 25 + offset * 4.5, y: ypos - 470 }, cstate, so.canonCoolDown, 100, ctx, -80)
+  renderProgressBar({ x: xpos, y: ypos - 900 }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, '#f00')
 }
 
 export function renderVector(
@@ -89,9 +91,30 @@ export function renderVector(
   ctx.restore()
 }
 
+export function renderHitBox(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+  ctx.save()
+  ctx.translate(so.position.x, so.position.y)
+  ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
+  ctx.strokeStyle = '#fff'
+  ctx.strokeRect(0, 0, so.size.x, so.size.y)
+  ctx.restore()
+}
+
+export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+  ctx.save()
+  ctx.translate(so.position.x, so.position.y)
+  ctx.strokeStyle = '#fff'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.arc(0, 0, so.hitRadius, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.restore()
+}
+
 export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false): void {
   const scale = 2
   const shipSize: Vec2d = { x: 40, y: 80 }
+  so.size = shipSize
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
   ctx.fillStyle = '#fff'
@@ -147,6 +170,8 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   // Restore drawing
   ctx.restore()
 
+  renderHitRadius(so, ctx)
+
   // Draw shots
   renderShot(so, ctx)
 }
@@ -199,7 +224,7 @@ export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void 
   ctx.restore()
 }
 
-export function renderProgressBar(pos: Vec2d, label: string, amount: number, max: number, ctx: CanvasRenderingContext2D, redLevel = 60): void {
+export function renderProgressBar(pos: Vec2d, label: string, amount: number, max: number, ctx: CanvasRenderingContext2D, redLevel = 60, warn = false, textWarnColor = '#7b7b7b'): void {
   ctx.save()
   ctx.translate(pos.x, pos.y)
   const linew = 8
@@ -210,11 +235,13 @@ export function renderProgressBar(pos: Vec2d, label: string, amount: number, max
   ctx.fillStyle = '#fff'
 
   if (amount < redLevel || (redLevel < 0 && amount > Math.abs(redLevel))) {
-    ctx.fillStyle = '#f22'
+    // ctx.fillStyle = '#ffa500'
+    ctx.fillStyle = '#ff0'
   } else if (redLevel < 0 && amount < Math.abs(redLevel)) {
-    ctx.fillStyle = '#2f2'
+    // ctx.fillStyle = '#090'
   }
-  const percent: string = round2dec((100 * amount) / max, 0) + '%'
+  const percent_n: number = (100 * amount) / max
+  const percent: string = round2dec(percent_n, 0) + '%'
 
   if (amount < 0) {
     amount = 0
@@ -223,15 +250,24 @@ export function renderProgressBar(pos: Vec2d, label: string, amount: number, max
   let p: number = (w * amount) / max - linew
   if (p < 0) p = 0
   if (p > w) {
-    ctx.fillStyle = '#f22'
+    ctx.fillStyle = '#f00'
   }
 
-  ctx.strokeRect(0, 0, w, h)
+  
+  ctx.fillRect(Math.floor(linew / 2), Math.floor(linew / 2), p, h - Math.floor(linew / 2))
 
-  ctx.fillRect(Math.floor(linew / 2), Math.floor(linew / 2), p, h - linew)
-
+  ctx.lineWidth = 1
+  ctx.strokeRect(w - Math.floor(linew / 2), Math.floor(linew / 2) + 1, 1, h - Math.floor(linew / 2) - 1)
+  ctx.strokeRect(Math.floor(linew / 2), Math.floor(linew / 2) + 1, 1, h - Math.floor(linew / 2) - 1)
+  
   ctx.font = 'bold 30px courier'
-  ctx.fillStyle = '#35f'
+  ctx.fillStyle = '#7b7b7b'
+  if (percent_n > 56) {
+    // ctx.fillStyle = '#000'
+  }
+  if (warn) {
+    ctx.fillStyle = textWarnColor
+  }
   ctx.fillText(percent, w / 2 - 10 * percent.length, linew + Math.floor(h / 2) + 1)
   ctx.fillText(label, linew * 2, linew + Math.floor(h / 2) + 1)
 

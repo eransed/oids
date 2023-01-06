@@ -9,6 +9,13 @@ export function randomGreen(): string {
   return randomColor(r, g, b)
 }
 
+export function randomLightGreen(): string {
+  const r = '678'
+  const g = 'ABCDEF'
+  const b = '678'
+  return randomColor(r, g, b)
+}
+
 export function randomBlue(): string {
   const r = '012345'
   const g = '012345'

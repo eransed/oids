@@ -5,6 +5,22 @@ export interface Vec2d {
   y: number
 }
 
+export enum SpaceShape {
+  Comet,
+  Moon,
+  Planet,
+  Star,
+  SmallShip,
+  XWing,
+  YWing,
+  Falcon,
+  SpaceStation,
+}
+
+export interface Shapable {
+  shape: SpaceShape
+}
+
 export interface Motivated {
   motivatorBroken: boolean
   motivationLevel: number
@@ -12,6 +28,7 @@ export interface Motivated {
 
 export interface Remote {
   online: boolean
+  serverVersion: string
 }
 
 export interface Local {
@@ -36,6 +53,7 @@ export interface Rotatable extends Positionable {
 
 export interface Collidable extends Positionable {
   colliding: boolean
+  hitRadius: number
 }
 
 
@@ -70,13 +88,13 @@ export interface Damageable extends Positionable {
   health: number
 }
 
-export interface SpaceObject extends Positionable, Motivated, Remote, Local, Physical, Thrustable, Steerable, Damager, Damageable, Fireable, Collidable, Bounceable {
+export interface SpaceObject extends Shapable, Positionable, Motivated, Remote, Local, Physical, Thrustable, Steerable, Damager, Damageable, Fireable, Collidable, Bounceable {
   name: string
   color: string
   shotsInFlight: SpaceObject[]
   collidingWith: SpaceObject[]
 }
 
-export function applySteer(o: Steerable, deltaTime: number): void {
-  o.angleDegree += o.steeringPower
-}
+// export function applySteer(o: Steerable, deltaTime: number): void {
+//   o.angleDegree += o.steeringPower
+// }

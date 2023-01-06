@@ -6,7 +6,7 @@ import { maxHeat, shotHitReversFactor } from './constants'
 import { renderExplosionFrame } from './render'
 import { createSpaceObject } from './utils'
 import { getHeading } from './physics'
-import { randomGreen } from './color'
+import { randomGreen, randomLightGreen } from './color'
 
 export function applyEngine(so: Thrustable, boost: number): number {
   const consumption: number = so.enginePower * boost
@@ -18,8 +18,8 @@ export function applyEngine(so: Thrustable, boost: number): number {
   return 0
 }
 
-export function applySteer(so: Steerable, dir: number): void {
-  so.angleDegree += dir * so.steeringPower
+export function applySteer(so: Steerable, dir: number, deltaTimeScaled: number): void {
+  so.angleDegree += dir * so.steeringPower * deltaTimeScaled
   // so.angularVelocity += dir * so.steeringPower
 }
 
@@ -75,8 +75,9 @@ export function fire(so: SpaceObject): void {
   shot.mass = 10
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
-  shot.size = { x: rndi(3, 4), y: rndi(18, 24) }
-  shot.color = randomGreen()
+  shot.size = { x: rndi(4, 5), y: rndi(19, 25) }
+  // shot.size = { x: 20, y: 20 }
+  shot.color = randomLightGreen()
   let head: Vec2d = copy(so.position)
   const aimError = 4 // 8
   const headError = 0.001 // 0.019

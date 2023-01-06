@@ -134,6 +134,7 @@ function broadcastToClients(skipSourceClient, connectedClients, data) {
     }
 }
 server.on('connection', function connection(clientConnection, req) {
+    clientConnection.send(JSON.stringify({ serverVersion: name_ver }));
     globalConnectedClients = removeDisconnectedClients(globalConnectedClients);
     var newClient = new Client(clientConnection, req, "Client-".concat(globalConnectedClients.length), new Date());
     if (addNewClientIfNotExisting(globalConnectedClients, newClient)) {

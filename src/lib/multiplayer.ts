@@ -2,6 +2,11 @@
 import type { SpaceObject } from './types'
 
 let socket: WebSocket
+let serverVersion = 'offline'
+
+export function getSerVer(): string {
+  return serverVersion
+}
 
 function connect() {
   return new Promise(function (resolve, reject) {
@@ -67,6 +72,11 @@ export function sendSpaceObjectToBroadcastServer(so: SpaceObject): void {
 
 export const registerServerUpdate = (callback: (newObject: SpaceObject) => void): void => {
   socket.addEventListener('message', (event) => {
-    callback(JSON.parse(event.data))
+    const data = JSON.parse(event.data)
+    if (data.serverVersion) {
+      serverVersion = data.serverVersion
+    } else {
+      callback(data)
+    }
   })
 }

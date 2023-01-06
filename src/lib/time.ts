@@ -12,15 +12,15 @@ export function getFrameTimeMs(timestamp: number): number {
   return frameTime
 }
 
-export function fpsCounter(frameTimeMs: number, ctx: CanvasRenderingContext2D): void {
+export function fpsCounter(frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const fps = round2dec(1000 / frameTimeMs, 0)
   const dt = round2dec(frameTimeMs, 0)
   fps_list.push(fps)
   if (fps_list.length >= fps_list_max_entries) {
     const afps: number = round2dec(fps_list.reduce((prev, cur) => prev + cur, 0) / fps_list_max_entries, 0)
-    renderFrameInfo(afps, dt, ctx)
+    renderFrameInfo(afps, dt, ver, ctx)
     fps_list.shift()
   } else {
-    renderFrameInfo(fps, dt, ctx)
+    renderFrameInfo(fps, dt, ver, ctx)
   }
 }

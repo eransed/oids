@@ -8,4 +8,5 @@ export const canvasBackgroundColor = '#000'
 export const maxRandomDefaultSpaceObjectVelocity = 1
 export const timeScale = 0.09
 export const maxHeat = 100
-export const shotHitReversFactor = -0.7
+export const shotHitReversFactor = -0.2
+export const collisionFrameDamage = 1

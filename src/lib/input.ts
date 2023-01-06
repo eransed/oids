@@ -79,11 +79,11 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 
   if (rightPressed) {
-    applySteer(so, 1 * dts)
+    applySteer(so, 1, dts)
   }
 
   if (leftPressed) {
-    applySteer(so, -1 * dts)
+    applySteer(so, -1, dts)
   }
 
   if (spacePressed) {

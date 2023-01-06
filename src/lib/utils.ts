@@ -1,4 +1,4 @@
-import type { SpaceObject, Vec2d } from './types'
+import { SpaceShape, type SpaceObject, type Vec2d } from './types'
 import { rndi, rndf, floor, round2dec } from './math'
 import { screenScale, maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 
@@ -27,7 +27,7 @@ export function createSpaceObject(): SpaceObject {
     ammo: 1000,
     shotsInFlight: [],
     missileSpeed: 20,
-    missileDamage: 10,
+    missileDamage: 2,
     canonCoolDown: 0,
     canonOverHeat: false,
     canonHeatAddedPerShot: 2,
@@ -35,7 +35,7 @@ export function createSpaceObject(): SpaceObject {
     colliding: false,
     collidingWith: [],
     damage: 5,
-    armedDelay: 8,
+    armedDelay: 2,
     bounceCount: 0,
     didHit: false,
     shotBlowFrame: 16,
@@ -46,6 +46,9 @@ export function createSpaceObject(): SpaceObject {
     motivationLevel: 100,
     online: false,
     isLocal: false,
+    shape: SpaceShape.SmallShip,
+    hitRadius: 30,
+    serverVersion: '',
   }
 
   return spaceObject

@@ -1,9 +1,9 @@
-import type { Bounceable, Damageable, Damager, Physical, Positionable, Rotatable, SpaceObject, Vec2d } from './types'
-import { add, degToRad, limitv, magnitude, mul, radToDeg, rndi, scalarMultiply, smul, sub } from './math'
+import type { Bounceable, Damager, Physical, Rotatable, SpaceObject, Vec2d } from './types'
+import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub } from './math'
 import { getScreenFromCanvas } from './utils'
 import { renderExplosionFrame } from './render'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
-import { angularFriction, linearFriction, timeScale } from './constants'
+import { angularFriction, collisionFrameDamage, linearFriction, timeScale } from './constants'
 
 export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
   // If assigning nan to so.velocity, position or acceleration it will stay nan for ever
@@ -120,9 +120,9 @@ export function alignHeadingToVelocity(p: Physical & Rotatable): void {
   p.angleDegree = radToDeg(Math.atan2(p.velocity.y, p.velocity.x))
 }
 
-export function alignVelocityToHeading(p: Physical): void {
-  // p.velocity = scalarMultiply(headingFromAngle(p.angleDegree), magnitude(p.velocity))
-}
+// export function alignVelocityToHeading(p: Physical): void {
+//   p.velocity = scalarMultiply(headingFromAngle(p.angleDegree), magnitude(p.velocity))
+// }
 
 export function isColliding(p0: Physical, p1: Physical): boolean {
   if (
@@ -131,6 +131,14 @@ export function isColliding(p0: Physical, p1: Physical): boolean {
     p0.position.y < p1.position.y + p1.size.y &&
     p0.position.y + p0.size.y > p1.position.y
   ) {
+    return true
+  }
+  return false
+}
+
+export function isWithinRadius(p0: Physical, p1: Physical, radius: number): boolean {
+  const d: number = magnitude(sub(p0.position, p1.position))
+  if (d < radius) {
     return true
   }
   return false
@@ -172,20 +180,20 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
         so1.colliding = true
         so0.collidingWith.push(so1)
         so1.collidingWith.push(so0)
-        so0.health -= 250
-        so1.health -= 250
+        so0.health -= collisionFrameDamage
+        so1.health -= collisionFrameDamage
         renderExplosionFrame(so0.position, ctx)
         renderExplosionFrame(so1.position, ctx)
       }
       for (const shot of so0.shotsInFlight) {
         if (shot.armedDelay < 0) {
           const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), 0.1)
-          if (isColliding(shot, so0) && shot.didHit === false) {
+          if (isWithinRadius(shot, so0, so0.hitRadius) && shot.didHit === false) {
             so0.health -= shot.damage
             so0.velocity = add(so0.velocity, heading)
             shot.didHit = true
           }
-          if (isColliding(shot, so1) && shot.didHit === false) {
+          if (isWithinRadius(shot, so1, so1.hitRadius) && shot.didHit === false) {
             so1.health -= shot.damage
             so1.velocity = add(so1.velocity, heading)
             shot.didHit = true

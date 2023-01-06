@@ -146,7 +146,7 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
 
 
 // object is any non-primitive object ie not string, number, boolean, undefined, null etc. added in typescript 2.2
-function broadcastToClients (skipSourceClient: Client, connectedClients: Client[], data: object): void {
+function broadcastToClients (skipSourceClient: Client, connectedClients: Client[], data: any): void {
   for (const client of connectedClients) {
     if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
       client.ws.send(JSON.stringify(data))
@@ -156,6 +156,7 @@ function broadcastToClients (skipSourceClient: Client, connectedClients: Client[
 
 
 server.on('connection', function connection(clientConnection: WebSocket, req: IncomingMessage) {
+  clientConnection.send(JSON.stringify({serverVersion: name_ver}))
   globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
 
   const newClient: Client = new Client(clientConnection, req, `Client-${globalConnectedClients.length}`, new Date())

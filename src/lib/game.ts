@@ -1,15 +1,15 @@
-import type { SpaceObject } from './types'
+import { SpaceShape, type SpaceObject } from './types'
 
 import { initKeyControllers, spaceObjectKeyController } from './input'
-import { fire, handleHittingShot, wrapSpaceObject } from './mechanics'
-import { clearScreen, loadingText, renderFrameInfo, renderMoon, renderShip, renderSpaceObjectStatusBar, renderVector } from './render'
+import { wrapSpaceObject } from './mechanics'
+import { clearScreen, loadingText, renderMoon, renderShip, renderSpaceObjectStatusBar } from './render'
 import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
-import { add, rndfVec2d, rndi, round2dec } from './math'
-import { randomAnyColor, randomBlue, randomColor, randomGreen } from './color'
+import { add, rndfVec2d, rndi } from './math'
+import { randomAnyColor } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
-import { initMultiplayer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
+import { getSerVer, initMultiplayer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
 
 export async function game(ctx: CanvasRenderingContext2D) {
 
@@ -32,23 +32,21 @@ export async function game(ctx: CanvasRenderingContext2D) {
   ship.mass = 0.1
   ship.angleDegree = -120
   ship.health = 250
-  ship.name = `Player-${rndi(0, 900000)}`
+  ship.name = `P-${rndi(0, 900000)}`
   ship.color = randomAnyColor()
   ship.isLocal = true
   console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
 
   sendToServer(ship)
-  // ship.steeringPower = 0.04
-  // for (let i = 0; i < 10; i++) {
-  //   fire(ship)
-  // }
 
   const bodies: SpaceObject[] = []
 
-  // for (let n = 0; n < 3; n++) {
+  // for (let n = 0; n < 2; n++) {
   //   const s = createSpaceObject()
-  //   s.color = randomGreen()
+  //   s.shape = SpaceShape.Moon
+  //   s.color = randomBlue()
   //   s.mass = 5
+  //   s.isLocal = true
   //   s.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
   //   bodies.push(s)
   // }
@@ -60,7 +58,6 @@ export async function game(ctx: CanvasRenderingContext2D) {
   let serverObjects: SpaceObject[] = []
 
   registerServerUpdate((so: SpaceObject) => {
-
     for (let i = 0; i < serverObjects.length; i++) {
       if (so.name === serverObjects[i].name) {
         if (so.online === false) {
@@ -80,7 +77,11 @@ export async function game(ctx: CanvasRenderingContext2D) {
     renderShip(ship, ctx, true)
 
     serverObjects.forEach((so) => {
-      renderShip(so, ctx)
+      if (so.shape === SpaceShape.Moon) {
+        renderMoon(so, ctx)
+      } else {
+        renderShip(so, ctx)
+      }
     })
 
     renderSpaceObjectStatusBar(serverObjects, ship, ctx)
@@ -136,7 +137,11 @@ export async function game(ctx: CanvasRenderingContext2D) {
 
       //Possible optimization send every other frame
       sendSpaceObjectToBroadcastServer(ship)
-      fpsCounter(dt, ctx)
+      // bodies.forEach((b: SpaceObject) => {
+      //   sendSpaceObjectToBroadcastServer(b)
+      // })
+
+      fpsCounter(dt, getSerVer(), ctx)
       requestAnimationFrame(update)
       nextFrame(ctx, dt)
     }
