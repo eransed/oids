@@ -37,7 +37,12 @@ var Client = /** @class */ (function () {
             // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
             console.log("".concat(_this.toString(), " has been disconnected, sending goodbye message"));
             var offlineMessage = _this.lastDataObject;
-            offlineMessage.online = false;
+            try {
+                offlineMessage.online = false;
+            }
+            catch (err) {
+                console.error(err);
+            }
             broadcastToClients(_this, globalConnectedClients, offlineMessage);
             globalConnectedClients = removeDisconnectedClients(globalConnectedClients);
             if (globalConnectedClients.length === 0) {

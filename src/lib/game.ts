@@ -6,14 +6,13 @@ import { clearScreen, loadingText, renderMoon, renderShip, renderSpaceObjectStat
 import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
 import { add, rndfVec2d, rndi } from './math'
-import { randomAnyColor } from './color'
+import { randomAnyColor, randomBlue } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
 import { getSerVer, initMultiplayer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
 
 export async function game(ctx: CanvasRenderingContext2D) {
 
-  
   if (!test()) {
     return
   }
@@ -60,7 +59,7 @@ export async function game(ctx: CanvasRenderingContext2D) {
   registerServerUpdate((so: SpaceObject) => {
     for (let i = 0; i < serverObjects.length; i++) {
       if (so.name === serverObjects[i].name) {
-        if (so.online === false) {
+        if (!so.online) {
           console.log(`${so.name} went offline`)
         }
         serverObjects[i] = so
@@ -73,9 +72,8 @@ export async function game(ctx: CanvasRenderingContext2D) {
     }
   })
 
-  const renderFrame = (ctx: CanvasRenderingContext2D): void => {
-    renderShip(ship, ctx, true)
-
+  const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
+    
     serverObjects.forEach((so) => {
       if (so.shape === SpaceShape.Moon) {
         renderMoon(so, ctx)
@@ -83,13 +81,18 @@ export async function game(ctx: CanvasRenderingContext2D) {
         renderShip(so, ctx)
       }
     })
-
+    
     renderSpaceObjectStatusBar(serverObjects, ship, ctx)
     // renderVector(ship.acceleration, ship.position, ctx, 400)
     // renderVector(ship.velocity, ship.position, ctx, 10)
     bodies.forEach((body) => {
       renderMoon(body, ctx)
     })
+
+    fpsCounter(dt, getSerVer(), ctx)
+
+    renderShip(ship, ctx, true)
+
   }
 
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
@@ -125,13 +128,13 @@ export async function game(ctx: CanvasRenderingContext2D) {
 
   function renderLoop(
     ctx: CanvasRenderingContext2D,
-    renderFrame: (ctx: CanvasRenderingContext2D) => void,
+    renderFrame: (ctx: CanvasRenderingContext2D, dt: number) => void,
     nextFrame: (ctx: CanvasRenderingContext2D, dt: number) => void
   ) {
     function update(timestamp: number): void {
       const dt: number = getFrameTimeMs(timestamp)
       clearScreen(ctx)
-      renderFrame(ctx)
+      renderFrame(ctx, dt)
       updateSpaceObject(ship, dt, ctx)
       updateSpaceObjects(bodies, dt, ctx)
 
@@ -141,7 +144,6 @@ export async function game(ctx: CanvasRenderingContext2D) {
       //   sendSpaceObjectToBroadcastServer(b)
       // })
 
-      fpsCounter(dt, getSerVer(), ctx)
       requestAnimationFrame(update)
       nextFrame(ctx, dt)
     }

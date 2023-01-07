@@ -21,6 +21,10 @@ export interface Shapable {
   shape: SpaceShape
 }
 
+export interface Boostable {
+  booster: number
+}
+
 export interface Motivated {
   motivatorBroken: boolean
   motivationLevel: number
@@ -71,6 +75,9 @@ export interface Fireable extends Positionable, Physical {
   canonOverHeat: boolean
   canonHeatAddedPerShot: number
   canonCoolDownSpeed: number
+  inverseFireRate: number // 1 -> 1 * shotsPerFrame shots/frame
+  framesSinceLastShot: number
+  shotsPerFrame: number
 }
 
 export interface Bounceable extends Positionable, Physical {
@@ -88,7 +95,7 @@ export interface Damageable extends Positionable {
   health: number
 }
 
-export interface SpaceObject extends Shapable, Positionable, Motivated, Remote, Local, Physical, Thrustable, Steerable, Damager, Damageable, Fireable, Collidable, Bounceable {
+export interface SpaceObject extends Shapable, Positionable, Motivated, Remote, Local, Physical, Thrustable, Steerable, Damager, Damageable, Fireable, Collidable, Bounceable, Boostable {
   name: string
   color: string
   shotsInFlight: SpaceObject[]

@@ -1,8 +1,11 @@
 import type { SpaceObject } from './types'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
+import { createSpaceObject } from './utils'
 
 let boost = false
+let halt = false
+let reset = false
 let upPressed = false
 let downPressed = false
 let rightPressed = false
@@ -15,10 +18,10 @@ function arrowControl(e: KeyboardEvent, value: boolean) {
   if (e.key === 'ArrowUp') {
     upPressed = value
   }
-  if (e.key === 'q') {
+  if (e.key === 'q' || e.code === 'PageUp') {
     leftStrafePressed = value
   }
-  if (e.key === 'e') {
+  if (e.key === 'e' || e.code === 'PageDown') {
     rightStrafePressed = value
   }
   if (e.key === 'w') {
@@ -49,6 +52,12 @@ function arrowControl(e: KeyboardEvent, value: boolean) {
   if (e.key === 'b') {
     boost = value
   }
+  if (e.key === 'v') {
+    halt = value
+  }
+  if (e.key === 'r') {
+    reset = value
+  }
 }
 
 export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
@@ -56,9 +65,25 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
 
   const dts: number = dt * timeScale
 
+  if (halt) {
+    so.velocity = {x: 0, y: 0}
+    so.acceleration = {x: 0, y: 0}
+  }
+
+  if (reset) {
+    so.ammo = 1000
+    so.health = 250
+    so.fuel = 500
+    so.canonCoolDown = 0
+    so.missileDamage = 4
+    so.booster = 5
+    so.inverseFireRate = 14
+    so.shotsPerFrame = 8
+  }
+
   if (boost) {
     //so.afterBurnerEnabled = true
-    applyEngineThrust(so, 0, 4)
+    applyEngineThrust(so, 0, true)
   }
 
   if (upPressed) {

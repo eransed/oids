@@ -12,7 +12,7 @@ export function createSpaceObject(): SpaceObject {
   const spaceObject: SpaceObject = {
     mass: 1,
     size: { x: 100, y: 100 },
-    color: '#fff',
+    color: '#90d', // cool purple
     position: initPos,
     velocity: initVel,
     acceleration: { x: 0, y: 0 },
@@ -26,12 +26,9 @@ export function createSpaceObject(): SpaceObject {
     steeringPower: 1.2,
     ammo: 1000,
     shotsInFlight: [],
-    missileSpeed: 20,
     missileDamage: 2,
     canonCoolDown: 0,
     canonOverHeat: false,
-    canonHeatAddedPerShot: 2,
-    canonCoolDownSpeed: 0.7,
     colliding: false,
     collidingWith: [],
     damage: 5,
@@ -40,15 +37,22 @@ export function createSpaceObject(): SpaceObject {
     didHit: false,
     shotBlowFrame: 16,
     steer: function (direction: number, deltaTime: number): void {
-      throw new Error('Function not implemented.')
+      throw new Error('Steer not implemented.')
     },
     motivatorBroken: false,
     motivationLevel: 100,
     online: false,
     isLocal: false,
     shape: SpaceShape.SmallShip,
-    hitRadius: 30,
+    hitRadius: 60,
     serverVersion: '',
+    booster: 2,
+    framesSinceLastShot: 0,
+    missileSpeed: 20,
+    canonCoolDownSpeed: 1.4,
+    canonHeatAddedPerShot: 2.5,
+    inverseFireRate: 8,
+    shotsPerFrame: 1,
   }
 
   return spaceObject

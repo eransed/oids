@@ -47,7 +47,11 @@ class Client {
       // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
       console.log(`${this.toString()} has been disconnected, sending goodbye message`)
       const offlineMessage: any = this.lastDataObject
-      offlineMessage.online = false
+      try {
+        offlineMessage.online = false
+      } catch (err) {
+        console.error(err)
+      }
       broadcastToClients(this, globalConnectedClients, offlineMessage)
       globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
       if (globalConnectedClients.length === 0) {

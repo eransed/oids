@@ -55,15 +55,15 @@ export interface Renderable extends Positionable, Sizeable {
 
 export class PhotonMissile implements Renderable, Steerable, Damager {
   position: Vec2d = { x: 0, y: 0 }
-  steeringPower: number = 1
-  angleDegree: number = 120
-  angularVelocity: number = 0
-  color: string = '#fff'
+  steeringPower = 1
+  angleDegree = 120
+  angularVelocity = 0
+  color = '#fff'
   size: Vec2d = { x: 10, y: 10 }
-  damage: number = 1
-  armedDelay: number = 20
-  didHit: boolean = false
-  shotBlowFrame: number = 0
+  damage = 1
+  armedDelay = 20
+  didHit = false
+  shotBlowFrame = 0
 
   readonly ctx: CanvasRenderingContext2D
 

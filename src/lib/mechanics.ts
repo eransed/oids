@@ -1,4 +1,4 @@
-import type { Bounceable, Damageable, Damager, Physical, Positionable, SpaceObject, Thrustable, Vec2d } from './types'
+import type { Boostable, Bounceable, Damageable, Damager, Physical, Positionable, SpaceObject, Thrustable, Vec2d } from './types'
 import type { Steerable } from './traits/Steerable'
 
 import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from './math'
@@ -6,10 +6,10 @@ import { maxHeat, shotHitReversFactor } from './constants'
 import { renderExplosionFrame } from './render'
 import { createSpaceObject } from './utils'
 import { getHeading } from './physics'
-import { randomGreen, randomLightGreen } from './color'
+import { randomLightGreen } from './color'
 
-export function applyEngine(so: Thrustable, boost: number): number {
-  const consumption: number = so.enginePower * boost
+export function applyEngine(so: Thrustable & Boostable, boost = false): number {
+  const consumption: number = so.enginePower * (boost ? so.booster : 1)
   if (so.fuel > 0) {
     so.fuel -= consumption
     return consumption
@@ -23,7 +23,7 @@ export function applySteer(so: Steerable, dir: number, deltaTimeScaled: number):
   // so.angularVelocity += dir * so.steeringPower
 }
 
-export function getThrustVector(so: Thrustable & Steerable, dirAng: number, boost: number): Vec2d {
+export function getThrustVector(so: Thrustable & Steerable & Boostable, dirAng: number, boost = false): Vec2d {
   const angleRadians: number = degToRad(so.angleDegree + dirAng)
   const engine: number = applyEngine(so, boost)
   return {
@@ -32,8 +32,8 @@ export function getThrustVector(so: Thrustable & Steerable, dirAng: number, boos
   }
 }
 
-export function applyEngineThrust(so: Thrustable & Steerable, directionDeg: number, boostFactor = 1): void {
-  so.velocity = add(so.velocity, getThrustVector(so, directionDeg, boostFactor))
+export function applyEngineThrust(so: Thrustable & Steerable & Boostable, directionDeg: number, boost = false): void {
+  so.velocity = add(so.velocity, getThrustVector(so, directionDeg, boost))
   // so.acceleration = add(so.acceleration, getThrustVector(so, directionDeg))
 }
 
@@ -59,29 +59,17 @@ export function coolDown(so: SpaceObject) {
   }
 }
 
-export function fire(so: SpaceObject): void {
-  if (so.ammo < 1) {
-    return
-  }
-  if (so.canonOverHeat) {
-    return
-  }
-  so.canonCoolDown += so.canonHeatAddedPerShot
-  if (so.canonCoolDown > maxHeat) {
-    return
-  }
-  so.ammo--
+export function generateMissileFrom(so: SpaceObject): SpaceObject {
   const shot: SpaceObject = createSpaceObject()
   shot.mass = 10
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
   shot.size = { x: rndi(4, 5), y: rndi(19, 25) }
-  // shot.size = { x: 20, y: 20 }
   shot.color = randomLightGreen()
   let head: Vec2d = copy(so.position)
-  const aimError = 4 // 8
-  const headError = 0.001 // 0.019
-  const speedError = 1.1 // 1.8
+  const aimError = 6 // 8
+  const headError = 0.32 // 0.019
+  const speedError = 7 // 1.8
 
   head = add(head, scalarMultiply(getHeading(so), 0))
 
@@ -99,7 +87,29 @@ export function fire(so: SpaceObject): void {
 
   shot.position = head
   shot.angleDegree = so.angleDegree
-  so.shotsInFlight.push(shot)
+
+  return shot
+}
+
+export function fire(so: SpaceObject): void {
+  if (so.ammo < 1) {
+    return
+  }
+  if (so.canonOverHeat) {
+    return
+  }
+  if (so.framesSinceLastShot > 0) {
+    return
+  }
+  so.canonCoolDown += so.canonHeatAddedPerShot * so.inverseFireRate
+  if (so.canonCoolDown > maxHeat) {
+    return
+  }
+  so.framesSinceLastShot+=so.inverseFireRate
+  so.ammo-=so.shotsPerFrame
+  for (let i = 0; i < so.shotsPerFrame; i++) {
+    so.shotsInFlight.push(generateMissileFrom(so))
+  }
 }
 
 export function handleHittingShot(shot: SpaceObject, ctx: CanvasRenderingContext2D): void {

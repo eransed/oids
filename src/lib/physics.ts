@@ -3,7 +3,7 @@ import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub }
 import { getScreenFromCanvas } from './utils'
 import { renderExplosionFrame } from './render'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
-import { angularFriction, collisionFrameDamage, linearFriction, timeScale } from './constants'
+import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from './constants'
 
 export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
   // If assigning nan to so.velocity, position or acceleration it will stay nan for ever
@@ -32,6 +32,9 @@ export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingCo
   decayDeadShots(so)
 
   coolDown(so)
+  if (so.framesSinceLastShot > 0) {
+    so.framesSinceLastShot--
+  }
 
   for (const shot of so.shotsInFlight) {
     const v: Vec2d = scalarMultiply(shot.velocity, dts)
@@ -187,7 +190,7 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
       }
       for (const shot of so0.shotsInFlight) {
         if (shot.armedDelay < 0) {
-          const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), 0.1)
+          const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
           if (isWithinRadius(shot, so0, so0.hitRadius) && shot.didHit === false) {
             so0.health -= shot.damage
             so0.velocity = add(so0.velocity, heading)
