@@ -134,3 +134,7 @@ export function withinBounds(v: Vec2d, maxBound: Vec2d, minBound: Vec2d = { x: 0
   if (v.y < maxBound.y) return false
   return true
 }
+
+export function linearTransform(v: number, v_lower: number, v_upper: number, t_lower: number, t_upper: number) {
+	return (v - v_lower) * ((t_upper - t_lower) / (v_upper - v_lower)) + t_lower;
+}

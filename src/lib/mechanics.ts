@@ -10,11 +10,11 @@ import { randomLightGreen } from './color'
 
 export function applyEngine(so: Thrustable & Boostable, boost = false): number {
   const consumption: number = so.enginePower * (boost ? so.booster : 1)
-  if (so.fuel > 0) {
-    so.fuel -= consumption
+  if (so.batteryLevel > 0) {
+    so.batteryLevel -= consumption
     return consumption
   }
-  so.fuel = 0
+  so.batteryLevel = 0
   return 0
 }
 

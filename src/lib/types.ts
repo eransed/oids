@@ -62,7 +62,7 @@ export interface Collidable extends Positionable {
 
 
 export interface Thrustable extends Positionable, Physical {
-  fuel: number
+  batteryLevel: number
   enginePower: number
 }
 

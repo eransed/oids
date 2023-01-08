@@ -1,5 +1,5 @@
 import { SpaceShape, type SpaceObject, type Vec2d } from './types'
-import { add, magnitude, rndi, round2dec, scalarMultiply } from './math'
+import { add, degToRad, linearTransform, magnitude, rndi, round2dec, scalarMultiply } from './math'
 import { canvasBackgroundColor, screenScale, timeScale } from './constants'
 import { getScreenFromCanvas, getScreenRect, to_string } from './utils'
 import { getConnInfo, getReadyStateText } from './multiplayer'
@@ -61,6 +61,8 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const xposBar = 20
   const scale = setScaledFont(ctx)
 
+  renderRoundIndicator({x: screen.x - 250, y: screen.y - 200}, 100 * magnitude(so.velocity), 0, 800, ctx, 200, 'm/s')
+
   ctx.fillStyle = '#fff'
   ctx.fillText(`Local: ${so.name}`, xpos, yrow1)
   // ctx.fillText(`---------------------`, xpos, yrow3)
@@ -75,7 +77,7 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const firstBar = 170
   const barDiff = 80
   renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, 'hp', so.health, 250, ctx, 75)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, 'Fuel', so.fuel, 500, ctx, 250)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, 'Bat', so.batteryLevel, 500, ctx, 250)
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, 'Amm', so.ammo, 1000, ctx, 200)
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
   const cstate: string = (so.canonOverHeat ? 'Overheat': 'Heat')
@@ -273,5 +275,76 @@ export function renderProgressBar(pos: Vec2d, label: string, amount: number, max
   ctx.fillText(percent, w / 2 - 10 * percent.length, linew + Math.floor(h / 2) + 1)
   ctx.fillText(label, linew * 2, linew + Math.floor(h / 2) + 1)
 
+  ctx.restore()
+}
+
+export function renderNumber(num: number, pos: Vec2d, ctx: CanvasRenderingContext2D, angleAdjDeg = 0) {
+  ctx.save()
+  ctx.translate(pos.x, pos.y)
+  ctx.rotate(degToRad(angleAdjDeg))
+  ctx.font = `bold 20px courier`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(`${num}`, 0, 0)
+  ctx.restore()
+}
+
+export function renderRoundIndicator(centerPos: Vec2d, value: number, min: number, max: number, ctx: CanvasRenderingContext2D, radius = 100, unitLabel: string, steps = 20): void {
+  ctx.save()
+  ctx.translate(centerPos.x, centerPos.y)
+  ctx.beginPath()
+  ctx.strokeStyle = '#fff'
+  ctx.fillStyle = '#fff'
+  ctx.lineWidth = 4
+  
+  const ang1 = -240
+  const meterAngleTest = round2dec(linearTransform(value, min, max, 0, -ang1), 0)
+  const meterAngleTestStr = meterAngleTest + ''
+  const roundVal = `${round2dec(value, 0)}`
+  ctx.fillText(`${meterAngleTest}`, -8 * meterAngleTestStr.length , radius/2)
+  // ctx.fillText(`${roundVal}`, -8 * roundVal.length , radius/2)
+  ctx.fillText(`${unitLabel}`, -8 * unitLabel.length , radius/2 + 40)
+  
+  
+  
+  ctx.arc(0, 0, radius/10, 0, 360 * 180 / Math.PI)
+  ctx.fill()
+  ctx.beginPath()
+  ctx.arc(0, 0, radius, degToRad(ang1), degToRad(60), false)
+  ctx.stroke()
+  
+  ctx.lineWidth = 4
+  ctx.rotate(degToRad(ang1))
+  
+  ctx.moveTo(radius - 10, 0)
+  ctx.lineTo(radius - 30, 0)
+  let fixAng = 260
+  const numberOffset = 60
+  const yoff = 0
+  const rot = Math.floor(meterAngleTest / 360) * 360
+  renderNumber(rot, {x: radius - numberOffset, y: yoff}, ctx, fixAng-=steps)
+  for (let i = 1; i < 16; i++) {
+    ctx.rotate(degToRad(steps))
+    renderNumber((i * steps) + rot, {x: radius - numberOffset, y: yoff}, ctx, fixAng-=steps)
+    ctx.moveTo(radius - 12, 0)
+    ctx.lineTo(radius - 35, 0)
+  }
+  
+  ctx.stroke()
+  
+  ctx.resetTransform()
+  
+  ctx.translate(centerPos.x, centerPos.y)
+  ctx.rotate(degToRad(ang1))
+  
+  const meterAngle = linearTransform(value, min, max, 0, -ang1)
+  ctx.rotate(degToRad(meterAngle)) // 0 - 270 -> min - max
+  ctx.beginPath()
+  const needleWith = 10
+  ctx.moveTo(-needleWith/2, 0)
+  ctx.lineTo(radius - 12, 0)
+  ctx.lineWidth = needleWith
+  ctx.strokeStyle = '#c00'
+  ctx.stroke()
   ctx.restore()
 }
