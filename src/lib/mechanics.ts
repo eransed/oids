@@ -105,11 +105,15 @@ export function fire(so: SpaceObject): void {
   if (so.canonCoolDown > maxHeat) {
     return
   }
+
   so.framesSinceLastShot+=so.inverseFireRate
-  so.ammo-=so.shotsPerFrame
-  for (let i = 0; i < so.shotsPerFrame; i++) {
+  
+  const shotLeftToFire = so.ammo - so.shotsPerFrame < 0 ? so.shotsPerFrame - so.ammo : so.shotsPerFrame
+  for (let i = 0; i < shotLeftToFire; i++) {
     so.shotsInFlight.push(generateMissileFrom(so))
   }
+  
+  so.ammo-=shotLeftToFire
 }
 
 export function handleHittingShot(shot: SpaceObject, ctx: CanvasRenderingContext2D): void {

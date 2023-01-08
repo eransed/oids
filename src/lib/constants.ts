@@ -11,3 +11,5 @@ export const maxHeat = 100
 export const shotHitReversFactor = 0.6
 export const collisionFrameDamage = 1
 export const missileDamageVelocityTransferFactor = 0.1
+export const purple1 = '#90d'
+export const purple2 = '#b0e'

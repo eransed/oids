@@ -2,7 +2,7 @@ import { SpaceShape, type SpaceObject, type Vec2d } from './types'
 import { add, magnitude, rndi, round2dec, scalarMultiply } from './math'
 import { canvasBackgroundColor, screenScale, timeScale } from './constants'
 import { getScreenFromCanvas, getScreenRect, to_string } from './utils'
-import { getReadyStateText } from './multiplayer'
+import { getConnInfo, getReadyStateText } from './multiplayer'
 
 export function clearScreen(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = canvasBackgroundColor
@@ -29,7 +29,7 @@ export function renderFrameInfo(fps: number, frameTimeMs: number, ver: string, c
   ctx.fillText('DT:  ' + round2dec(frameTimeMs, dec) + 'ms', xpos, 100)
   ctx.fillText('DTS: ' + round2dec(frameTimeMs * timeScale, dec), xpos, 150)
   ctx.fillText('RES: ' + screen.x + 'x' + screen.y + ' (x' + screenScale + ', ' + ratio + ')', xpos, 200)
-  ctx.fillText('WS:  ' + getReadyStateText(), xpos, 250)
+  ctx.fillText(`WS: ${getReadyStateText()} ${getConnInfo()}`, xpos, 250)
   renderProgressBar({ x: xposBar, y: 270 }, 'Load', frameTimeMs, 50, ctx, -40)
   ctx.fillStyle = '#444'
   ctx.fillText('' + ver, screen.x - ver.length * 27, 50)
@@ -74,9 +74,9 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), xpos + 1400, yrow1)
   const firstBar = 170
   const barDiff = 80
-  renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, 'Health', so.health, 250, ctx, 75)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, 'Fuel', so.fuel, 500, ctx, 100)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, 'Ammo', so.ammo, 1000, ctx, 200)
+  renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, 'hp', so.health, 250, ctx, 75)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, 'Fuel', so.fuel, 500, ctx, 250)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, 'Amm', so.ammo, 1000, ctx, 200)
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
   const cstate: string = (so.canonOverHeat ? 'Overheat': 'Heat')
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 4) }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, '#d44')
@@ -127,6 +127,10 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   const scale = setScaledFont(ctx)
   const shipSize: Vec2d = { x: 60, y: 100 }
   so.size = shipSize
+
+  // Render hit box of ship after contex restore
+  // renderHitRadius(so, ctx)
+
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
@@ -158,9 +162,6 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   
   // Restore drawing
   ctx.restore()
-
-  // Render hit box of ship after contex restore
-  renderHitRadius(so, ctx)
 
   // Draw shots
   renderShot(so, ctx)
@@ -241,7 +242,8 @@ export function renderProgressBar(pos: Vec2d, label: string, amount: number, max
     // ctx.fillStyle = '#090'
   }
   const percent_n: number = (100 * amount) / max
-  const percent: string = round2dec(percent_n, 0) + '%'
+  const percent = `${round2dec(percent_n, 0)}%`
+  // const percent = `${round2dec(percent_n, 0)}% (${round2dec(amount, 0)}/${max})`
 
   if (amount < 0) {
     amount = 0
@@ -250,7 +252,7 @@ export function renderProgressBar(pos: Vec2d, label: string, amount: number, max
   let p: number = w * amount / max - linew
   if (p < 0) p = 0
   if (p > w) {
-    ctx.fillStyle = '#f00'
+    ctx.fillStyle = '#600'
     p = w - linew
   }
 

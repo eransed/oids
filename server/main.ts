@@ -1,15 +1,15 @@
 import type { IncomingMessage } from 'http'
 import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from 'ws'
-import { OIDS_WS_PORT } from './config'
+import { OIDS_WS_PORT } from './pub_config'
 import { getLocalIp, ipport } from './net'
 
-const pack = require('./package.json')
+const pack = require('../package.json')
 const name_ver: string = pack.name + ' ' + pack.version
 
-const PORT = OIDS_WS_PORT
+const WS_PORT = OIDS_WS_PORT
 
 const server: WebSocketServer = new WebSocketServer({
-  port: PORT,
+  port: WS_PORT,
 })
 
 let globalConnectedClients: Client[] = []
@@ -22,7 +22,7 @@ class Client {
   dateAdded: Date
   lastDataObject: any
   private nameHasBeenUpdated = false
-  constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded) {
+  constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded: Date) {
     this.ws = _ws
     this.req = _req
     this.name = _name
@@ -175,4 +175,5 @@ server.on('connection', function connection(clientConnection: WebSocket, req: In
 })
 
 
-console.log('Starting ' + name_ver + ', listening on ws://' + getLocalIp() + ':' + PORT)
+console.log(`Starting ${name_ver}`)
+console.log(`Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`)

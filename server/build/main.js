@@ -1,16 +1,16 @@
 "use strict";
 exports.__esModule = true;
 var ws_1 = require("ws");
-var config_1 = require("./config");
+var pub_config_1 = require("./pub_config");
 var net_1 = require("./net");
-var pack = require('./package.json');
+var pack = require('../package.json');
 var name_ver = pack.name + ' ' + pack.version;
-var PORT = config_1.OIDS_WS_PORT;
+var WS_PORT = pub_config_1.OIDS_WS_PORT;
 var server = new ws_1.WebSocketServer({
-    port: PORT
+    port: WS_PORT
 });
 var globalConnectedClients = [];
-var Client = /** @class */ (function () {
+var Client = (function () {
     function Client(_ws, _req, _name, _dateAdded) {
         this.nameHasBeenUpdated = false;
         this.ws = _ws;
@@ -32,9 +32,7 @@ var Client = /** @class */ (function () {
     };
     Client.prototype.addEventListeners = function () {
         var _this = this;
-        // console.log(`Adding event-listeners for ${this.toString()}`)
         this.ws.addEventListener('close', function () {
-            // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
             console.log("".concat(_this.toString(), " has been disconnected, sending goodbye message"));
             var offlineMessage = _this.lastDataObject;
             try {
@@ -93,8 +91,6 @@ function addNewClientIfNotExisting(clients, clientConnection) {
     clients.push(clientConnection);
     return true;
 }
-// This function concept is not working, issues when updating with only one user.
-// Always one closed client left in clients...
 function removeClientIfExisting(clients, clientConnection) {
     var lengthBefore = clients.length;
     clients = clients.filter(function (c) {
@@ -110,7 +106,6 @@ function removeClientIfExisting(clients, clientConnection) {
     return clients;
 }
 function removeDisconnectedClients(clients) {
-    // const lengthBefore: number = clients.length
     var disconnectedClients = clients.filter(function (c) {
         return c.ws.readyState === ws_1.CLOSED || c.ws.readyState === ws_1.CLOSING;
     });
@@ -123,13 +118,8 @@ function removeDisconnectedClients(clients) {
     connectedClients.forEach(function (c) {
         console.log("Connected: ".concat(c.toString()));
     });
-    // const disconClientCount: number = lengthBefore - connectedClients.length
-    // if (disconClientCount > 0) {
-    //   console.log(`Removed ${disconClientCount} disconnected clients`)
-    // }
     return connectedClients;
 }
-// object is any non-primitive object ie not string, number, boolean, undefined, null etc. added in typescript 2.2
 function broadcastToClients(skipSourceClient, connectedClients, data) {
     for (var _i = 0, connectedClients_1 = connectedClients; _i < connectedClients_1.length; _i++) {
         var client = connectedClients_1[_i];
@@ -150,4 +140,5 @@ server.on('connection', function connection(clientConnection, req) {
         console.log("   ".concat(c.toString()));
     });
 });
-console.log('Starting ' + name_ver + ', listening on ws://' + (0, net_1.getLocalIp)() + ':' + PORT);
+console.log("Starting ".concat(name_ver));
+console.log("Listening on ws://localhost:".concat(WS_PORT, " and ws://").concat((0, net_1.getLocalIp)(), ":").concat(WS_PORT, "\n"));

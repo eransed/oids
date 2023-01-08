@@ -8,8 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "build-server": "npx tsc server/main.ts",
-    "server": "npm run build-server && node server/main.js"
+    "build-server": "npx tsc --build server/tsconfig.json",
+    "server": "npm run build-server && node server/build/main.js"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.0",

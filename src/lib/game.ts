@@ -9,7 +9,7 @@ import { add, rndfVec2d, rndi } from './math'
 import { randomAnyColor, randomBlue } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
-import { getSerVer, initMultiplayer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
+import { getSerVer, initMultiplayer, isConnectedToWsServer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
 
 export async function game(ctx: CanvasRenderingContext2D) {
 
@@ -22,7 +22,8 @@ export async function game(ctx: CanvasRenderingContext2D) {
   loadingText('Loading...', ctx)
   initKeyControllers()
 
-  await initMultiplayer()
+  initMultiplayer()
+  // await initMultiplayer()
 
   const offset = 500
 
@@ -35,8 +36,6 @@ export async function game(ctx: CanvasRenderingContext2D) {
   ship.color = randomAnyColor()
   ship.isLocal = true
   console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
-
-  sendToServer(ship)
 
   const bodies: SpaceObject[] = []
 
@@ -139,7 +138,9 @@ export async function game(ctx: CanvasRenderingContext2D) {
       updateSpaceObjects(bodies, dt, ctx)
 
       //Possible optimization send every other frame
-      sendSpaceObjectToBroadcastServer(ship)
+      if (isConnectedToWsServer()) {
+        sendSpaceObjectToBroadcastServer(ship)
+      }
       // bodies.forEach((b: SpaceObject) => {
       //   sendSpaceObjectToBroadcastServer(b)
       // })

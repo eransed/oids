@@ -71,7 +71,7 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 
   if (reset) {
-    so.ammo = 1000
+    so.ammo = 100
     so.health = 250
     so.fuel = 500
     so.canonCoolDown = 0
