@@ -11,9 +11,14 @@ export function clearScreen(ctx: CanvasRenderingContext2D) {
 
 export function render(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
   switch (s.shape) {
-    case SpaceShape.Moon: renderMoon(s, ctx); break
-    case SpaceShape.SmallShip: renderShip(s, ctx); break
-    default: console.error(`Unknown shape: ${s.shape}`)
+    case SpaceShape.Moon:
+      renderMoon(s, ctx)
+      break
+    case SpaceShape.SmallShip:
+      renderShip(s, ctx)
+      break
+    default:
+      console.error(`Unknown shape: ${s.shape}`)
   }
 }
 
@@ -39,7 +44,7 @@ export function loadingText(text: string, ctx: CanvasRenderingContext2D) {
   ctx.font = 'bold 80px courier'
   ctx.fillStyle = '#fff'
   const ppt = 15
-  ctx.fillText(text, getScreenRect(ctx).x/2 - text.length * ppt, getScreenRect(ctx).y/2)
+  ctx.fillText(text, getScreenRect(ctx).x / 2 - text.length * ppt, getScreenRect(ctx).y / 2)
 }
 
 export function getNamesAsString(sos: SpaceObject[], label = ''): string {
@@ -61,7 +66,7 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const xposBar = 20
   const scale = setScaledFont(ctx)
 
-  renderRoundIndicator({x: screen.x - 250, y: screen.y - 200}, 100 * magnitude(so.velocity), 0, 800, ctx, 200, 'm/s')
+  renderRoundIndicator({ x: screen.x - 250, y: screen.y - 200 }, 100 * magnitude(so.velocity), 0, 800, ctx, 200, 'm/s')
 
   ctx.fillStyle = '#fff'
   ctx.fillText(`Local: ${so.name}`, xpos, yrow1)
@@ -80,20 +85,13 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, 'Bat', so.batteryLevel, 500, ctx, 250)
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, 'Amm', so.ammo, 1000, ctx, 200)
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
-  const cstate: string = (so.canonOverHeat ? 'Overheat': 'Heat')
+  const cstate: string = so.canonOverHeat ? 'Overheat' : 'Heat'
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 4) }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, '#d44')
   // renderProgressBar({ x: xpos, y: yrow1 - 500 }, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
   // renderProgressBar({ x: xpos, y: yrow1 - 700 }, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
 }
 
-export function renderVector(
-  v: Vec2d,
-  origin: Vec2d,
-  ctx: CanvasRenderingContext2D,
-  scale = 10000,
-  color = '#fff',
-  offset: Vec2d = { x: 0, y: 0 }
-) {
+export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContext2D, scale = 10000, color = '#fff', offset: Vec2d = { x: 0, y: 0 }) {
   ctx.save()
   ctx.translate(origin.x + offset.x, origin.y + offset.y)
   ctx.beginPath()
@@ -137,31 +135,65 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   ctx.translate(so.position.x, so.position.y)
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
   ctx.lineWidth = 2 * screenScale
-  
+
   // Hull
   ctx.strokeStyle = so.colliding ? '#f00' : so.color
   ctx.fillStyle = so.colliding ? '#f00' : so.color
-  ctx.beginPath()
-  ctx.moveTo(0, (-shipSize.y / 3) * scale)
-  ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
-  ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
-  ctx.lineTo(0, (-shipSize.y / 3) * scale)
 
-  if (renderAsLocalPlayer) {
-    ctx.stroke()
-  } else {
-    ctx.fill()
+  let shipPath = new Path2D('')
+  let hull = new Path2D(
+    'M149.999999,-0.000285c0,0,38.131318,22.805854,50,64.871161s0,235.129439,0,235.129439h-100c0,0-14.235513-193.341187,0-235.129439s50-64.871161,50-64.871161Z'
+  )
+
+  let hullMatrix = new DOMMatrix()
+
+  //Adjusting the path to be on the hull
+  hullMatrix.a = 0.667334
+  hullMatrix.b = 0
+  hullMatrix.c = 0
+  hullMatrix.d = 0.999998
+  hullMatrix.e = 50
+  hullMatrix.f = 0.000285
+
+  let rightWing = new Path2D(
+    'M183.3667,300c0,0,9.554469-9.31039,26.870542-15s89.762758-18.102681,89.762758-18.102681v-43.741505c0,0-72.808219-46.518781-89.762758-73.155814s-26.870542-85.128968-26.870542-85.128968'
+  )
+
+  let leftWing = new Path2D(
+    'M116.6333,299.999999c0,0-9.429182-7.873136-26.6333-15s-90-18.102681-90-18.102681v-43.741505c0,0,73.031615-46.567809,90-73.155814s26.6333-85.128968,26.6333-85.128968'
+  )
+
+  shipPath.addPath(hull, hullMatrix)
+  shipPath.addPath(rightWing)
+  shipPath.addPath(leftWing)
+
+  const transformPath = (path: Path2D, matrix: DOMMatrix) => {
+    const copy = new Path2D()
+    copy.addPath(path, matrix)
+    return copy
   }
 
-  ctx.fillStyle = "#f00"
-  ctx.rotate(20 * Math.PI / 180)
+  let shipMatrix = new DOMMatrix()
+
+  shipMatrix.e = -150
+
+  const newPath = transformPath(shipPath, shipMatrix)
+
+  if (renderAsLocalPlayer) {
+    ctx.stroke(newPath)
+  } else {
+    ctx.fill(newPath)
+  }
+
+  ctx.fillStyle = '#f00'
+  ctx.rotate((20 * Math.PI) / 180)
   if (!so.online && !renderAsLocalPlayer) {
-    ctx.fillText(so.name, -1.2 * so.size.x/2, -30)
-    ctx.fillText('offline', -1.2 * so.size.x/2, 30)
+    ctx.fillText(so.name, (-1.2 * so.size.x) / 2, -30)
+    ctx.fillText('offline', (-1.2 * so.size.x) / 2, 30)
   } else if (so.health <= 0) {
     ctx.fillText('DEAD', -so.size.x, 0)
   }
-  
+
   // Restore drawing
   ctx.restore()
 
@@ -226,7 +258,16 @@ export function setScaledFont(ctx: CanvasRenderingContext2D): number {
   return scale
 }
 
-export function renderProgressBar(pos: Vec2d, label: string, amount: number, max: number, ctx: CanvasRenderingContext2D, redLevel = 60, warn = false, textWarnColor = '#7b7b7b'): void {
+export function renderProgressBar(
+  pos: Vec2d,
+  label: string,
+  amount: number,
+  max: number,
+  ctx: CanvasRenderingContext2D,
+  redLevel = 60,
+  warn = false,
+  textWarnColor = '#7b7b7b'
+): void {
   ctx.save()
   ctx.translate(pos.x, pos.y)
   const linew = 8
@@ -251,7 +292,7 @@ export function renderProgressBar(pos: Vec2d, label: string, amount: number, max
     amount = 0
   }
 
-  let p: number = w * amount / max - linew
+  let p: number = (w * amount) / max - linew
   if (p < 0) p = 0
   if (p > w) {
     ctx.fillStyle = '#600'
@@ -259,11 +300,11 @@ export function renderProgressBar(pos: Vec2d, label: string, amount: number, max
   }
 
   ctx.fillRect(Math.floor(linew / 2), Math.floor(linew / 2), p, h - Math.floor(linew / 2))
-  
+
   ctx.lineWidth = 1
   ctx.strokeRect(w - Math.floor(linew / 2), Math.floor(linew / 2) + 1, 1, h - Math.floor(linew / 2) - 1)
   ctx.strokeRect(Math.floor(linew / 2), Math.floor(linew / 2) + 1, 1, h - Math.floor(linew / 2) - 1)
-  
+
   setScaledFont(ctx)
   ctx.fillStyle = '#7b7b7b'
   if (percent_n > 56) {
@@ -289,59 +330,66 @@ export function renderNumber(num: number, pos: Vec2d, ctx: CanvasRenderingContex
   ctx.restore()
 }
 
-export function renderRoundIndicator(centerPos: Vec2d, value: number, min: number, max: number, ctx: CanvasRenderingContext2D, radius = 100, unitLabel: string, steps = 20): void {
+export function renderRoundIndicator(
+  centerPos: Vec2d,
+  value: number,
+  min: number,
+  max: number,
+  ctx: CanvasRenderingContext2D,
+  radius = 100,
+  unitLabel: string,
+  steps = 20
+): void {
   ctx.save()
   ctx.translate(centerPos.x, centerPos.y)
   ctx.beginPath()
   ctx.strokeStyle = '#fff'
   ctx.fillStyle = '#fff'
   ctx.lineWidth = 4
-  
+
   const ang1 = -240
   const meterAngleTest = round2dec(linearTransform(value, min, max, 0, -ang1), 0)
   const meterAngleTestStr = meterAngleTest + ''
   const roundVal = `${round2dec(value, 0)}`
-  ctx.fillText(`${meterAngleTest}`, -8 * meterAngleTestStr.length , radius/2)
+  ctx.fillText(`${meterAngleTest}`, -8 * meterAngleTestStr.length, radius / 2)
   // ctx.fillText(`${roundVal}`, -8 * roundVal.length , radius/2)
-  ctx.fillText(`${unitLabel}`, -8 * unitLabel.length , radius/2 + 40)
-  
-  
-  
-  ctx.arc(0, 0, radius/10, 0, 360 * 180 / Math.PI)
+  ctx.fillText(`${unitLabel}`, -8 * unitLabel.length, radius / 2 + 40)
+
+  ctx.arc(0, 0, radius / 10, 0, (360 * 180) / Math.PI)
   ctx.fill()
   ctx.beginPath()
   ctx.arc(0, 0, radius, degToRad(ang1), degToRad(60), false)
   ctx.stroke()
-  
+
   ctx.lineWidth = 4
   ctx.rotate(degToRad(ang1))
-  
+
   ctx.moveTo(radius - 10, 0)
   ctx.lineTo(radius - 30, 0)
   let fixAng = 260
   const numberOffset = 60
   const yoff = 0
   const rot = Math.floor(meterAngleTest / 360) * 360
-  renderNumber(rot, {x: radius - numberOffset, y: yoff}, ctx, fixAng-=steps)
+  renderNumber(rot, { x: radius - numberOffset, y: yoff }, ctx, (fixAng -= steps))
   for (let i = 1; i < 16; i++) {
     ctx.rotate(degToRad(steps))
-    renderNumber((i * steps) + rot, {x: radius - numberOffset, y: yoff}, ctx, fixAng-=steps)
+    renderNumber(i * steps + rot, { x: radius - numberOffset, y: yoff }, ctx, (fixAng -= steps))
     ctx.moveTo(radius - 12, 0)
     ctx.lineTo(radius - 35, 0)
   }
-  
+
   ctx.stroke()
-  
+
   ctx.resetTransform()
-  
+
   ctx.translate(centerPos.x, centerPos.y)
   ctx.rotate(degToRad(ang1))
-  
+
   const meterAngle = linearTransform(value, min, max, 0, -ang1)
   ctx.rotate(degToRad(meterAngle)) // 0 - 270 -> min - max
   ctx.beginPath()
   const needleWith = 10
-  ctx.moveTo(-needleWith/2, 0)
+  ctx.moveTo(-needleWith / 2, 0)
   ctx.lineTo(radius - 12, 0)
   ctx.lineWidth = needleWith
   ctx.strokeStyle = '#c00'
