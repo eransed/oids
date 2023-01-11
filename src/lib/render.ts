@@ -66,8 +66,8 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const xposBar = 20
   const scale = setScaledFont(ctx)
 
-  renderRoundIndicator({x: screen.x - 400, y: screen.y - 370}, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 300, 'y m/s')
-  renderRoundIndicator({x: screen.x - 1100, y: screen.y - 370}, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 300, 'x m/s')
+  renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 300, 'y m/s')
+  renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 300, 'x m/s')
   ctx.fillStyle = '#fff'
   ctx.fillText(`Local: ${so.name}`, xpos, yrow1)
   // ctx.fillText(`---------------------`, xpos, yrow3)
@@ -176,6 +176,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   const shipMatrix = new DOMMatrix()
 
   shipMatrix.e = -150
+  shipMatrix.f = -150
 
   const newPath = transformPath(shipPath, shipMatrix)
 
@@ -201,7 +202,6 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   renderShot(so, ctx)
 }
 
-
 export function renderOGShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false): void {
   const scale = setScaledFont(ctx)
   const shipSize: Vec2d = { x: 60, y: 100 }
@@ -214,7 +214,7 @@ export function renderOGShip(so: SpaceObject, ctx: CanvasRenderingContext2D, ren
   ctx.translate(so.position.x, so.position.y)
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
   ctx.lineWidth = 2 * screenScale
-  
+
   // Hull
   ctx.strokeStyle = so.colliding ? '#f00' : so.color
   ctx.fillStyle = so.colliding ? '#f00' : so.color
@@ -230,15 +230,15 @@ export function renderOGShip(so: SpaceObject, ctx: CanvasRenderingContext2D, ren
     ctx.fill()
   }
 
-  ctx.fillStyle = "#f00"
-  ctx.rotate(20 * Math.PI / 180)
+  ctx.fillStyle = '#f00'
+  ctx.rotate((20 * Math.PI) / 180)
   if (!so.online && !renderAsLocalPlayer) {
-    ctx.fillText(so.name, -1.2 * so.size.x/2, -30)
-    ctx.fillText('offline', -1.2 * so.size.x/2, 30)
+    ctx.fillText(so.name, (-1.2 * so.size.x) / 2, -30)
+    ctx.fillText('offline', (-1.2 * so.size.x) / 2, 30)
   } else if (so.health <= 0) {
     ctx.fillText('DEAD', -so.size.x, 0)
   }
-  
+
   // Restore drawing
   ctx.restore()
 
@@ -388,7 +388,7 @@ export function renderRoundIndicator(
   ctx.strokeStyle = '#fff'
   ctx.fillStyle = '#fff'
   ctx.lineWidth = 8
-  
+
   const ang1 = -240
   const meterAngleTest = round2dec(linearTransform(value, min, max, 0, -ang1), 0)
   const meterAngleTestStr = meterAngleTest + ''
@@ -402,22 +402,22 @@ export function renderRoundIndicator(
   ctx.beginPath()
   ctx.arc(0, 0, radius, degToRad(ang1), degToRad(60), false)
   ctx.stroke()
-  
+
   ctx.lineWidth = 3
   ctx.rotate(degToRad(ang1))
 
   const outerOff = 20
   const innerOff = 60
   const numberOffset = 100
-  
+
   ctx.moveTo(radius - outerOff, 0)
   ctx.lineTo(radius - innerOff, 0)
   let fixAng = 260
   const rot = Math.floor(meterAngleTest / 360) * 360
-  renderNumber(rot, {x: radius - numberOffset, y: 0}, ctx, fixAng-=steps)
+  renderNumber(rot, { x: radius - numberOffset, y: 0 }, ctx, (fixAng -= steps))
   for (let i = 1; i < 16; i++) {
     ctx.rotate(degToRad(steps))
-    renderNumber((i * steps) + rot, {x: radius - numberOffset, y: 0}, ctx, fixAng-=steps)
+    renderNumber(i * steps + rot, { x: radius - numberOffset, y: 0 }, ctx, (fixAng -= steps))
     ctx.moveTo(radius - outerOff, 0)
     ctx.lineTo(radius - innerOff, 0)
   }
