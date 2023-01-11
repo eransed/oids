@@ -15,11 +15,21 @@ import Menu90 from "./Menu90.svelte"
     {
         buttonText: 'Singleplayer',
         clickCallback: () => {console.log('Singleplayer')},
-        selected: false,
+        selected: true,
     },
     {
         buttonText: 'Multiplayer', 
         clickCallback: () => {console.log('Multiplayer')},
+        selected: false,
+    },
+    {
+        buttonText: 'Settings', 
+        clickCallback: () => {console.log('Settings')},
+        selected: false,
+    },
+    {
+        buttonText: 'About', 
+        clickCallback: () => {console.log('About')},
         selected: false,
     }]
 

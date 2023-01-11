@@ -6,39 +6,41 @@
     //Should maybe be local for this component, this?
     
     const rotate = (index: number, size: number): number => {
+        if (index < 0) return (size + index % size) % size
         return index % size
     }
 
+    function handleMenuSelection(event: KeyboardEvent) {
+        let selectedIndex = 0
 
-    document.addEventListener('keydown', (event) => {
-
-        let direction = 1
-
-       
-
-        if (event.code === 'ArrowUp') {
-            
-        } else if (event.code === 'ArrowDown') {
-            direction=-1
-        } else return
-
-       
-        buttons.forEach((b,index) => {
+        buttons.forEach((b, index) => {
             if (b.selected) {
-
-                let i = (index-direction)%buttons.length+direction
-
-                buttons[i].selected = true
-                b.selected = false
-                console.log(b, i)
+                selectedIndex = index
                 return
             }
-
+            // No selected button, default to the first one
             buttons[0].selected = true
-
         })
-    })
 
+        buttons.forEach(b => {
+            b.selected = false
+        })
+
+        if (event.code === 'ArrowUp') {
+            selectedIndex--
+        } else if (event.code === 'ArrowDown') {
+            selectedIndex++
+        } else if (event.code === 'Enter') {
+            buttons[selectedIndex].clickCallback()
+        }
+
+        selectedIndex = rotate(selectedIndex, buttons.length)
+        buttons[selectedIndex].selected = true
+    }
+
+    document.addEventListener('keydown', (event) => {
+        handleMenuSelection(event)
+    })
 
 </script>
 
