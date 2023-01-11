@@ -12,7 +12,7 @@
 
     function handleMenuSelection(event: KeyboardEvent) {
         let selectedIndex = 0
-
+        
         buttons.forEach((b, index) => {
             if (b.selected) {
                 selectedIndex = index
@@ -21,11 +21,11 @@
             // No selected button, default to the first one
             buttons[0].selected = true
         })
-
+        
         buttons.forEach(b => {
             b.selected = false
         })
-
+        
         if (event.code === 'ArrowUp') {
             selectedIndex--
         } else if (event.code === 'ArrowDown') {
@@ -33,12 +33,13 @@
         } else if (event.code === 'Enter') {
             buttons[selectedIndex].clickCallback()
         }
-
+            
         selectedIndex = rotate(selectedIndex, buttons.length)
         buttons[selectedIndex].selected = true
     }
-
+    
     document.addEventListener('keydown', (event) => {
+        console.log('code =', event.code, ', key =',event.key)
         handleMenuSelection(event)
     })
 
@@ -55,6 +56,7 @@
 
     .buttonList{
         list-style-type: none;
+        border: 2px solid #ccc;
     }
 
 </style>

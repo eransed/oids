@@ -15,10 +15,12 @@ export let buttonConfig: Button90Config = {
 <style>
 
     button{
-        border: solid;  
-        padding: 20px;
-        margin: 10px;
-        min-width: 150px;
+        /* border: solid; */
+        padding: 15px;
+        margin: 5px;
+        min-width: 180px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
     }
 
     .notSelected{
@@ -29,8 +31,8 @@ export let buttonConfig: Button90Config = {
     .selected{
         background-color: #fff;
         color: #000;
-        border: solid;
-        border-color: #ccc;
+        /* border: solid; */
+        /* border-color: #ccc; */
     }
     
 </style>
