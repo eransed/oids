@@ -12,12 +12,13 @@ import { test } from './test'
 import { getSerVer, initMultiplayer, isConnectedToWsServer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
 
 export async function game(ctx: CanvasRenderingContext2D) {
-
   if (!test()) {
     return
   }
-  
+
   console.log('Starting oids...')
+
+  //Needs to be a default canvas size so people get the same game size.
   setCanvasSize(ctx)
   loadingText('Loading...', ctx)
   initKeyControllers()
@@ -72,7 +73,6 @@ export async function game(ctx: CanvasRenderingContext2D) {
   })
 
   const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
-    
     serverObjects.forEach((so) => {
       if (so.shape === SpaceShape.Moon) {
         renderMoon(so, ctx)
@@ -80,7 +80,7 @@ export async function game(ctx: CanvasRenderingContext2D) {
         renderShip(so, ctx)
       }
     })
-    
+
     renderSpaceObjectStatusBar(serverObjects, ship, ctx)
     // renderVector(ship.acceleration, ship.position, ctx, 400)
     // renderVector(ship.velocity, ship.position, ctx, 10)
@@ -91,7 +91,6 @@ export async function game(ctx: CanvasRenderingContext2D) {
     fpsCounter(dt, getSerVer(), ctx)
 
     renderShip(ship, ctx, true)
-
   }
 
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {

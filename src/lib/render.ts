@@ -176,6 +176,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   let shipMatrix = new DOMMatrix()
 
   shipMatrix.e = -150
+  shipMatrix.f = -150
 
   const newPath = transformPath(shipPath, shipMatrix)
 

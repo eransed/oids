@@ -1,13 +1,16 @@
 <script lang="ts">
   import Game from './components/Game.svelte'
+  import WelcomeScreen from './components/WelcomeSreen.svelte'
 </script>
 
+<body>
 <main>
-  <!-- <h2>oids</h2> -->
   <div>
-    <Game />
+    <WelcomeScreen/>
+    <!-- <Game /> -->
   </div>
 </main>
+</body>
 
 <style>
 
