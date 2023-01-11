@@ -50,9 +50,10 @@ export function createSpaceObject(): SpaceObject {
     framesSinceLastShot: 0,
     missileSpeed: 20,
     canonCoolDownSpeed: 1.4,
-    canonHeatAddedPerShot: 2.5,
-    inverseFireRate: 8,
+    canonHeatAddedPerShot: 1.7,
+    inverseFireRate: 6,
     shotsPerFrame: 1,
+    photonColor: '#0f0'
   }
 
   return spaceObject

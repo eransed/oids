@@ -2,7 +2,7 @@ import type { Vec2d } from './types'
 
 export const frontVersion = '0.1.0'
 export const screenScale = 3
-export const linearFriction: Vec2d = { x: 0.997, y: 0.99 }
+export const linearFriction: Vec2d = { x: 0.998, y: 0.99 }
 export const angularFriction = 0.995
 export const canvasBackgroundColor = '#000'
 export const maxRandomDefaultSpaceObjectVelocity = 1

@@ -36,3 +36,10 @@ export function randomAnyColor(): string {
   const b = '0123456789ABCDEF'
   return randomColor(r, g, b)
 }
+
+export function randomAnyLightColor(): string {
+  const r = 'BCDEF'
+  const g = 'BCDEF'
+  const b = 'BCDEF'
+  return randomColor(r, g, b)
+}

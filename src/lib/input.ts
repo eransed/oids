@@ -71,14 +71,15 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 
   if (reset) {
-    so.ammo = 100
+    // so.canonCoolDown = 0
+    so.ammo = 1000
     so.health = 250
     so.batteryLevel = 500
-    so.canonCoolDown = 0
-    so.missileDamage = 4
     so.booster = 5
-    so.inverseFireRate = 14
-    so.shotsPerFrame = 8
+    
+    so.missileDamage = 4
+    so.inverseFireRate = 12
+    so.shotsPerFrame = 10
   }
 
   if (boost) {
