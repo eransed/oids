@@ -12,7 +12,7 @@
 
     function handleMenuSelection(event: KeyboardEvent) {
         let selectedIndex = 0
-        
+
         buttons.forEach((b, index) => {
             if (b.selected) {
                 selectedIndex = index
@@ -56,7 +56,7 @@
 
     .buttonList{
         list-style-type: none;
-        border: 2px solid #ccc;
+        border: 2px solid #fff;
     }
 
 </style>
@@ -64,9 +64,7 @@
 <div class="wrapper">
     <ul class='buttonList'>
     {#each buttons as button} 
-    
-    <li><Button90 buttonConfig={button}/></li>
-            
+        <li><Button90 buttonConfig={button}/></li>    
     {/each}
     </ul>
 </div>

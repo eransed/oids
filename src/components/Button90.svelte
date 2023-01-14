@@ -19,10 +19,15 @@ export let buttonConfig: Button90Config = {
         padding: 15px;
         margin: 5px;
         min-width: 180px;
-        font-family: 'Courier New', Courier, monospace;
+        height: 60px;
+        /* font-family: 'Courier New', Courier, monospace; */
+        /* font-family: 'Times New Roman', Times, serif; */
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        
         font-weight: bold;
+        font-size: 15px;
     }
-
+    
     .notSelected{
         background-color: transparent;
         color: #fff;
@@ -31,6 +36,10 @@ export let buttonConfig: Button90Config = {
     .selected{
         background-color: #fff;
         color: #000;
+        text-decoration-line: underline;
+        font-weight: bold;
+        font-size: 17px;
+        font-stretch: expanded;
         /* border: solid; */
         /* border-color: #ccc; */
     }

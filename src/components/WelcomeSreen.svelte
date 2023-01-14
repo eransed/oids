@@ -19,7 +19,7 @@ import Menu90 from "./Menu90.svelte"
     },
     {
         buttonText: 'Multiplayer', 
-        clickCallback: () => {console.log('Multiplayer')},
+        clickCallback: () => {alert('Multiplayer');console.log('Multiplayer')},
         selected: false,
     },
     {
