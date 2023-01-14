@@ -22,10 +22,35 @@ export function sub(to: Vec2d, from: Vec2d): Vec2d {
   return tmp
 }
 
-export function mul(to: Vec2d, from: Vec2d): Vec2d {
-  const tmp: Vec2d = copy(from)
-  tmp.x = to.x * from.x
-  tmp.y = to.y * from.y
+// export function mul(to: Vec2d, from: Vec2d): Vec2d {
+//   const tmp: Vec2d = copy(from)
+//   tmp.x = to.x * from.x
+//   tmp.y = to.y * from.y
+//   return tmp
+// }
+
+export function scalarMultiply(v: Vec2d, s: number): Vec2d {
+  const tmp: Vec2d = copy(v)
+  tmp.x *= s
+  tmp.y *= s
+  return tmp
+}
+
+export function smul(v: Vec2d, s: number): Vec2d {
+  const tmp: Vec2d = copy(v)
+  tmp.x *= s
+  tmp.y *= s
+  return tmp
+}
+
+export function sdiv(v: Vec2d, s: number): Vec2d {
+  if (s === 0) {
+    console.error('Division by 0')
+    return {x: 0, y: 0}
+  }
+  const tmp: Vec2d = copy(v)
+  tmp.x /= s
+  tmp.y /= s
   return tmp
 }
 
@@ -42,6 +67,14 @@ export function floor(v: Vec2d): Vec2d {
 
 export function magnitude(v: Vec2d): number {
   return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2))
+}
+
+export function mag(v: Vec2d): number {
+  return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2))
+}
+
+export function norm(v: Vec2d): Vec2d {
+  return sdiv(v, mag(v))
 }
 
 export function rndf(min: number, max: number): number {
@@ -103,20 +136,6 @@ export function mirrorWrap(vector: Vec2d, screen: Vec2d) {
 export function round2dec(num: number, dec = 2): number {
   const exp = Math.pow(10, dec)
   return Math.round((num + Number.EPSILON) * exp) / exp
-}
-
-export function scalarMultiply(v: Vec2d, s: number): Vec2d {
-  const tmp: Vec2d = copy(v)
-  tmp.x *= s
-  tmp.y *= s
-  return tmp
-}
-
-export function smul(v: Vec2d, s: number): Vec2d {
-  const tmp: Vec2d = copy(v)
-  tmp.x *= s
-  tmp.y *= s
-  return tmp
 }
 
 export function degToRad(deg: number): number {

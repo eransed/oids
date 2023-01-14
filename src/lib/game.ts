@@ -2,21 +2,28 @@ import { SpaceShape, type SpaceObject } from './types'
 
 import { initKeyControllers, spaceObjectKeyController } from './input'
 import { bounceSpaceObject, wrapSpaceObject } from './mechanics'
-import { clearScreen, loadingText, renderMoon, renderShip, renderSpaceObjectStatusBar } from './render'
-import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
+import { clearScreen, loadingText, renderMoon, renderOGShip, renderPoint, renderShip, renderSpaceObjectStatusBar } from './render'
+import { createSpaceObject, getMousePosition, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
 import { add, rndfVec2d, rndi } from './math'
-import { randomAnyColor, randomAnyLightColor, randomBlue } from './color'
+import { randomAnyColor } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
-import { getSerVer, initMultiplayer, isConnectedToWsServer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
+import { getSerVer, initMultiplayer, isConnectedToWsServer, registerServerUpdate, sendSpaceObjectToBroadcastServer } from './multiplayer'
+import { LineSegment, Ray } from './shapes'
 
-export async function game(ctx: CanvasRenderingContext2D) {
+function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
+  return canvas.getContext("2d")
+}
+
+export async function game(canvas: HTMLCanvasElement) {
   if (!test()) {
     return
   }
 
   console.log('Starting oids...')
+
+  const ctx = <CanvasRenderingContext2D> getContext(canvas)
 
   //Needs to be a default canvas size so people get the same game size.
   setCanvasSize(ctx)
@@ -38,6 +45,13 @@ export async function game(ctx: CanvasRenderingContext2D) {
   ship.photonColor = '#f0f'
   ship.isLocal = true
   console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
+
+  const ray = new Ray({x:1000, y:750}, {x:1, y:0})
+  const ls = new LineSegment({x: 2000, y:500}, {x: 2000, y: 1000})
+
+  document.addEventListener('mousemove', (event) => {
+    ray.lookAt(getMousePosition(canvas, event))
+  })
 
   const bodies: SpaceObject[] = []
 
@@ -90,10 +104,18 @@ export async function game(ctx: CanvasRenderingContext2D) {
     })
 
     fpsCounter(dt, getSerVer(), ctx)
+    
+    renderOGShip(ship, ctx, true)
 
-    renderShip(ship, ctx, true)
+    const inter = ray.cast(ls)
+    if (inter) {
+      renderPoint(ctx, inter, '#f00', 20)
+    }
+    ray.render(ctx, 100)
+    ls.render(ctx)
+    
   }
-
+  
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
     spaceObjectKeyController(ship, dt)
     friction(ship)

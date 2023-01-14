@@ -66,6 +66,8 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const xposBar = 20
   const scale = setScaledFont(ctx)
 
+  ctx.save()
+
   renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 300, 'y m/s')
   renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 300, 'x m/s')
   ctx.fillStyle = '#fff'
@@ -89,6 +91,7 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 4) }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, '#d44')
   // renderProgressBar({ x: xpos, y: yrow1 - 500 }, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
   // renderProgressBar({ x: xpos, y: yrow1 - 700 }, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
+  ctx.restore()
 }
 
 export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContext2D, scale = 10000, color = '#fff', offset: Vec2d = { x: 0, y: 0 }) {
@@ -100,6 +103,19 @@ export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContex
   ctx.moveTo(0, 0)
   ctx.lineTo(scale * v.x, scale * v.y)
   ctx.stroke()
+  ctx.restore()
+}
+
+
+export function renderPoint(ctx: CanvasRenderingContext2D, v: Vec2d, color: string, radius = 10): void {
+  ctx.save()
+  ctx.translate(v.x, v.y)
+  ctx.fillStyle = color
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  // ctx.strokeStyle = color
+  ctx.arc(0, 0, radius, 0, Math.PI * 2, false)
+  ctx.fill()
   ctx.restore()
 }
 
@@ -262,6 +278,7 @@ export function renderExplosionFrame(pos: Vec2d, ctx: CanvasRenderingContext2D) 
 }
 
 export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D) {
+  ctx.save()
   for (const shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
@@ -279,6 +296,7 @@ export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D) {
     ctx.fillRect(-shot.size.x / 2, -shot.size.y / 2, shot.size.x, shot.size.y)
     ctx.restore()
   }
+  ctx.restore()
 }
 
 export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void {

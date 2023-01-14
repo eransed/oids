@@ -82,3 +82,15 @@ export function getScreenFromCanvas(ctx: CanvasRenderingContext2D): Vec2d {
 export function to_string(v: Vec2d, dec = 0): string {
   return '(' + round2dec(v.x, dec) + ', ' + round2dec(v.y, dec) + ')'
 }
+
+
+export function  getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEvent): Vec2d {
+  const rect = canvas.getBoundingClientRect()
+  const scaleX = canvas.width / rect.width
+  const scaleY = canvas.height / rect.height
+
+  return {
+    x: (mouseEvent.clientX - rect.left) * scaleX,
+    y: (mouseEvent.clientY - rect.top) * scaleY
+  }
+}

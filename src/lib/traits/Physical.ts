@@ -12,15 +12,17 @@ export interface Sizeable {
 }
 
 export class Physical implements Positionable, Testable {
-  mass: number = 1
+  mass = 1
   size: Vec2d = { x: 10, y: 10 }
   position: Vec2d = { x: 0, y: 0 }
   velocity: Vec2d = { x: 0, y: 0 }
   acceleration: Vec2d = { x: 0, y: 0 }
-  angleDegree: number = 120
-  angularVelocity: number = 0
+  angleDegree = 120
+  angularVelocity = 0
 
-  constructor() {}
+  constructor() {
+    console.log('Creates a Physical...')
+  }
 
   update(deltaTime: number): void {
     if (isNaN(deltaTime)) {
@@ -58,7 +60,7 @@ export class Physical implements Positionable, Testable {
     this.angularVelocity = this.angularVelocity * angularFriction
   }
 
-  gravityAttract(attractee: Physical, G: number = 1): void {
+  gravityAttract(attractee: Physical, G = 1): void {
     const m0: number = this.mass
     const m1: number = attractee.mass
     const v01: Vec2d = sub(this.position, attractee.position)

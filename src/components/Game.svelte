@@ -8,11 +8,10 @@
 
   onMount(() => {
     const canvasElement: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("game_canvas")
-    const ctx: CanvasRenderingContext2D | null = canvasElement.getContext("2d")
-    if (ctx === null){
-      console.error('ctx is null')
+    if (canvasElement === null){
+      console.error('Could not find id "game_canvas"')
     } else {
-      game(ctx)
+      game(canvasElement)
     }
   });
 
