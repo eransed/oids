@@ -77,6 +77,17 @@ export function norm(v: Vec2d): Vec2d {
   return sdiv(v, mag(v))
 }
 
+export function dist(v0: Vec2d, v1: Vec2d): number {
+  return Math.sqrt(Math.pow(v1.x - v0.x, 2) + Math.pow(v1.y - v1.y, 2))
+}
+
+export function direction(angleDegree: number): Vec2d {
+  return {
+    x: Math.cos(degToRad(angleDegree)),
+    y: Math.sin(degToRad(angleDegree)),
+  }
+}
+
 export function rndf(min: number, max: number): number {
   return Math.random() * (max - min) + min
 }
@@ -139,11 +150,11 @@ export function round2dec(num: number, dec = 2): number {
 }
 
 export function degToRad(deg: number): number {
-  return (deg * Math.PI) / 180
+  return deg * (Math.PI  / 180.0)
 }
 
 export function radToDeg(rad: number): number {
-  return rad * (180 / Math.PI)
+  return rad * (180.0 / Math.PI)
 }
 
 export function withinBounds(v: Vec2d, maxBound: Vec2d, minBound: Vec2d = { x: 0, y: 0 }) {

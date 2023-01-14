@@ -1,5 +1,52 @@
-import { norm, smul, sub, vec2d } from "./math";
 import type { Vec2d } from "./types";
+import { direction, dist, norm, smul, sub, vec2d } from "./math";
+import { renderPoint } from "./render";
+
+export class LightSource {
+  position: Vec2d
+  direction: Vec2d
+  rays: Ray[] = []
+  fovDegrees: number
+
+  constructor(_position: Vec2d, _direction: Vec2d, _fovDegrees: number) {
+    this.position = _position
+    this.direction = _direction
+    this.fovDegrees = _fovDegrees
+  }
+
+  shine(segments: LineSegment[], ctx: CanvasRenderingContext2D) {
+    this.rays = []
+    for (let a = 0; a <= 360; a += 5) {
+      this.rays.push(new Ray(this.position, direction(a)))
+    }
+    for (const ray of this.rays) {
+      let min = Infinity;
+      let nearestIntersect: Vec2d | null = null
+      for (const segment of segments) {
+        const p = ray.cast(segment);
+        if (p) {
+          const d = dist(this.position, p)
+          if (d < min) {
+            min = d;
+            nearestIntersect = p;
+          }
+        }
+      }
+      if (nearestIntersect) {
+        renderPoint(ctx, nearestIntersect, '#f00', 10)
+        new LineSegment(this.position, nearestIntersect).render(ctx)
+      }
+    }
+  }
+
+  render(ctx: CanvasRenderingContext2D): void {
+    for (const ray of this.rays) {
+      ray.render(ctx)
+    }
+    renderPoint(ctx, this.position, '#fff', 6)
+  }
+
+}
 
 export class Ray {
   position: Vec2d
@@ -44,16 +91,13 @@ export class Ray {
     } else {
       return
     }
-
-
-
   }
 
   render(ctx: CanvasRenderingContext2D, scale = 1): void {
     const dirScaled = smul(this.direction, scale)
     ctx.save()
     ctx.lineWidth = 6
-    ctx.strokeStyle = '#0f0'
+    ctx.strokeStyle = '#fff'
     ctx.translate(this.position.x, this.position.y)
     ctx.beginPath()
     ctx.moveTo(0, 0)
@@ -73,14 +117,13 @@ export class LineSegment {
     this.p1 = _p1
   }
 
-  // intersects(line: LineSegment): LineSegment | boolean {
-  //   const x1 = this.
+  // intersects(line: LineSegment): LineSegment | undefind {
   // }
 
   render(ctx: CanvasRenderingContext2D): void {
     ctx.save()
-    ctx.lineWidth = 2
-    ctx.strokeStyle = '#00f'
+    ctx.lineWidth = 6
+    ctx.strokeStyle = '#fff'
     ctx.translate(0, 0)
     ctx.beginPath()
     ctx.moveTo(this.p0.x, this.p0.y)

@@ -5,12 +5,12 @@ import { bounceSpaceObject, wrapSpaceObject } from './mechanics'
 import { clearScreen, loadingText, renderMoon, renderOGShip, renderPoint, renderShip, renderSpaceObjectStatusBar } from './render'
 import { createSpaceObject, getMousePosition, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
-import { add, rndfVec2d, rndi } from './math'
+import { add, rndfVec2d, rndi, sub } from './math'
 import { randomAnyColor } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
 import { getSerVer, initMultiplayer, isConnectedToWsServer, registerServerUpdate, sendSpaceObjectToBroadcastServer } from './multiplayer'
-import { LineSegment, Ray } from './shapes'
+import { LightSource, LineSegment, Ray } from './shapes'
 
 function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
   return canvas.getContext("2d")
@@ -46,11 +46,24 @@ export async function game(canvas: HTMLCanvasElement) {
   ship.isLocal = true
   console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
 
-  const ray = new Ray({x:1000, y:750}, {x:1, y:0})
-  const ls = new LineSegment({x: 2000, y:500}, {x: 2000, y: 1000})
+  const lightSource = new LightSource({x: 1000, y:750}, {x:1, y:0}, 45)
+  const segments: LineSegment[] = []
+  
+  const padding = 500
+  const pad = {x: padding, y: padding}
+  const scr = sub(getScreenRect(ctx), pad)
+  segments.push(new LineSegment(pad, {x: scr.x, y: padding}))
+  segments.push(new LineSegment({x: scr.x, y: padding}, {x: scr.x, y: scr.y}))
+  segments.push(new LineSegment({x: scr.x, y: scr.y}, {x: padding, y: scr.y}))
+  segments.push(new LineSegment({x: padding, y: scr.y}, {x: padding, y: padding}))
+  
+  segments.push(new LineSegment({x: 2000, y:500}, {x: 2000, y: 1000}))
+  segments.push(new LineSegment({x: 2100, y:550}, {x: 2300, y: 1200}))
+  segments.push(new LineSegment({x: 700, y:600}, {x: 1000, y: 1000}))
+  segments.push(new LineSegment({x: 200, y:700}, {x: 1400, y: 700}))
 
   document.addEventListener('mousemove', (event) => {
-    ray.lookAt(getMousePosition(canvas, event))
+    lightSource.position = getMousePosition(canvas, event)
   })
 
   const bodies: SpaceObject[] = []
@@ -107,12 +120,18 @@ export async function game(canvas: HTMLCanvasElement) {
     
     renderOGShip(ship, ctx, true)
 
-    const inter = ray.cast(ls)
-    if (inter) {
-      renderPoint(ctx, inter, '#f00', 20)
+    // const inter = ray.cast(ls)
+    // if (inter) {
+    //   renderPoint(ctx, inter, '#fff', 20)
+    // }
+    // ray.render(ctx, 100)
+
+    lightSource.shine(segments, ctx)
+    // lightSource.render(ctx)
+
+    for (const segs of segments) {
+      segs.render(ctx)
     }
-    ray.render(ctx, 100)
-    ls.render(ctx)
     
   }
   
