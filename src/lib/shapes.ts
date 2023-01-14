@@ -16,7 +16,10 @@ export class LightSource {
 
   shine(segments: LineSegment[], ctx: CanvasRenderingContext2D) {
     this.rays = []
-    for (let a = 0; a <= 360; a += 5) {
+    // min diff from 0 and 180 that wont cause issues with vertical lines:
+    // const startAngle = Number.EPSILON * 14680 // = ~3.259e-12
+    const startAngle = 0.000001
+    for (let a = startAngle; a <= 360; a += 5) {
       this.rays.push(new Ray(this.position, direction(a)))
     }
     for (const ray of this.rays) {
@@ -33,8 +36,8 @@ export class LightSource {
         }
       }
       if (nearestIntersect) {
-        renderPoint(ctx, nearestIntersect, '#f00', 10)
-        new LineSegment(this.position, nearestIntersect).render(ctx)
+        // renderPoint(ctx, nearestIntersect, '#f00', 10)
+        new LineSegment(this.position, nearestIntersect, '#555').render(ctx)
       }
     }
   }
@@ -43,7 +46,7 @@ export class LightSource {
     for (const ray of this.rays) {
       ray.render(ctx)
     }
-    renderPoint(ctx, this.position, '#fff', 6)
+    renderPoint(ctx, this.position, '#777', 6)
   }
 
 }
@@ -97,7 +100,7 @@ export class Ray {
     const dirScaled = smul(this.direction, scale)
     ctx.save()
     ctx.lineWidth = 6
-    ctx.strokeStyle = '#fff'
+    ctx.strokeStyle = '#555'
     ctx.translate(this.position.x, this.position.y)
     ctx.beginPath()
     ctx.moveTo(0, 0)
@@ -111,10 +114,12 @@ export class Ray {
 export class LineSegment {
   p0: Vec2d
   p1: Vec2d
+  color: string
 
-  constructor (_p0: Vec2d, _p1: Vec2d) {
+  constructor (_p0: Vec2d, _p1: Vec2d, _color = '#fff') {
     this.p0 = _p0
     this.p1 = _p1
+    this.color = _color
   }
 
   // intersects(line: LineSegment): LineSegment | undefind {
@@ -123,7 +128,7 @@ export class LineSegment {
   render(ctx: CanvasRenderingContext2D): void {
     ctx.save()
     ctx.lineWidth = 6
-    ctx.strokeStyle = '#fff'
+    ctx.strokeStyle = this.color
     ctx.translate(0, 0)
     ctx.beginPath()
     ctx.moveTo(this.p0.x, this.p0.y)

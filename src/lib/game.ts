@@ -49,21 +49,29 @@ export async function game(canvas: HTMLCanvasElement) {
   const lightSource = new LightSource({x: 1000, y:750}, {x:1, y:0}, 45)
   const segments: LineSegment[] = []
   
-  const padding = 500
+  const padding = 10
   const pad = {x: padding, y: padding}
   const scr = sub(getScreenRect(ctx), pad)
   segments.push(new LineSegment(pad, {x: scr.x, y: padding}))
   segments.push(new LineSegment({x: scr.x, y: padding}, {x: scr.x, y: scr.y}))
   segments.push(new LineSegment({x: scr.x, y: scr.y}, {x: padding, y: scr.y}))
   segments.push(new LineSegment({x: padding, y: scr.y}, {x: padding, y: padding}))
+
+  const padding2 = 650
+  const pad2 = {x: padding2, y: padding2}
+  const scr2 = sub(getScreenRect(ctx), pad2)
+  segments.push(new LineSegment(pad2, {x: scr2.x, y: padding2}))
+  segments.push(new LineSegment({x: scr2.x, y: padding2}, {x: scr2.x, y: scr2.y}))
+  segments.push(new LineSegment({x: scr2.x, y: scr2.y}, {x: padding2, y: scr2.y}))
+  segments.push(new LineSegment({x: padding2, y: scr2.y}, {x: padding2, y: padding2}))
   
-  segments.push(new LineSegment({x: 2000, y:500}, {x: 2000, y: 1000}))
-  segments.push(new LineSegment({x: 2100, y:550}, {x: 2300, y: 1200}))
-  segments.push(new LineSegment({x: 700, y:600}, {x: 1000, y: 1000}))
-  segments.push(new LineSegment({x: 200, y:700}, {x: 1400, y: 700}))
+  segments.push(new LineSegment({x: 2000, y:200}, {x: 2000, y: 1000}))
+  segments.push(new LineSegment({x: 2400, y:300}, {x: 2300, y: 1600}))
+  segments.push(new LineSegment({x: 700, y:600}, {x: 1000, y: 1500}))
+  segments.push(new LineSegment({x: 200, y:700}, {x: 1400, y: 1000}))
 
   document.addEventListener('mousemove', (event) => {
-    lightSource.position = getMousePosition(canvas, event)
+    // lightSource.position = getMousePosition(canvas, event)
   })
 
   const bodies: SpaceObject[] = []
@@ -118,21 +126,23 @@ export async function game(canvas: HTMLCanvasElement) {
 
     fpsCounter(dt, getSerVer(), ctx)
     
-    renderOGShip(ship, ctx, true)
-
+    
     // const inter = ray.cast(ls)
     // if (inter) {
-    //   renderPoint(ctx, inter, '#fff', 20)
-    // }
-    // ray.render(ctx, 100)
-
+      //   renderPoint(ctx, inter, '#fff', 20)
+      // }
+      // ray.render(ctx, 100)
+      
+    lightSource.position = ship.position
+    
     lightSource.shine(segments, ctx)
     // lightSource.render(ctx)
-
+    
     for (const segs of segments) {
       segs.render(ctx)
     }
-    
+      
+    renderOGShip(ship, ctx, true)
   }
   
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
