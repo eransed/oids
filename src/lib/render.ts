@@ -66,8 +66,8 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const xposBar = 20
   const scale = setScaledFont(ctx)
 
-  renderRoundIndicator({ x: screen.x - 250, y: screen.y - 200 }, 100 * magnitude(so.velocity), 0, 800, ctx, 200, 'm/s')
-
+  renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 300, 'y m/s')
+  renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 300, 'x m/s')
   ctx.fillStyle = '#fff'
   ctx.fillText(`Local: ${so.name}`, xpos, yrow1)
   // ctx.fillText(`---------------------`, xpos, yrow3)
@@ -140,12 +140,12 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   ctx.strokeStyle = so.colliding ? '#f00' : so.color
   ctx.fillStyle = so.colliding ? '#f00' : so.color
 
-  let shipPath = new Path2D('')
-  let hull = new Path2D(
+  const shipPath = new Path2D('')
+  const hull = new Path2D(
     'M149.999999,-0.000285c0,0,38.131318,22.805854,50,64.871161s0,235.129439,0,235.129439h-100c0,0-14.235513-193.341187,0-235.129439s50-64.871161,50-64.871161Z'
   )
 
-  let hullMatrix = new DOMMatrix()
+  const hullMatrix = new DOMMatrix()
 
   //Adjusting the path to be on the hull
   hullMatrix.a = 0.667334
@@ -155,11 +155,11 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   hullMatrix.e = 50
   hullMatrix.f = 0.000285
 
-  let rightWing = new Path2D(
+  const rightWing = new Path2D(
     'M183.3667,300c0,0,9.554469-9.31039,26.870542-15s89.762758-18.102681,89.762758-18.102681v-43.741505c0,0-72.808219-46.518781-89.762758-73.155814s-26.870542-85.128968-26.870542-85.128968'
   )
 
-  let leftWing = new Path2D(
+  const leftWing = new Path2D(
     'M116.6333,299.999999c0,0-9.429182-7.873136-26.6333-15s-90-18.102681-90-18.102681v-43.741505c0,0,73.031615-46.567809,90-73.155814s26.6333-85.128968,26.6333-85.128968'
   )
 
@@ -173,7 +173,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
     return copy
   }
 
-  let shipMatrix = new DOMMatrix()
+  const shipMatrix = new DOMMatrix()
 
   shipMatrix.e = -150
   shipMatrix.f = -150
@@ -184,6 +184,50 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
     ctx.stroke(newPath)
   } else {
     ctx.fill(newPath)
+  }
+
+  ctx.fillStyle = '#f00'
+  ctx.rotate((20 * Math.PI) / 180)
+  if (!so.online && !renderAsLocalPlayer) {
+    ctx.fillText(so.name, (-1.2 * so.size.x) / 2, -30)
+    ctx.fillText('offline', (-1.2 * so.size.x) / 2, 30)
+  } else if (so.health <= 0) {
+    ctx.fillText('DEAD', -so.size.x, 0)
+  }
+
+  // Restore drawing
+  ctx.restore()
+
+  // Draw shots
+  renderShot(so, ctx)
+}
+
+export function renderOGShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false): void {
+  const scale = setScaledFont(ctx)
+  const shipSize: Vec2d = { x: 60, y: 100 }
+  so.size = shipSize
+
+  // Render hit box of ship after contex restore
+  // renderHitRadius(so, ctx)
+
+  ctx.save()
+  ctx.translate(so.position.x, so.position.y)
+  ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
+  ctx.lineWidth = 2 * screenScale
+
+  // Hull
+  ctx.strokeStyle = so.colliding ? '#f00' : so.color
+  ctx.fillStyle = so.colliding ? '#f00' : so.color
+  ctx.beginPath()
+  ctx.moveTo(0, (-shipSize.y / 3) * scale)
+  ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
+  ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
+  ctx.lineTo(0, (-shipSize.y / 3) * scale)
+
+  if (renderAsLocalPlayer) {
+    ctx.stroke()
+  } else {
+    ctx.fill()
   }
 
   ctx.fillStyle = '#f00'
@@ -221,11 +265,11 @@ export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D) {
   for (const shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#00f' : '#fff'
-    } else if (Math.random() > 0.985) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#ff0' : '#fff'
-    } else if (Math.random() > 0.975) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#f00' : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? '#fff' : '#fff'
+    } else if (Math.random() > 0.9) {
+      ctx.fillStyle = shot.armedDelay < 0 ? '#f0f' : '#fff'
+    } else if (Math.random() > 0.8) {
+      ctx.fillStyle = shot.armedDelay < 0 ? '#0f0' : '#fff'
     } else {
       ctx.fillStyle = shot.armedDelay < 0 ? shot.color : '#fff'
     }
@@ -233,9 +277,6 @@ export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D) {
     ctx.translate(shot.position.x, shot.position.y)
     ctx.rotate(((90 + shot.angleDegree) * Math.PI) / 180)
     ctx.fillRect(-shot.size.x / 2, -shot.size.y / 2, shot.size.x, shot.size.y)
-    // ctx.beginPath()
-    // ctx.arc(0, 0, 5, 0, 2 * Math.PI);
-    // ctx.fill()
     ctx.restore()
   }
 }
@@ -324,7 +365,7 @@ export function renderNumber(num: number, pos: Vec2d, ctx: CanvasRenderingContex
   ctx.save()
   ctx.translate(pos.x, pos.y)
   ctx.rotate(degToRad(angleAdjDeg))
-  ctx.font = `bold 20px courier`
+  ctx.font = `bold 22px courier`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(`${num}`, 0, 0)
@@ -346,7 +387,7 @@ export function renderRoundIndicator(
   ctx.beginPath()
   ctx.strokeStyle = '#fff'
   ctx.fillStyle = '#fff'
-  ctx.lineWidth = 4
+  ctx.lineWidth = 8
 
   const ang1 = -240
   const meterAngleTest = round2dec(linearTransform(value, min, max, 0, -ang1), 0)
@@ -362,21 +403,23 @@ export function renderRoundIndicator(
   ctx.arc(0, 0, radius, degToRad(ang1), degToRad(60), false)
   ctx.stroke()
 
-  ctx.lineWidth = 4
+  ctx.lineWidth = 3
   ctx.rotate(degToRad(ang1))
 
-  ctx.moveTo(radius - 10, 0)
-  ctx.lineTo(radius - 30, 0)
+  const outerOff = 20
+  const innerOff = 60
+  const numberOffset = 100
+
+  ctx.moveTo(radius - outerOff, 0)
+  ctx.lineTo(radius - innerOff, 0)
   let fixAng = 260
-  const numberOffset = 60
-  const yoff = 0
   const rot = Math.floor(meterAngleTest / 360) * 360
-  renderNumber(rot, { x: radius - numberOffset, y: yoff }, ctx, (fixAng -= steps))
+  renderNumber(rot, { x: radius - numberOffset, y: 0 }, ctx, (fixAng -= steps))
   for (let i = 1; i < 16; i++) {
     ctx.rotate(degToRad(steps))
-    renderNumber(i * steps + rot, { x: radius - numberOffset, y: yoff }, ctx, (fixAng -= steps))
-    ctx.moveTo(radius - 12, 0)
-    ctx.lineTo(radius - 35, 0)
+    renderNumber(i * steps + rot, { x: radius - numberOffset, y: 0 }, ctx, (fixAng -= steps))
+    ctx.moveTo(radius - outerOff, 0)
+    ctx.lineTo(radius - innerOff, 0)
   }
 
   ctx.stroke()
@@ -387,11 +430,12 @@ export function renderRoundIndicator(
   ctx.rotate(degToRad(ang1))
 
   const meterAngle = linearTransform(value, min, max, 0, -ang1)
-  ctx.rotate(degToRad(meterAngle)) // 0 - 270 -> min - max
   ctx.beginPath()
   const needleWith = 10
+  ctx.rotate(degToRad(meterAngle)) // 0 - 270 -> min - max
+  ctx.moveTo(0, 0)
+  ctx.lineTo(radius - 25, 0)
   ctx.moveTo(-needleWith / 2, 0)
-  ctx.lineTo(radius - 12, 0)
   ctx.lineWidth = needleWith
   ctx.strokeStyle = '#c00'
   ctx.stroke()

@@ -1,12 +1,12 @@
 import { SpaceShape, type SpaceObject } from './types'
 
 import { initKeyControllers, spaceObjectKeyController } from './input'
-import { wrapSpaceObject } from './mechanics'
+import { bounceSpaceObject, wrapSpaceObject } from './mechanics'
 import { clearScreen, loadingText, renderMoon, renderShip, renderSpaceObjectStatusBar } from './render'
 import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
 import { add, rndfVec2d, rndi } from './math'
-import { randomAnyColor, randomBlue } from './color'
+import { randomAnyColor, randomAnyLightColor, randomBlue } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
 import { getSerVer, initMultiplayer, isConnectedToWsServer, registerServerUpdate, sendSpaceObjectToBroadcastServer, sendToServer } from './multiplayer'
@@ -35,6 +35,7 @@ export async function game(ctx: CanvasRenderingContext2D) {
   ship.health = 250
   ship.name = `P-${rndi(0, 900000)}`
   ship.color = randomAnyColor()
+  ship.photonColor = '#f0f'
   ship.isLocal = true
   console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
 
@@ -96,7 +97,8 @@ export async function game(ctx: CanvasRenderingContext2D) {
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
     spaceObjectKeyController(ship, dt)
     friction(ship)
-    wrapSpaceObject(ship, getScreenRect(ctx))
+    // wrapSpaceObject(ship, getScreenRect(ctx))
+    bounceSpaceObject(ship, getScreenRect(ctx), 0.4, 0, 0)
 
     bodies.forEach((body) => {
       bodies.forEach((other) => {
@@ -112,7 +114,9 @@ export async function game(ctx: CanvasRenderingContext2D) {
       })
 
       friction(body)
-      wrapSpaceObject(body, getScreenRect(ctx))
+      // wrapSpaceObject(body, getScreenRect(ctx))
+      bounceSpaceObject(body, getScreenRect(ctx), 0.4, 0, 0)
+
     })
 
     serverObjects = serverObjects.filter((so) => {
@@ -138,7 +142,9 @@ export async function game(ctx: CanvasRenderingContext2D) {
 
       //Possible optimization send every other frame
       if (isConnectedToWsServer()) {
+        ship.photonColor = '#f00'
         sendSpaceObjectToBroadcastServer(ship)
+        ship.photonColor = '#f0f'
       }
       // bodies.forEach((b: SpaceObject) => {
       //   sendSpaceObjectToBroadcastServer(b)

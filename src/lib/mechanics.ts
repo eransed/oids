@@ -65,7 +65,8 @@ export function generateMissileFrom(so: SpaceObject): SpaceObject {
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
   shot.size = { x: rndi(4, 5), y: rndi(19, 25) }
-  shot.color = randomLightGreen()
+  // shot.color = randomLightGreen()
+  shot.color = so.photonColor
   let head: Vec2d = copy(so.position)
   const aimError = 6 // 8
   const headError = 0.32 // 0.019

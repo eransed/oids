@@ -78,6 +78,7 @@ export interface Fireable extends Positionable, Physical {
   inverseFireRate: number // 1 -> 1 * shotsPerFrame shots/frame
   framesSinceLastShot: number
   shotsPerFrame: number
+  photonColor: string
 }
 
 export interface Bounceable extends Positionable, Physical {
