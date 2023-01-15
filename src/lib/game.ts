@@ -109,6 +109,16 @@ export async function game(canvas: HTMLCanvasElement) {
   })
 
   const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
+    
+    lightSource.position = ship.position
+    
+    lightSource.shine(segments, ctx)
+    lightSource.render(ctx)
+    
+    for (const segs of segments) {
+      segs.render(ctx)
+    }
+    
     serverObjects.forEach((so) => {
       if (so.shape === SpaceShape.Moon) {
         renderMoon(so, ctx)
@@ -125,23 +135,6 @@ export async function game(canvas: HTMLCanvasElement) {
     })
 
     fpsCounter(dt, getSerVer(), ctx)
-    
-    
-    // const inter = ray.cast(ls)
-    // if (inter) {
-      //   renderPoint(ctx, inter, '#fff', 20)
-      // }
-      // ray.render(ctx, 100)
-      
-    lightSource.position = ship.position
-    
-    lightSource.shine(segments, ctx)
-    // lightSource.render(ctx)
-    
-    for (const segs of segments) {
-      segs.render(ctx)
-    }
-      
     renderOGShip(ship, ctx, true)
   }
   

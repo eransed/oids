@@ -19,7 +19,7 @@ export class LightSource {
     // min diff from 0 and 180 that wont cause issues with vertical lines:
     // const startAngle = Number.EPSILON * 14680 // = ~3.259e-12
     const startAngle = 0.000001
-    for (let a = startAngle; a <= 360; a += 5) {
+    for (let a = startAngle; a <= 360; a += 1) {
       this.rays.push(new Ray(this.position, direction(a)))
     }
     for (const ray of this.rays) {
@@ -37,7 +37,7 @@ export class LightSource {
       }
       if (nearestIntersect) {
         // renderPoint(ctx, nearestIntersect, '#f00', 10)
-        new LineSegment(this.position, nearestIntersect, '#555').render(ctx)
+        new LineSegment(this.position, nearestIntersect, '#50503a').render(ctx)
       }
     }
   }
