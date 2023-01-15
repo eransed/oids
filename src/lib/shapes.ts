@@ -2,6 +2,11 @@ import type { Vec2d } from "./types";
 import { add, angle, direction, dist, norm, smul, sub, vec2d } from "./math";
 import { renderPoint, renderVector } from "./render";
 
+export interface ViewSlice {
+  height: number
+  color: string
+}
+
 export class LightSource {
   position: Vec2d
   direction: Vec2d
@@ -16,7 +21,8 @@ export class LightSource {
     this.rayAngleDiff = _rayAngleDiff
   }
 
-  shine(segments: LineSegment[], ctx: CanvasRenderingContext2D) {
+  shine(segments: LineSegment[], ctx: CanvasRenderingContext2D): ViewSlice[] {
+    const slices: ViewSlice[] = []
     this.rays = []
     // min diff from 0 and 180 that wont cause issues with vertical lines:
     // const startAngle = Number.EPSILON * 14680 // = ~3.259e-12
@@ -28,6 +34,7 @@ export class LightSource {
     for (const ray of this.rays) {
       let min = Infinity;
       let nearestIntersect: Vec2d | null = null
+      let color = '#000'
       for (const segment of segments) {
         const p = ray.cast(segment);
         if (p) {
@@ -35,23 +42,26 @@ export class LightSource {
           if (d < min) {
             min = d;
             nearestIntersect = p;
+            color = segment.color
           }
         }
       }
       if (nearestIntersect) {
-        renderPoint(ctx, nearestIntersect, '#f00', 10)
         new LineSegment(this.position, nearestIntersect, '#50503a').render(ctx)
+        renderPoint(ctx, nearestIntersect, '#ff0', 20)
+        slices.push({height: min, color: color})
       }
     }
+    return slices
   }
 
-  render(ctx: CanvasRenderingContext2D): void {
-    for (const ray of this.rays) {
-      ray.render(ctx)
-    }
-    renderPoint(ctx, this.position, '#50503a', 8)
-    // renderVector(this.direction, this.position, ctx, 100, '#0f0')
-  }
+  // render(ctx: CanvasRenderingContext2D): void {
+  //   for (const ray of this.rays) {
+  //     ray.render(ctx)
+  //   }
+  //   renderPoint(ctx, this.position, '#50503a', 8)
+  //   // renderVector(this.direction, this.position, ctx, 100, '#0f0')
+  // }
 
 }
 
@@ -109,6 +119,7 @@ export class Ray {
     ctx.beginPath()
     ctx.moveTo(0, 0)
     ctx.lineTo(dirScaled.x, dirScaled.y)
+    ctx.closePath()
     ctx.stroke()
     ctx.restore()
   }
@@ -131,12 +142,13 @@ export class LineSegment {
 
   render(ctx: CanvasRenderingContext2D): void {
     ctx.save()
-    ctx.lineWidth = 6
+    ctx.lineWidth = 18
     ctx.strokeStyle = this.color
     ctx.translate(0, 0)
     ctx.beginPath()
     ctx.moveTo(this.p0.x, this.p0.y)
     ctx.lineTo(this.p1.x, this.p1.y)
+    ctx.closePath()
     ctx.stroke()
     ctx.restore()
   }

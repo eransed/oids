@@ -1,11 +1,11 @@
 import { SpaceShape, type SpaceObject, type Vec2d } from './types'
 import { add, degToRad, linearTransform, magnitude, rndi, round2dec, scalarMultiply } from './math'
-import { canvasBackgroundColor, screenScale, timeScale } from './constants'
+import { screenScale, timeScale } from './constants'
 import { getScreenFromCanvas, getScreenRect, to_string } from './utils'
 import { getConnInfo, getReadyStateText } from './multiplayer'
 
-export function clearScreen(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = canvasBackgroundColor
+export function clearScreen(ctx: CanvasRenderingContext2D, color = '#000') {
+  ctx.fillStyle = color
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
 
@@ -102,6 +102,7 @@ export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContex
   ctx.lineWidth = 5
   ctx.moveTo(0, 0)
   ctx.lineTo(scale * v.x, scale * v.y)
+  ctx.closePath()
   ctx.stroke()
   ctx.restore()
 }
@@ -115,6 +116,7 @@ export function renderPoint(ctx: CanvasRenderingContext2D, v: Vec2d, color: stri
   ctx.beginPath()
   // ctx.strokeStyle = color
   ctx.arc(0, 0, radius, 0, Math.PI * 2, false)
+  ctx.closePath()
   ctx.fill()
   ctx.restore()
 }
@@ -135,6 +137,7 @@ export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D):
   ctx.lineWidth = 1
   ctx.beginPath()
   ctx.arc(0, 0, so.hitRadius, 0, Math.PI * 2)
+  ctx.closePath()
   ctx.stroke()
   ctx.restore()
 }
@@ -239,6 +242,7 @@ export function renderOGShip(so: SpaceObject, ctx: CanvasRenderingContext2D, ren
   ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo(0, (-shipSize.y / 3) * scale)
+  ctx.closePath();
 
   if (renderAsLocalPlayer) {
     ctx.stroke()
@@ -305,6 +309,7 @@ export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void 
   ctx.beginPath()
   ctx.fillStyle = s.color
   ctx.arc(0, 0, 20, 0, Math.PI * 2, false)
+  ctx.closePath()
   ctx.fill()
   setScaledFont(ctx)
   ctx.fillStyle = '#ccc'
@@ -416,9 +421,11 @@ export function renderRoundIndicator(
   ctx.fillText(`${unitLabel}`, -8 * unitLabel.length, radius / 2 + 40)
 
   ctx.arc(0, 0, radius / 10, 0, (360 * 180) / Math.PI)
+  ctx.closePath()
   ctx.fill()
   ctx.beginPath()
   ctx.arc(0, 0, radius, degToRad(ang1), degToRad(60), false)
+  ctx.closePath()
   ctx.stroke()
 
   ctx.lineWidth = 3
@@ -428,6 +435,7 @@ export function renderRoundIndicator(
   const innerOff = 60
   const numberOffset = 100
 
+  ctx.beginPath()
   ctx.moveTo(radius - outerOff, 0)
   ctx.lineTo(radius - innerOff, 0)
   let fixAng = 260
@@ -440,6 +448,7 @@ export function renderRoundIndicator(
     ctx.lineTo(radius - innerOff, 0)
   }
 
+  ctx.closePath()
   ctx.stroke()
 
   ctx.resetTransform()
@@ -456,6 +465,7 @@ export function renderRoundIndicator(
   ctx.moveTo(-needleWith / 2, 0)
   ctx.lineWidth = needleWith
   ctx.strokeStyle = '#c00'
+  ctx.closePath()
   ctx.stroke()
   ctx.restore()
 }
