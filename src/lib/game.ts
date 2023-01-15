@@ -5,7 +5,7 @@ import { bounceSpaceObject, wrapSpaceObject } from './mechanics'
 import { clearScreen, loadingText, renderMoon, renderOGShip, renderPoint, renderShip, renderSpaceObjectStatusBar } from './render'
 import { createSpaceObject, getMousePosition, getScreenCenterPosition, getScreenRect, setCanvasSize } from './utils'
 import { friction, gravity, handleCollisions, updateSpaceObject, updateSpaceObjects } from './physics'
-import { add, rndfVec2d, rndi, sub } from './math'
+import { add, direction, rndfVec2d, rndi, sub } from './math'
 import { randomAnyColor } from './color'
 import { fpsCounter, getFrameTimeMs } from './time'
 import { test } from './test'
@@ -46,7 +46,7 @@ export async function game(canvas: HTMLCanvasElement) {
   ship.isLocal = true
   console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
 
-  const lightSource = new LightSource({x: 1000, y:750}, {x:1, y:0}, 45)
+  const lightSource = new LightSource({x: 1000, y:750}, {x:1, y:0}, 180, 1)
   const segments: LineSegment[] = []
   
   const padding = 10
@@ -111,7 +111,7 @@ export async function game(canvas: HTMLCanvasElement) {
   const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
     
     lightSource.position = ship.position
-    
+    lightSource.direction = direction(ship.angleDegree)
     lightSource.shine(segments, ctx)
     lightSource.render(ctx)
     

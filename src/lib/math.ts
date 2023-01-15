@@ -88,6 +88,11 @@ export function direction(angleDegree: number): Vec2d {
   }
 }
 
+export function angle(v: Vec2d): number {
+  return radToDeg(Math.atan2(v.y, v.x))
+}
+
+
 export function rndf(min: number, max: number): number {
   return Math.random() * (max - min) + min
 }

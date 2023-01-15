@@ -1,25 +1,28 @@
 import type { Vec2d } from "./types";
-import { direction, dist, norm, smul, sub, vec2d } from "./math";
-import { renderPoint } from "./render";
+import { add, angle, direction, dist, norm, smul, sub, vec2d } from "./math";
+import { renderPoint, renderVector } from "./render";
 
 export class LightSource {
   position: Vec2d
   direction: Vec2d
   rays: Ray[] = []
   fovDegrees: number
+  rayAngleDiff: number
 
-  constructor(_position: Vec2d, _direction: Vec2d, _fovDegrees: number) {
+  constructor(_position: Vec2d, _direction: Vec2d, _fovDegrees = 45, _rayAngleDiff = 2) {
     this.position = _position
     this.direction = _direction
     this.fovDegrees = _fovDegrees
+    this.rayAngleDiff = _rayAngleDiff
   }
 
   shine(segments: LineSegment[], ctx: CanvasRenderingContext2D) {
     this.rays = []
     // min diff from 0 and 180 that wont cause issues with vertical lines:
     // const startAngle = Number.EPSILON * 14680 // = ~3.259e-12
-    const startAngle = 0.000001
-    for (let a = startAngle; a <= 360; a += 1) {
+    const startAngle = 0.000001 + angle(this.direction) - this.fovDegrees/2
+    const stopAngle = angle(this.direction) + this.fovDegrees/2
+    for (let a = startAngle; a <= stopAngle; a += this.rayAngleDiff) {
       this.rays.push(new Ray(this.position, direction(a)))
     }
     for (const ray of this.rays) {
@@ -36,7 +39,7 @@ export class LightSource {
         }
       }
       if (nearestIntersect) {
-        // renderPoint(ctx, nearestIntersect, '#f00', 10)
+        renderPoint(ctx, nearestIntersect, '#f00', 10)
         new LineSegment(this.position, nearestIntersect, '#50503a').render(ctx)
       }
     }
@@ -46,7 +49,8 @@ export class LightSource {
     for (const ray of this.rays) {
       ray.render(ctx)
     }
-    renderPoint(ctx, this.position, '#777', 6)
+    renderPoint(ctx, this.position, '#50503a', 8)
+    // renderVector(this.direction, this.position, ctx, 100, '#0f0')
   }
 
 }
