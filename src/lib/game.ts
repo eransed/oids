@@ -41,7 +41,7 @@ export async function game(canvas: HTMLCanvasElement) {
   ship.angleDegree = -120
   ship.health = 250
   ship.steeringPower = 0.55
-  ship.enginePower = 0.025
+  ship.enginePower = 0.1
   ship.name = `P-${rndi(0, 900000)}`
   ship.color = randomAnyColor()
   ship.photonColor = '#f0f'
@@ -125,20 +125,25 @@ export async function game(canvas: HTMLCanvasElement) {
 
     const viewSlices = lightSource.shine(segments, ctx)
     const viewTopLeft = {x: 2500, y:100}
-    const viewSize = {x: 25 * viewSlices.length, y: 15 * viewSlices.length}
-    const viewSlizeWidth = Math.floor(viewSize.x / viewSlices.length)
+    const viewSize = {x: 12 * viewSlices.length, y: 6 * viewSlices.length}
+    const viewSliceWidth = Math.floor(viewSize.x / viewSlices.length)
     ctx.save()
+
+    ctx.fillStyle = '#000'
+    ctx.fillRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
+    ctx.fill()
+
     ctx.beginPath()
     for (let i = 0; i < viewSlices.length; i++) {
-      const roofFloorPad = 150
-      const c = linearTransform(viewSlices[i].height, 0, getScreenRect(ctx).x + 250, 255, 2)
-      const h = linearTransform(viewSlices[i].height, 0, getScreenRect(ctx).x, viewSize.y - roofFloorPad, roofFloorPad)
+      const roofFloorPad = 0
+      const c = linearTransform(viewSlices[i].distance, 100, getScreenRect(ctx).x, 255, 2)
+      const h = linearTransform(viewSlices[i].distance, 100, getScreenRect(ctx).x, viewSize.y - roofFloorPad, roofFloorPad)
       const y = viewTopLeft.y + (viewSize.y - h)/2
       // ctx.fillStyle = greyScale(c)
       ctx.fillStyle = viewSlices[i].color
-      ctx.fillRect(viewTopLeft.x + (viewSlizeWidth * i), y, viewSlizeWidth, h)
+      ctx.fillRect(viewTopLeft.x + (viewSliceWidth * i), y, viewSliceWidth, h)
     }
-    ctx.strokeStyle = '#f00'
+    ctx.strokeStyle = '#fff'
     ctx.lineWidth = 10
     ctx.strokeRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
     ctx.stroke()
