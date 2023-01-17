@@ -29,6 +29,15 @@
     if (e.key === 'Escape') menuOpen = !menuOpen
   })
 
+  function handleStartMultiplayerClick(): void {
+    if (game.isRunning()) {
+      console.log('Game is already running')
+    } else {
+      game.startMultiplayer()
+    }
+    menuOpen = false
+  }
+
   const menuItems: Button90Config[] = [
   {
       buttonText: 'Singleplayer',
@@ -38,8 +47,7 @@
   {
       buttonText: 'Multiplayer', 
       clickCallback: () => {
-        game.startMultiplayer()
-        menuOpen = false
+        handleStartMultiplayerClick()
       },
       selected: false,
   },
