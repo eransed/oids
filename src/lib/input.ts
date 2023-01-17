@@ -2,6 +2,7 @@ import type { SpaceObject } from './types'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
 import { createSpaceObject } from './utils'
+import { getMenu } from './menu'
 
 let boost = false
 let halt = false
@@ -15,6 +16,9 @@ let leftPressed = false
 let spacePressed = false
 
 function arrowControl(e: KeyboardEvent, value: boolean) {
+  if (e.key === 'Escape') {
+    console.log(getMenu())
+  }
   if (e.key === 'ArrowUp') {
     upPressed = value
   }
@@ -66,8 +70,8 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   const dts: number = dt * timeScale
 
   if (halt) {
-    so.velocity = {x: 0, y: 0}
-    so.acceleration = {x: 0, y: 0}
+    so.velocity = { x: 0, y: 0 }
+    so.acceleration = { x: 0, y: 0 }
   }
 
   if (reset) {
@@ -76,7 +80,7 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
     so.health = 250
     so.batteryLevel = 500
     so.booster = 5
-    
+
     so.missileDamage = 4
     so.inverseFireRate = 12
     so.shotsPerFrame = 10

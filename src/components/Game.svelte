@@ -1,11 +1,12 @@
 
 <canvas id="game_canvas"></canvas>
 
+
 <script lang="ts">
   
+  import WelcomeSreen from './WelcomeSreen.svelte'
   import { onMount } from 'svelte'
-  import { game } from '../lib/game';
-  import { getMenu } from '../lib/menu';
+  import { game } from '../lib/game'
 
   onMount(() => {
     const canvasElement: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("game_canvas")
@@ -17,3 +18,5 @@
   });
 
 </script>
+
+

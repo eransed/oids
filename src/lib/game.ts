@@ -13,8 +13,14 @@ import { getSerVer, initMultiplayer, isConnectedToWsServer, registerServerUpdate
 import { LightSource, LineSegment, Ray } from './shapes'
 import { getMenu } from './menu'
 
+let playerShip: SpaceObject
+
 function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
   return canvas.getContext('2d')
+}
+
+export function getPlayerShip() {
+  return playerShip
 }
 
 export async function game(canvas: HTMLCanvasElement) {
@@ -47,13 +53,20 @@ export async function game(canvas: HTMLCanvasElement) {
   ship.WelcomeMenu = true
   console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
 
-  if (getMenu(ship, ship.WelcomeMenu) === 'Startup') {
-    return console.log('Render Welcome Menu')
+  if (getMenu(ship.WelcomeMenu) === 'Startup') {
+    console.log('Render Welcome Menu')
+    ship.WelcomeMenu = false
     //Can't import Svelte components to Typescript so I cant render it :(
   }
 
+  //if chosen multiplayer
   initMultiplayer()
-  // await initMultiplayer()
+  ship.ExistingGame = true
+  ship.GameTypes.MultiPlayer = true
+
+  //if chosen singleplayer
+  // ship.ExistingGame = true
+  // ship.GameTypes.SinglePlayer = true
 
   const lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
   const segments: LineSegment[] = []
@@ -219,7 +232,7 @@ export async function game(canvas: HTMLCanvasElement) {
       renderFrame(ctx, dt)
       updateSpaceObject(ship, dt, ctx)
       updateSpaceObjects(bodies, dt, ctx)
-
+      playerShip = ship
       //Possible optimization send every other frame
       if (isConnectedToWsServer()) {
         ship.photonColor = '#f00'

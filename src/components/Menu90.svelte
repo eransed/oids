@@ -47,12 +47,6 @@
 
 
 <style>
-    .wrapper{
-        color: #fff;
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-    }
 
     .buttonList{
         list-style-type: none;
@@ -61,10 +55,10 @@
 
 </style>
 
-<div class="wrapper">
+
     <ul class='buttonList'>
     {#each buttons as button} 
         <li><Button90 buttonConfig={button}/></li>    
     {/each}
     </ul>
-</div>
+

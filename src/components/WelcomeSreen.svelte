@@ -38,8 +38,10 @@ import Menu90 from "./Menu90.svelte"
 <style>
 
 .wrapper{
-    display: flex;
-    justify-content: center;
+    display: grid;
+
+    background-color: red;
+    position: fixed;
 }
 
 </style>

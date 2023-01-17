@@ -1,4 +1,3 @@
-
 body {
   background-color: #000;
   overflow: hidden;
@@ -11,5 +10,6 @@ body {
 
 #game_canvas {
   width: 100%;
+  position: absolute;
   /* cursor: none; */
 }
