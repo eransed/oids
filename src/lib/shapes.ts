@@ -1,9 +1,9 @@
 import type { Vec2d } from "./types";
-import { add, angle, direction, dist, norm, smul, sub, vec2d } from "./math";
+import { add, angle, degToRad, direction, dist, norm, smul, sub, vec2d } from "./math";
 import { renderPoint, renderVector } from "./render";
 
 export interface ViewSlice {
-  height: number
+  distance: number
   color: string
 }
 
@@ -36,12 +36,14 @@ export class LightSource {
       let nearestIntersect: Vec2d | null = null
       let color = '#000'
       for (const segment of segments) {
-        const p = ray.cast(segment);
+        const p = ray.cast(segment)
         if (p) {
-          const d = dist(this.position, p)
-          if (d < min) {
-            min = d;
-            nearestIntersect = p;
+          const distance = dist(this.position, p)
+          const angleRayDirection = angle(ray.direction) - angle(this.direction)
+          const projection = distance * Math.cos(degToRad(angleRayDirection))
+          if (projection < min) {
+            min = projection
+            nearestIntersect = p
             color = segment.color
           }
         }
@@ -49,7 +51,7 @@ export class LightSource {
       if (nearestIntersect) {
         new LineSegment(this.position, nearestIntersect, '#50503a').render(ctx)
         renderPoint(ctx, nearestIntersect, '#ff0', 20)
-        slices.push({height: min, color: color})
+        slices.push({distance: min, color: color})
       }
     }
     return slices

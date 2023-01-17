@@ -20,6 +20,8 @@ export class Game {
   localPlayer: SpaceObject
   private remotePlayers: SpaceObject[] = []
   quit = false
+  lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
+  segments: LineSegment[] = []
 
   constructor (_canvas: HTMLCanvasElement, _localPlayer: SpaceObject) {
     this.canvas = _canvas
@@ -80,16 +82,14 @@ export class Game {
     // ship.ExistingGame = true
     // ship.GameTypes.SinglePlayer = true
   
-    const lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
-    const segments: LineSegment[] = []
   
     const padding = 0
     const pad = { x: padding, y: padding }
     const scr = sub(getScreenRect(this.ctx), pad)
-    segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
-    segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
-    segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
-    segments.push(new LineSegment({ x: padding, y: scr.y }, { x: padding, y: padding }))
+    this.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
+    this.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
+    this.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
+    this.segments.push(new LineSegment({ x: padding, y: scr.y }, { x: padding, y: padding }))
   
     // const padding2 = 650
     // const pad2 = {x: padding2, y: padding2}
@@ -149,19 +149,24 @@ export class Game {
     })
   
     const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
-      lightSource.position = this.localPlayer.position
-      lightSource.direction = direction(this.localPlayer.angleDegree)
+      this.lightSource.position = this.localPlayer.position
+      this.lightSource.direction = direction(this.localPlayer.angleDegree)
   
-      const viewSlices = lightSource.shine(segments, ctx)
+      const viewSlices = this.lightSource.shine(this.segments, ctx)
       const viewTopLeft = { x: 2500, y: 100 }
       const viewSize = { x: 25 * viewSlices.length, y: 15 * viewSlices.length }
       const viewSlizeWidth = Math.floor(viewSize.x / viewSlices.length)
       ctx.save()
+
+      ctx.fillStyle = '#000'
+      ctx.fillRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
+      ctx.fill()
+
       ctx.beginPath()
       for (let i = 0; i < viewSlices.length; i++) {
         const roofFloorPad = 150
-        const c = linearTransform(viewSlices[i].height, 0, getScreenRect(ctx).x + 250, 255, 2)
-        const h = linearTransform(viewSlices[i].height, 0, getScreenRect(ctx).x, viewSize.y - roofFloorPad, roofFloorPad)
+        const c = linearTransform(viewSlices[i].distance, 0, getScreenRect(ctx).x + 250, 255, 2)
+        const h = linearTransform(viewSlices[i].distance, 0, getScreenRect(ctx).x, viewSize.y - roofFloorPad, roofFloorPad)
         const y = viewTopLeft.y + (viewSize.y - h) / 2
         // ctx.fillStyle = greyScale(c)
         ctx.fillStyle = viewSlices[i].color
@@ -173,9 +178,8 @@ export class Game {
       ctx.stroke()
       ctx.fill()
       ctx.restore()
-      // lightSource.render(ctx)
   
-      for (const segs of segments) {
+      for (const segs of this.segments) {
         segs.render(ctx)
       }
   
@@ -233,6 +237,4 @@ export class Game {
     renderLoop(this, renderFrame, nextFrame, bodies)
 
   }
-
-
 }

@@ -26,13 +26,6 @@ export function sub(to: Vec2d, from: Vec2d): Vec2d {
   return tmp
 }
 
-// export function mul(to: Vec2d, from: Vec2d): Vec2d {
-//   const tmp: Vec2d = copy(from)
-//   tmp.x = to.x * from.x
-//   tmp.y = to.y * from.y
-//   return tmp
-// }
-
 export function scalarMultiply(v: Vec2d, s: number): Vec2d {
   const tmp: Vec2d = copy(v)
   tmp.x *= s
@@ -95,7 +88,6 @@ export function direction(angleDegree: number): Vec2d {
 export function angle(v: Vec2d): number {
   return radToDeg(Math.atan2(v.y, v.x))
 }
-
 
 export function rndf(min: number, max: number): number {
   return Math.random() * (max - min) + min
@@ -175,5 +167,5 @@ export function withinBounds(v: Vec2d, maxBound: Vec2d, minBound: Vec2d = { x: 0
 }
 
 export function linearTransform(v: number, v_lower: number, v_upper: number, t_lower: number, t_upper: number) {
-	return (v - v_lower) * ((t_upper - t_lower) / (v_upper - v_lower)) + t_lower;
+  return (v - v_lower) * ((t_upper - t_lower) / (v_upper - v_lower)) + t_lower;
 }
