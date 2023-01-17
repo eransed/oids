@@ -44,7 +44,6 @@ export async function game(canvas: HTMLCanvasElement) {
   ship.color = randomAnyColor()
   ship.photonColor = '#f0f'
   ship.isLocal = true
-  ship.ExistingGame = true
   ship.WelcomeMenu = true
   console.log('Your ship name is: ' + ship.name + '\nAnd your color is: ' + ship.color)
 
