@@ -6,8 +6,7 @@
 <body>
 <main>
   <div>
-    <Game />
-    <!-- <WelcomeScreen/> -->
+    <Game/>
   </div>
 </main>
 </body>

@@ -12,7 +12,7 @@ export function createSpaceObject(): SpaceObject {
   const spaceObject: SpaceObject = {
     mass: 1,
     size: { x: 100, y: 100 },
-    color: '#90d', // cool purple
+    color: '#90d',
     position: initPos,
     velocity: initVel,
     acceleration: { x: 0, y: 0 },
@@ -53,7 +53,16 @@ export function createSpaceObject(): SpaceObject {
     canonHeatAddedPerShot: 1.7,
     inverseFireRate: 6,
     shotsPerFrame: 1,
-    photonColor: '#0f0'
+    photonColor: '#0f0',
+    ExistingGame: false,
+    GameTypes: {
+      SinglePlayer: false,
+      MultiPlayer: false,
+    },
+    WelcomeMenu: false,
+    InGameMenu: false,
+    LobbyMenu: false,
+    GameOverMenu: false,
   }
 
   return spaceObject
@@ -83,14 +92,13 @@ export function to_string(v: Vec2d, dec = 0): string {
   return '(' + round2dec(v.x, dec) + ', ' + round2dec(v.y, dec) + ')'
 }
 
-
-export function  getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEvent): Vec2d {
+export function getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEvent): Vec2d {
   const rect = canvas.getBoundingClientRect()
   const scaleX = canvas.width / rect.width
   const scaleY = canvas.height / rect.height
 
   return {
     x: (mouseEvent.clientX - rect.left) * scaleX,
-    y: (mouseEvent.clientY - rect.top) * scaleY
+    y: (mouseEvent.clientY - rect.top) * scaleY,
   }
 }

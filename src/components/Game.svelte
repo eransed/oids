@@ -5,6 +5,7 @@
   
   import { onMount } from 'svelte'
   import { game } from '../lib/game';
+  import { getMenu } from '../lib/menu';
 
   onMount(() => {
     const canvasElement: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("game_canvas")

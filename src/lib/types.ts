@@ -1,5 +1,20 @@
 import type { Steerable } from './traits/Steerable'
 
+export interface GameTypes {
+  GameTypes: {
+    SinglePlayer: boolean
+    MultiPlayer: boolean
+  }
+  ExistingGame: boolean
+}
+
+export interface MenuType {
+  WelcomeMenu: boolean
+  InGameMenu: boolean
+  LobbyMenu: boolean
+  GameOverMenu: boolean
+}
+
 export interface Vec2d {
   x: number
   y: number
@@ -60,7 +75,6 @@ export interface Collidable extends Positionable {
   hitRadius: number
 }
 
-
 export interface Thrustable extends Positionable, Physical {
   batteryLevel: number
   enginePower: number
@@ -96,7 +110,23 @@ export interface Damageable extends Positionable {
   health: number
 }
 
-export interface SpaceObject extends Shapable, Positionable, Motivated, Remote, Local, Physical, Thrustable, Steerable, Damager, Damageable, Fireable, Collidable, Bounceable, Boostable {
+export interface SpaceObject
+  extends Shapable,
+    Positionable,
+    Motivated,
+    Remote,
+    Local,
+    Physical,
+    Thrustable,
+    Steerable,
+    Damager,
+    Damageable,
+    Fireable,
+    Collidable,
+    Bounceable,
+    Boostable,
+    GameTypes,
+    MenuType {
   name: string
   color: string
   shotsInFlight: SpaceObject[]
