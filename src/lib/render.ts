@@ -1,7 +1,7 @@
 import { SpaceShape, type SpaceObject, type Vec2d } from './types'
-import { add, degToRad, linearTransform, magnitude, rndi, round2dec, scalarMultiply } from './math'
+import { add, degToRad, linearTransform, magnitude, rndi, round2dec, scalarMultiply, to_string } from './math'
 import { screenScale, timeScale } from './constants'
-import { getScreenFromCanvas, getScreenRect, to_string } from './utils'
+import { getScreenFromCanvas, getScreenRect } from './canvas_util'
 import { getConnInfo, getReadyStateText } from './multiplayer'
 
 export function clearScreen(ctx: CanvasRenderingContext2D, color = '#000') {

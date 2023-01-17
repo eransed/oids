@@ -1,6 +1,6 @@
 <script lang="ts">
   import Game from './components/Game.svelte'
-  import WelcomeScreen from './components/WelcomeSreen.svelte'
+  import WelcomeScreen from './components/WelcomeScreen.svelte'
 </script>
 
 <body>

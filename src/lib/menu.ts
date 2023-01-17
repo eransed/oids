@@ -1,24 +1,40 @@
-import type { SpaceObject } from './types'
-import { getPlayerShip } from './game'
+import { GameType } from './types'
+import type { Game } from './game'
 
-export const getMenu = (init?: boolean): string => {
-  let ship = getPlayerShip()
+export class Menu {
 
-  let menu = ''
-
-  if (init) {
-    menu = 'Startup'
+  show(): void {
+    // logic to show the correct menu...
   }
 
-  if (ship) {
-    if (ship.ExistingGame) {
-      if (ship.GameTypes.SinglePlayer) {
-        menu = 'Singleplayer'
-      } else if (ship.GameTypes.MultiPlayer) {
-        menu = 'MultiPlayer'
-      }
+}
+
+export function getSomeMenu(game: Game) {
+  if (game.type === GameType.MultiPlayer) {
+    if (game.shouldQuit() === false) {
+      // game is still running in multiplayer mode
+      // return some ButtonConfig90[]
     }
   }
-
-  return menu
 }
+
+// export const getMenu = (ship: SpaceObject, init?: boolean): string => {
+
+//   let menu = ''
+
+//   if (init) {
+//     menu = 'Startup'
+//   }
+
+//   if (ship) {
+//     if (ship.ExistingGame) {
+//       if (ship.GameTypes.SinglePlayer) {
+//         menu = 'Singleplayer'
+//       } else if (ship.GameTypes.MultiPlayer) {
+//         menu = 'MultiPlayer'
+//       }
+//     }
+//   }
+
+//   return menu
+// }

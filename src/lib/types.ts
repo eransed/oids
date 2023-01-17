@@ -1,19 +1,24 @@
 import type { Steerable } from './traits/Steerable'
 
-export interface GameTypes {
-  GameTypes: {
-    SinglePlayer: boolean
-    MultiPlayer: boolean
-  }
-  ExistingGame: boolean
+export enum GameType {
+  SinglePlayer,
+  MultiPlayer
 }
 
-export interface MenuType {
-  WelcomeMenu: boolean
-  InGameMenu: boolean
-  LobbyMenu: boolean
-  GameOverMenu: boolean
+export enum MenuEnum {
+  Welcome,
+  InGame,
+  Lobby,
+  GameOver
 }
+
+// export interface Game {
+//   gameType: GameType
+//   canvas: HTMLCanvasElement
+//   id: string
+//   startedById: string
+//   localPlayer: SpaceObject
+// }
 
 export interface Vec2d {
   x: number
@@ -124,9 +129,7 @@ export interface SpaceObject
     Fireable,
     Collidable,
     Bounceable,
-    Boostable,
-    GameTypes,
-    MenuType {
+    Boostable {
   name: string
   color: string
   shotsInFlight: SpaceObject[]

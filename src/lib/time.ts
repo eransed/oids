@@ -1,5 +1,9 @@
+import type { Game } from './game'
 import { round2dec } from './math'
-import { renderFrameInfo } from './render'
+import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from './multiplayer'
+import { updateSpaceObject, updateSpaceObjects } from './physics'
+import { clearScreen, renderFrameInfo } from './render'
+import type { SpaceObject } from './types'
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -24,3 +28,33 @@ export function fpsCounter(frameTimeMs: number, ver: string, ctx: CanvasRenderin
     renderFrameInfo(fps, dt, ver, ctx)
   }
 }
+
+
+
+export function renderLoop(
+  game: Game,
+  renderFrame: (ctx: CanvasRenderingContext2D, dt: number) => void,
+  nextFrame: (ctx: CanvasRenderingContext2D, dt: number) => void,
+  others: SpaceObject[],
+) {
+  function update(timestamp: number): void {
+    const dt: number = getFrameTimeMs(timestamp)
+    clearScreen(game.ctx)
+    renderFrame(game.ctx, dt)
+    updateSpaceObject(game.localPlayer, dt, game.ctx)
+    updateSpaceObjects(others, dt, game.ctx)
+    if (isConnectedToWsServer()) {
+      sendSpaceObjectToBroadcastServer(game.localPlayer)
+    }
+    const frameId = requestAnimationFrame(update)
+    if (game.shouldQuit() === true) {
+      console.log('renderLoop stops')
+      cancelAnimationFrame(frameId)
+      clearScreen(game.ctx)
+    }
+    nextFrame(game.ctx, dt)
+  }
+  update(0)
+}
+
+

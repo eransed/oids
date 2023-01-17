@@ -11,27 +11,27 @@
 import type { Button90Config } from "./interface"
 import Menu90 from "./Menu90.svelte"
 
-    let menuItems: Button90Config[] = [
-    {
-        buttonText: 'Singleplayer',
-        clickCallback: () => {console.log('Singleplayer')},
-        selected: true,
-    },
-    {
-        buttonText: 'Multiplayer', 
-        clickCallback: () => {alert('Multiplayer');console.log('Multiplayer')},
-        selected: false,
-    },
-    {
-        buttonText: 'Settings', 
-        clickCallback: () => {console.log('Settings')},
-        selected: false,
-    },
-    {
-        buttonText: 'About', 
-        clickCallback: () => {console.log('About')},
-        selected: false,
-    }]
+let menuItems: Button90Config[] = [
+{
+    buttonText: 'Singleplayer',
+    clickCallback: () => {console.log('Singleplayer')},
+    selected: true,
+},
+{
+    buttonText: 'Multiplayer', 
+    clickCallback: () => {alert('Multiplayer');console.log('Multiplayer')},
+    selected: false,
+},
+{
+    buttonText: 'Settings', 
+    clickCallback: () => {console.log('Settings')},
+    selected: false,
+},
+{
+    buttonText: 'About', 
+    clickCallback: () => {console.log('About')},
+    selected: false,
+}]
 
 </script>
 

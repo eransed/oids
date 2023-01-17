@@ -1,6 +1,6 @@
 import type { Bounceable, Damager, Physical, Rotatable, SpaceObject, Vec2d } from './types'
 import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub } from './math'
-import { getScreenFromCanvas } from './utils'
+import { getScreenFromCanvas } from './canvas_util'
 import { renderExplosionFrame } from './render'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
 import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from './constants'

@@ -4,7 +4,7 @@ import type { Steerable } from './traits/Steerable'
 import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from './math'
 import { maxHeat, shotHitReversFactor } from './constants'
 import { renderExplosionFrame } from './render'
-import { createSpaceObject } from './utils'
+import { createSpaceObject } from './factory'
 import { getHeading } from './physics'
 import { randomLightGreen } from './color'
 

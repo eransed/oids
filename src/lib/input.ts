@@ -1,8 +1,6 @@
-import type { SpaceObject } from './types'
+import type { SpaceObject, Vec2d } from './types'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
-import { createSpaceObject } from './utils'
-import { getMenu } from './menu'
 
 let boost = false
 let halt = false
@@ -16,9 +14,6 @@ let leftPressed = false
 let spacePressed = false
 
 function arrowControl(e: KeyboardEvent, value: boolean) {
-  if (e.key === 'Escape') {
-    console.log(getMenu())
-  }
   if (e.key === 'ArrowUp') {
     upPressed = value
   }
@@ -121,8 +116,21 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 }
 
+
 export function initKeyControllers(): void {
   console.log('adds event listeners')
   document.addEventListener('keydown', (event) => arrowControl(event, true))
   document.addEventListener('keyup', (event) => arrowControl(event, false))
 }
+
+export function getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEvent): Vec2d {
+  const rect = canvas.getBoundingClientRect()
+  const scaleX = canvas.width / rect.width
+  const scaleY = canvas.height / rect.height
+
+  return {
+    x: (mouseEvent.clientX - rect.left) * scaleX,
+    y: (mouseEvent.clientY - rect.top) * scaleY,
+  }
+}
+

@@ -1,22 +1,81 @@
 
-<canvas id="game_canvas"></canvas>
-
 
 <script lang="ts">
   
-  import WelcomeSreen from './WelcomeSreen.svelte'
+  import type { Button90Config } from './interface'
+  import Menu90 from './Menu90.svelte'
   import { onMount } from 'svelte'
-  import { game } from '../lib/game'
+  import { Game } from '../lib/game'
+  import { createSpaceObject } from '../lib/factory'
+  import type { SpaceObject } from '../lib/types';
 
+  function getCanvas(): HTMLCanvasElement {
+    return <HTMLCanvasElement>document.getElementById("game_canvas")
+  }
+
+  let game: Game
+  let localPlayer: SpaceObject
+  
   onMount(() => {
-    const canvasElement: HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("game_canvas")
-    if (canvasElement === null){
-      console.error('Could not find id "game_canvas"')
-    } else {
-      game(canvasElement)
-    }
+    console.log ('mount...')
+    localPlayer = createSpaceObject('LocalPlayer')
+    game = new Game(getCanvas(), localPlayer)
   });
+
+  let menuOpen = true
+  $: display = menuOpen ? 'block' : 'none'
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') menuOpen = !menuOpen
+  })
+
+  const menuItems: Button90Config[] = [
+  {
+      buttonText: 'Singleplayer',
+      clickCallback: () => {console.log('Singleplayer')},
+      selected: true,
+  },
+  {
+      buttonText: 'Multiplayer', 
+      clickCallback: () => {
+        game.startMultiplayer()
+        menuOpen = false
+      },
+      selected: false,
+  },
+  {
+      buttonText: 'Settings', 
+      clickCallback: () => {console.log('Settings')},
+      selected: false,
+  },
+  {
+      buttonText: 'Exit game', 
+      clickCallback: () => {
+        console.log('stops game')
+        game.stopGame()
+      },
+      selected: false,
+  }]
+
 
 </script>
 
+<style>
+  #menu_test {
+    color: #fff;
+    position: fixed;
+  }
+  
+  #game_canvas {
+    width: 100%;
+    position: absolute;
+    /* cursor: none; */
+  }
 
+</style>
+
+<canvas id="game_canvas"></canvas>
+
+<div id="menu_test" style:display>
+  <Menu90 menuOpen={menuOpen} buttons={menuItems}></Menu90>
+</div>

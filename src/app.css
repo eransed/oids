@@ -7,9 +7,3 @@ body {
   margin: 0;
   padding: 0;
 }
-
-#game_canvas {
-  width: 100%;
-  position: absolute;
-  /* cursor: none; */
-}
