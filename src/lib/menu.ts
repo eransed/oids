@@ -1,21 +1,60 @@
 import { GameType } from './types'
 import type { Game } from './game'
+import type { Button90Config } from '../components/interface'
+import { menu } from './stores'
 
-export class Menu {
+export function getMenu(game: Game, handleStartMultiplayerClick: () => void) {
+  let startUpMenu: Button90Config[] = [
+    {
+      buttonText: 'Singleplayer',
+      clickCallback: () => {
+        console.log('Singleplayer')
+      },
+      selected: true,
+    },
+    {
+      buttonText: 'Multiplayer',
+      clickCallback: () => {
+        handleStartMultiplayerClick()
+        menu.set(inGameMenu)
+      },
+      selected: false,
+    },
+    {
+      buttonText: 'Settings',
+      clickCallback: () => {
+        console.log('Settings')
+      },
+      selected: false,
+    },
+  ]
 
-  show(): void {
-    // logic to show the correct menu...
-  }
+  let inGameMenu: Button90Config[] = [
+    {
+      buttonText: 'Settings',
+      clickCallback: () => {
+        console.log('Settings')
+      },
+      selected: false,
+    },
+    {
+      buttonText: 'Exit game',
+      clickCallback: () => {
+        console.log('stops game')
+        game.stopGame()
+        menu.set(startUpMenu)
+      },
+      selected: false,
+    },
+  ]
 
-}
-
-export function getSomeMenu(game: Game) {
-  if (game.type === GameType.MultiPlayer) {
-    if (game.shouldQuit() === false) {
-      // game is still running in multiplayer mode
-      // return some ButtonConfig90[]
+  if (game) {
+    if (game.isRunning()) {
+      return inGameMenu
     }
   }
+
+  return startUpMenu
 }
 
 // export const getMenu = (ship: SpaceObject, init?: boolean): string => {
