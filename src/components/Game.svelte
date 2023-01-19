@@ -8,7 +8,7 @@
   import { onMount } from 'svelte'
 
   import { createSpaceObject } from '../lib/factory'
-  import { menu, showMenu, showWelcomeScreen } from '../lib/stores'
+  import { menu, showMenu } from '../lib/stores'
   import { getMenu } from '../lib/menu'
   import { Game } from '../lib/game'
 
@@ -31,7 +31,6 @@
 
   // Variables to subscribe on menu store
   let chosenMenu: Button90Config[]
-  let welcomeScreen: boolean
   
   onMount(() => {
     console.log ('mount...')
@@ -40,9 +39,7 @@
 
     // Setting welcome menu
     menu.set(getMenu(game))
-    showWelcomeScreen.set(true)
-    showWelcomeScreen.subscribe(value => {welcomeScreen = value})
-
+  
     // Subscribing on store
     menu.subscribe(value => {chosenMenu = value})
   })

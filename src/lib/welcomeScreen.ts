@@ -1,20 +1,17 @@
+import { setCanvasSize, getScreenCenterPosition, getScreenRect } from './canvas_util'
+import { randomAnyColor, randomBlue } from './color'
+import { createSpaceObject } from './factory'
 import type { Game } from './game'
-
+import { initKeyControllers, spaceObjectKeyController } from './input'
+import { add, rndfVec2d, rndi, sub, direction, linearTransform } from './math'
+import { bounceSpaceObject } from './mechanics'
+import { friction, gravity } from './physics'
+import { loadingText, renderMoon } from './render'
+import { LineSegment } from './shapes'
+import { renderLoop } from './time'
 import { GameType, SpaceShape, type SpaceObject } from './types'
 
-import { initKeyControllers, spaceObjectKeyController } from './input'
-import { bounceSpaceObject } from './mechanics'
-import { loadingText, renderMoon, renderOGShip, renderShip, renderSpaceObjectStatusBar } from './render'
-import { getScreenCenterPosition, getScreenRect, setCanvasSize } from './canvas_util'
-import { friction, gravity, handleCollisions } from './physics'
-import { add, direction, linearTransform, rndfVec2d, rndi, sub } from './math'
-import { randomAnyColor } from './color'
-import { fpsCounter, renderLoop } from './time'
-import { test } from './test'
-import { getSerVer, initMultiplayer, registerServerUpdate } from './webSocket'
-import { LineSegment } from './shapes'
-
-export const multiPlayer = (game: Game) => {
+export const welcomeScreen = (game: Game) => {
   if (game.isRunning()) {
     console.log('Game is already running')
     return
@@ -22,15 +19,12 @@ export const multiPlayer = (game: Game) => {
 
   game.running = true
   console.log('starts multi')
-  game.type = GameType.MultiPlayer
-  if (!test()) {
-    return
-  }
+  game.type = GameType.WelcomeScreen
 
   //Needs to be a default canvas size so people get the same game size.
   setCanvasSize(game.ctx)
   loadingText('Loading...', game.ctx)
-  initKeyControllers()
+  //initKeyControllers()
 
   const offset = 500
 
@@ -47,19 +41,6 @@ export const multiPlayer = (game: Game) => {
   game.localPlayer.isLocal = true
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
-  // if (getMenu(game.localPlayer.WelcomeMenu) === 'Startup') {
-  //   console.log('Render Welcome Menu')
-  //   game.localPlayer.WelcomeMenu = false
-  //   //Can't import Svelte components to Typescript so I cant render it :(
-  // }
-
-  //if chosen multiplayer
-  initMultiplayer()
-
-  //if chosen singleplayer
-  // ship.ExistingGame = true
-  // ship.GameTypes.SinglePlayer = true
-
   const padding = 0
   const pad = { x: padding, y: padding }
   const scr = sub(getScreenRect(game.ctx), pad)
@@ -68,61 +49,21 @@ export const multiPlayer = (game: Game) => {
   game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
   game.segments.push(new LineSegment({ x: padding, y: scr.y }, { x: padding, y: padding }))
 
-  // const padding2 = 650
-  // const pad2 = {x: padding2, y: padding2}
-  // const scr2 = sub(getScreenRect(ctx), pad2)
-  // segments.push(new LineSegment(pad2, {x: scr2.x, y: padding2}))
-  // segments.push(new LineSegment({x: scr2.x, y: padding2}, {x: scr2.x, y: scr2.y}))
-  // segments.push(new LineSegment({x: scr2.x, y: scr2.y}, {x: padding2, y: scr2.y}))
-  // segments.push(new LineSegment({x: padding2, y: scr2.y}, {x: padding2, y: padding2}))
-
-  // segments.push(new LineSegment({x: 2000, y:200}, {x: 2000, y: 1000}))
-  // segments.push(new LineSegment({x: 2400, y:300}, {x: 2300, y: 1600}))
-  // segments.push(new LineSegment({x: 700, y:600}, {x: 1000, y: 1500}))
-  // segments.push(new LineSegment({x: 200, y:700}, {x: 1400, y: 1000}))
-
-  // document.addEventListener('mousemove', (event) => {
-  // lightSource.position = getMousePosition(canvas, event)
-  // const l = linearTransform(getMousePosition(canvas, event).y, 0, getScreenRect(ctx).y, 0, 100)
-  // const hsl = new HSL(shade)
-  // hsl.l = l
-  // background = hsl.toHex()
-  // console.log(background)
-  // })
-
   const bodies: SpaceObject[] = []
 
-  // for (let n = 0; n < 2; n++) {
-  //   const s = createSpaceObject()
-  //   s.shape = SpaceShape.Moon
-  //   s.color = randomBlue()
-  //   s.mass = 5
-  //   s.isLocal = true
-  //   s.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
-  //   bodies.push(s)
-  // }
+  for (let n = 0; n < 2; n++) {
+    const s = createSpaceObject()
+    s.shape = SpaceShape.Moon
+    s.color = randomBlue()
+    s.mass = 5
+    s.isLocal = true
+    s.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
+    bodies.push(s)
+  }
 
   let all: SpaceObject[] = []
   all = all.concat(bodies)
   all.push(game.localPlayer)
-
-  let serverObjects: SpaceObject[] = []
-
-  registerServerUpdate((so: SpaceObject) => {
-    for (let i = 0; i < serverObjects.length; i++) {
-      if (so.name === serverObjects[i].name) {
-        if (!so.online) {
-          console.log(`${so.name} went offline`)
-        }
-        serverObjects[i] = so
-        return
-      }
-    }
-    if (so.name !== game.localPlayer.name) {
-      serverObjects.push(so)
-      console.log(`New ship online: ${so.name}`)
-    }
-  })
 
   const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
     game.lightSource.position = game.localPlayer.position
@@ -144,7 +85,6 @@ export const multiPlayer = (game: Game) => {
       const c = linearTransform(viewSlices[i].distance, 0, getScreenRect(ctx).x + 250, 255, 2)
       const h = linearTransform(viewSlices[i].distance, 0, getScreenRect(ctx).x, viewSize.y - roofFloorPad, roofFloorPad)
       const y = viewTopLeft.y + (viewSize.y - h) / 2
-      // ctx.fillStyle = greyScale(c)
       ctx.fillStyle = viewSlices[i].color
       ctx.fillRect(viewTopLeft.x + viewSlizeWidth * i, y, viewSlizeWidth, h)
     }
@@ -159,23 +99,9 @@ export const multiPlayer = (game: Game) => {
       segs.render(ctx)
     }
 
-    serverObjects.forEach((so) => {
-      if (so.shape === SpaceShape.Moon) {
-        renderMoon(so, ctx)
-      } else {
-        renderShip(so, ctx)
-      }
-    })
-
-    renderSpaceObjectStatusBar(serverObjects, game.localPlayer, ctx)
-    // renderVector(ship.acceleration, ship.position, ctx, 400)
-    // renderVector(ship.velocity, ship.position, ctx, 10)
     bodies.forEach((body) => {
       renderMoon(body, ctx)
     })
-
-    fpsCounter(dt, getSerVer(), ctx)
-    renderOGShip(game.localPlayer, ctx, true)
   }
 
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
@@ -201,14 +127,6 @@ export const multiPlayer = (game: Game) => {
       // wrapSpaceObject(body, getScreenRect(ctx))
       bounceSpaceObject(body, getScreenRect(ctx), 0.4, 0, 0)
     })
-
-    serverObjects = serverObjects.filter((so) => {
-      return so.online || so.isLocal
-    })
-
-    const currentSpaceObjects = all.concat(serverObjects)
-
-    handleCollisions(currentSpaceObjects, ctx)
   }
   renderLoop(game, renderFrame, nextFrame, bodies)
 }

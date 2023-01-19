@@ -4,6 +4,7 @@ import { getContext } from './canvas_util'
 
 import { LightSource, LineSegment } from './shapes'
 import { multiPlayer } from './multiplayer'
+import { welcomeScreen } from './welcomeScreen'
 
 export class Game {
   type: GameType = GameType.SinglePlayer
@@ -36,6 +37,15 @@ export class Game {
 
   startSingleplayer(): void {
     console.log('starts single')
+  }
+
+  startWelcomeScreen(): void {
+    welcomeScreen(this)
+  }
+
+  stopWelcomeScreen(): void {
+    console.log('Stops welcomescreen')
+    this.running = false
   }
 
   startMultiplayer(): void {

@@ -17,6 +17,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
   const about = createButton90Config('About')
 
   const multiPlayer = createButton90Config('Multiplayer', () => {
+    game.stopWelcomeScreen()
     // Start multiplayer on the game object
     game.startMultiplayer()
 
@@ -69,6 +70,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
     // Selected menu if game is not running:
     stateMenu = startupMenu
+    game.startWelcomeScreen()
   }
 
   // Return the collection of menu item buttons

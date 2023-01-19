@@ -2,14 +2,15 @@ import type { Steerable } from './traits/Steerable'
 
 export enum GameType {
   SinglePlayer,
-  MultiPlayer
+  MultiPlayer,
+  WelcomeScreen,
 }
 
 export enum MenuEnum {
   Welcome,
   InGame,
   Lobby,
-  GameOver
+  GameOver,
 }
 
 // export interface Game {
