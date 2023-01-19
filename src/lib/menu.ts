@@ -1,6 +1,6 @@
 import type { Game } from './game'
 import type { Button90Config } from '../components/interface'
-import { menu, showMenu, showWelcomeScreen } from './stores'
+import { menu, showMenu } from './stores'
 import { createButton90Config } from './factory'
 
 // Keep selected state:
@@ -18,16 +18,18 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
   const multiPlayer = createButton90Config('Multiplayer', () => {
     game.stopWelcomeScreen()
+
     // Start multiplayer on the game object
-    game.startMultiplayer()
+    // Need a timeout so the welcomeScreen gets time to stop on next render()
+    setTimeout(() => {
+      game.startMultiplayer()
+      // Get and set the menu depending by the game state
+      // We dont care what the user selected the last time this menu was shown:
+      menu.set(getMenu(game, false))
 
-    // Get and set the menu depending by the game state
-    // We dont care what the user selected the last time this menu was shown:
-    menu.set(getMenu(game, false))
-
-    // Hide the menu when starting a new game:
-    showMenu.set(false)
-    showWelcomeScreen.set(false)
+      // Hide the menu when starting a new game:
+      showMenu.set(false)
+    }, 10)
   })
 
   const exitGame = createButton90Config('Quit', () => {
@@ -40,7 +42,6 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
     // Show the menu when quitting a game:
     showMenu.set(true)
-    showWelcomeScreen.set(true)
   })
 
   // Pick menu depending on game state:
@@ -70,7 +71,6 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
     // Selected menu if game is not running:
     stateMenu = startupMenu
-    game.startWelcomeScreen()
   }
 
   // Return the collection of menu item buttons

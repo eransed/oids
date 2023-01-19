@@ -116,7 +116,6 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 }
 
-
 export function initKeyControllers(): void {
   console.log('adds event listeners')
   document.addEventListener('keydown', (event) => arrowControl(event, true))
@@ -133,4 +132,3 @@ export function getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEve
     y: (mouseEvent.clientY - rect.top) * scaleY,
   }
 }
-

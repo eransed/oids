@@ -212,3 +212,6 @@ export const multiPlayer = (game: Game) => {
   }
   renderLoop(game, renderFrame, nextFrame, bodies)
 }
+function getCanvas(): HTMLCanvasElement {
+  throw new Error('Function not implemented.')
+}

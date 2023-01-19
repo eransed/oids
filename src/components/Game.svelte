@@ -22,11 +22,13 @@
     if (e.key === 'Escape') menuOpen = !menuOpen
   })
 
-  function getCanvas(): HTMLCanvasElement {
+  export function getCanvas(): HTMLCanvasElement {
     return <HTMLCanvasElement>document.getElementById("game_canvas")
   }
 
   let game: Game
+  
+
   // let localPlayer: SpaceObject
 
   // Variables to subscribe on menu store
@@ -42,7 +44,9 @@
   
     // Subscribing on store
     menu.subscribe(value => {chosenMenu = value})
+    game.startWelcomeScreen()
   })
+
 
 </script>
 
@@ -64,7 +68,6 @@
 <canvas id="game_canvas"></canvas>
 
 {#if game}
-
 <div id="game_menu" style:display>
   <Menu90 menuOpen={menuOpen} buttons={chosenMenu}></Menu90>
 </div>

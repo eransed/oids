@@ -1,4 +1,3 @@
-
 import type { SpaceObject } from './types'
 import { OIDS_WS_PORT } from '../../server/pub_config'
 
@@ -25,7 +24,7 @@ export function getWsUrl(): URL {
 function connect() {
   return new Promise(function (resolve, reject) {
     const wsUrl: URL = getWsUrl()
-    console.log (`Connecting to ${wsUrl.href} ...`)
+    console.log(`Connecting to ${wsUrl.href} ...`)
     socket = new WebSocket(wsUrl)
     socket.onopen = function () {
       resolve(socket)
