@@ -31,7 +31,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
   const exitGame = createButton90Config('Quit', () => {
     // Start multiplayer on the game object
-      // Stop the current game:
+    // Stop the current game:
     game.stopGame()
 
     // Keep the selection on the last selected item in the menu:
@@ -61,7 +61,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
   } else {
 
-    // If startupMenu is undefined we have to create it - there is no selected item
+    // If startupMenu is undefined we have to create it - there is no last selected item
     if (!keepLastSelected || !startupMenu) {
 
       // Default selected item:
