@@ -2,7 +2,7 @@ import { SpaceShape, type SpaceObject, type Vec2d } from './types'
 import { add, degToRad, linearTransform, magnitude, rndi, round2dec, scalarMultiply, to_string } from './math'
 import { screenScale, timeScale } from './constants'
 import { getScreenFromCanvas, getScreenRect } from './canvas_util'
-import { getConnInfo, getReadyStateText } from './multiplayer'
+import { getConnInfo, getReadyStateText } from './webSocket'
 
 export function clearScreen(ctx: CanvasRenderingContext2D, color = '#000') {
   ctx.fillStyle = color
@@ -106,7 +106,6 @@ export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContex
   ctx.stroke()
   ctx.restore()
 }
-
 
 export function renderPoint(ctx: CanvasRenderingContext2D, v: Vec2d, color: string, radius = 10): void {
   ctx.save()
@@ -242,7 +241,7 @@ export function renderOGShip(so: SpaceObject, ctx: CanvasRenderingContext2D, ren
   ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo(0, (-shipSize.y / 3) * scale)
-  ctx.closePath();
+  ctx.closePath()
 
   if (renderAsLocalPlayer) {
     ctx.stroke()

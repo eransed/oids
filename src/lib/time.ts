@@ -1,6 +1,6 @@
 import type { Game } from './game'
 import { round2dec } from './math'
-import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from './multiplayer'
+import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from './webSocket'
 import { updateSpaceObject, updateSpaceObjects } from './physics'
 import { clearScreen, renderFrameInfo } from './render'
 import type { SpaceObject } from './types'
@@ -29,13 +29,11 @@ export function fpsCounter(frameTimeMs: number, ver: string, ctx: CanvasRenderin
   }
 }
 
-
-
 export function renderLoop(
   game: Game,
   renderFrame: (ctx: CanvasRenderingContext2D, dt: number) => void,
   nextFrame: (ctx: CanvasRenderingContext2D, dt: number) => void,
-  others: SpaceObject[],
+  others: SpaceObject[]
 ) {
   function update(timestamp: number): void {
     const dt: number = getFrameTimeMs(timestamp)
@@ -56,5 +54,3 @@ export function renderLoop(
   }
   update(0)
 }
-
-

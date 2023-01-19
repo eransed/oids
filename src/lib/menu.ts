@@ -1,6 +1,6 @@
 import type { Game } from './game'
 import type { Button90Config } from '../components/interface'
-import { menu, showMenu } from './stores'
+import { menu, showMenu, showWelcomeScreen } from './stores'
 import { createButton90Config } from './factory'
 
 // Keep selected state:
@@ -26,6 +26,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
     // Hide the menu when starting a new game:
     showMenu.set(false)
+    showWelcomeScreen.set(false)
   })
 
   const exitGame = createButton90Config('Quit', () => {
@@ -38,6 +39,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
     // Show the menu when quitting a game:
     showMenu.set(true)
+    showWelcomeScreen.set(true)
   })
 
   // Pick menu depending on game state:
