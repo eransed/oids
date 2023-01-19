@@ -1,13 +1,12 @@
 import { setCanvasSize, getScreenCenterPosition, getScreenRect } from './canvas_util'
-import { randomAnyColor, randomBlue } from './color'
+import { randomAnyLightColor, randomBlue, randomLightGreen, randomRed } from './color'
 import { createSpaceObject } from './factory'
 import type { Game } from './game'
-import { initKeyControllers, spaceObjectKeyController } from './input'
-import { add, rndfVec2d, rndi, sub, direction, linearTransform } from './math'
-import { bounceSpaceObject } from './mechanics'
-import { friction, gravity } from './physics'
-import { loadingText, renderMoon } from './render'
-import { LineSegment } from './shapes'
+import { spaceObjectKeyController } from './input'
+import { add, rndfVec2d, direction, linearTransform, rndi } from './math'
+import { bounceSpaceObject, wrapSpaceObject } from './mechanics'
+import { friction, gravity, handleCollisions } from './physics'
+import { loadingText, renderComet, renderMoon } from './render'
 import { renderLoop } from './time'
 import { GameType, SpaceShape, type SpaceObject } from './types'
 
@@ -18,7 +17,7 @@ export const welcomeScreen = (game: Game) => {
   }
 
   game.running = true
-  console.log('starts multi')
+  console.log('starts welcomescreen')
   game.type = GameType.WelcomeScreen
 
   //Needs to be a default canvas size so people get the same game size.
@@ -26,37 +25,38 @@ export const welcomeScreen = (game: Game) => {
   loadingText('Loading...', game.ctx)
   //initKeyControllers()
 
-  const offset = 500
+  const offset = 2000
 
   // const game.localPlayer: SpaceObject = createSpaceObject()
-  game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
-  game.localPlayer.mass = 0.1
-  game.localPlayer.angleDegree = -120
-  game.localPlayer.health = 250
-  game.localPlayer.steeringPower = 0.55
-  game.localPlayer.enginePower = 0.025
-  game.localPlayer.name = `P-${rndi(0, 900000)}`
-  game.localPlayer.color = randomAnyColor()
-  game.localPlayer.photonColor = '#f0f'
-  game.localPlayer.isLocal = true
-  console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
-
-  const padding = 0
-  const pad = { x: padding, y: padding }
-  const scr = sub(getScreenRect(game.ctx), pad)
-  game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
-  game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
-  game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
-  game.segments.push(new LineSegment({ x: padding, y: scr.y }, { x: padding, y: padding }))
-
   const bodies: SpaceObject[] = []
 
-  for (let n = 0; n < 2; n++) {
+  //Moons
+  for (let n = 0; n < 15; n++) {
     const s = createSpaceObject()
     s.shape = SpaceShape.Moon
     s.color = randomBlue()
-    s.mass = 5
+    s.mass = 1
     s.isLocal = true
+    s.size.y = rndi(10, 70)
+    s.acceleration.x = rndi(-0.5, 1)
+    s.acceleration.y = rndi(-0.5, 1)
+    s.health = 0
+    s.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
+    bodies.push(s)
+  }
+
+  //Comets
+  for (let n = 0; n < 5; n++) {
+    const s = createSpaceObject()
+    s.shape = SpaceShape.Comet
+    s.color = randomAnyLightColor()
+    s.mass = 1
+    s.isLocal = true
+    s.acceleration.x = rndi(-0.5, 1)
+    s.acceleration.y = rndi(-0.5, 1)
+    s.size.x = rndi(50, 80)
+    s.size.y = rndi(50, 80)
+    s.health = 0
     s.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
     bodies.push(s)
   }
@@ -100,15 +100,19 @@ export const welcomeScreen = (game: Game) => {
     }
 
     bodies.forEach((body) => {
-      renderMoon(body, ctx)
+      if (body.shape === SpaceShape.Moon) {
+        renderMoon(body, ctx)
+      }
+
+      if (body.shape === SpaceShape.Comet) {
+        renderComet(body, ctx)
+      }
     })
   }
 
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
-    spaceObjectKeyController(game.localPlayer, dt)
-    friction(game.localPlayer)
     // wrapSpaceObject(ship, getScreenRect(ctx))
-    bounceSpaceObject(game.localPlayer, getScreenRect(ctx), 0.4, 0, 0)
+    //bounceSpaceObject(game.localPlayer, getScreenRect(ctx), 0.4, 0, 0)
 
     bodies.forEach((body) => {
       bodies.forEach((other) => {
@@ -117,15 +121,11 @@ export const welcomeScreen = (game: Game) => {
         }
       })
 
-      gravity(body, game.localPlayer)
+      //gravity(body, game.localPlayer)
 
-      game.localPlayer.shotsInFlight.forEach((shot) => {
-        gravity(body, shot)
-      })
+      wrapSpaceObject(body, getScreenRect(ctx))
 
-      friction(body)
-      // wrapSpaceObject(body, getScreenRect(ctx))
-      bounceSpaceObject(body, getScreenRect(ctx), 0.4, 0, 0)
+      //bounceSpaceObject(body, getScreenRect(ctx), 0.4, 0, 0)
     })
   }
   renderLoop(game, renderFrame, nextFrame, bodies)

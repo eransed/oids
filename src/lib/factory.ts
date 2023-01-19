@@ -1,8 +1,8 @@
-import type { SpaceObject, Vec2d } from "./types"
-import { SpaceShape } from "./types"
-import { rndf, rndi } from "./math"
-import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
-import type { Button90Config } from "../components/interface"
+import type { SpaceObject, Vec2d } from './types'
+import { SpaceShape } from './types'
+import { rndf, rndi } from './math'
+import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
+import type { Button90Config } from '../components/interface'
 
 export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
@@ -61,10 +61,16 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   return spaceObject
 }
 
-export function createButton90Config(buttonText = 'Button90', clickCallback = () => {alert(`${buttonText} selected`)}, selected = false): Button90Config {
+export function createButton90Config(
+  buttonText = 'Button90',
+  clickCallback = () => {
+    alert(`${buttonText} selected`)
+  },
+  selected = false
+): Button90Config {
   return {
     buttonText: buttonText,
     clickCallback: clickCallback,
-    selected: selected
+    selected: selected,
   }
 }
