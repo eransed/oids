@@ -20,7 +20,7 @@
         // No selected button, default to the first one
         buttons[0].selected = true
       })
-      
+
       buttons.forEach(b => {
           b.selected = false
       })
@@ -30,7 +30,7 @@
       } else if (event.code === 'ArrowDown') {
           selectedIndex++
       } else if (event.code === 'Enter') {
-          buttons[selectedIndex].clickCallback()
+        buttons[selectedIndex].clickCallback()
       }
       selectedIndex = rotate(selectedIndex, buttons.length)
       buttons[selectedIndex].selected = true
@@ -52,7 +52,8 @@
 
     .buttonList{
         list-style-type: none;
-        border: 2px solid #fff;
+        border: 4px solid #fff;
+        background-color: #000;
     }
 
 </style>

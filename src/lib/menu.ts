@@ -1,79 +1,81 @@
-import { GameType } from './types'
 import type { Game } from './game'
 import type { Button90Config } from '../components/interface'
-import { menu } from './stores'
+import { menu, showMenu } from './stores'
+import { createButton90Config } from './factory'
 
-export function getMenu(game: Game, handleStartMultiplayerClick: () => void) {
-  let startUpMenu: Button90Config[] = [
-    {
-      buttonText: 'Singleplayer',
-      clickCallback: () => {
-        console.log('Singleplayer')
-      },
-      selected: true,
-    },
-    {
-      buttonText: 'Multiplayer',
-      clickCallback: () => {
-        handleStartMultiplayerClick()
-        menu.set(inGameMenu)
-      },
-      selected: false,
-    },
-    {
-      buttonText: 'Settings',
-      clickCallback: () => {
-        console.log('Settings')
-      },
-      selected: false,
-    },
-  ]
+// Keep selected state:
+let inGameMenu: Button90Config[]
+let startupMenu: Button90Config[]
 
-  let inGameMenu: Button90Config[] = [
-    {
-      buttonText: 'Settings',
-      clickCallback: () => {
-        console.log('Settings')
-      },
-      selected: false,
-    },
-    {
-      buttonText: 'Exit game',
-      clickCallback: () => {
-        console.log('stops game')
-        game.stopGame()
-        menu.set(startUpMenu)
-      },
-      selected: false,
-    },
-  ]
+// Function returns the correct menu configuration depending on
+// the current game state:
+export function getMenu(game: Game, keepLastSelected = false) {
 
-  if (game) {
-    if (game.isRunning()) {
-      return inGameMenu
+  // Create all buttons as variables so they can be reused in
+  // multiple menu item collections (Button90Config[]'s):
+  const singlePlayer = createButton90Config('Singleplayer')
+  const settings = createButton90Config('Settings')
+  const about = createButton90Config('About')
+
+  const multiPlayer = createButton90Config('Multiplayer', () => {
+      // Start multiplayer on the game object
+      game.startMultiplayer()
+
+      // Get and set the menu depending by the game state
+      // We dont care what the user selected the last time this menu was shown:
+      menu.set(getMenu(game, false))
+
+      // Hide the menu when starting a new game:
+      showMenu.set(false)
+  })
+
+  const exitGame = createButton90Config('Quit', () => {
+    // Start multiplayer on the game object
+      // Stop the current game:
+    game.stopGame()
+
+    // Keep the selection on the last selected item in the menu:
+    menu.set(getMenu(game, true))
+
+    // Show the menu when quitting a game:
+    showMenu.set(true)
+  })
+
+  // Pick menu depending on game state:
+  let stateMenu: Button90Config[]
+
+  if (game.isRunning()) {
+
+    // If inGameMenu is undefined we have to create it - there is no selected item
+    if (!keepLastSelected || !inGameMenu) {
+
+      // Default selected item:
+      settings.selected = true
+
+      // Set the module local variable
+      inGameMenu = [settings, exitGame]
     }
+
+    // Selected menu if game is running
+    stateMenu = inGameMenu
+
+  } else {
+
+    // If startupMenu is undefined we have to create it - there is no selected item
+    if (!keepLastSelected || !startupMenu) {
+
+      // Default selected item:
+      singlePlayer.selected = true
+
+      // Set the module local variable:
+      startupMenu = [singlePlayer, multiPlayer, settings, about]
+    }
+
+    // Selected menu if game is not running:
+    stateMenu = startupMenu
   }
 
-  return startUpMenu
+  // Return the collection of menu item buttons
+  return stateMenu
+
 }
-
-// export const getMenu = (ship: SpaceObject, init?: boolean): string => {
-
-//   let menu = ''
-
-//   if (init) {
-//     menu = 'Startup'
-//   }
-
-//   if (ship) {
-//     if (ship.ExistingGame) {
-//       if (ship.GameTypes.SinglePlayer) {
-//         menu = 'Singleplayer'
-//       } else if (ship.GameTypes.MultiPlayer) {
-//         menu = 'MultiPlayer'
-//       }
-//     }
-//   }
-
-//   return menu
-// }

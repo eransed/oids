@@ -13,7 +13,6 @@ import { getSerVer, initMultiplayer, registerServerUpdate } from './multiplayer'
 import { LightSource, LineSegment } from './shapes'
 
 export class Game {
-  welcomeScreen = true
   type: GameType = GameType.SinglePlayer
   ctx: CanvasRenderingContext2D
   private canvas: HTMLCanvasElement
@@ -38,17 +37,21 @@ export class Game {
   }
 
   stopGame(): void {
+    console.log ('Stops game')
     this.running = false
-    this.welcomeScreen = true
   }
 
   startSingleplayer(): void {
-    this.welcomeScreen = false
     console.log('starts single')
   }
 
   startMultiplayer(): void {
-    this.welcomeScreen = false
+
+    if (this.isRunning()) {
+      console.log('Game is already running')
+      return
+    }
+
     this.running = true
     console.log('starts multi')
     this.type = GameType.MultiPlayer
