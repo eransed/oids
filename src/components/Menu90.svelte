@@ -54,6 +54,7 @@
         list-style-type: none;
         border: 4px solid #fff;
         background-color: #000;
+        position: absolute;
     }
 
 </style>

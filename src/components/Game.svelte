@@ -16,7 +16,7 @@
   showMenu.set(menuOpen)
   showMenu.subscribe(value => {menuOpen = value})
 
-  $: display = menuOpen ? 'block' : 'none'
+  $: display = menuOpen ? 'flex' : 'none'
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') menuOpen = !menuOpen
@@ -47,9 +47,10 @@
 </script>
 
 <style>
-  #menu_test {
+  #game_menu {
     color: #fff;
-    position: fixed;
+    justify-content: center;
+    align-content: center;
   }
   
   #game_canvas {
@@ -63,7 +64,7 @@
 <canvas id="game_canvas"></canvas>
 
 {#if game}
-<div id="menu_test" style:display>
+<div id="game_menu" style:display>
   <Menu90 menuOpen={menuOpen} buttons={chosenMenu}></Menu90>
 </div>
 {/if}

@@ -10,7 +10,6 @@ let startupMenu: Button90Config[]
 // Function returns the correct menu configuration depending on
 // the current game state:
 export function getMenu(game: Game, keepLastSelected = false) {
-
   // Create all buttons as variables so they can be reused in
   // multiple menu item collections (Button90Config[]'s):
   const singlePlayer = createButton90Config('Singleplayer')
@@ -18,15 +17,15 @@ export function getMenu(game: Game, keepLastSelected = false) {
   const about = createButton90Config('About')
 
   const multiPlayer = createButton90Config('Multiplayer', () => {
-      // Start multiplayer on the game object
-      game.startMultiplayer()
+    // Start multiplayer on the game object
+    game.startMultiplayer()
 
-      // Get and set the menu depending by the game state
-      // We dont care what the user selected the last time this menu was shown:
-      menu.set(getMenu(game, false))
+    // Get and set the menu depending by the game state
+    // We dont care what the user selected the last time this menu was shown:
+    menu.set(getMenu(game, false))
 
-      // Hide the menu when starting a new game:
-      showMenu.set(false)
+    // Hide the menu when starting a new game:
+    showMenu.set(false)
   })
 
   const exitGame = createButton90Config('Quit', () => {
@@ -45,10 +44,8 @@ export function getMenu(game: Game, keepLastSelected = false) {
   let stateMenu: Button90Config[]
 
   if (game.isRunning()) {
-
     // If inGameMenu is undefined we have to create it - there is no selected item
     if (!keepLastSelected || !inGameMenu) {
-
       // Default selected item:
       settings.selected = true
 
@@ -58,12 +55,9 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
     // Selected menu if game is running
     stateMenu = inGameMenu
-
   } else {
-
     // If startupMenu is undefined we have to create it - there is no last selected item
     if (!keepLastSelected || !startupMenu) {
-
       // Default selected item:
       singlePlayer.selected = true
 
@@ -77,5 +71,4 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
   // Return the collection of menu item buttons
   return stateMenu
-
 }

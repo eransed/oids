@@ -23,7 +23,6 @@ export let buttonConfig: Button90Config = {
         /* font-family: 'Courier New', Courier, monospace; */
         /* font-family: 'Times New Roman', Times, serif; */
         font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-        
         font-weight: bold;
         font-size: 15px;
     }
