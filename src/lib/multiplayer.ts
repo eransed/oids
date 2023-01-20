@@ -28,7 +28,7 @@ export const multiPlayer = (game: Game) => {
   }
 
   //Needs to be a default canvas size so people get the same game size.
-  setCanvasSize(game.ctx)
+
   loadingText('Loading...', game.ctx)
   initKeyControllers()
 
@@ -125,6 +125,7 @@ export const multiPlayer = (game: Game) => {
   })
 
   const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
+    setCanvasSize(game.ctx)
     game.lightSource.position = game.localPlayer.position
     game.lightSource.direction = direction(game.localPlayer.angleDegree)
 

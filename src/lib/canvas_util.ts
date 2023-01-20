@@ -11,7 +11,6 @@ export function setCanvasSize(ctx: CanvasRenderingContext2D): void {
   const vh: number = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
   ctx.canvas.width = vw * screenScale
   ctx.canvas.height = vh * screenScale
-  console.log({ vw, vh })
 }
 
 export function getScreenCenterPosition(ctx: CanvasRenderingContext2D): Vec2d {
@@ -25,4 +24,3 @@ export function getScreenFromCanvas(ctx: CanvasRenderingContext2D): Vec2d {
 export function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   return <CanvasRenderingContext2D>canvas.getContext('2d')
 }
-
