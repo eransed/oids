@@ -58,9 +58,19 @@
   }
   
   #game_canvas {
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
     position: absolute;
     /* cursor: none; */
+  }
+  
+  #menuWrapper{
+    height: 70vh;
+    display: flex;
+    flex-flow: wrap;
+    justify-content: center;
+    align-content: center; 
+    
   }
 
 </style>
@@ -68,7 +78,9 @@
 <canvas id="game_canvas"></canvas>
 
 {#if game}
+<div id='menuWrapper' >
 <div id="game_menu" style:display>
   <Menu90 menuOpen={menuOpen} buttons={chosenMenu}></Menu90>
+</div>
 </div>
 {/if}

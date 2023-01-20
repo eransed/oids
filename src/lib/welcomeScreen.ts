@@ -21,7 +21,7 @@ export const welcomeScreen = (game: Game) => {
   game.type = GameType.WelcomeScreen
 
   //Needs to be a default canvas size so people get the same game size.
-  setCanvasSize(game.ctx)
+
   loadingText('Loading...', game.ctx)
   //initKeyControllers()
 
@@ -69,6 +69,7 @@ export const welcomeScreen = (game: Game) => {
   all.push(game.localPlayer)
 
   const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
+    setCanvasSize(game.ctx)
     ctx.save()
     ctx.fillStyle = '#000'
     ctx.fill()
