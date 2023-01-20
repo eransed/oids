@@ -30,30 +30,33 @@ export const welcomeScreen = (game: Game) => {
   // const game.localPlayer: SpaceObject = createSpaceObject()
   const bodies: SpaceObject[] = []
 
+  let speedMin = -0.5
+  let speedMax = 0
+
   //Moons
-  for (let n = 0; n < 15; n++) {
+  for (let n = 0; n < 10; n++) {
     const s = createSpaceObject()
     s.shape = SpaceShape.Moon
     s.color = randomBlue()
     s.mass = 1
     s.isLocal = true
     s.size.y = rndi(10, 70)
-    s.acceleration.x = rndi(-0.5, 1)
-    s.acceleration.y = rndi(-0.5, 1)
+    s.acceleration.x = rndi(speedMin, speedMax)
+    s.acceleration.y = rndi(speedMin, speedMax)
     s.health = 0
     s.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
     bodies.push(s)
   }
 
   //Comets
-  for (let n = 0; n < 5; n++) {
+  for (let n = 0; n < 10; n++) {
     const s = createSpaceObject()
     s.shape = SpaceShape.Comet
     s.color = randomAnyLightColor()
-    s.mass = 1
+    s.mass = 2
     s.isLocal = true
-    s.acceleration.x = rndi(-0.5, 1)
-    s.acceleration.y = rndi(-0.5, 1)
+    s.acceleration.x = rndi(speedMin, speedMax)
+    s.acceleration.y = rndi(speedMin, speedMax)
     s.size.x = rndi(50, 80)
     s.size.y = rndi(50, 80)
     s.health = 0
@@ -66,38 +69,15 @@ export const welcomeScreen = (game: Game) => {
   all.push(game.localPlayer)
 
   const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
-    game.lightSource.position = game.localPlayer.position
-    game.lightSource.direction = direction(game.localPlayer.angleDegree)
-
-    const viewSlices = game.lightSource.shine(game.segments, ctx)
-    const viewTopLeft = { x: 2500, y: 100 }
-    const viewSize = { x: 25 * viewSlices.length, y: 15 * viewSlices.length }
-    const viewSlizeWidth = Math.floor(viewSize.x / viewSlices.length)
     ctx.save()
-
     ctx.fillStyle = '#000'
-    ctx.fillRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
     ctx.fill()
-
     ctx.beginPath()
-    for (let i = 0; i < viewSlices.length; i++) {
-      const roofFloorPad = 150
-      const c = linearTransform(viewSlices[i].distance, 0, getScreenRect(ctx).x + 250, 255, 2)
-      const h = linearTransform(viewSlices[i].distance, 0, getScreenRect(ctx).x, viewSize.y - roofFloorPad, roofFloorPad)
-      const y = viewTopLeft.y + (viewSize.y - h) / 2
-      ctx.fillStyle = viewSlices[i].color
-      ctx.fillRect(viewTopLeft.x + viewSlizeWidth * i, y, viewSlizeWidth, h)
-    }
     ctx.strokeStyle = '#f00'
     ctx.lineWidth = 10
-    ctx.strokeRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
     ctx.stroke()
     ctx.fill()
     ctx.restore()
-
-    for (const segs of game.segments) {
-      segs.render(ctx)
-    }
 
     bodies.forEach((body) => {
       if (body.shape === SpaceShape.Moon) {

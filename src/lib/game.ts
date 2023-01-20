@@ -33,6 +33,9 @@ export class Game {
   stopGame(): void {
     console.log('Stops game')
     this.running = false
+    setTimeout(() => {
+      this.startWelcomeScreen()
+    }, 10)
   }
 
   startSingleplayer(): void {
