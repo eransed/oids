@@ -35,7 +35,7 @@ export class Game {
     this.running = false
     setTimeout(() => {
       this.startWelcomeScreen()
-    }, 10)
+    }, 20)
   }
 
   startSingleplayer(): void {

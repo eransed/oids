@@ -55,6 +55,11 @@ export function getNamesAsString(sos: SpaceObject[], label = ''): string {
   return label + arr.join(', ')
 }
 
+const renderSpeedometer = (screen: Vec2d, so: SpaceObject, ctx: CanvasRenderingContext2D) => {
+  renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 150, 'y m/s')
+  renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 150, 'x m/s')
+}
+
 export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   const screen: Vec2d = getScreenFromCanvas(ctx)
   const yrow1: number = screen.y - 30
@@ -68,8 +73,9 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
 
   ctx.save()
 
-  renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 300, 'y m/s')
-  renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 300, 'x m/s')
+  //Speedometer
+  // renderSpeedometer(screen, so, ctx)
+
   ctx.fillStyle = '#fff'
   ctx.fillText(`Local: ${so.name}`, xpos, yrow1)
   // ctx.fillText(`---------------------`, xpos, yrow3)
@@ -157,85 +163,6 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   // Hull
   ctx.strokeStyle = so.colliding ? '#f00' : so.color
   ctx.fillStyle = so.colliding ? '#f00' : so.color
-
-  const shipPath = new Path2D('')
-  const hull = new Path2D(
-    'M149.999999,-0.000285c0,0,38.131318,22.805854,50,64.871161s0,235.129439,0,235.129439h-100c0,0-14.235513-193.341187,0-235.129439s50-64.871161,50-64.871161Z'
-  )
-
-  const hullMatrix = new DOMMatrix()
-
-  //Adjusting the path to be on the hull
-  hullMatrix.a = 0.667334
-  hullMatrix.b = 0
-  hullMatrix.c = 0
-  hullMatrix.d = 0.999998
-  hullMatrix.e = 50
-  hullMatrix.f = 0.000285
-
-  const rightWing = new Path2D(
-    'M183.3667,300c0,0,9.554469-9.31039,26.870542-15s89.762758-18.102681,89.762758-18.102681v-43.741505c0,0-72.808219-46.518781-89.762758-73.155814s-26.870542-85.128968-26.870542-85.128968'
-  )
-
-  const leftWing = new Path2D(
-    'M116.6333,299.999999c0,0-9.429182-7.873136-26.6333-15s-90-18.102681-90-18.102681v-43.741505c0,0,73.031615-46.567809,90-73.155814s26.6333-85.128968,26.6333-85.128968'
-  )
-
-  shipPath.addPath(hull, hullMatrix)
-  shipPath.addPath(rightWing)
-  shipPath.addPath(leftWing)
-
-  const transformPath = (path: Path2D, matrix: DOMMatrix) => {
-    const copy = new Path2D()
-    copy.addPath(path, matrix)
-    return copy
-  }
-
-  const shipMatrix = new DOMMatrix()
-
-  shipMatrix.e = -150
-  shipMatrix.f = -150
-
-  const newPath = transformPath(shipPath, shipMatrix)
-
-  if (renderAsLocalPlayer) {
-    ctx.stroke(newPath)
-  } else {
-    ctx.fill(newPath)
-  }
-
-  ctx.fillStyle = '#f00'
-  ctx.rotate((20 * Math.PI) / 180)
-  if (!so.online && !renderAsLocalPlayer) {
-    ctx.fillText(so.name, (-1.2 * so.size.x) / 2, -30)
-    ctx.fillText('offline', (-1.2 * so.size.x) / 2, 30)
-  } else if (so.health <= 0) {
-    ctx.fillText('DEAD', -so.size.x, 0)
-  }
-
-  // Restore drawing
-  ctx.restore()
-
-  // Draw shots
-  renderShot(so, ctx)
-}
-
-export function renderOGShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false): void {
-  const scale = setScaledFont(ctx)
-  const shipSize: Vec2d = { x: 60, y: 100 }
-  so.size = shipSize
-
-  // Render hit box of ship after contex restore
-  // renderHitRadius(so, ctx)
-
-  ctx.save()
-  ctx.translate(so.position.x, so.position.y)
-  ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
-  ctx.lineWidth = 2 * screenScale
-
-  // Hull
-  ctx.strokeStyle = so.colliding ? '#f00' : so.color
-  ctx.fillStyle = so.colliding ? '#f00' : so.color
   ctx.beginPath()
   ctx.moveTo(0, (-shipSize.y / 3) * scale)
   ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
@@ -254,8 +181,6 @@ export function renderOGShip(so: SpaceObject, ctx: CanvasRenderingContext2D, ren
   if (!so.online && !renderAsLocalPlayer) {
     ctx.fillText(so.name, (-1.2 * so.size.x) / 2, -30)
     ctx.fillText('offline', (-1.2 * so.size.x) / 2, 30)
-  } else if (so.health <= 0) {
-    ctx.fillText('DEAD', -so.size.x, 0)
   }
 
   // Restore drawing

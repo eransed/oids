@@ -4,7 +4,7 @@ import { GameType, SpaceShape, type SpaceObject } from './types'
 
 import { initKeyControllers, spaceObjectKeyController } from './input'
 import { bounceSpaceObject } from './mechanics'
-import { loadingText, renderMoon, renderOGShip, renderShip, renderSpaceObjectStatusBar } from './render'
+import { loadingText, renderExplosionFrame, renderMoon, renderShip, renderSpaceObjectStatusBar } from './render'
 import { getScreenCenterPosition, getScreenRect, setCanvasSize } from './canvas_util'
 import { friction, gravity, handleCollisions } from './physics'
 import { add, direction, linearTransform, rndfVec2d, rndi, sub } from './math'
@@ -38,7 +38,7 @@ export const multiPlayer = (game: Game) => {
   game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
   game.localPlayer.mass = 0.1
   game.localPlayer.angleDegree = -120
-  game.localPlayer.health = 250
+  game.localPlayer.health = 50
   game.localPlayer.steeringPower = 0.55
   game.localPlayer.enginePower = 0.025
   game.localPlayer.name = `P-${rndi(0, 900000)}`
@@ -63,10 +63,6 @@ export const multiPlayer = (game: Game) => {
   const padding = 0
   const pad = { x: padding, y: padding }
   const scr = sub(getScreenRect(game.ctx), pad)
-  game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
-  game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
-  game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
-  game.segments.push(new LineSegment({ x: padding, y: scr.y }, { x: padding, y: padding }))
 
   // const padding2 = 650
   // const pad2 = {x: padding2, y: padding2}
@@ -115,6 +111,7 @@ export const multiPlayer = (game: Game) => {
           console.log(`${so.name} went offline`)
         }
         serverObjects[i] = so
+
         return
       }
     }
@@ -124,13 +121,14 @@ export const multiPlayer = (game: Game) => {
     }
   })
 
-  const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
-    setCanvasSize(game.ctx)
-    game.lightSource.position = game.localPlayer.position
-    game.lightSource.direction = direction(game.localPlayer.angleDegree)
+  const render3DFrame = (ctx: CanvasRenderingContext2D) => {
+    game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
+    game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
+    game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
+    game.segments.push(new LineSegment({ x: padding, y: scr.y }, { x: padding, y: padding }))
 
     const viewSlices = game.lightSource.shine(game.segments, ctx)
-    const viewTopLeft = { x: 2500, y: 100 }
+    const viewTopLeft = { x: getScreenRect(ctx).x - 1200, y: 100 }
     const viewSize = { x: 25 * viewSlices.length, y: 15 * viewSlices.length }
     const viewSlizeWidth = Math.floor(viewSize.x / viewSlices.length)
     ctx.save()
@@ -159,12 +157,23 @@ export const multiPlayer = (game: Game) => {
     for (const segs of game.segments) {
       segs.render(ctx)
     }
+  }
+
+  const renderFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
+    setCanvasSize(game.ctx)
+    game.lightSource.position = game.localPlayer.position
+    game.lightSource.direction = direction(game.localPlayer.angleDegree)
+
+    // render3DFrame(ctx)
 
     serverObjects.forEach((so) => {
       if (so.shape === SpaceShape.Moon) {
         renderMoon(so, ctx)
       } else {
-        renderShip(so, ctx)
+        if (so.health <= 0) {
+          renderExplosionFrame(so.position, ctx)
+          return
+        } else renderShip(so, ctx, false)
       }
     })
 
@@ -176,10 +185,18 @@ export const multiPlayer = (game: Game) => {
     })
 
     fpsCounter(dt, getSerVer(), ctx)
-    renderOGShip(game.localPlayer, ctx, true)
+    if (game.localPlayer.health <= 0) {
+      renderExplosionFrame(game.localPlayer.position, ctx)
+      // renderShip(game.localPlayer, ctx, true)
+      return
+    } else renderShip(game.localPlayer, ctx, true)
   }
 
   const nextFrame = (ctx: CanvasRenderingContext2D, dt: number): void => {
+    if (game.localPlayer.health <= 0) {
+      bounceSpaceObject(game.localPlayer, getScreenRect(ctx), 0.4, 0, 0)
+      return
+    }
     spaceObjectKeyController(game.localPlayer, dt)
     friction(game.localPlayer)
     // wrapSpaceObject(ship, getScreenRect(ctx))
