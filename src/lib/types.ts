@@ -114,6 +114,7 @@ export interface Damager extends Positionable {
 
 export interface Damageable extends Positionable {
   health: number
+  isDead: boolean
 }
 
 export interface SpaceObject

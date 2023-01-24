@@ -1,11 +1,12 @@
 import type { Game } from './game'
 import type { Button90Config } from '../components/interface'
-import { menu, showMenu } from './stores'
+import { menu, showMenu, health } from './stores'
 import { createButton90Config } from './factory'
 
 // Keep selected state:
 let inGameMenu: Button90Config[]
 let startupMenu: Button90Config[]
+let gameOverMenu: Button90Config[]
 
 // Function returns the correct menu configuration depending on
 // the current game state:
@@ -15,6 +16,9 @@ export function getMenu(game: Game, keepLastSelected = false) {
   const singlePlayer = createButton90Config('Singleplayer')
   const settings = createButton90Config('Settings')
   const about = createButton90Config('About')
+  const spectate = createButton90Config('Spectate', () => {
+    showMenu.set(false)
+  })
 
   const multiPlayer = createButton90Config('Multiplayer', () => {
     game.stopWelcomeScreen()
@@ -71,6 +75,11 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
     // Selected menu if game is not running:
     stateMenu = startupMenu
+  }
+
+  // If player is dead
+  if (game.localPlayer.isDead) {
+    stateMenu = [spectate, settings, exitGame]
   }
 
   // Return the collection of menu item buttons

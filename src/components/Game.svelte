@@ -8,13 +8,15 @@
   import { onMount } from 'svelte'
 
   import { createSpaceObject } from '../lib/factory'
-  import { menu, showMenu } from '../lib/stores'
+  import { health, menu, showMenu } from '../lib/stores'
   import { getMenu } from '../lib/menu'
   import { Game } from '../lib/game'
 
   let menuOpen = true
   showMenu.set(menuOpen)
   showMenu.subscribe(value => {menuOpen = value})
+
+
 
   $: display = menuOpen ? 'flex' : 'none'
 
@@ -45,6 +47,16 @@
     // Subscribing on store
     menu.subscribe(value => {chosenMenu = value})
     game.startWelcomeScreen()
+  })
+
+  health.subscribe(hp => {
+    if (hp <= 0) {
+      console.log('hp')
+      game.localPlayer.isDead = true
+      // menu.set(getMenu(game))
+      menu.set(getMenu(game))
+      showMenu.set(true)
+    } 
   })
 
 

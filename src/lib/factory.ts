@@ -12,6 +12,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   }
 
   const spaceObject: SpaceObject = {
+    isDead: false,
     mass: 1,
     size: { x: 100, y: 100 },
     color: '#90d',

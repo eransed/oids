@@ -15,6 +15,7 @@ export class Game {
   lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
   segments: LineSegment[] = []
   running = false
+  gameOver = false
 
   constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject) {
     this.canvas = _canvas
