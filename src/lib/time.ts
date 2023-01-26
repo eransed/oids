@@ -31,16 +31,17 @@ export function fpsCounter(frameTimeMs: number, ver: string, ctx: CanvasRenderin
 
 export function renderLoop(
   game: Game,
-  renderFrame: (ctx: CanvasRenderingContext2D, dt: number) => void,
-  nextFrame: (ctx: CanvasRenderingContext2D, dt: number) => void,
-  others: SpaceObject[]
+  renderFrame: (game: Game, dt: number) => void,
+  nextFrame: (game: Game, dt: number) => void
 ) {
   function update(timestamp: number): void {
+    // console.log('renderLoop runs...')
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx)
-    renderFrame(game.ctx, dt)
-    updateSpaceObject(game.localPlayer, dt, game.ctx)
-    updateSpaceObjects(others, dt, game.ctx)
+    renderFrame(game, dt)
+    // updateSpaceObject(game.localPlayer, dt, game.ctx)
+    // updateSpaceObjects(game.remotePlayers, dt, game.ctx)
+    updateSpaceObjects(game.all, dt, game.ctx)
     if (isConnectedToWsServer()) {
       sendSpaceObjectToBroadcastServer(game.localPlayer)
     }
@@ -50,7 +51,7 @@ export function renderLoop(
       cancelAnimationFrame(frameId)
       clearScreen(game.ctx)
     }
-    nextFrame(game.ctx, dt)
+    nextFrame(game, dt)
   }
   update(0)
 }

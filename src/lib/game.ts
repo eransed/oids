@@ -3,19 +3,22 @@ import { GameType, type SpaceObject } from './types'
 import { getContext } from './canvas_util'
 
 import { LightSource, LineSegment } from './shapes'
-import { multiPlayer } from './multiplayer'
-import { welcomeScreen } from './welcomeScreen'
+import { renderLoop } from './time'
+import * as WelcomeScreen from './gameModes/welcomeScreen'
+import * as Regular from './gameModes/regular'
 
 export class Game {
   type: GameType = GameType.SinglePlayer
   ctx: CanvasRenderingContext2D
-  private canvas: HTMLCanvasElement
+  canvas: HTMLCanvasElement
   localPlayer: SpaceObject
-  private remotePlayers: SpaceObject[] = []
+  remotePlayers: SpaceObject[] = []
   lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
   segments: LineSegment[] = []
   running = false
   gameOver = false
+  bodies: SpaceObject[] = []
+  all: SpaceObject[] = []
 
   constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject) {
     this.canvas = _canvas
@@ -44,7 +47,8 @@ export class Game {
   }
 
   startWelcomeScreen(): void {
-    welcomeScreen(this)
+    WelcomeScreen.initWelcomeScreen(this)
+    renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
   }
 
   stopWelcomeScreen(): void {
@@ -53,6 +57,10 @@ export class Game {
   }
 
   startMultiplayer(): void {
-    multiPlayer(this)
+    // init a regular game
+    Regular.initRegularGame(this)
+
+    // start the animation loop
+    renderLoop(this, Regular.renderFrame, Regular.nextFrame)
   }
 }
