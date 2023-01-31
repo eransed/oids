@@ -66,6 +66,8 @@
   }
   
   #game_canvas {
+    max-width: 4000px;
+    max-height: 3000px;
     width: 100vw;
     height: 100vh;
     position: absolute;
@@ -73,13 +75,24 @@
   }
   
   #menuWrapper{
-    height: 70vh;
+    height: 35vh;
     display: flex;
     flex-flow: wrap;
     justify-content: center;
     align-content: center; 
     
   }
+
+  @media only screen and (min-width: 800px) {
+    #menuWrapper{
+    height: 50vh;
+    display: flex;
+    flex-flow: wrap;
+    justify-content: center;
+    align-content: center; 
+    
+  }} 
+
 
 </style>
 

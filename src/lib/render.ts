@@ -155,7 +155,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   so.size = shipSize
 
   // Render hit box of ship after contex restore
-  renderHitRadius(so, ctx)
+  //renderHitRadius(so, ctx)
 
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
