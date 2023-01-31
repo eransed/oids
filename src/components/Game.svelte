@@ -8,9 +8,10 @@
   import { onMount } from 'svelte'
 
   import { createSpaceObject } from '../lib/factory'
-  import { health, menu, showMenu } from '../lib/stores'
+  import { menu, showMenu } from '../lib/stores'
   import { getMenu } from '../lib/menu'
   import { Game } from '../lib/game'
+  import { removeKeyControllers } from '../lib/input'
 
   let menuOpen = true
   showMenu.set(menuOpen)
@@ -39,7 +40,7 @@
   onMount(() => {
     console.log ('mount...')
     const localPlayer = createSpaceObject('LocalPlayer')
-    game = new Game(getCanvas(), localPlayer)
+    game = new Game(getCanvas(), localPlayer, showDeadMenu)
 
     // Setting welcome menu
     menu.set(getMenu(game))
@@ -49,16 +50,11 @@
     game.startWelcomeScreen()
   })
 
-  health.subscribe(hp => {
-    if (hp <= 0) {
-      console.log('hp')
-      game.localPlayer.isDead = true
-      // menu.set(getMenu(game))
-      menu.set(getMenu(game))
-      showMenu.set(true)
-    } 
-  })
-
+  const showDeadMenu = (): void => {
+    removeKeyControllers()
+    menu.set(getMenu(game))
+    showMenu.set(true)
+  }
 
 </script>
 

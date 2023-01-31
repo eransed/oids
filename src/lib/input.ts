@@ -12,6 +12,7 @@ let rightStrafePressed = false
 let leftStrafePressed = false
 let leftPressed = false
 let spacePressed = false
+let selfDestruct = false
 
 function arrowControl(e: KeyboardEvent, value: boolean) {
   if (e.key === 'ArrowUp') {
@@ -56,6 +57,9 @@ function arrowControl(e: KeyboardEvent, value: boolean) {
   }
   if (e.key === 'r') {
     reset = value
+  }
+  if (e.key === 'k') {
+    selfDestruct = value
   }
 }
 
@@ -114,12 +118,23 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   if (spacePressed) {
     fire(so)
   }
+  if (selfDestruct) {
+    let x = 0
+    console.log(x++)
+    so.health = 0
+  }
 }
 
 export function initKeyControllers(): void {
-  console.log('adds event listeners')
+  console.log('adds game event listeners')
   document.addEventListener('keydown', (event) => arrowControl(event, true))
   document.addEventListener('keyup', (event) => arrowControl(event, false))
+}
+
+export function removeKeyControllers(): void {
+  console.log('remove game event listeners')
+  document.removeEventListener('keydown', (event) => arrowControl(event, true))
+  document.removeEventListener('keyup', (event) => arrowControl(event, false))
 }
 
 export function getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEvent): Vec2d {

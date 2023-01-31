@@ -1,22 +1,23 @@
-import type { Game } from "../game"
-import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas_util"
-import { initKeyControllers, spaceObjectKeyController } from "../input"
-import { add, direction, rndfVec2d, rndi, sub } from "../math"
-import { bounceSpaceObject } from "../mechanics"
-import { friction, gravity, handleCollisions } from "../physics"
-import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText } from "../render"
-import { fpsCounter } from "../time"
-import { GameType, SpaceShape, type SpaceObject } from "../types"
-import { getSerVer, initMultiplayer, registerServerUpdate } from "../webSocket"
-import { randomAnyColor } from "../color"
+import type { Game } from '../game'
+import { setCanvasSize, getScreenRect, getScreenCenterPosition } from '../canvas_util'
+import { initKeyControllers, spaceObjectKeyController } from '../input'
+import { add, direction, rndfVec2d, rndi, sub } from '../math'
+import { bounceSpaceObject } from '../mechanics'
+import { friction, gravity, handleCollisions } from '../physics'
+import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText } from '../render'
+import { fpsCounter } from '../time'
+import { GameType, SpaceShape, type SpaceObject } from '../types'
+import { getSerVer, initMultiplayer, registerServerUpdate } from '../webSocket'
+import { randomAnyColor } from '../color'
 import { test } from '../test'
-
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
     console.log('Game is already running')
     return
   }
+
+  game.clearBodies()
 
   game.running = true
   console.log('starts multi')
@@ -31,6 +32,9 @@ export function initRegularGame(game: Game): void {
   const offset = 500
 
   game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
+
+  //Local player init
+  game.reset()
   game.localPlayer.mass = 0.1
   game.localPlayer.angleDegree = -120
   game.localPlayer.health = 100
@@ -98,6 +102,9 @@ export function renderFrame(game: Game, dt: number): void {
 
   fpsCounter(dt, getSerVer(), ctx)
   if (game.localPlayer.health <= 0) {
+    //Local player is dead
+    game.localPlayer.isDead = true
+    game.callBackWrapper()
     renderExplosionFrame(game.localPlayer.position, ctx)
     return
   } else {
@@ -105,14 +112,11 @@ export function renderFrame(game: Game, dt: number): void {
   }
 }
 
-
-
 export function nextFrame(game: Game, dt: number): void {
-  if (game.localPlayer.health <= 0) {
-    bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.4, 0, 0)
-    return
+  if (!game.localPlayer.isDead) {
+    spaceObjectKeyController(game.localPlayer, dt)
   }
-  spaceObjectKeyController(game.localPlayer, dt)
+  bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.4, 0, 0)
   friction(game.localPlayer)
   bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.4, 0, 0)
 

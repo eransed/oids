@@ -3,7 +3,7 @@
     import type { Button90Config } from "./interface"
     export let menuOpen: boolean
     export let buttons: Button90Config[]
-
+ 
     const rotate = (index: number, size: number): number => {
       if (index < 0) return (size + index % size) % size
       return index % size
@@ -13,6 +13,7 @@
       let selectedIndex = 0
 
       buttons.forEach((b, index) => {
+   
         if (b.selected) {
           selectedIndex = index
           return
@@ -34,14 +35,14 @@
       }
       selectedIndex = rotate(selectedIndex, buttons.length)
       buttons[selectedIndex].selected = true
-      console.log('code =', event.code, ', key =',event.key)
+      // console.log('code =', event.code, ', key =',event.key)
     }
 
     $: if (menuOpen){
-        console.log ('adds events')
+        console.log ('adds menu events')
         document.addEventListener('keydown', handleMenuSelection)
     } else {
-        console.log ('try to remove eventers...')
+        console.log ('remove menu events')
         document.removeEventListener('keydown', handleMenuSelection)
     }
 

@@ -1,6 +1,6 @@
 import type { Game } from './game'
 import type { Button90Config } from '../components/interface'
-import { menu, showMenu, health } from './stores'
+import { menu, showMenu } from './stores'
 import { createButton90Config } from './factory'
 
 // Keep selected state:
@@ -37,6 +37,9 @@ export function getMenu(game: Game, keepLastSelected = false) {
   })
 
   const exitGame = createButton90Config('Quit', () => {
+    //player is alive again
+    game.localPlayer.isDead = false
+
     // Start multiplayer on the game object
     // Stop the current game:
     game.stopGame()
@@ -79,6 +82,9 @@ export function getMenu(game: Game, keepLastSelected = false) {
 
   // If player is dead
   if (game.localPlayer.isDead) {
+    settings.selected = false
+    spectate.selected = true
+
     stateMenu = [spectate, settings, exitGame]
   }
 

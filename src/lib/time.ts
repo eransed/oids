@@ -29,11 +29,9 @@ export function fpsCounter(frameTimeMs: number, ver: string, ctx: CanvasRenderin
   }
 }
 
-export function renderLoop(
-  game: Game,
-  renderFrame: (game: Game, dt: number) => void,
-  nextFrame: (game: Game, dt: number) => void
-) {
+export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void) {
+  console.log('renderloop start')
+
   function update(timestamp: number): void {
     // console.log('renderLoop runs...')
     const dt: number = getFrameTimeMs(timestamp)

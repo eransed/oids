@@ -19,10 +19,13 @@ export class Game {
   gameOver = false
   bodies: SpaceObject[] = []
   all: SpaceObject[] = []
+  OnDeadLocalPlayerCallBack: () => void
+  hasCalledCallback: boolean = false
 
-  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject) {
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
+    this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
     this.ctx = getContext(this.canvas)
   }
 
@@ -54,6 +57,24 @@ export class Game {
   stopWelcomeScreen(): void {
     console.log('Stops welcomescreen')
     this.running = false
+  }
+
+  clearBodies(): void {
+    this.bodies = []
+  }
+
+  callBackWrapper(): void {
+    if (!this.hasCalledCallback) {
+      this.hasCalledCallback = true
+      this.OnDeadLocalPlayerCallBack()
+    }
+  }
+
+  reset(): void {
+    console.log('reseting this ')
+    this.hasCalledCallback = false
+    this.localPlayer.isDead = false
+    this.clearBodies()
   }
 
   startMultiplayer(): void {

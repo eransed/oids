@@ -4,7 +4,6 @@ import { getScreenFromCanvas } from './canvas_util'
 import { renderExplosionFrame } from './render'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
 import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from './constants'
-import { health } from './stores'
 
 export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
   // If assigning nan to so.velocity, position or acceleration it will stay nan for ever
@@ -196,7 +195,6 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
             so0.health -= shot.damage
             so0.velocity = add(so0.velocity, heading)
             shot.didHit = true
-            health.set(so0.health)
           }
           if (isWithinRadius(shot, so1, so1.hitRadius) && shot.didHit === false) {
             so1.health -= shot.damage
