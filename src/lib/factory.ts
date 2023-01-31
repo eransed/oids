@@ -35,7 +35,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     colliding: false,
     collidingWith: [],
     damage: 5,
-    armedDelay: 2,
+    armedDelay: 6,
     bounceCount: 0,
     didHit: false,
     shotBlowFrame: 16,

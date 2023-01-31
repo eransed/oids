@@ -45,6 +45,7 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
+  game.localPlayer.hitRadius = 50
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
   initMultiplayer()

@@ -141,7 +141,7 @@ export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D):
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
   ctx.strokeStyle = '#447'
-  ctx.lineWidth = 1
+  ctx.lineWidth = 3
   ctx.beginPath()
   ctx.arc(0, 0, so.hitRadius, 0, Math.PI * 2)
   ctx.closePath()
@@ -155,7 +155,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   so.size = shipSize
 
   // Render hit box of ship after contex restore
-  // renderHitRadius(so, ctx)
+  renderHitRadius(so, ctx)
 
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
@@ -413,7 +413,7 @@ export function renderRoundIndicator(
 const render3DFrame = (game: Game) => {
   const scr = getScreenRect(game.ctx)
   const padding = 0
-  const pad: Vec2d = {x: padding, y: padding}
+  const pad: Vec2d = { x: padding, y: padding }
   game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
   game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
   game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
@@ -449,4 +449,3 @@ const render3DFrame = (game: Game) => {
     segs.render(game.ctx)
   }
 }
-

@@ -61,6 +61,7 @@ export class Game {
 
   clearBodies(): void {
     this.bodies = []
+    this.all = []
   }
 
   callBackWrapper(): void {
