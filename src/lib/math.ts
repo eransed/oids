@@ -1,4 +1,8 @@
-import type { Vec2d } from "./types"
+import type { Vec2d } from './types'
+
+export function to_string(v: Vec2d, dec = 0): string {
+  return '(' + round2dec(v.x, dec) + ', ' + round2dec(v.y, dec) + ')'
+}
 
 export function vec2d(): Vec2d {
   return { x: 0, y: 0 }
@@ -9,21 +13,46 @@ export function copy(from: Vec2d): Vec2d {
 }
 
 export function add(to: Vec2d, from: Vec2d): Vec2d {
-  let tmp: Vec2d = copy(to)
+  const tmp: Vec2d = copy(to)
   tmp.x += from.x
   tmp.y += from.y
   return tmp
 }
 
 export function sub(to: Vec2d, from: Vec2d): Vec2d {
-  let tmp: Vec2d = copy(to)
+  const tmp: Vec2d = copy(to)
   tmp.x -= from.x
   tmp.y -= from.y
   return tmp
 }
 
+export function scalarMultiply(v: Vec2d, s: number): Vec2d {
+  const tmp: Vec2d = copy(v)
+  tmp.x *= s
+  tmp.y *= s
+  return tmp
+}
+
+export function smul(v: Vec2d, s: number): Vec2d {
+  const tmp: Vec2d = copy(v)
+  tmp.x *= s
+  tmp.y *= s
+  return tmp
+}
+
+export function sdiv(v: Vec2d, s: number): Vec2d {
+  if (s === 0) {
+    console.error('Division by 0')
+    return {x: 0, y: 0}
+  }
+  const tmp: Vec2d = copy(v)
+  tmp.x /= s
+  tmp.y /= s
+  return tmp
+}
+
 export function round(v: Vec2d, decimals: number): Vec2d {
-  let tmp = copy(v)
+  const tmp = copy(v)
   tmp.x = round2dec(tmp.x, decimals)
   tmp.y = round2dec(tmp.y, decimals)
   return tmp
@@ -35,6 +64,29 @@ export function floor(v: Vec2d): Vec2d {
 
 export function magnitude(v: Vec2d): number {
   return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2))
+}
+
+export function mag(v: Vec2d): number {
+  return Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2))
+}
+
+export function norm(v: Vec2d): Vec2d {
+  return sdiv(v, mag(v))
+}
+
+export function dist(v0: Vec2d, v1: Vec2d): number {
+  return Math.sqrt(Math.pow(v1.x - v0.x, 2) + Math.pow(v1.y - v1.y, 2))
+}
+
+export function direction(angleDegree: number): Vec2d {
+  return {
+    x: Math.cos(degToRad(angleDegree)),
+    y: Math.sin(degToRad(angleDegree)),
+  }
+}
+
+export function angle(v: Vec2d): number {
+  return radToDeg(Math.atan2(v.y, v.x))
 }
 
 export function rndf(min: number, max: number): number {
@@ -51,13 +103,12 @@ export function rndfVec2d(min: number, max: number): Vec2d {
   return { x: rndf(min, max), y: rndf(min, max) }
 }
 
-
 export function limit(n: number, max: number): number {
-  return (n >= Math.abs(max) ? max : n)
+  return n >= Math.abs(max) ? max : n
 }
 
 export function limitv(v: Vec2d, max: Vec2d): Vec2d {
-  return {x: limit(v.x, max.x), y: limit(v.y, max.y)}
+  return { x: limit(v.x, max.x), y: limit(v.y, max.y) }
 }
 
 export function wrap(vector: Vec2d, screen: Vec2d) {
@@ -94,22 +145,27 @@ export function mirrorWrap(vector: Vec2d, screen: Vec2d) {
   }
 }
 
-export function round2dec(num: number, dec: number = 2): number {
+export function round2dec(num: number, dec = 2): number {
   const exp = Math.pow(10, dec)
   return Math.round((num + Number.EPSILON) * exp) / exp
 }
 
-export function scalarMultiply(v: Vec2d, s: number): Vec2d {
-  let tmp: Vec2d = copy(v)
-  tmp.x *= s
-  tmp.y *= s
-  return tmp
-}
-
 export function degToRad(deg: number): number {
-  return (deg * Math.PI) / 180
+  return deg * (Math.PI  / 180.0)
 }
 
 export function radToDeg(rad: number): number {
-  return rad * (180 / Math.PI)
+  return rad * (180.0 / Math.PI)
+}
+
+export function withinBounds(v: Vec2d, maxBound: Vec2d, minBound: Vec2d = { x: 0, y: 0 }) {
+  if (v.x > minBound.x) return false
+  if (v.x < maxBound.x) return false
+  if (v.y > minBound.y) return false
+  if (v.y < maxBound.y) return false
+  return true
+}
+
+export function linearTransform(v: number, v_lower: number, v_upper: number, t_lower: number, t_upper: number) {
+  return (v - v_lower) * ((t_upper - t_lower) / (v_upper - v_lower)) + t_lower;
 }

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "isolatedModules": true,
+    "removeComments": true,
+    "allowJs": false,
+    "checkJs": false,
+    "strict": true,
+    "outDir": "build"
+  },
+  "include": ["./*.ts"]
+}

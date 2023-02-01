@@ -1,21 +1,31 @@
 {
   "name": "oids",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "build-server": "npx tsc --build server/tsconfig.json",
+    "server": "npm run build-server && node server/build/main.js"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.0",
     "@tsconfig/svelte": "^3.0.0",
+    "@types/node": "^18.11.18",
+    "@types/ws": "^8.5.4",
+    "@typescript-eslint/eslint-plugin": "^5.48.0",
+    "@typescript-eslint/parser": "^5.48.0",
+    "eslint": "^8.31.0",
     "svelte": "^3.54.0",
     "svelte-check": "^2.10.0",
     "tslib": "^2.4.1",
     "typescript": "^4.9.3",
     "vite": "^4.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.11.0"
   }
 }

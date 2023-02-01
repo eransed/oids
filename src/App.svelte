@@ -2,12 +2,13 @@
   import Game from './components/Game.svelte'
 </script>
 
+<body>
 <main>
-  <!-- <h2>oids</h2> -->
   <div>
-    <Game />
+    <Game/>
   </div>
 </main>
+</body>
 
 <style>
 

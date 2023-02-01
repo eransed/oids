@@ -1,108 +1,88 @@
-import type { SpaceObject } from "./types"
+import { GameType, type SpaceObject } from './types'
 
-import { initKeyControllers, spaceObjectKeyController } from "./input"
-import { wrapSpaceObject } from "./mechanics"
-import { clearScreen, renderMoon, renderShip, renderVector } from "./render"
-import { createSpaceObject, getScreenCenterPosition, getScreenRect, setCanvasSize } from "./utils"
-import { friction, gravity, updateSpaceObject, updateSpaceObjects } from "./physics"
-import { add, rndfVec2d } from "./math"
-import { randomBlue } from "./color"
+import { getContext } from './canvas_util'
 
-export function oids_game(ctx: CanvasRenderingContext2D) {
+import { LightSource, LineSegment } from './shapes'
+import { renderLoop } from './time'
+import * as WelcomeScreen from './gameModes/welcomeScreen'
+import * as Regular from './gameModes/regular'
 
-  console.log('Starting oids...')
-  setCanvasSize(ctx)
-  initKeyControllers()
-  
-  const offset: number = 600
+export class Game {
+  type: GameType = GameType.SinglePlayer
+  ctx: CanvasRenderingContext2D
+  canvas: HTMLCanvasElement
+  localPlayer: SpaceObject
+  remotePlayers: SpaceObject[] = []
+  lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
+  segments: LineSegment[] = []
+  running = false
+  gameOver = false
+  bodies: SpaceObject[] = []
+  all: SpaceObject[] = []
+  OnDeadLocalPlayerCallBack: () => void
+  hasCalledCallback: boolean = false
 
-  const ship: SpaceObject = createSpaceObject()
-  const moon: SpaceObject = createSpaceObject()
-  const star: SpaceObject = createSpaceObject()
-  const planet: SpaceObject = createSpaceObject()
-
-  const bodies: SpaceObject[] = []
-  bodies.push(moon)
-  bodies.push(star)
-  bodies.push(planet)
-  for (let n = 0; n < 3; n++) {
-    const s = createSpaceObject()
-    s.color = randomBlue()
-    s.mass = 4
-    s.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
-    bodies.push(s)
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _OnDeadLocalPlayerCallBack: () => void) {
+    this.canvas = _canvas
+    this.localPlayer = _localPlayer
+    this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
+    this.ctx = getContext(this.canvas)
   }
 
-  moon.color = '#ffa'
-  ship.color = '#afa'
-  planet.color = '#f88'
-  star.color = '#fff'
-
-  star.frictionFactor = 0.1
-
-  ship.mass = 0.4
-  moon.mass = 4
-  planet.mass = 4
-  star.mass = 1
-
-
-  moon.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
-  ship.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
-  star.position = add(getScreenCenterPosition(ctx), rndfVec2d(-20, 20))
-  planet.position = add(getScreenCenterPosition(ctx), rndfVec2d(-offset, offset))
-
-
-  const renderFrame = (ctx: CanvasRenderingContext2D): void => {
-    renderShip(ship, ctx)
-    // renderMoon(ship, ctx)
-    // renderVector(ship.acceleration, ship.position, ctx, 400)
-    // renderVector(ship.velocity, ship.position, ctx, 10)
-    bodies.forEach((body) => {
-      renderMoon(body, ctx)
-    })
+  isRunning(): boolean {
+    return this.running
   }
 
-  const nextFrame = (ctx: CanvasRenderingContext2D): void => {
-
-    spaceObjectKeyController(ship)
-    friction(ship)
-    wrapSpaceObject(ship, getScreenRect(ctx))
-
-    bodies.forEach((body) => {
-      bodies.forEach((other) => {
-        if (body !== other) {
-          gravity(body, other)
-        }
-      })
-      gravity(body, ship)
-      gravity(ship, body)
-      friction(body)
-      wrapSpaceObject(body, getScreenRect(ctx))
-    })
-
+  shouldQuit(): boolean {
+    return !this.running
   }
 
-  let time_ms: number
+  stopGame(): void {
+    console.log('Stops game')
+    this.running = false
+    setTimeout(() => {
+      this.startWelcomeScreen()
+    }, 20)
+  }
 
-  function renderLoop(
-    ctx: CanvasRenderingContext2D,
-    renderFrame: (ctx: CanvasRenderingContext2D) => void,
-    nextFrame: (ctx: CanvasRenderingContext2D) => void
-  ) {
+  startSingleplayer(): void {
+    console.log('starts single')
+  }
 
-    function update(time_ms: number): void {
-      clearScreen(ctx)
-      renderFrame(ctx)
-      updateSpaceObject(ship)
-      updateSpaceObjects(bodies)
-      requestAnimationFrame(update)
-      nextFrame(ctx)
+  startWelcomeScreen(): void {
+    WelcomeScreen.initWelcomeScreen(this)
+    renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
+  }
+
+  stopWelcomeScreen(): void {
+    console.log('Stops welcomescreen')
+    this.running = false
+  }
+
+  clearBodies(): void {
+    this.bodies = []
+    this.all = []
+  }
+
+  callBackWrapper(): void {
+    if (!this.hasCalledCallback) {
+      this.hasCalledCallback = true
+      this.OnDeadLocalPlayerCallBack()
     }
-
-    update(time_ms)
-
   }
 
-  renderLoop(ctx, renderFrame, nextFrame)
-}
+  reset(): void {
+    console.log('reseting this ')
+    this.hasCalledCallback = false
+    this.localPlayer.isDead = false
+    this.clearBodies()
+  }
 
+  startMultiplayer(): void {
+    // init a regular game
+    Regular.initRegularGame(this)
+
+    // start the animation loop
+    renderLoop(this, Regular.renderFrame, Regular.nextFrame)
+  }
+}
