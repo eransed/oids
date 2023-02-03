@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let title: string = "Example";
+  export let title: string = "Title";
   export let closeBtn: boolean = true;
   export let showModal: boolean = true;
   export let isEditable: boolean = false;
@@ -10,7 +10,7 @@
     showModal = false;
   }
 
-  const modalExlain =
+  const modalExplain =
     "This will be deleted if you give the <Modal> component any children </Modal>";
 </script>
 
@@ -57,6 +57,7 @@
   }
 
   #closeBtn {
+    cursor: pointer;
     position: absolute;
     right: 1px;
     top: 1px;
@@ -106,6 +107,7 @@
           id="closeBtn"
         />{/if}
     </div>
-    <slot><p>{modalExlain}</p></slot>
+
+    <slot><p>{modalExplain}</p></slot>
   </div>
 </div>

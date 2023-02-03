@@ -10,7 +10,6 @@
   import { getMenu } from "../lib/menu";
   import { Game } from "../lib/game";
   import { removeKeyControllers } from "../lib/input";
-  import Modal from "./shared/Modal.svelte";
 
   let menuOpen = true;
   showMenu.set(menuOpen);
