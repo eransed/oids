@@ -5,7 +5,8 @@
     "allowJs": false,
     "checkJs": false,
     "strict": true,
-    "outDir": "build"
+    "outDir": "build",
+    "esModuleInterop": true
   },
   "include": ["./*.ts"]
 }
