@@ -1,4 +1,5 @@
 //https://www.section.io/engineering-education/how-to-create-a-simple-rest-api-using-typescript-and-nodejs/
+//https://dev.to/mihaiandrei97/jwt-authentication-using-prisma-and-express-37nk
 
 import { Request, Response, NextFunction } from "express";
 import axios, { AxiosResponse } from "axios";

@@ -32,7 +32,7 @@ export const apiServer = () => {
   });
 
   /** Routes */
-  router.use("/", routes);
+  router.use("/api/v1", routes);
 
   /** Error handling */
   router.use((req, res, next) => {

@@ -10,12 +10,18 @@
   import { getMenu } from "../lib/menu";
   import { Game } from "../lib/game";
   import { removeKeyControllers } from "../lib/input";
+  import axios from "axios";
 
   let menuOpen = true;
   showMenu.set(menuOpen);
   showMenu.subscribe((value) => {
     menuOpen = value;
   });
+
+  const getUsers = async () => {
+    let response = await axios.get("http://localhost:6060/api/v1/users");
+    console.log(response);
+  };
 
   $: display = menuOpen ? "flex" : "none";
 
@@ -47,6 +53,7 @@
       chosenMenu = value;
     });
     game.startWelcomeScreen();
+    getUsers();
   });
 
   const showDeadMenu = (): void => {
