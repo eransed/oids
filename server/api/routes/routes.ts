@@ -1,6 +1,10 @@
 import express from "express";
 import controller from "../controllers/users";
+import { auth } from "../auth/auth.routes";
+
 const router = express.Router();
+
+router.use("/auth", auth);
 
 router.get("/users", controller.getAllUsers);
 // router.get("/posts/:id", controller.getPost);
