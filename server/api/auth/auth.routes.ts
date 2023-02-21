@@ -10,7 +10,8 @@ import {
 } from "./auth.services";
 import { findUserById } from "../users/users.services";
 import hashToken from "../utils/hashToken";
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
+import { JWT_REFRESH_SECRET } from "../../pub_config";
 
 export const auth = express.Router();
 
@@ -18,13 +19,6 @@ const {
   findUserByEmail,
   createUserByEmailAndPassword,
 } = require("../users/users.services");
-
-declare const process: {
-  env: {
-    JWT_ACCESS_SECRET: string;
-    JWT_REFRESH_SECRET: string;
-  };
-};
 
 //Register endpoint
 auth.post("/register", async (req, res, next) => {
@@ -57,8 +51,6 @@ auth.post("/register", async (req, res, next) => {
 });
 
 //User login endpoint
-// add bcrypt at the top of the file.
-
 auth.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -105,7 +97,9 @@ auth.post("/refreshToken", async (req, res, next) => {
       res.status(400);
       throw new Error("Missing refresh token.");
     }
-    const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    const payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+
     const savedRefreshToken = await findRefreshTokenById(payload.jti);
 
     if (!savedRefreshToken || savedRefreshToken.revoked === true) {

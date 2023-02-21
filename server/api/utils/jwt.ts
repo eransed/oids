@@ -2,16 +2,11 @@ import jwt from "jsonwebtoken";
 
 import type { User } from "../types/user";
 
-declare const process: {
-  env: {
-    JWT_ACCESS_SECRET: string;
-    JWT_REFRESH_SECRET: string;
-  };
-};
+import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../../pub_config";
 
 //Token valid time
 export const generateAccessToken = (user: User) => {
-  return jwt.sign({ userId: user.id }, process.env.JWT_ACCESS_SECRET, {
+  return jwt.sign({ userId: user.id }, JWT_ACCESS_SECRET, {
     expiresIn: "5m",
   });
 };
@@ -23,7 +18,7 @@ export const generateRefreshToken = (user: User, jti: string) => {
       userId: user.id,
       jti,
     },
-    process.env.JWT_REFRESH_SECRET,
+    JWT_REFRESH_SECRET,
     {
       expiresIn: "8h", //Set to 8 hour to gimmick a working day!
     }

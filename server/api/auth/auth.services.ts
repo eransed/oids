@@ -1,3 +1,4 @@
+import { JwtPayload } from "jsonwebtoken";
 import db from "../utils/db";
 import hashToken from "../utils/hashToken";
 
