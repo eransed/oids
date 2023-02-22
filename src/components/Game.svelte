@@ -1,32 +1,29 @@
 <script lang="ts">
   import Menu90 from "./shared/menu/Menu90.svelte";
 
-  import type { Button90Config } from "./interface";
+  import type { Button90Config, User } from "./interface";
 
   import { onMount } from "svelte";
 
   import { createSpaceObject } from "../lib/factory";
-  import {
-    menu,
-    showLoginPage,
-    showMenu,
-    isLoggedIn,
-    authThoken,
-  } from "../lib/stores";
+  import { menu, showLoginPage, showMenu, isLoggedIn } from "../lib/stores";
   import { getMenu } from "../lib/menu";
   import { Game } from "../lib/game";
   import { removeKeyControllers } from "../lib/input";
 
   import Modal from "./shared/Modal.svelte";
   import login from "../lib/services/auth/login";
+  import getProfile from "../lib/services/user/profile";
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const response = await login(formData);
-    if (response?.status === 200) {
+    if (response.status === 200) {
       errorText = "";
       isLoggedIn.set(true);
+      const profile = await getProfile();
+      user = profile.data;
     } else errorText = "Wrong email or password, try again!";
   };
 
@@ -34,6 +31,7 @@
   let logInPage = false;
   let loggedIn = false;
   let errorText: any = "";
+  let user: User | undefined;
 
   showMenu.set(menuOpen);
   showLoginPage.set(logInPage);
@@ -145,7 +143,12 @@
         <button>Log in</button>
       </form>
     {/if}
-    {#if loggedIn} Login success! {/if}
+    {#if loggedIn}
+      Login success!
+      <p>Welcome</p>
+      {user?.email}
+    {/if}
+
     {errorText}
   </Modal>
 {/if}
