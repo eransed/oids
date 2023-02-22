@@ -4,9 +4,12 @@ import express from "express";
 import type { Express } from "express";
 import morgan from "morgan";
 import routes from "./api/routes/routes";
+import cors from "cors";
 
 export const apiServer = () => {
   const router: Express = express();
+
+  router.use(cors());
 
   /** Logging */
   router.use(morgan("dev"));
@@ -21,11 +24,15 @@ export const apiServer = () => {
     // set the CORS headers
     res.header(
       "Access-Control-Allow-Headers",
-      "origin, X-Requested-With,Content-Type,Accept, Authorization"
+      "Origin, X-Api-Key, X-Requested-With,Content-Type,Accept, Authorization"
     );
+
     // set the CORS method headers
     if (req.method === "OPTIONS") {
-      res.header("Access-Control-Allow-Methods", "GET PATCH DELETE POST");
+      res.header(
+        "Access-Control-Allow-Methods",
+        "GET PATCH DELETE POST OPTIONS"
+      );
       return res.status(200).json({});
     }
     next();

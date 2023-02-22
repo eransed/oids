@@ -6,22 +6,49 @@
   import { onMount } from "svelte";
 
   import { createSpaceObject } from "../lib/factory";
-  import { menu, showMenu } from "../lib/stores";
+  import {
+    menu,
+    showLoginPage,
+    showMenu,
+    isLoggedIn,
+    authThoken,
+  } from "../lib/stores";
   import { getMenu } from "../lib/menu";
   import { Game } from "../lib/game";
   import { removeKeyControllers } from "../lib/input";
-  import axios from "axios";
+
+  import Modal from "./shared/Modal.svelte";
+  import login from "../lib/services/auth/login";
+
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const response = await login(formData);
+    if (response?.status === 200) {
+      errorText = "";
+      isLoggedIn.set(true);
+    } else errorText = "Wrong email or password, try again!";
+  };
 
   let menuOpen = true;
+  let logInPage = false;
+  let loggedIn = false;
+  let errorText: any = "";
+
   showMenu.set(menuOpen);
+  showLoginPage.set(logInPage);
+  isLoggedIn.set(loggedIn);
+
+  isLoggedIn.subscribe((value) => {
+    loggedIn = value;
+  });
+
+  showLoginPage.subscribe((value) => {
+    logInPage = value;
+  });
   showMenu.subscribe((value) => {
     menuOpen = value;
   });
-
-  const getUsers = async () => {
-    let response = await axios.get("http://localhost:6060/api/v1/users");
-    console.log(response);
-  };
 
   $: display = menuOpen ? "flex" : "none";
 
@@ -47,13 +74,12 @@
 
     // Setting welcome menu
     menu.set(getMenu(game));
-
+    showLoginPage.set(false);
     // Subscribing on store
     menu.subscribe((value) => {
       chosenMenu = value;
     });
     game.startWelcomeScreen();
-    getUsers();
   });
 
   const showDeadMenu = (): void => {
@@ -99,6 +125,30 @@
 </style>
 
 <canvas id="game_canvas" />
+
+{#if logInPage}
+  <Modal title="Log in">
+    {#if !loggedIn}
+      <form on:submit={handleSubmit} on:formdata>
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" />
+        </label>
+        <label>
+          Password
+          <input
+            name="password"
+            type="password"
+            autocomplete="current-password"
+          />
+        </label>
+        <button>Log in</button>
+      </form>
+    {/if}
+    {#if loggedIn} Login success! {/if}
+    {errorText}
+  </Modal>
+{/if}
 
 {#if game}
   <div id="menuWrapper">

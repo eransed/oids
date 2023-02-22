@@ -1,93 +1,98 @@
-import type { Game } from './game'
-import type { Button90Config } from '../components/interface'
-import { menu, showMenu } from './stores'
-import { createButton90Config } from './factory'
+import type { Game } from "./game";
+import type { Button90Config } from "../components/interface";
+import { authThoken, menu, showLoginPage, showMenu } from "./stores";
+import { createButton90Config } from "./factory";
 
 // Keep selected state:
-let inGameMenu: Button90Config[]
-let startupMenu: Button90Config[]
-let gameOverMenu: Button90Config[]
+let inGameMenu: Button90Config[];
+let startupMenu: Button90Config[];
+let gameOverMenu: Button90Config[];
 
 // Function returns the correct menu configuration depending on
 // the current game state:
 export function getMenu(game: Game, keepLastSelected = false) {
   // Create all buttons as variables so they can be reused in
   // multiple menu item collections (Button90Config[]'s):
-  const singlePlayer = createButton90Config('Singleplayer')
-  const settings = createButton90Config('Settings')
-  const about = createButton90Config('About')
-  const spectate = createButton90Config('Spectate', () => {
-    showMenu.set(false)
-  })
+  const singlePlayer = createButton90Config("Singleplayer");
+  const settings = createButton90Config("Settings");
+  const about = createButton90Config("About");
 
-  const multiPlayer = createButton90Config('Multiplayer', () => {
-    game.stopWelcomeScreen()
+  const login = createButton90Config("Login", () => {
+    showMenu.set(false);
+    showLoginPage.set(true);
+  });
+  const spectate = createButton90Config("Spectate", () => {
+    showMenu.set(false);
+  });
+
+  const multiPlayer = createButton90Config("Multiplayer", () => {
+    game.stopWelcomeScreen();
 
     // Start multiplayer on the game object
     // Need a timeout so the welcomeScreen gets time to stop on next render()
     setTimeout(() => {
-      game.startMultiplayer()
+      game.startMultiplayer();
       // Get and set the menu depending by the game state
       // We dont care what the user selected the last time this menu was shown:
-      menu.set(getMenu(game, false))
+      menu.set(getMenu(game, false));
 
       // Hide the menu when starting a new game:
-      showMenu.set(false)
-    }, 10)
-  })
+      showMenu.set(false);
+    }, 10);
+  });
 
-  const exitGame = createButton90Config('Quit', () => {
+  const exitGame = createButton90Config("Quit", () => {
     //player is alive again
-    game.localPlayer.isDead = false
+    game.localPlayer.isDead = false;
 
     // Start multiplayer on the game object
     // Stop the current game:
-    game.stopGame()
+    game.stopGame();
 
     // Keep the selection on the last selected item in the menu:
-    menu.set(getMenu(game, true))
+    menu.set(getMenu(game, true));
 
     // Show the menu when quitting a game:
-    showMenu.set(true)
-  })
+    showMenu.set(true);
+  });
 
   // Pick menu depending on game state:
-  let stateMenu: Button90Config[]
+  let stateMenu: Button90Config[];
 
   if (game.isRunning()) {
     // If inGameMenu is undefined we have to create it - there is no selected item
     if (!keepLastSelected || !inGameMenu) {
       // Default selected item:
-      settings.selected = true
+      settings.selected = true;
 
       // Set the module local variable
-      inGameMenu = [settings, exitGame]
+      inGameMenu = [settings, exitGame];
     }
 
     // Selected menu if game is running
-    stateMenu = inGameMenu
+    stateMenu = inGameMenu;
   } else {
     // If startupMenu is undefined we have to create it - there is no last selected item
     if (!keepLastSelected || !startupMenu) {
       // Default selected item:
-      singlePlayer.selected = true
+      singlePlayer.selected = true;
 
       // Set the module local variable:
-      startupMenu = [singlePlayer, multiPlayer, settings, about]
+      startupMenu = [singlePlayer, multiPlayer, settings, about, login];
     }
 
     // Selected menu if game is not running:
-    stateMenu = startupMenu
+    stateMenu = startupMenu;
   }
 
   // If player is dead
   if (game.localPlayer.isDead) {
-    settings.selected = false
-    spectate.selected = true
+    settings.selected = false;
+    spectate.selected = true;
 
-    stateMenu = [spectate, settings, exitGame]
+    stateMenu = [spectate, settings, exitGame];
   }
 
   // Return the collection of menu item buttons
-  return stateMenu
+  return stateMenu;
 }
