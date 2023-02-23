@@ -1,25 +1,26 @@
 import axios, { type AxiosResponse } from "axios"
-import { authThoken, refreshToken } from "../../stores"
 import { get } from "svelte/store"
+import { user } from "../../stores"
+import { hostname } from "../../constants"
 
 const getProfile = async () => {
   let status
   let data
   let error
 
-  const token = get(authThoken)
+  const token = localStorage.getItem("accessToken")
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   }
-
-  const hostname = location.hostname
 
   await axios
     .get(`http://${hostname}:6060/api/v1/users/profile`, config)
     .then((response: AxiosResponse<any>) => {
       data = response.data
       status = response.status
+      console.log(data)
+      user.set(data)
     })
     .catch((err) => {
       error = err

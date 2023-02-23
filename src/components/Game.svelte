@@ -6,7 +6,13 @@
   import { onMount } from "svelte"
 
   import { createSpaceObject } from "../lib/factory"
-  import { menu, showLoginPage, showMenu, isLoggedIn } from "../lib/stores"
+  import {
+    menu,
+    showLoginPage,
+    showMenu,
+    isLoggedIn,
+    user,
+  } from "../lib/stores"
   import { getMenu } from "../lib/menu"
   import { Game } from "../lib/game"
   import { removeKeyControllers } from "../lib/input"
@@ -14,6 +20,9 @@
   import Modal from "./shared/Modal.svelte"
   import login from "../lib/services/auth/login"
   import getProfile from "../lib/services/user/profile"
+  import { validateToken } from "../lib/services/utils/Token"
+
+  import { get } from "svelte/store"
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault()
@@ -21,17 +30,20 @@
     const response = await login(formData)
     if (response.status === 200) {
       errorText = ""
-      isLoggedIn.set(true)
-      const profile = await getProfile()
-      user = profile.data
+
+      await getProfile()
     } else errorText = "Wrong email or password, try again!"
   }
 
   let menuOpen = true
   let logInPage = false
   let loggedIn = false
+  let profile: User | undefined
   let errorText: any = ""
-  let user: User | undefined
+
+  user.subscribe((value) => {
+    profile = value
+  })
 
   showMenu.set(menuOpen)
   showLoginPage.set(logInPage)
@@ -66,6 +78,8 @@
   let chosenMenu: Button90Config[]
 
   onMount(() => {
+    validateToken()
+
     console.log("mount...")
     const localPlayer = createSpaceObject("LocalPlayer")
     game = new Game(getCanvas(), localPlayer, showDeadMenu)
@@ -144,9 +158,8 @@
       </form>
     {/if}
     {#if loggedIn}
-      Login success!
       <p>Welcome</p>
-      {user?.email}
+      {profile?.email}
     {/if}
 
     {errorText}
