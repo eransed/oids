@@ -16,7 +16,6 @@ export const validateToken = async () => {
 
   //If no refreshToken stored in localstorage -> return undefined and user needs to login
   if (!storedRefreshToken) {
-    console.log("no stored refreshToken, please login")
     return
   }
 
@@ -28,7 +27,6 @@ export const validateToken = async () => {
     .post(`http://${hostname}:6060/api/v1/auth/refreshToken`, body)
     .then(async (response: AxiosResponse<any>) => {
       if (response.status === 200) {
-        console.log("testiung")
         accessToken = response.data.accessToken
         refreshToken = response.data.refreshToken
         localStorage.setItem("refreshToken", refreshToken)
