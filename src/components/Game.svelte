@@ -6,55 +6,25 @@
   import { onMount } from "svelte"
 
   import { createSpaceObject } from "../lib/factory"
-  import {
-    menu,
-    showLoginPage,
-    showMenu,
-    isLoggedIn,
-    user,
-  } from "../lib/stores"
+  import { menu, showLoginPage, showMenu, isLoggedIn } from "../lib/stores"
   import { getMenu } from "../lib/menu"
   import { Game } from "../lib/game"
   import { removeKeyControllers } from "../lib/input"
 
-  import Modal from "./shared/Modal.svelte"
-  import login from "../lib/services/auth/login"
-  import getProfile from "../lib/services/user/profile"
   import { validateToken } from "../lib/services/utils/Token"
   import Header from "./header.svelte"
 
-  const handleSubmit = async (e: Event) => {
-    e.preventDefault()
-    const formData = new FormData(e.target as HTMLFormElement)
-    const response = await login(formData)
-    if (response.status === 200) {
-      errorText = ""
-      await getProfile()
-    } else errorText = "Wrong email or password, try again!"
-  }
-
   let menuOpen = true
-  let logInPage = false
   let loggedIn = false
-  let profile: User | undefined
-  let errorText: any = ""
-
-  user.subscribe((value) => {
-    profile = value
-  })
 
   showMenu.set(menuOpen)
-  showLoginPage.set(logInPage)
+
   isLoggedIn.set(loggedIn)
 
   isLoggedIn.subscribe((value) => {
     loggedIn = value
   })
 
-  showLoginPage.subscribe((value) => {
-    logInPage = value
-    console.log(value)
-  })
   showMenu.subscribe((value) => {
     menuOpen = value
   })
@@ -138,34 +108,6 @@
 <Header />
 
 <canvas id="game_canvas" />
-
-{#if logInPage}
-  <Modal showModal={logInPage} title={loggedIn ? "Profile" : "Log in"}>
-    {#if !loggedIn}
-      <form on:submit={handleSubmit} on:formdata>
-        <label>
-          Email
-          <input name="email" type="email" autocomplete="email" />
-        </label>
-        <label>
-          Password
-          <input
-            name="password"
-            type="password"
-            autocomplete="current-password"
-          />
-        </label>
-        <button>Log in</button>
-      </form>
-    {/if}
-    {#if loggedIn}
-      <p>Welcome</p>
-      {profile?.name}
-    {/if}
-
-    {errorText}
-  </Modal>
-{/if}
 
 {#if game}
   <div id="menuWrapper">

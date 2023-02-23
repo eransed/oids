@@ -1,17 +1,19 @@
 <script lang="ts">
-  export let title: string = "Title";
-  export let closeBtn: boolean = true;
-  export let showModal: boolean = true;
-  export let isEditable: boolean = false;
+  export let title: string = "Title"
+  export let closeBtn: boolean = true
+  export let showModal: boolean = true
+  export let isEditable: boolean = false
+  export let closedCallback: () => void = () => {}
 
-  $: display = showModal ? "flex" : "none";
+  $: display = showModal ? "flex" : "none"
 
   function handleClick() {
-    showModal = false;
+    showModal = false
+    closedCallback()
   }
 
   const modalExplain =
-    "This will be deleted if you give the <Modal> component any children </Modal>";
+    "This will be deleted if you give the <Modal> component any children </Modal>"
 </script>
 
 <style>
@@ -102,7 +104,7 @@
       <div id="headerTitle"><h3>{title}</h3></div>
 
       {#if closeBtn}<div
-          on:click|once={() => handleClick()}
+          on:click={() => handleClick()}
           on:keydown={() => {}}
           id="closeBtn"
         />{/if}
