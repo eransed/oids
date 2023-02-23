@@ -17,10 +17,6 @@ export function getMenu(game: Game, keepLastSelected = false) {
   const settings = createButton90Config("Settings")
   const about = createButton90Config("About")
 
-  const login = createButton90Config("Login", () => {
-    showMenu.set(false)
-    showLoginPage.set(true)
-  })
   const spectate = createButton90Config("Spectate", () => {
     showMenu.set(false)
   })
@@ -78,7 +74,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
       singlePlayer.selected = true
 
       // Set the module local variable:
-      startupMenu = [singlePlayer, multiPlayer, settings, about, login]
+      startupMenu = [singlePlayer, multiPlayer, settings, about]
     }
 
     // Selected menu if game is not running:

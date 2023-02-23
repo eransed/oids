@@ -21,8 +21,7 @@
   import login from "../lib/services/auth/login"
   import getProfile from "../lib/services/user/profile"
   import { validateToken } from "../lib/services/utils/Token"
-
-  import { get } from "svelte/store"
+  import Header from "./header.svelte"
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault()
@@ -30,7 +29,6 @@
     const response = await login(formData)
     if (response.status === 200) {
       errorText = ""
-
       await getProfile()
     } else errorText = "Wrong email or password, try again!"
   }
@@ -55,6 +53,7 @@
 
   showLoginPage.subscribe((value) => {
     logInPage = value
+    console.log(value)
   })
   showMenu.subscribe((value) => {
     menuOpen = value
@@ -136,10 +135,12 @@
   }
 </style>
 
+<Header />
+
 <canvas id="game_canvas" />
 
 {#if logInPage}
-  <Modal title="Log in">
+  <Modal showModal={logInPage} title={loggedIn ? "Profile" : "Log in"}>
     {#if !loggedIn}
       <form on:submit={handleSubmit} on:formdata>
         <label>
