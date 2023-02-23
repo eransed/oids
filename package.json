@@ -24,6 +24,7 @@
     "@sveltejs/vite-plugin-svelte": "^2.0.0",
     "@tsconfig/svelte": "^3.0.0",
     "@types/bcrypt": "^5.0.0",
+    "@types/cors": "^2.8.13",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/node": "^18.11.18",
     "@types/uuid": "^9.0.0",

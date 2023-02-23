@@ -1,12 +1,12 @@
 import axios, { type AxiosResponse } from "axios"
-import { authThoken, refreshToken } from "../../stores"
+import { hostname } from "../../constants"
+
+import { user, isLoggedIn } from "../../stores"
 
 const login = async (req: FormData) => {
   let status
   let data
   let error
-
-  const hostname = location.hostname
 
   const json = Object.fromEntries(req.entries())
   await axios
@@ -15,10 +15,9 @@ const login = async (req: FormData) => {
       data = response.data
       status = response.status
       if (status === 200) {
-        authThoken.set(response.data.accessToken)
-        refreshToken.set(response.data.refreshToken)
-        localStorage.setItem("authToken", response.data.accessToken)
+        localStorage.setItem("accessToken", response.data.accessToken)
         localStorage.setItem("refreshToken", response.data.refreshToken)
+        isLoggedIn.set(true)
       }
     })
     .catch((err) => {
