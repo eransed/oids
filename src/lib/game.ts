@@ -20,7 +20,7 @@ export class Game {
   bodies: SpaceObject[] = []
   all: SpaceObject[] = []
   OnDeadLocalPlayerCallBack: () => void
-  hasCalledCallback: boolean = false
+  hasCalledCallback = false
 
   constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas

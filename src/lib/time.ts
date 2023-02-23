@@ -1,19 +1,25 @@
 import type { Game } from './game'
 import { round2dec } from './math'
 import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from './webSocket'
-import { updateSpaceObject, updateSpaceObjects } from './physics'
+import { updateSpaceObjects } from './physics'
 import { clearScreen, renderFrameInfo } from './render'
-import type { SpaceObject } from './types'
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
 const fps_list: number[] = []
+const max_dt = 80
 
 export function getFrameTimeMs(timestamp: number): number {
   // todo: make sure not to return nan
   const frameTime = timestamp - prevTimestamp
   prevTimestamp = timestamp
-  return frameTime
+
+  if (frameTime < max_dt) {
+    return frameTime
+  } else {
+    console.log (`Limits frametime ${frameTime} to ${max_dt}`)
+    return max_dt
+  }
 }
 
 export function fpsCounter(frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {

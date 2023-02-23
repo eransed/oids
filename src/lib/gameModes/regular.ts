@@ -38,7 +38,7 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.mass = 0.1
   game.localPlayer.angleDegree = -120
   game.localPlayer.health = 100
-  game.localPlayer.batteryLevel = 1000
+  game.localPlayer.batteryLevel = 500
   game.localPlayer.steeringPower = 1.6
   game.localPlayer.enginePower = 0.25
   game.localPlayer.name = `P-${rndi(0, 900000)}`
@@ -119,7 +119,6 @@ export function nextFrame(game: Game, dt: number): void {
   }
   bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.4, 0, 0)
   friction(game.localPlayer)
-  bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.4, 0, 0)
 
   game.bodies.forEach((body) => {
     game.bodies.forEach((other) => {
