@@ -159,7 +159,7 @@
     {/if}
     {#if loggedIn}
       <p>Welcome</p>
-      {profile?.email}
+      {profile?.name}
     {/if}
 
     {errorText}

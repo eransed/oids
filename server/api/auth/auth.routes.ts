@@ -16,16 +16,13 @@ import { JWT_REFRESH_SECRET } from "../../pub_config"
 
 export const auth = express.Router()
 
-const {
-  findUserByEmail,
-  createUserByEmailAndPassword,
-} = require("../users/users.services")
+const { findUserByEmail, createUser } = require("../users/users.services")
 
 //Register endpoint
 auth.post("/register", async (req, res, next) => {
   try {
-    const { email, password } = req.body
-    if (!email || !password) {
+    const { email, password, name } = req.body
+    if (!email || !password || !name) {
       res.status(400)
       throw new Error("You must provide an email and a password.")
     }
@@ -37,7 +34,7 @@ auth.post("/register", async (req, res, next) => {
       throw new Error("Email already in use.")
     }
 
-    const user = await createUserByEmailAndPassword({ email, password })
+    const user = await createUser({ email, password, name })
     const jti = uuidv4()
     const { accessToken, refreshToken } = generateTokens(user, jti)
     await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id })
