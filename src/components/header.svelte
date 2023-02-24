@@ -111,9 +111,13 @@
   }
 
   .form input {
-    width: 50%;
+    width: 80%;
     padding: 8px;
     margin: 8px;
+  }
+
+  .form button {
+    width: 50%;
   }
 </style>
 
