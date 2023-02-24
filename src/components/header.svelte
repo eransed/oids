@@ -88,6 +88,9 @@
     transition: var(--borderColor);
     transition-duration: 3s;
     transition-delay: 0.5s;
+    top: 0.2em;
+    right: 0.2em;
+    position: absolute;
   }
 
   .profile::after {
@@ -123,6 +126,7 @@
 
 <div class="header">
   <div
+    title={loggedIn ? "Profile" : "Log in!"}
     class="profile"
     style="--borderColor: {borderColor};"
     on:mousedown={handleClickProfile}
