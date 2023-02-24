@@ -4,8 +4,11 @@
   export let showModal: boolean = true
   export let isEditable: boolean = false
   export let closedCallback: () => void = () => {}
+  export let backDrop: boolean = true
 
   $: display = showModal ? "flex" : "none"
+  $: width = backDrop ? "100%" : "fit-content"
+  $: height = backDrop ? "100vh" : "fit-content"
 
   function handleClick() {
     showModal = false
@@ -17,26 +20,46 @@
 </script>
 
 <style>
+  :root {
+    --width: "";
+    --height: "";
+  }
+
   #modal {
     background-color: rgb(0, 0, 0, 0.7);
     position: fixed;
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    width: 100%;
-    height: 100vh;
-    left: 0;
-    top: 0;
+    width: var(--width);
+    height: var(--height);
     z-index: 1;
     color: #000;
+    top: 0.2em;
+    right: 0.2em;
   }
 
   #modalContent {
     width: 15%;
     min-width: 200px;
     min-height: 200px;
-    background-color: #fff;
+    background-color: rgb(255, 255, 255);
+    background-image: linear-gradient(160deg, #ffffff 0%, #d6e8e5 100%);
+    opacity: 0.85;
     padding: 0.2em;
+    border-radius: 8px;
+  }
+
+  @media screen and (max-width: 600px) {
+    #modal {
+      background-color: #fff;
+      width: 100%;
+      height: 100%;
+    }
+    #modalContent {
+      width: 90vw;
+      height: 70vh;
+    }
   }
 
   #header {
@@ -98,7 +121,11 @@
   }
 </style>
 
-<div id="modal" style:display contenteditable={isEditable}>
+<div
+  id="modal"
+  style="display: {display}; --width: {width}; --height: {height}"
+  contenteditable={isEditable}
+>
   <div id="modalContent">
     <div id="header">
       <div id="headerTitle"><h3>{title}</h3></div>

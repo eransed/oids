@@ -10,7 +10,7 @@
   import getProfile from "../lib/services/user/profile"
 
   //Stores
-  import { user } from "../lib/stores"
+  import { user, userLoading } from "../lib/stores"
 
   //Interfaces
   import type { User } from "./interface"
@@ -19,6 +19,12 @@
   let errorText: any = ""
   let wrongPassword: boolean = false
   let profile: User | undefined
+  let loading: boolean
+
+  userLoading.subscribe((value) => {
+    loading = value
+  })
+
   user.subscribe((value) => {
     profile = value
   })
@@ -49,10 +55,16 @@
 </script>
 
 <style>
+  :root {
+    --borderColor: rgb(255, 165, 0);
+    --borderSize: 3px;
+    --borderStyle: solid;
+  }
+
   .header {
     position: fixed;
-    top: 1em;
-    width: 98%;
+    top: 0;
+    width: 100%;
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: wrap;
@@ -63,64 +75,96 @@
   .profile {
     height: 50px;
     width: 50px;
-    border-radius: 50%;
     display: flex;
     text-align: center;
     flex-wrap: wrap;
     justify-content: center;
     align-content: center;
-    border-radius: 50%;
-    border-width: 0.2em;
+    cursor: pointer;
+    border-radius: 100%;
     border-style: solid;
+    border-width: 3px;
+    border-color: var(--borderColor);
+    transition: var(--borderColor);
+    transition-duration: 3s;
+    transition-delay: 0.5s;
+  }
+
+  .profile::after {
+    display: block;
+    background-color: red;
+    position: absolute;
+    height: 100px;
+    content: "";
   }
 
   .avatar {
     height: 100%;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-content: center;
+  }
+
+  .form input {
+    width: 50%;
+    padding: 8px;
+    margin: 8px;
   }
 </style>
 
 <div class="header">
   <div
     class="profile"
-    style="border-color: {borderColor}"
+    style="--borderColor: {borderColor};"
     on:mousedown={handleClickProfile}
   >
     <img class="avatar" src={Avatar} alt="Avatar" />
   </div>
-  <Modal
-    title={loggedIn ? "Profile" : "Log in"}
-    {showModal}
-    closedCallback={() => {
-      showModal = false
-    }}
-  >
-    {#if !loggedIn}
-      <form on:submit={handleSubmit} on:formdata>
-        <label>
-          Email
-          <input name="email" type="email" autocomplete="email" />
-        </label>
-        <label>
-          Password
+  {#if showModal}
+    <Modal
+      backDrop={false}
+      title={loggedIn ? "Profile" : "Log in"}
+      {showModal}
+      closedCallback={() => {
+        showModal = false
+      }}
+    >
+      {#if !loggedIn}
+        <form on:submit={handleSubmit} on:formdata class="form">
           <input
+            placeholder="Email"
+            name="email"
+            type="email"
+            autocomplete="email"
+          />
+
+          <input
+            placeholder="Password"
             name="password"
             type="password"
             autocomplete="current-password"
             style="border: {wrongPassword && '2px solid red'}"
           />
-        </label>
-        <button>Log in</button>
-      </form>
-      <h6>{errorText}</h6>
-    {/if}
-    {#if loggedIn}
-      <h4>Welcome {profile?.name}</h4>
 
-      <p style="margin-top: 0.5em;">Email: {profile?.email}</p>
-      <p>
-        Created: {profile &&
-          new Intl.DateTimeFormat("en-SE").format(new Date(profile.createdAt))}
-      </p>
-    {/if}
-  </Modal>
+          <button>Log in</button>
+        </form>
+      {/if}
+      {#if loggedIn}
+        <h4>Welcome {profile?.name}</h4>
+
+        <p style="margin-top: 0.5em;">Email: {profile?.email}</p>
+        <p>
+          Created: {profile &&
+            new Intl.DateTimeFormat("en-SE").format(
+              new Date(profile.createdAt)
+            )}
+        </p>
+      {/if}
+    </Modal>
+  {/if}
 </div>

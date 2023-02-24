@@ -5,7 +5,7 @@ import type { AxiosResponse } from "axios"
 import { hostname } from "../../constants"
 import getProfile from "../user/profile"
 
-import { isLoggedIn, user } from "../../stores"
+import { isLoggedIn, user, userLoading } from "../../stores"
 
 //Check if token is valid and renew
 export const validateToken = async () => {
@@ -23,6 +23,8 @@ export const validateToken = async () => {
     refreshToken: storedRefreshToken,
   }
 
+  userLoading.set(true)
+
   await axios
     .post(`http://${hostname}:6060/api/v1/auth/refreshToken`, body)
     .then(async (response: AxiosResponse<any>) => {
@@ -35,7 +37,9 @@ export const validateToken = async () => {
         const userProfile = await getProfile()
         user.set(userProfile.data)
         isLoggedIn.set(true)
+        userLoading.set(false)
       } else {
+        userLoading.set(false)
         return
       }
     })
