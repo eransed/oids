@@ -91,6 +91,14 @@
     top: 0.2em;
     right: 0.2em;
     position: absolute;
+    transition-property: all;
+    transition: 1s;
+  }
+
+  .profile :hover {
+    opacity: 0.8;
+    transition-property: all;
+    transition: 1s;
   }
 
   .profile::after {
@@ -126,7 +134,6 @@
 
 <div class="header">
   <div
-    title={loggedIn ? "Profile" : "Log in!"}
     class="profile"
     style="--borderColor: {borderColor};"
     on:mousedown={handleClickProfile}

@@ -11,6 +11,8 @@
   import { Game } from "../lib/game"
   import { removeKeyControllers } from "../lib/input"
 
+  import { fade } from "svelte/transition"
+
   import { validateToken } from "../lib/services/utils/Token"
   import Header from "./header.svelte"
 
@@ -110,7 +112,7 @@
 <canvas id="game_canvas" />
 
 {#if game}
-  <div id="menuWrapper">
+  <div id="menuWrapper" in:fade={{ duration: 600, delay: 150 }}>
     <div id="game_menu" style:display>
       <Menu90 {menuOpen} buttons={chosenMenu} />
     </div>

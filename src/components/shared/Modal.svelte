@@ -6,6 +6,8 @@
   export let closedCallback: () => void = () => {}
   export let backDrop: boolean = true
 
+  import { fade } from "svelte/transition"
+
   $: display = showModal ? "flex" : "none"
   $: width = backDrop ? "100%" : "fit-content"
   $: height = backDrop ? "100vh" : "fit-content"
@@ -131,6 +133,8 @@
   id="modal"
   style="display: {display}; --width: {width}; --height: {height}"
   contenteditable={isEditable}
+  in:fade={{ delay: 50 }}
+  out:fade
 >
   <div id="modalContent">
     <div id="header">
