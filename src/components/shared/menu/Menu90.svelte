@@ -9,14 +9,6 @@
     return index % size
   }
 
-  $: m = { x: "", y: "" }
-
-  function handleMousemove(event: MouseEvent) {
-    m.x = event.pageX + "px"
-    m.y = event.pageY + "px"
-    console.log(m)
-  }
-
   function handleMenuSelection(event: KeyboardEvent): void {
     let selectedIndex = 0
 
@@ -55,11 +47,6 @@
 </script>
 
 <style>
-  :root {
-    --left: 0;
-    --top: 0;
-  }
-
   .buttonList {
     list-style-type: none;
     /* border: 4px solid #fff; */
@@ -74,36 +61,10 @@
     position: absolute;
     opacity: 0.8;
   }
-
-  .beam {
-    position: fixed;
-    box-shadow: 1px 1px 30px 20px rgb(132, 210, 241);
-    border-radius: 100%;
-    z-index: -1;
-    display: block;
-    content: "";
-    height: 0px;
-    width: 0px;
-    left: var(--left);
-    top: var(--top);
-    opacity: 0;
-    transition-property: opacity;
-    transition-delay: 0s;
-    transition-duration: 1.5s;
-    overflow: hidden;
-  }
-
-  .buttonList:hover .beam {
-    opacity: 1;
-    transition-property: opacity;
-    transition-delay: 0s;
-    transition-duration: 1s;
-  }
 </style>
 
-<ul class="buttonList" on:mousemove={handleMousemove}>
+<ul class="buttonList">
   {#each buttons as button}
     <li><Button90 buttonConfig={button} /></li>
   {/each}
-  <div class="beam" style="--left: {m.x}; --top: {m.y}" />
 </ul>
