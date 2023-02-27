@@ -128,10 +128,11 @@
   }
 
   .form button {
-    width: 90%;
+    width: 85%;
     padding: 7px;
     margin: 8px;
     align-self: center;
+    cursor: pointer;
   }
 </style>
 

@@ -80,18 +80,16 @@
 
   @media screen and (max-width: 600px) {
     #modal {
-      background-color: #fff;
       width: 100%;
       height: 100%;
-      background-color: rgb(255, 255, 255);
-      background-image: linear-gradient(160deg, #ffffff 0%, #d6e8e5 100%);
+      background-color: #000;
       top: 0em;
       right: 0em;
     }
     #modalContent {
       width: 90vw;
       height: 70vh;
-      background-color: #fff;
+      background-color: #000;
       background-image: "";
     }
   }
