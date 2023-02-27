@@ -19,16 +19,24 @@
 
   const modalExplain =
     "This will be deleted if you give the <Modal> component any children </Modal>"
+
+  $: m = { x: "", y: "" }
+
+  function handleMousemove(event: MouseEvent) {
+    m.x = event.offsetX + "px"
+    m.y = event.offsetY + "px"
+  }
 </script>
 
 <style>
   :root {
     --width: "";
     --height: "";
+    --left: 0;
+    --top: 0;
   }
 
   #modal {
-    background-color: rgb(0, 0, 0, 0.7);
     position: fixed;
     justify-content: center;
     align-content: center;
@@ -36,20 +44,38 @@
     width: var(--width);
     height: var(--height);
     z-index: 1;
-    color: #000;
+    color: #fff;
     top: 0.2em;
     right: 0.2em;
+    transition: all;
+    transition-duration: 1s;
+    background: #000;
+    opacity: 0.95;
+  }
+
+  #modalContent:hover {
+    background: radial-gradient(
+      800px circle at var(--left) var(--top),
+      rgba(255, 255, 255, 0.1),
+      transparent 40%
+    );
+    transition: all;
+    transition-duration: 1s;
   }
 
   #modalContent {
     width: 15%;
     min-width: 200px;
     min-height: 200px;
-    background-color: rgb(255, 255, 255);
-    background-image: linear-gradient(160deg, #ffffff 0%, #d6e8e5 100%);
+    background: radial-gradient(
+      800px circle at 100px 100px,
+      rgba(255, 255, 255, 0.05),
+      transparent 40%
+    );
     opacity: 0.85;
     padding: 0.2em;
-    border-radius: 8px;
+    transition: all;
+    transition-duration: 1s;
   }
 
   @media screen and (max-width: 600px) {
@@ -80,6 +106,7 @@
     width: 100%;
     height: 20%;
     min-height: 35px;
+    background: transparent;
     border-bottom-width: 0.2em;
     border-bottom-style: solid;
     border-bottom-color: rgb(105, 105, 105);
@@ -131,12 +158,13 @@
 
 <div
   id="modal"
-  style="display: {display}; --width: {width}; --height: {height}"
+  style="  display:  {display}; --width: {width}; --height: {height}"
   contenteditable={isEditable}
   in:fade={{ delay: 50 }}
   out:fade
+  on:mousemove={handleMousemove}
 >
-  <div id="modalContent">
+  <div id="modalContent" style="--left: {m.x}; --top: {m.y};">
     <div id="header">
       <div id="headerTitle"><h3>{title}</h3></div>
 
