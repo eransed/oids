@@ -21,13 +21,14 @@
 
 <style>
   :root {
-    --left: 0;
-    --top: 0;
+    --left: 100px;
+    --top: 100px;
   }
 
   button {
     /* border: solid; */
     padding: 15px;
+
     /* margin: 5px; */
     min-width: 180px;
     height: 60px;
@@ -39,6 +40,7 @@
     font-size: 15px;
     border-radius: 8px;
     border-width: 0px;
+    letter-spacing: calc(var(--top) * 1.05 - var(--top));
   }
 
   button.notSelected:hover {
@@ -47,11 +49,10 @@
     background: radial-gradient(
       800px circle at var(--left) var(--top),
       rgba(255, 255, 255, 0.7),
-      transparent 40%
+      transparent 100%
     );
     transition-property: all;
     transition-duration: 1s;
-    letter-spacing: 1px;
   }
 
   .notSelected {
@@ -63,7 +64,7 @@
     background: radial-gradient(
       800px circle at var(--left) var(--top),
       rgba(255, 255, 255, 0.06),
-      transparent 40%
+      transparent 100%
     );
   }
   .selected {
@@ -75,7 +76,7 @@
     background: radial-gradient(
       800px circle at var(--left) var(--top),
       rgba(255, 255, 255, 1),
-      transparent 40%
+      transparent 100%
     );
   }
 </style>
