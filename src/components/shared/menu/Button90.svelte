@@ -14,8 +14,8 @@
   $: m = { x: "", y: "" }
 
   function handleMousemove(event: MouseEvent) {
-    m.x = event.pageX + "px"
-    m.y = event.pageY + "px"
+    m.x = event.offsetX + "px"
+    m.y = event.offsetY + "px"
   }
 </script>
 
@@ -39,75 +39,60 @@
     font-size: 15px;
     border-radius: 8px;
     border-width: 0px;
-    transition-property: all;
-    transition-duration: 1s;
   }
 
-  button:hover {
+  button.notSelected:hover {
+    cursor: pointer;
+    color: #000;
+    background: radial-gradient(
+      800px circle at var(--left) var(--top),
+      rgba(255, 255, 255, 0.7),
+      transparent 40%
+    );
     transition-property: all;
     transition-duration: 1s;
-    cursor: pointer;
+    letter-spacing: 1px;
   }
 
   .notSelected {
     background-color: transparent;
     color: #fff;
     opacity: 0.85;
+    transition-property: all;
+    transition-duration: 0.5s;
+    background: radial-gradient(
+      800px circle at var(--left) var(--top),
+      rgba(255, 255, 255, 0.06),
+      transparent 40%
+    );
   }
   .selected {
-    background-color: #fff;
+    background-color: transparent;
     color: #000;
-    font-weight: bold;
-    font-size: 17px;
-    font-stretch: expanded;
-
-    /* border: solid; */
-    /* border-color: #ccc; */
-  }
-  .beam {
-    position: fixed;
-    box-shadow: 1px 1px 100px 50px rgb(132, 210, 241);
-
-    border-radius: 100%;
-    z-index: -1;
-    display: block;
-    content: "";
-    height: 0px;
-    width: 0px;
-    max-width: 100%;
-    left: var(--left);
-    top: var(--top);
-    opacity: 0;
-    transition-property: opacity;
-    transition-delay: 0s;
-    transition-duration: 1.5s;
-    overflow: hidden;
-  }
-
-  .notSelected:hover .beam {
-    opacity: 1;
-    transition-property: opacity;
-    transition-delay: 0s;
-    transition-duration: 1s;
-  }
-
-  .notSelected:hover {
-    color: #000;
+    opacity: 0.85;
+    transition-property: all;
+    transition-duration: 0.5s;
+    background: radial-gradient(
+      800px circle at var(--left) var(--top),
+      rgba(255, 255, 255, 1),
+      transparent 40%
+    );
   }
 </style>
 
-<div>
+<div on:mousemove={handleMousemove}>
   {#if buttonConfig.selected}
-    <button class="selected" on:click={buttonConfig.clickCallback}
-      >{buttonConfig.buttonText}</button
+    <button
+      style="--left: {m.x}; --top: {m.y}"
+      class="selected"
+      on:click={buttonConfig.clickCallback}>{buttonConfig.buttonText}</button
     >
   {:else}
     <button
+      style="--left: {m.x}; --top: {m.y}"
       class="notSelected"
       on:click={buttonConfig.clickCallback}
-      on:mousemove={handleMousemove}
       >{buttonConfig.buttonText}
-      <div class="beam" style="--left: {m.x}; --top: {m.y}" /></button
-    >
+    </button>
   {/if}
 </div>
