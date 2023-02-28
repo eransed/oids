@@ -8,6 +8,7 @@ import * as WelcomeScreen from './gameModes/welcomeScreen'
 import * as Regular from './gameModes/regular'
 
 export class Game {
+  private running = false
   type: GameType = GameType.SinglePlayer
   ctx: CanvasRenderingContext2D
   canvas: HTMLCanvasElement
@@ -15,12 +16,12 @@ export class Game {
   remotePlayers: SpaceObject[] = []
   lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
   segments: LineSegment[] = []
-  running = false
   gameOver = false
   bodies: SpaceObject[] = []
   all: SpaceObject[] = []
-  OnDeadLocalPlayerCallBack: () => void
   hasCalledCallback = false
+  OnDeadLocalPlayerCallBack: () => void
+  stopper: (() => Promise<number>) | null = null
 
   constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
@@ -37,12 +38,14 @@ export class Game {
     return !this.running
   }
 
-  stopGame(): void {
+  stopGame = async (): Promise<void> => {
     console.log('Stops game')
     this.running = false
-    setTimeout(() => {
-      this.startWelcomeScreen()
-    }, 20)
+    if (this.stopper) {
+      await this.stopper()
+    } else {
+      console.error('stopper not init')
+    }
   }
 
   startSingleplayer(): void {
@@ -51,12 +54,7 @@ export class Game {
 
   startWelcomeScreen(): void {
     WelcomeScreen.initWelcomeScreen(this)
-    renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
-  }
-
-  stopWelcomeScreen(): void {
-    console.log('Stops welcomescreen')
-    this.running = false
+    this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
   }
 
   clearBodies(): void {
@@ -82,7 +80,9 @@ export class Game {
     // init a regular game
     Regular.initRegularGame(this)
 
+    this.running = true
+
     // start the animation loop
-    renderLoop(this, Regular.renderFrame, Regular.nextFrame)
+    this.stopper = renderLoop(this, Regular.renderFrame, Regular.nextFrame)
   }
 }

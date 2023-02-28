@@ -60,7 +60,6 @@ export function initWelcomeScreen(game: Game): void {
     return
   }
 
-  game.running = true
   console.log("starts welcomescreen")
   game.type = GameType.WelcomeScreen
 

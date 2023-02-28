@@ -59,15 +59,15 @@
       rgba(6, 122, 201, 1) 86%,
       rgba(255, 255, 255, 0.4660633484162896) 100%
     );
-    transition-property: all;
-    transition-duration: 1s;
+    /* transition-property: all; */
+    /* transition-duration: 1s; */
   }
 
   .notSelected {
     background-color: transparent;
     opacity: 1;
-    transition-property: all;
-    transition-duration: 0.5s;
+    /* transition-property: all; */
+    /* transition-duration: 0.5s; */
     background: radial-gradient(
       800px circle at var(--left) var(--top),
       rgba(255, 255, 255, 0.06),
@@ -78,8 +78,8 @@
     background-color: transparent;
     border-color: rgb(161, 211, 247, 1);
     opacity: 1;
-    transition-property: all;
-    transition-duration: 0.5s;
+    /* transition-property: all; */
+    /* transition-duration: 0.5s; */
     background: rgb(0, 0, 0);
     background: linear-gradient(
       180deg,

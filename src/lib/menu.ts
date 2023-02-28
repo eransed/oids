@@ -21,29 +21,30 @@ export function getMenu(game: Game, keepLastSelected = false) {
     showMenu.set(false)
   })
 
-  const multiPlayer = createButton90Config("Multiplayer", () => {
-    game.stopWelcomeScreen()
+  const multiPlayer = createButton90Config("Multiplayer", async () => {
+
+    await game.stopGame()
 
     // Start multiplayer on the game object
     // Need a timeout so the welcomeScreen gets time to stop on next render()
-    setTimeout(() => {
-      game.startMultiplayer()
-      // Get and set the menu depending by the game state
-      // We dont care what the user selected the last time this menu was shown:
-      menu.set(getMenu(game, false))
+    game.startMultiplayer()
+    // Get and set the menu depending by the game state
+    // We dont care what the user selected the last time this menu was shown:
+    menu.set(getMenu(game, false))
 
-      // Hide the menu when starting a new game:
-      showMenu.set(false)
-    }, 10)
+    // Hide the menu when starting a new game:
+    showMenu.set(false)
   })
 
-  const exitGame = createButton90Config("Quit", () => {
+  const exitGame = createButton90Config("Quit", async () => {
     //player is alive again
     game.localPlayer.isDead = false
 
     // Start multiplayer on the game object
     // Stop the current game:
-    game.stopGame()
+    await game.stopGame()
+
+    game.startWelcomeScreen()
 
     // Keep the selection on the last selected item in the menu:
     menu.set(getMenu(game, true))
@@ -90,5 +91,6 @@ export function getMenu(game: Game, keepLastSelected = false) {
   }
 
   // Return the collection of menu item buttons
+  console.log ({stateMenu})
   return stateMenu
 }

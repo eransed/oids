@@ -35,11 +35,12 @@ export function fpsCounter(frameTimeMs: number, ver: string, ctx: CanvasRenderin
   }
 }
 
-export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void) {
-  console.log('renderloop start')
+export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
+  console.log('renderloop starting...')
+
+  let fid: number
 
   function update(timestamp: number): void {
-    // console.log('renderLoop runs...')
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx)
     renderFrame(game, dt)
@@ -49,13 +50,30 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     if (isConnectedToWsServer()) {
       sendSpaceObjectToBroadcastServer(game.localPlayer)
     }
-    const frameId = requestAnimationFrame(update)
-    if (game.shouldQuit() === true) {
-      console.log('renderLoop stops')
-      cancelAnimationFrame(frameId)
-      clearScreen(game.ctx)
-    }
+    fid = requestAnimationFrame(update)
     nextFrame(game, dt)
   }
+
   update(0)
+
+  console.log('renderloop started!')
+
+  function stopper(): Promise<number> {
+    return new Promise<number>((resolve) => {
+      console.log ('resolving...')
+
+      cancelAnimationFrame(fid)
+      resolve(fid)
+
+      // setTimeout(() => {
+      //   cancelAnimationFrame(fid)
+      //   resolve(fid)
+      // }, 1000)
+
+      console.log ('after resolve')
+
+    })
+  }
+
+  return stopper
 }

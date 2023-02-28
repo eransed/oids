@@ -21,7 +21,7 @@ export function getWsUrl(): URL {
   return new URL(`ws://${new URL(window.location.href).hostname}:${OIDS_WS_PORT}`)
 }
 
-function connect() {
+function connect(): Promise<WebSocket> {
   return new Promise(function (resolve, reject) {
     const wsUrl: URL = getWsUrl()
     console.log(`Connecting to ${wsUrl.href} ...`)

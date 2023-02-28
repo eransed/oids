@@ -27,10 +27,9 @@ export function initRegularGame(game: Game): void {
     return
   }
 
-  game.clearBodies()
+  // game.clearBodies()
   game.reset()
 
-  game.running = true
   console.log("starts multi")
   game.type = GameType.MultiPlayer
   if (!test()) {
