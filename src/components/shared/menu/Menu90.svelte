@@ -3,6 +3,7 @@
   import type { Button90Config } from "../../interface"
   export let menuOpen: boolean
   export let buttons: Button90Config[]
+  export let menuHeader: string = "Menu"
 
   const rotate = (index: number, size: number): number => {
     if (index < 0) return (size + (index % size)) % size
@@ -47,23 +48,47 @@
 </script>
 
 <style>
+  :root {
+    --color: rgb(99, 136, 179, 1);
+    --opacity: 0.6;
+  }
+
   .buttonList {
+    min-width: 250px;
+    min-height: fit-content;
+    padding: 20px;
     list-style-type: none;
-    /* border: 4px solid #fff; */
-    border-radius: 8px;
-    /* background: rgb(0, 0, 0);
-    background: linear-gradient(
-      133deg,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(20, 255, 0, 0.08587184873949583) 83%,
-      rgba(255, 255, 255, 0.06066176470588236) 100%
-    ); */
     position: absolute;
     opacity: 0.8;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    border-radius: 8px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--color);
+    background: rgb(25, 0, 255, 0.1);
+    box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
+    -webkit-box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
+    -moz-box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
+  }
+
+  .buttonList li {
+    width: 95%;
+    margin-top: 0.5em;
+  }
+
+  .menuHeader {
+    text-transform: uppercase;
+    font-size: 12px;
   }
 </style>
 
 <ul class="buttonList">
+  <h3 class="menuHeader">{menuHeader}</h3>
   {#each buttons as button}
     <li><Button90 buttonConfig={button} /></li>
   {/each}
