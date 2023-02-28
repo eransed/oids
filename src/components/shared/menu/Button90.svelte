@@ -32,14 +32,14 @@
     width: 100%;
     /* margin: 5px; */
 
-    height: 45px;
+    height: 4em;
     /* font-family: 'Courier New', Courier, monospace; */
     /* font-family: 'Times New Roman', Times, serif; */
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
       "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
     font-weight: bold;
     font-size: 15px;
-    border-radius: 8px;
+    border-radius: 4px;
     border-width: 2px;
     border-style: solid;
     border-color: rgb(161, 211, 247, 0.5);
@@ -47,7 +47,7 @@
     text-transform: uppercase;
     cursor: pointer;
     font-size: 12px;
-    font: menu;
+    font-weight: 900;
   }
 
   button:hover {

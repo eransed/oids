@@ -54,6 +54,7 @@
   }
 
   .buttonList {
+    zoom: 1.5;
     min-width: 250px;
     min-height: fit-content;
     padding: 20px;
@@ -66,14 +67,33 @@
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    border-radius: 8px;
+    border-radius: 4px;
     border-style: solid;
     border-width: 2px;
     border-color: var(--color);
+    outline: 2px solid rgb(36, 22, 159);
     background: rgb(25, 0, 255, 0.1);
     box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
     -webkit-box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
     -moz-box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
+  }
+
+  @media screen and (max-width: 600px) {
+    .buttonList {
+      zoom: 1;
+    }
+  }
+
+  @media screen and (max-width: 350px) {
+    .buttonList {
+      zoom: 0.8;
+    }
+  }
+
+  @media screen and (max-width: 300px) {
+    .buttonList {
+      zoom: 0.5;
+    }
   }
 
   .buttonList li {
