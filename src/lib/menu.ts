@@ -1,7 +1,7 @@
-import type { Game } from './game'
-import type { Button90Config } from '../components/interface'
-import { menu, showMenu } from './stores'
-import { createButton90Config } from './factory'
+import type { Game } from "./game"
+import type { Button90Config } from "../components/interface"
+import { menu, showLoginPage, showMenu } from "./stores"
+import { createButton90Config } from "./factory"
 
 // Keep selected state:
 let inGameMenu: Button90Config[]
@@ -13,14 +13,15 @@ let gameOverMenu: Button90Config[]
 export function getMenu(game: Game, keepLastSelected = false) {
   // Create all buttons as variables so they can be reused in
   // multiple menu item collections (Button90Config[]'s):
-  const singlePlayer = createButton90Config('Singleplayer')
-  const settings = createButton90Config('Settings')
-  const about = createButton90Config('About')
-  const spectate = createButton90Config('Spectate', () => {
+  const singlePlayer = createButton90Config("Singleplayer")
+  const settings = createButton90Config("Settings")
+  const about = createButton90Config("About")
+
+  const spectate = createButton90Config("Spectate", () => {
     showMenu.set(false)
   })
 
-  const multiPlayer = createButton90Config('Multiplayer', () => {
+  const multiPlayer = createButton90Config("Multiplayer", () => {
     game.stopWelcomeScreen()
 
     // Start multiplayer on the game object
@@ -36,7 +37,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
     }, 10)
   })
 
-  const exitGame = createButton90Config('Quit', () => {
+  const exitGame = createButton90Config("Quit", () => {
     //player is alive again
     game.localPlayer.isDead = false
 

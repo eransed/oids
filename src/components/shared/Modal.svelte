@@ -1,40 +1,97 @@
 <script lang="ts">
-  export let title: string = "Title";
-  export let closeBtn: boolean = true;
-  export let showModal: boolean = true;
-  export let isEditable: boolean = false;
+  export let title: string = "Title"
+  export let closeBtn: boolean = true
+  export let showModal: boolean = true
+  export let isEditable: boolean = false
+  export let closedCallback: () => void = () => {}
+  export let backDrop: boolean = true
 
-  $: display = showModal ? "flex" : "none";
+  import { fade } from "svelte/transition"
+
+  $: display = showModal ? "flex" : "none"
+  $: width = backDrop ? "100%" : "fit-content"
+  $: height = backDrop ? "100vh" : "fit-content"
 
   function handleClick() {
-    showModal = false;
+    showModal = false
+    closedCallback()
   }
 
   const modalExplain =
-    "This will be deleted if you give the <Modal> component any children </Modal>";
+    "This will be deleted if you give the <Modal> component any children </Modal>"
+
+  $: m = { x: "", y: "" }
+
+  function handleMousemove(event: MouseEvent) {
+    m.x = event.offsetX + "px"
+    m.y = event.offsetY + "px"
+  }
 </script>
 
 <style>
+  :root {
+    --width: "";
+    --height: "";
+    --left: 0;
+    --top: 0;
+  }
+
   #modal {
-    background-color: rgb(0, 0, 0, 0.7);
     position: fixed;
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    width: 100%;
-    height: 100vh;
-    left: 0;
-    top: 0;
+    width: var(--width);
+    height: var(--height);
     z-index: 1;
-    color: #000;
+    color: #fff;
+    top: 0.2em;
+    right: 0.2em;
+    transition: all;
+    transition-duration: 1s;
+    background: #000;
+    opacity: 0.95;
+  }
+
+  #modalContent:hover {
+    background: radial-gradient(
+      800px circle at var(--left) var(--top),
+      rgba(255, 255, 255, 0.1),
+      transparent 40%
+    );
+    transition: all;
+    transition-duration: 1s;
   }
 
   #modalContent {
     width: 15%;
     min-width: 200px;
     min-height: 200px;
-    background-color: #fff;
+    background: radial-gradient(
+      800px circle at 100px 100px,
+      rgba(255, 255, 255, 0.05),
+      transparent 40%
+    );
+    opacity: 0.85;
     padding: 0.2em;
+    transition: all;
+    transition-duration: 1s;
+  }
+
+  @media screen and (max-width: 600px) {
+    #modal {
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      top: 0em;
+      right: 0em;
+    }
+    #modalContent {
+      width: 90vw;
+      height: 70vh;
+      background-color: #000;
+      background-image: "";
+    }
   }
 
   #header {
@@ -47,6 +104,7 @@
     width: 100%;
     height: 20%;
     min-height: 35px;
+    background: transparent;
     border-bottom-width: 0.2em;
     border-bottom-style: solid;
     border-bottom-color: rgb(105, 105, 105);
@@ -96,13 +154,20 @@
   }
 </style>
 
-<div id="modal" style:display contenteditable={isEditable}>
-  <div id="modalContent">
+<div
+  id="modal"
+  style="  display:  {display}; --width: {width}; --height: {height}"
+  contenteditable={isEditable}
+  in:fade={{ delay: 50 }}
+  out:fade
+  on:mousemove={handleMousemove}
+>
+  <div id="modalContent" style="--left: {m.x}; --top: {m.y};">
     <div id="header">
       <div id="headerTitle"><h3>{title}</h3></div>
 
       {#if closeBtn}<div
-          on:click|once={() => handleClick()}
+          on:click={() => handleClick()}
           on:keydown={() => {}}
           id="closeBtn"
         />{/if}

@@ -4,5 +4,11 @@
   "description": "Object broadcast server",
   "main": "main.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "prisma": "^4.10.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.13"
+  }
 }
