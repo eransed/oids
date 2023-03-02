@@ -61,7 +61,10 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   function stopper(): Promise<number> {
     return new Promise<number>((resolve) => {
       console.log ('resolving...')
-
+      if (isConnectedToWsServer()) {
+        game.localPlayer.online = false
+        sendSpaceObjectToBroadcastServer(game.localPlayer)
+      }
       cancelAnimationFrame(fid)
       resolve(fid)
 

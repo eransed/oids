@@ -132,6 +132,7 @@ export interface SpaceObject
     Collidable,
     Bounceable,
     Boostable {
+  framesSinceLastServerUpdate: number
   name: string
   color: string
   shotsInFlight: SpaceObject[]

@@ -95,6 +95,12 @@ export function initRegularGame(game: Game): void {
   })
 }
 
+function handleRemotePlayers(remotes: SpaceObject[]): void {
+  remotes.forEach((so) => {
+    so.framesSinceLastServerUpdate++
+  })
+}
+
 export function renderFrame(game: Game, dt: number): void {
   const ctx = game.ctx
   setCanvasSize(game.ctx)
