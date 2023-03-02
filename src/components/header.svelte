@@ -51,6 +51,12 @@
     }
   }
 
+  const handleLogout = () => {
+    console.log("Logout")
+    localStorage.clear()
+    isLoggedIn.set(false)
+  }
+
   $: borderColor = loggedIn ? "rgb(144, 238, 144)" : "rgb(255, 165, 0)"
 </script>
 
@@ -183,6 +189,9 @@
               new Date(profile.createdAt)
             )}
         </p>
+        <form on:submit|preventDefault={handleLogout} class="form">
+          <button>Log out</button>
+        </form>
       {/if}
     </Modal>
   {/if}
