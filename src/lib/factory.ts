@@ -57,6 +57,8 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     inverseFireRate: 6,
     shotsPerFrame: 1,
     photonColor: '#0f0',
+    isPlaying: false,
+    framesSinceLastServerUpdate: 0
   }
 
   return spaceObject

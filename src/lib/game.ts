@@ -1,11 +1,11 @@
-import { GameType, type SpaceObject } from './types'
+import { GameType, type SpaceObject } from "./types"
 
-import { getContext } from './canvas_util'
+import { getContext } from "./canvas_util"
 
-import { LightSource, LineSegment } from './shapes'
-import { renderLoop } from './time'
-import * as WelcomeScreen from './gameModes/welcomeScreen'
-import * as Regular from './gameModes/regular'
+import { LightSource, LineSegment } from "./shapes"
+import { renderLoop } from "./time"
+import * as WelcomeScreen from "./gameModes/welcomeScreen"
+import * as Regular from "./gameModes/regular"
 
 export class Game {
   private running = false
@@ -19,11 +19,16 @@ export class Game {
   gameOver = false
   bodies: SpaceObject[] = []
   all: SpaceObject[] = []
+  shouldSendToServer = false
   hasCalledCallback = false
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
 
-  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _OnDeadLocalPlayerCallBack: () => void) {
+  constructor(
+    _canvas: HTMLCanvasElement,
+    _localPlayer: SpaceObject,
+    _OnDeadLocalPlayerCallBack: () => void
+  ) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
     this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
@@ -39,22 +44,28 @@ export class Game {
   }
 
   stopGame = async (): Promise<void> => {
-    console.log('Stops game')
+    console.log("Stops game")
     this.running = false
+    this.shouldSendToServer = false
+    this.localPlayer.isPlaying = false
     if (this.stopper) {
       await this.stopper()
     } else {
-      console.error('stopper not init')
+      console.error("stopper not init")
     }
   }
 
   startSingleplayer(): void {
-    console.log('starts single')
+    console.log("starts single")
   }
 
   startWelcomeScreen(): void {
     WelcomeScreen.initWelcomeScreen(this)
-    this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
+    this.stopper = renderLoop(
+      this,
+      WelcomeScreen.renderFrame,
+      WelcomeScreen.nextFrame
+    )
   }
 
   clearBodies(): void {
@@ -70,7 +81,7 @@ export class Game {
   }
 
   reset(): void {
-    console.log('reseting this ')
+    console.log("reseting this ")
     this.hasCalledCallback = false
     this.localPlayer.isDead = false
     this.clearBodies()
@@ -78,6 +89,8 @@ export class Game {
 
   startMultiplayer(): void {
     // init a regular game
+    this.shouldSendToServer = true
+    this.localPlayer.isPlaying = true
     Regular.initRegularGame(this)
 
     this.running = true

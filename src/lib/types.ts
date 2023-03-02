@@ -132,6 +132,7 @@ export interface SpaceObject
     Collidable,
     Bounceable,
     Boostable {
+  isPlaying: boolean
   framesSinceLastServerUpdate: number
   name: string
   color: string

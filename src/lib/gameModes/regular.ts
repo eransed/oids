@@ -95,19 +95,27 @@ export function initRegularGame(game: Game): void {
   })
 }
 
-function handleRemotePlayers(remotes: SpaceObject[]): void {
+function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext2D): SpaceObject[] {
   remotes.forEach((so) => {
     so.framesSinceLastServerUpdate++
   })
-}
 
-export function renderFrame(game: Game, dt: number): void {
-  const ctx = game.ctx
-  setCanvasSize(game.ctx)
-  game.lightSource.position = game.localPlayer.position
-  game.lightSource.direction = direction(game.localPlayer.angleDegree)
+  const stillPlaying = remotes.filter((so) => {
+    return so.isPlaying === true
+  })
 
-  game.remotePlayers.forEach((so) => {
+  const stoppedPlaying = remotes.filter((so) => {
+    return so.isPlaying === false
+  })
+
+  if (stoppedPlaying.length > 0) {
+    stoppedPlaying.forEach((s) => {
+      console.log (`${s.name} exited the game`)
+    })
+  }
+
+
+  stillPlaying.forEach((so) => {
     if (so.shape === SpaceShape.Moon) {
       renderMoon(so, ctx)
     } else {
@@ -119,6 +127,17 @@ export function renderFrame(game: Game, dt: number): void {
       }
     }
   })
+
+  return stillPlaying
+}
+
+export function renderFrame(game: Game, dt: number): void {
+  const ctx = game.ctx
+  setCanvasSize(game.ctx)
+  game.lightSource.position = game.localPlayer.position
+  game.lightSource.direction = direction(game.localPlayer.angleDegree)
+
+  game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx)
 
   renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
   game.bodies.forEach((body) => {
