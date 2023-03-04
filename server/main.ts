@@ -5,18 +5,22 @@ import { OIDS_WS_PORT } from "./pub_config";
 import { getLocalIp, ipport } from "./net";
 
 import { apiServer } from "./apiServer";
+import { start_host_server } from "./host_server";
 
-//start ApiServer
-apiServer();
+// start ApiServer
+apiServer()
 
-const pack = require("../package.json");
-const name_ver: string = pack.name + " " + pack.version;
+// start host server
+start_host_server()
 
-const WS_PORT = OIDS_WS_PORT;
+const pack = require("../package.json")
+const name_ver: string = pack.name + " " + pack.version
+
+const WS_PORT = OIDS_WS_PORT
 
 const server: WebSocketServer = new WebSocketServer({
   port: WS_PORT,
-});
+})
 
 let globalConnectedClients: Client[] = [];
 
