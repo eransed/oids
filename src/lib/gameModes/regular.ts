@@ -23,14 +23,12 @@ import { test } from "../test"
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
-    console.log("Game is already running")
     return
   }
 
   // game.clearBodies()
   game.reset()
 
-  console.log("starts multi")
   game.type = GameType.MultiPlayer
   if (!test()) {
     return
@@ -95,7 +93,10 @@ export function initRegularGame(game: Game): void {
   })
 }
 
-function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext2D): SpaceObject[] {
+function handleRemotePlayers(
+  remotes: SpaceObject[],
+  ctx: CanvasRenderingContext2D
+): SpaceObject[] {
   remotes.forEach((so) => {
     so.framesSinceLastServerUpdate++
   })
@@ -110,10 +111,9 @@ function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext
 
   if (stoppedPlaying.length > 0) {
     stoppedPlaying.forEach((s) => {
-      console.log (`${s.name} exited the game`)
+      console.log(`${s.name} exited the game`)
     })
   }
-
 
   stillPlaying.forEach((so) => {
     if (so.shape === SpaceShape.Moon) {

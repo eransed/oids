@@ -52,7 +52,6 @@
   }
 
   const handleLogout = () => {
-    console.log("Logout")
     localStorage.clear()
     isLoggedIn.set(false)
   }

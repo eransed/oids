@@ -19,7 +19,7 @@ const getProfile = async () => {
     .then((response: AxiosResponse<any>) => {
       data = response.data
       status = response.status
-      console.log(data)
+
       user.set(data)
     })
     .catch((err) => {

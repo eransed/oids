@@ -20,7 +20,6 @@ export function getFrameTimeMs(timestamp: number): number {
   if (frameTime < max_dt) {
     return frameTime
   } else {
-    console.log(`Limits frametime ${frameTime} to ${max_dt}`)
     return max_dt
   }
 }
@@ -50,8 +49,6 @@ export function renderLoop(
   renderFrame: (game: Game, dt: number) => void,
   nextFrame: (game: Game, dt: number) => void
 ): () => Promise<number> {
-  console.log("renderloop starting...")
-
   let fid: number
 
   function update(timestamp: number): void {
@@ -70,15 +67,11 @@ export function renderLoop(
 
   update(0)
 
-  console.log("renderloop started!")
-
   function stopper(): Promise<number> {
     return new Promise<number>((resolve) => {
-      console.log ('resolving...')
       if (isConnectedToWsServer()) {
-        console.log ('sending quit message')
         game.localPlayer.isPlaying = false
-        console.log({ p: game.localPlayer })
+
         sendSpaceObjectToBroadcastServer(game.localPlayer)
       }
       cancelAnimationFrame(fid)
@@ -88,8 +81,6 @@ export function renderLoop(
       //   cancelAnimationFrame(fid)
       //   resolve(fid)
       // }, 1000)
-
-      console.log("after resolve")
     })
   }
 

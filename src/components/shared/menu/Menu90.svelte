@@ -39,10 +39,8 @@
   }
 
   $: if (menuOpen) {
-    console.log("adds menu events")
     document.addEventListener("keydown", handleMenuSelection)
   } else {
-    console.log("remove menu events")
     document.removeEventListener("keydown", handleMenuSelection)
   }
 </script>

@@ -51,7 +51,6 @@
   onMount(() => {
     validateToken()
 
-    console.log("mount...")
     const localPlayer = createSpaceObject("LocalPlayer")
     game = new Game(getCanvas(), localPlayer, showDeadMenu)
 

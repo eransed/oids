@@ -22,7 +22,6 @@ export function getMenu(game: Game, keepLastSelected = false) {
   })
 
   const multiPlayer = createButton90Config("Multiplayer", async () => {
-
     await game.stopGame()
 
     // Start multiplayer on the game object
@@ -91,6 +90,6 @@ export function getMenu(game: Game, keepLastSelected = false) {
   }
 
   // Return the collection of menu item buttons
-  console.log ({stateMenu})
+
   return stateMenu
 }

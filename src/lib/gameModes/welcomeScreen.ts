@@ -56,11 +56,9 @@ export function renderFrame(game: Game, dt: number): void {
 
 export function initWelcomeScreen(game: Game): void {
   if (game.isRunning()) {
-    console.log("Game is already running")
     return
   }
 
-  console.log("starts welcomescreen")
   game.type = GameType.WelcomeScreen
 
   loadingText("Loading...", game.ctx)
@@ -90,12 +88,6 @@ export function initWelcomeScreen(game: Game): void {
   game.localPlayer.hitRadius = 50
   game.localPlayer.position.x = screenCenter.x
   game.localPlayer.position.y = screenCenter.y
-  console.log(
-    "Your ship name is: " +
-      game.localPlayer.name +
-      "\nAnd your color is: " +
-      game.localPlayer.color
-  )
 
   //Moons
   for (let n = 0; n < 10; n++) {
