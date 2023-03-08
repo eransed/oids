@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Button90Config } from "../../interface"
 
+  export let mouseTracking: boolean = true
+
   //Name explained: Tribute to 90's game button styles
 
   export let buttonConfig: Button90Config = {
@@ -14,8 +16,10 @@
   $: m = { x: "", y: "" }
 
   function handleMousemove(event: MouseEvent) {
-    m.x = event.offsetX + "px"
-    m.y = event.offsetY + "px"
+    if (mouseTracking) {
+      m.x = event.offsetX + "px"
+      m.y = event.offsetY + "px"
+    }
   }
 </script>
 

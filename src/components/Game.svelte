@@ -6,7 +6,13 @@
   import { onMount } from "svelte"
 
   import { createSpaceObject } from "../lib/factory"
-  import { menu, showLoginPage, showMenu, isLoggedIn } from "../lib/stores"
+  import {
+    menu,
+    showLoginPage,
+    showMenu,
+    isLoggedIn,
+    showLobby,
+  } from "../lib/stores"
   import { getMenu } from "../lib/menu"
   import { Game } from "../lib/game"
   import { removeKeyControllers } from "../lib/input"
@@ -19,6 +25,12 @@
 
   let menuOpen = true
   let loggedIn = false
+
+  let showGameLobby = false
+
+  showLobby.subscribe((showLobbyValue: boolean) => {
+    showGameLobby = showLobbyValue
+  })
 
   showMenu.set(menuOpen)
 
@@ -35,7 +47,7 @@
   $: display = menuOpen ? "flex" : "none"
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") menuOpen = !menuOpen
+    if (e.key === "Escape" && !showGameLobby) menuOpen = !menuOpen
   })
 
   export function getCanvas(): HTMLCanvasElement {
@@ -105,16 +117,26 @@
       align-content: center;
     }
   }
+
+  .gameLobby {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+  }
 </style>
 
 <Header />
-
-<GameLobby />
 
 <canvas id="game_canvas" />
 
 {#if game}
   <div id="menuWrapper" in:fade={{ duration: 600, delay: 150 }}>
+    {#if showGameLobby}
+      <div class="gameLobby">
+        <GameLobby />
+      </div>
+    {/if}
     <div id="game_menu" style:display>
       <Menu90 {menuOpen} buttons={chosenMenu} />
     </div>

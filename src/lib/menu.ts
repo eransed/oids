@@ -6,7 +6,6 @@ import { createButton90Config } from "./factory"
 // Keep selected state:
 let inGameMenu: Button90Config[]
 let startupMenu: Button90Config[]
-let gameOverMenu: Button90Config[]
 
 // Function returns the correct menu configuration depending on
 // the current game state:
@@ -39,6 +38,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
   )
   const joinGame = createButton90Config("Join game", () => {
     showLobby.set(true)
+    showMenu.set(false)
   })
 
   const spectate = createButton90Config("Spectate", () => {
@@ -51,6 +51,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
   })
 
   const exitGame = createButton90Config("Quit", async () => {
+    console.log("exit game")
     //player is alive again
     game.localPlayer.isDead = false
 
