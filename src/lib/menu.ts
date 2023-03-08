@@ -51,7 +51,6 @@ export function getMenu(game: Game, keepLastSelected = false) {
   })
 
   const exitGame = createButton90Config("Quit", async () => {
-    console.log("exit game")
     //player is alive again
     game.localPlayer.isDead = false
 

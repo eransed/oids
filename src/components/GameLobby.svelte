@@ -38,16 +38,27 @@
 <style>
   form {
     padding: 1em;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+  }
+
+  input {
+    padding: 1em;
   }
 
   button {
     cursor: pointer;
     background: none;
+    width: 120%;
+    margin: 0.5em;
   }
 </style>
 
 <MenuWrapper>
-  <h5>Enter game code to join lobby</h5>
+  <h5>Enter game code to join lobbys</h5>
   <form on:submit|preventDefault={handleSubmit} on:formdata>
     <input placeholder="Game code" name="gameCode" type="text" />
     <button type="submit"
