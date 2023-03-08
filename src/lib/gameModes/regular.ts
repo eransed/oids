@@ -1,25 +1,16 @@
 import type { Game } from "../game"
-import {
-  setCanvasSize,
-  getScreenRect,
-  getScreenCenterPosition,
-} from "../canvas_util"
+import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas_util"
 import { initKeyControllers, spaceObjectKeyController } from "../input"
 import { add, direction, rndfVec2d, rndi, sub } from "../math"
-import { bounceSpaceObject } from "../mechanics"
+import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, gravity, handleCollisions } from "../physics"
-import {
-  renderMoon,
-  renderExplosionFrame,
-  renderShip,
-  renderSpaceObjectStatusBar,
-  loadingText,
-} from "../render"
+import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText } from "../render"
 import { fpsCounter } from "../time"
 import { GameType, SpaceShape, type SpaceObject } from "../types"
 import { getSerVer, initMultiplayer, registerServerUpdate } from "../webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
+import { explosionDuration } from "../constants"
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
@@ -39,14 +30,12 @@ export function initRegularGame(game: Game): void {
 
   const offset = 500
 
-  game.localPlayer.position = add(
-    getScreenCenterPosition(game.ctx),
-    rndfVec2d(-offset, offset)
-  )
+  game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
 
   //Local player init
   game.reset()
   game.localPlayer.mass = 0.1
+  game.localPlayer.missileDamage = 5
   game.localPlayer.angleDegree = -120
   game.localPlayer.health = 100
   game.localPlayer.batteryLevel = 500
@@ -57,12 +46,8 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.photonColor = "#f0f"
   game.localPlayer.isLocal = true
   game.localPlayer.hitRadius = 50
-  console.log(
-    "Your ship name is: " +
-      game.localPlayer.name +
-      "\nAnd your color is: " +
-      game.localPlayer.color
-  )
+
+  console.log("Your ship name is: " + game.localPlayer.name + "\nAnd your color is: " + game.localPlayer.color)
 
   initMultiplayer()
 
@@ -93,10 +78,7 @@ export function initRegularGame(game: Game): void {
   })
 }
 
-function handleRemotePlayers(
-  remotes: SpaceObject[],
-  ctx: CanvasRenderingContext2D
-): SpaceObject[] {
+function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext2D): SpaceObject[] {
   remotes.forEach((so) => {
     so.framesSinceLastServerUpdate++
   })
@@ -120,7 +102,10 @@ function handleRemotePlayers(
       renderMoon(so, ctx)
     } else {
       if (so.health <= 0) {
-        renderExplosionFrame(so.position, ctx)
+        handleDeathExplosion(so, explosionDuration)
+        if (!so.obliterated) {
+          renderExplosionFrame(so, ctx)
+        }
         return
       } else {
         renderShip(so, ctx, false)
@@ -148,8 +133,16 @@ export function renderFrame(game: Game, dt: number): void {
   if (game.localPlayer.health <= 0) {
     //Local player is dead
     game.localPlayer.isDead = true
-    game.callBackWrapper()
-    renderExplosionFrame(game.localPlayer.position, ctx)
+
+    handleDeathExplosion(game.localPlayer, explosionDuration)
+    if (!game.localPlayer.obliterated) {
+      renderExplosionFrame(game.localPlayer, ctx)
+    } else {
+      setTimeout(() => {
+        game.callBackWrapper()
+      }, 1000)
+    }
+
     return
   } else {
     renderShip(game.localPlayer, ctx, true)

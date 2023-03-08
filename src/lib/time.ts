@@ -1,9 +1,6 @@
 import type { Game } from "./game"
 import { round2dec } from "./math"
-import {
-  isConnectedToWsServer,
-  sendSpaceObjectToBroadcastServer,
-} from "./webSocket"
+import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from "./webSocket"
 import { updateSpaceObjects } from "./physics"
 import { clearScreen, renderFrameInfo } from "./render"
 
@@ -24,19 +21,12 @@ export function getFrameTimeMs(timestamp: number): number {
   }
 }
 
-export function fpsCounter(
-  frameTimeMs: number,
-  ver: string,
-  ctx: CanvasRenderingContext2D
-): void {
+export function fpsCounter(frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const fps = round2dec(1000 / frameTimeMs, 0)
   const dt = round2dec(frameTimeMs, 0)
   fps_list.push(fps)
   if (fps_list.length >= fps_list_max_entries) {
-    const afps: number = round2dec(
-      fps_list.reduce((prev, cur) => prev + cur, 0) / fps_list_max_entries,
-      0
-    )
+    const afps: number = round2dec(fps_list.reduce((prev, cur) => prev + cur, 0) / fps_list_max_entries, 0)
     renderFrameInfo(afps, dt, ver, ctx)
     fps_list.shift()
   } else {
@@ -44,11 +34,7 @@ export function fpsCounter(
   }
 }
 
-export function renderLoop(
-  game: Game,
-  renderFrame: (game: Game, dt: number) => void,
-  nextFrame: (game: Game, dt: number) => void
-): () => Promise<number> {
+export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
 
   function update(timestamp: number): void {
@@ -85,4 +71,10 @@ export function renderLoop(
   }
 
   return stopper
+}
+
+export function delayFrames(time: number) {
+  for (let i = 0; i < time; i++) {
+    console.log("Delay")
+  }
 }

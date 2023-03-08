@@ -24,11 +24,7 @@ export class Game {
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
 
-  constructor(
-    _canvas: HTMLCanvasElement,
-    _localPlayer: SpaceObject,
-    _OnDeadLocalPlayerCallBack: () => void
-  ) {
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
     this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
@@ -60,11 +56,7 @@ export class Game {
 
   startWelcomeScreen(): void {
     WelcomeScreen.initWelcomeScreen(this)
-    this.stopper = renderLoop(
-      this,
-      WelcomeScreen.renderFrame,
-      WelcomeScreen.nextFrame
-    )
+    this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
   }
 
   clearBodies(): void {
@@ -82,6 +74,8 @@ export class Game {
   reset(): void {
     this.hasCalledCallback = false
     this.localPlayer.isDead = false
+    this.localPlayer.obliterated = false
+    this.localPlayer.deadFrameCount = 0
     this.clearBodies()
   }
 

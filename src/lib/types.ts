@@ -1,4 +1,4 @@
-import type { Steerable } from './traits/Steerable'
+import type { Steerable } from "./traits/Steerable"
 
 export enum GameType {
   SinglePlayer,
@@ -115,6 +115,8 @@ export interface Damager extends Positionable {
 export interface Damageable extends Positionable {
   health: number
   isDead: boolean
+  deadFrameCount: number
+  obliterated: boolean
 }
 
 export interface SpaceObject

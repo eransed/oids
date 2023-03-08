@@ -1,9 +1,9 @@
-import type { Bounceable, Damager, Physical, Rotatable, SpaceObject, Vec2d } from './types'
-import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub } from './math'
-import { getScreenFromCanvas } from './canvas_util'
-import { renderExplosionFrame } from './render'
-import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
-import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from './constants'
+import type { Bounceable, Damager, Physical, Rotatable, SpaceObject, Vec2d } from "./types"
+import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub } from "./math"
+import { getScreenFromCanvas } from "./canvas_util"
+import { renderExplosionFrame, renderHitExplosion } from "./render"
+import { coolDown, decayDeadShots, handleHittingShot } from "./mechanics"
+import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from "./constants"
 
 export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
   // If assigning nan to so.velocity, position or acceleration it will stay nan for ever
@@ -185,8 +185,8 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
         so1.collidingWith.push(so0)
         so0.health -= collisionFrameDamage
         so1.health -= collisionFrameDamage
-        renderExplosionFrame(so0.position, ctx)
-        renderExplosionFrame(so1.position, ctx)
+        renderHitExplosion(so0.position, ctx)
+        renderHitExplosion(so1.position, ctx)
       }
       for (const shot of so0.shotsInFlight) {
         if (shot.armedDelay < 0) {

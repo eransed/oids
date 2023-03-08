@@ -1,12 +1,12 @@
-import type { Boostable, Bounceable, Damageable, Damager, Physical, Positionable, SpaceObject, Thrustable, Vec2d } from './types'
-import type { Steerable } from './traits/Steerable'
+import type { Boostable, Bounceable, Damageable, Damager, Physical, Positionable, SpaceObject, Thrustable, Vec2d } from "./types"
+import type { Steerable } from "./traits/Steerable"
 
-import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from './math'
-import { maxHeat, shotHitReversFactor } from './constants'
-import { renderExplosionFrame } from './render'
-import { createSpaceObject } from './factory'
-import { getHeading } from './physics'
-import { randomLightGreen } from './color'
+import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from "./math"
+import { maxHeat, shotHitReversFactor } from "./constants"
+import { renderExplosionFrame, renderHitExplosion } from "./render"
+import { createSpaceObject } from "./factory"
+import { getHeading } from "./physics"
+import { randomLightGreen } from "./color"
 
 export function applyEngine(so: Thrustable & Boostable, boost = false): number {
   const consumption: number = so.enginePower * (boost ? so.booster : 1)
@@ -107,21 +107,21 @@ export function fire(so: SpaceObject): void {
     return
   }
 
-  so.framesSinceLastShot+=so.inverseFireRate
-  
+  so.framesSinceLastShot += so.inverseFireRate
+
   const shotLeftToFire = so.ammo - so.shotsPerFrame < 0 ? so.shotsPerFrame - so.ammo : so.shotsPerFrame
   for (let i = 0; i < shotLeftToFire; i++) {
     so.shotsInFlight.push(generateMissileFrom(so))
   }
-  
-  so.ammo-=shotLeftToFire
+
+  so.ammo -= shotLeftToFire
 }
 
 export function handleHittingShot(shot: SpaceObject, ctx: CanvasRenderingContext2D): void {
   if (shot.didHit) {
     shot.shotBlowFrame--
     shot.velocity = scalarMultiply(shot.velocity, shotHitReversFactor)
-    renderExplosionFrame(shot.position, ctx)
+    renderHitExplosion(shot.position, ctx)
     if (shot.shotBlowFrame < 0) {
       shot.health = 0
     }
@@ -141,6 +141,19 @@ export function decayDeadSpaceObjects(so: Damageable[]): Damageable[] {
     return e.health > 0
   })
   return out
+}
+
+export function handleDeathExplosion(so: SpaceObject, maximumIncrement: number): void {
+  //Increment deadframecount to use in render of explosion
+  if (so.obliterated) {
+    return
+  }
+
+  if (maximumIncrement < so.deadFrameCount) {
+    so.obliterated = true
+    return
+  }
+  so.deadFrameCount++
 }
 
 export function bounceSpaceObject(so: Physical & Damager & Bounceable, screen: Vec2d, energyFactor = 1, gap = 1, damageDeltaFactor: number) {

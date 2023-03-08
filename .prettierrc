@@ -1,4 +1,5 @@
 {
   "svelteSortOrder": "scripts-styles-markup",
-  "semi": false
+  "semi": false,
+  "printWidth": 160
 }
