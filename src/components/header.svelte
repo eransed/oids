@@ -54,6 +54,7 @@
   const handleLogout = () => {
     localStorage.clear()
     isLoggedIn.set(false)
+    user.set(undefined)
   }
 
   $: borderColor = loggedIn ? "rgb(144, 238, 144)" : "rgb(255, 165, 0)"

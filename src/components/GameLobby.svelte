@@ -1,20 +1,28 @@
 <script lang="ts">
   import { showLobby, showMenu } from "../lib/stores"
-  import type { Button90Config } from "./interface"
+  import type { Button90Config, User } from "./interface"
   import Button90 from "./shared/menu/Button90.svelte"
   import MenuWrapper from "./shared/MenuWrapper.svelte"
-  import { removeKeyControllers } from "../lib/input"
+  import { connectToLobbys } from "../lib/services/auth/lobby"
+  import { user } from "../lib/stores"
 
-  let showGameLobby = false
+  let lobbyStep = 0
 
-  showLobby.subscribe((showLobbyValue: boolean) => {
-    showGameLobby = showLobbyValue
+  let userData: User | undefined
+
+  user.subscribe((storedUser) => {
+    userData = storedUser
   })
 
-  const handleSubmit = (e: Event) => {
+  const handleSubmit = async (e: Event) => {
     const formData = new FormData(e.target as HTMLFormElement)
     const values = Object.fromEntries(formData.entries())
-    console.log(values)
+    console.log("Handle submit")
+    const response = await connectToLobbys(formData)
+
+    if (response.status === 200) {
+      lobbyStep = 1
+    }
   }
 
   const handleExit = () => {
@@ -30,6 +38,12 @@
 
   const submitButton: Button90Config = {
     buttonText: "Lets go!",
+    clickCallback: () => handleSubmit,
+    selected: false,
+  }
+
+  const readyButton: Button90Config = {
+    buttonText: "I'm ready!",
     clickCallback: () => handleSubmit,
     selected: false,
   }
@@ -55,15 +69,34 @@
     width: 120%;
     margin: 0.5em;
   }
+
+  .lobbyButtons > * {
+    padding: 0.5em;
+  }
 </style>
 
-<MenuWrapper>
-  <h5>Enter game code to join lobbys</h5>
-  <form on:submit|preventDefault={handleSubmit} on:formdata>
-    <input placeholder="Game code" name="gameCode" type="text" />
-    <button type="submit"
-      ><Button90 mouseTracking={false} buttonConfig={submitButton} /></button
-    >
-  </form>
-  <Button90 buttonConfig={exitButton} />
-</MenuWrapper>
+{#if lobbyStep === 0}
+  <MenuWrapper>
+    <h5>Enter game code to join lobbys</h5>
+    <form on:submit|preventDefault={handleSubmit} on:formdata>
+      <input placeholder="Game code" name="gameCode" type="text" />
+      <button type="submit"
+        ><Button90 mouseTracking={false} buttonConfig={submitButton} /></button
+      >
+    </form>
+    <Button90 buttonConfig={exitButton} />
+  </MenuWrapper>
+{/if}
+
+{#if lobbyStep === 1}
+  <MenuWrapper>
+    <h5>Welcome to the Lobby</h5>
+
+    <p>Players in lobby</p>
+    <p>{userData?.name ?? "Guest"}</p>
+    <div class="lobbyButtons">
+      <div><Button90 mouseTracking={false} buttonConfig={readyButton} /></div>
+      <div><Button90 mouseTracking={false} buttonConfig={exitButton} /></div>
+    </div>
+  </MenuWrapper>
+{/if}
