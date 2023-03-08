@@ -15,6 +15,7 @@
 
   import { validateToken } from "../lib/services/utils/Token"
   import Header from "./header.svelte"
+  import GameLobby from "./GameLobby.svelte"
 
   let menuOpen = true
   let loggedIn = false
@@ -23,12 +24,12 @@
 
   isLoggedIn.set(loggedIn)
 
-  isLoggedIn.subscribe((value) => {
-    loggedIn = value
+  isLoggedIn.subscribe((isLoggedInValue: boolean) => {
+    loggedIn = isLoggedInValue
   })
 
-  showMenu.subscribe((value) => {
-    menuOpen = value
+  showMenu.subscribe((showMenuValue: boolean) => {
+    menuOpen = showMenuValue
   })
 
   $: display = menuOpen ? "flex" : "none"
@@ -107,6 +108,8 @@
 </style>
 
 <Header />
+
+<GameLobby />
 
 <canvas id="game_canvas" />
 

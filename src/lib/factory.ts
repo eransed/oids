@@ -1,10 +1,10 @@
-import type { SpaceObject, Vec2d } from './types'
-import { SpaceShape } from './types'
-import { rndf, rndi } from './math'
-import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
-import type { Button90Config } from '../components/interface'
+import type { SpaceObject, Vec2d } from "./types"
+import { SpaceShape } from "./types"
+import { rndf, rndi } from "./math"
+import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
+import type { Button90Config } from "../components/interface"
 
-export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
+export function createSpaceObject(name = "SpaceObject"): SpaceObject {
   const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2d = {
     x: rndi(0, 100),
@@ -15,7 +15,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     isDead: false,
     mass: 1,
     size: { x: 100, y: 100 },
-    color: '#90d',
+    color: "#90d",
     position: initPos,
     velocity: initVel,
     acceleration: { x: 0, y: 0 },
@@ -40,7 +40,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     didHit: false,
     shotBlowFrame: 16,
     steer: function (direction: number, deltaTime: number): void {
-      throw new Error('Steer not implemented.')
+      throw new Error("Steer not implemented.")
     },
     motivatorBroken: false,
     motivationLevel: 100,
@@ -48,7 +48,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     isLocal: false,
     shape: SpaceShape.SmallShip,
     hitRadius: 60,
-    serverVersion: '',
+    serverVersion: "",
     booster: 2,
     framesSinceLastShot: 0,
     missileSpeed: 20,
@@ -56,18 +56,18 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     canonHeatAddedPerShot: 1.7,
     inverseFireRate: 6,
     shotsPerFrame: 1,
-    photonColor: '#0f0',
+    photonColor: "#0f0",
     isPlaying: false,
-    framesSinceLastServerUpdate: 0
+    framesSinceLastServerUpdate: 0,
   }
 
   return spaceObject
 }
 
 export function createButton90Config(
-  buttonText = 'Button90',
+  buttonText = "Button90",
   clickCallback = () => {
-    alert(`${buttonText} selected`)
+    console.log(`${buttonText} selected`)
   },
   selected = false
 ): Button90Config {
