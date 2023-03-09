@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { xlink_attr } from "svelte/internal"
   import type { Button90Config } from "../../interface"
 
   export let mouseTracking: boolean = true
@@ -21,6 +22,11 @@
       m.y = event.offsetY + "px"
     }
   }
+
+  const handleMouseLeave = (event: MouseEvent) => {
+    m.x = "0px"
+    m.y = "0px"
+  }
 </script>
 
 <style>
@@ -35,12 +41,10 @@
     padding: 10px;
     width: 100%;
     /* margin: 5px; */
-
     height: 4em;
     /* font-family: 'Courier New', Courier, monospace; */
     /* font-family: 'Times New Roman', Times, serif; */
-    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-      "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
     font-weight: bold;
     font-size: 15px;
     border-radius: 4px;
@@ -52,19 +56,16 @@
     cursor: pointer;
     font-size: 12px;
     font-weight: 900;
+
+    transition-duration: 1.8s;
   }
 
   button:hover {
     border-color: rgb(161, 211, 247, 1);
     background: rgb(0, 0, 0);
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.7375565610859729) 0%,
-      rgba(6, 122, 201, 1) 86%,
-      rgba(255, 255, 255, 0.4660633484162896) 100%
-    );
-    /* transition-property: all; */
-    /* transition-duration: 1s; */
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.7375565610859729) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%);
+    transition: all;
+    transition-duration: 0s;
   }
 
   .notSelected {
@@ -72,11 +73,7 @@
     opacity: 1;
     /* transition-property: all; */
     /* transition-duration: 0.5s; */
-    background: radial-gradient(
-      800px circle at var(--left) var(--top),
-      rgba(255, 255, 255, 0.06),
-      transparent 100%
-    );
+    background: radial-gradient(800px circle at var(--left) var(--top), rgba(255, 255, 255, 0.06), transparent 100%);
   }
   .selected {
     background-color: transparent;
@@ -85,12 +82,7 @@
     /* transition-property: all; */
     /* transition-duration: 0.5s; */
     background: rgb(0, 0, 0);
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.7375565610859729) 0%,
-      rgba(6, 122, 201, 1) 86%,
-      rgba(255, 255, 255, 0.4660633484162896) 100%
-    );
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.7375565610859729) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%);
   }
 
   .buttonWrapper {
@@ -99,19 +91,10 @@
   }
 </style>
 
-<div on:mousemove={handleMousemove} class="buttonWrapper">
+<div on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave} class="buttonWrapper">
   {#if buttonConfig.selected}
-    <button
-      style="--left: {m.x}; --top: {m.y}"
-      class="selected"
-      on:click={buttonConfig.clickCallback}>{buttonConfig.buttonText}</button
-    >
+    <button style="--left: {m.x}; --top: {m.y}" class="selected" on:click={buttonConfig.clickCallback}>{buttonConfig.buttonText}</button>
   {:else}
-    <button
-      style="--left: {m.x}; --top: {m.y}"
-      class="notSelected"
-      on:click={buttonConfig.clickCallback}
-      >{buttonConfig.buttonText}
-    </button>
+    <button style="--left: {m.x}; --top: {m.y}" class="notSelected" on:click={buttonConfig.clickCallback}>{buttonConfig.buttonText} </button>
   {/if}
 </div>

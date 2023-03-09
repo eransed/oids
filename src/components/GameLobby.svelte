@@ -80,9 +80,7 @@
     <h5>Enter game code to join lobbys</h5>
     <form on:submit|preventDefault={handleSubmit} on:formdata>
       <input placeholder="Game code" name="gameCode" type="text" />
-      <button type="submit"
-        ><Button90 mouseTracking={false} buttonConfig={submitButton} /></button
-      >
+      <button type="submit"><Button90 mouseTracking={false} buttonConfig={submitButton} /></button>
     </form>
     <Button90 buttonConfig={exitButton} />
   </MenuWrapper>

@@ -93,19 +93,30 @@
     text-transform: uppercase;
     font-size: 12px;
   }
+
+  .buttonList:hover > .button {
+    opacity: 0.6;
+    transition: all;
+    transition-duration: 0.5s;
+  }
+
+  .buttonList:hover .button:hover {
+    opacity: 1;
+    transition: all;
+    transition-duration: 0.5s;
+  }
+
+  .buttonList .button {
+    transition: all;
+    transition-duration: 0.5s;
+  }
 </style>
 
 <MenuWrapper>
   <ul class="buttonList">
     <h3 class="menuHeader">{menuHeader}</h3>
     {#each buttons as button}
-      <li
-        in:fade={{
-          duration: 800,
-          delay:
-            buttons.indexOf(button) === 0 ? 50 : 200 * buttons.indexOf(button),
-        }}
-      >
+      <li class="button">
         <Button90 buttonConfig={button} />
       </li>
     {/each}
