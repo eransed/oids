@@ -124,12 +124,13 @@ export function renderFrame(game: Game, dt: number): void {
 
   game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx)
 
-  renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
+  // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
+  // fpsCounter(dt, getSerVer(), ctx)
+
   game.bodies.forEach((body) => {
     renderMoon(body, ctx)
   })
 
-  fpsCounter(dt, getSerVer(), ctx)
   if (game.localPlayer.health <= 0) {
     //Local player is dead
     game.localPlayer.isDead = true
