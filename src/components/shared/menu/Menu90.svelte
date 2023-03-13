@@ -64,6 +64,7 @@
     flex-wrap: wrap;
     justify-content: center;
     align-content: center;
+    z-index: 1;
   }
 
   @media screen and (max-width: 600px) {

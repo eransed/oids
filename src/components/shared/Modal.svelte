@@ -17,8 +17,7 @@
     closedCallback()
   }
 
-  const modalExplain =
-    "This will be deleted if you give the <Modal> component any children </Modal>"
+  const modalExplain = "This will be deleted if you give the <Modal> component any children </Modal>"
 
   $: m = { x: "", y: "" }
 
@@ -43,7 +42,7 @@
     flex-wrap: wrap;
     width: var(--width);
     height: var(--height);
-    z-index: 1;
+    z-index: 2;
     color: #fff;
     top: 0.2em;
     right: 0.2em;
@@ -54,11 +53,7 @@
   }
 
   #modalContent:hover {
-    background: radial-gradient(
-      800px circle at var(--left) var(--top),
-      rgba(255, 255, 255, 0.1),
-      transparent 40%
-    );
+    background: radial-gradient(800px circle at var(--left) var(--top), rgba(255, 255, 255, 0.1), transparent 40%);
     transition: all;
     transition-duration: 1s;
   }
@@ -67,11 +62,7 @@
     width: 15%;
     min-width: 200px;
     min-height: 200px;
-    background: radial-gradient(
-      800px circle at 100px 100px,
-      rgba(255, 255, 255, 0.05),
-      transparent 40%
-    );
+    background: radial-gradient(800px circle at 100px 100px, rgba(255, 255, 255, 0.05), transparent 40%);
     opacity: 0.85;
     padding: 0.2em;
     transition: all;
@@ -80,16 +71,19 @@
 
   @media screen and (max-width: 600px) {
     #modal {
-      width: 100%;
-      height: 100%;
-      background-color: #000;
+      opacity: 1;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
       top: 0em;
       right: 0em;
+      z-index: 1;
     }
     #modalContent {
-      width: 90vw;
-      height: 70vh;
-      background-color: #000;
+      opacity: 1;
+      width: 98vw;
+      height: 98vh;
+      background: #000;
       background-image: "";
     }
   }
@@ -166,11 +160,7 @@
     <div id="header">
       <div id="headerTitle"><h3>{title}</h3></div>
 
-      {#if closeBtn}<div
-          on:click={() => handleClick()}
-          on:keydown={() => {}}
-          id="closeBtn"
-        />{/if}
+      {#if closeBtn}<div on:click={() => handleClick()} on:keydown={() => {}} id="closeBtn" />{/if}
     </div>
 
     <slot><p>{modalExplain}</p></slot>

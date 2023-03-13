@@ -80,6 +80,34 @@
     padding-left: calc(100vw);
     transition: all;
     transition-duration: 1s;
+    transition-timing-function: ease-in;
+  }
+
+  .header:hover {
+    padding: 0em;
+    transition: padding;
+    transition-duration: 0.8s;
+  }
+
+  .header > * {
+    opacity: 0.2;
+    transition: all;
+    transition-duration: 1s;
+    margin: 1em;
+  }
+
+  .header:hover > * {
+    opacity: 0.5;
+    transition: all;
+    transition-duration: 1s;
+  }
+
+  .header:hover > *:hover {
+    filter: saturate(5);
+    opacity: 1;
+    margin-top: 1.2em;
+    transition: all;
+    transition-duration: 1s;
   }
 
   .header:first-child::before {
@@ -94,59 +122,18 @@
     margin-right: 102vw;
     margin-top: 0.65em;
     transition: all;
-    transition-duration: 1s;
+    transition-duration: 0.8s;
+    transition-timing-function: ease;
     border-top: 4px solid rgb(47, 167, 252);
     border-bottom: 4px solid rgb(47, 167, 252);
     transform: rotate(0deg);
-    transition-delay: 0.1s;
-    cursor: pointer;
+    transition-delay: 0.4s;
   }
 
   .header:hover:first-child::before {
-    opacity: 0;
-    content: "";
-    font-size: 3em;
-    /* border-left: 2px solid cadetblue; */
-    position: absolute;
-    width: 0.8em;
-    height: 0.2em;
-    right: 0px;
-    margin-right: 0vw;
-    margin-top: 0.65em;
-    transition: all;
-    transition-duration: 1s;
-    border-top: 4px solid rgb(47, 167, 252);
-    border-bottom: 4px solid rgb(47, 167, 252);
-    transform: rotate(0deg);
-    transition-delay: 0s;
-    cursor: pointer;
-  }
-
-  .header:hover {
-    padding: 0em;
-    transition: padding;
-    transition-duration: 1s;
-  }
-
-  .header > * {
-    opacity: 0.2;
-    transition: all;
-    transition-duration: 1s;
-    margin: 1em;
-  }
-
-  .header:hover > * {
-    opacity: 0.5;
-    transition: all;
-    transition-duration: 0.5s;
-  }
-
-  .header:hover > *:hover {
-    filter: saturate(5);
-    opacity: 1;
-    margin-top: 1.2em;
-    transition: all;
-    transition-duration: 0.5s;
+    margin-right: -10vw;
+    transition: margin;
+    transition-duration: 0.8s;
   }
 
   .profile {
@@ -165,9 +152,7 @@
     transition: var(--borderColor);
     transition-duration: 3s;
     transition-delay: 0.5s;
-
     transition-property: all;
-    transition: 1s;
   }
 
   .profile :hover {
