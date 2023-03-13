@@ -6,6 +6,8 @@ import { getConnInfo, getReadyStateText } from "./webSocket"
 import { LineSegment } from "./shapes"
 import type { Game } from "./game"
 import { delayFrames } from "./time"
+import * as ship from "../assets/ship.svg"
+import "../app.css"
 
 export function clearScreen(ctx: CanvasRenderingContext2D, color = "#000") {
   ctx.fillStyle = color
@@ -155,6 +157,10 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   const shipSize: Vec2d = { x: 60, y: 100 }
   so.size = shipSize
 
+  let shipSvg = new Image()
+
+  shipSvg.src = ship.default
+
   // Render hit box of ship after contex restore
   //renderHitRadius(so, ctx)
 
@@ -167,15 +173,20 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   ctx.strokeStyle = so.colliding ? "#f00" : so.color
   ctx.fillStyle = so.colliding ? "#f00" : so.color
   ctx.beginPath()
-  ctx.moveTo(0, (-shipSize.y / 3) * scale)
-  ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
-  ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
-  ctx.lineTo(0, (-shipSize.y / 3) * scale)
+  // ctx.moveTo(0, (-shipSize.y / 3) * scale)
+  // ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
+  // ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
+  // ctx.lineTo(0, (-shipSize.y / 3) * scale)
+
   ctx.closePath()
 
   if (renderAsLocalPlayer) {
+    ctx.filter = "hue-rotate(250deg)"
+    ctx.drawImage(shipSvg, -75, -75, 150, 150)
     ctx.stroke()
   } else {
+    ctx.filter = "hue-rotate(360deg)"
+    ctx.drawImage(shipSvg, -75, -75, 150, 150)
     ctx.fill()
   }
 
