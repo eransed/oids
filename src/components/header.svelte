@@ -13,7 +13,11 @@
   import { user, userLoading } from "../lib/stores"
 
   //Interfaces
-  import type { User } from "./interface"
+  import type { Button90Config, User } from "./interface"
+  import Button90 from "./shared/menu/Button90.svelte"
+
+  //Svelte fx
+  import { fade } from "svelte/transition"
 
   let showModal: boolean | undefined = false
   let errorText: any = ""
@@ -57,6 +61,18 @@
     user.set(undefined)
   }
 
+  const logOutButton: Button90Config = {
+    buttonText: "Log out",
+    clickCallback: () => handleLogout(),
+    selected: false,
+  }
+
+  const loginButton: Button90Config = {
+    buttonText: "Log in",
+    clickCallback: () => {},
+    selected: false,
+  }
+
   $: borderColor = loggedIn ? "rgb(144, 238, 144)" : "rgb(255, 165, 0)"
 </script>
 
@@ -84,10 +100,10 @@
     flex-wrap: wrap;
     color: #fff;
     overflow: hidden;
-    z-index: 1;
+    z-index: 2;
     transition: all;
     transition-duration: 0s;
-    transition-timing-function: ease-in;
+    transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
   }
 
   .header > * {
@@ -141,7 +157,8 @@
     transition-delay: 0.2s;
   }
 
-  .profile {
+  .profile,
+  .modalProfile {
     height: 50px;
     width: 50px;
     display: flex;
@@ -159,9 +176,26 @@
     transition-duration: 1s;
     transition-delay: 0.2s;
     transition-property: all;
+    transition-timing-function: cubic-bezier(1, -0.53, 0.26, 1.1);
   }
 
-  .profile :hover {
+  .modalProfile {
+    height: 40px;
+    width: 40px;
+    top: 0.5em;
+    left: 6em;
+    cursor: auto;
+    filter: saturate(2);
+  }
+
+  .modalProfile:hover {
+    transition-property: all;
+    transition: 0.5s;
+    cursor: pointer;
+    width: fit-content;
+  }
+
+  .profile:hover {
     opacity: 0.8;
     transition-property: all;
     transition: 0.5s;
@@ -193,12 +227,24 @@
     margin: 8px;
   }
 
-  .form button {
-    width: 85%;
-    padding: 7px;
-    margin: 8px;
-    align-self: center;
-    cursor: pointer;
+  .row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .column {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .column p {
+    padding-left: 0.6em;
   }
 </style>
 
@@ -218,24 +264,49 @@
         }}
       >
         {#if !loggedIn}
-          <form on:submit={handleSubmit} on:formdata class="form">
-            <input placeholder="Email" name="email" type="email" autocomplete="email" />
+          <div in:fade={{ duration: 600, delay: 150 }}>
+            <form on:submit|preventDefault={handleSubmit} on:formdata class="form">
+              <input placeholder="Email" name="email" type="email" autocomplete="email" />
 
-            <input placeholder="Password" name="password" type="password" autocomplete="current-password" style="border: {wrongPassword && '2px solid red'}" />
+              <input
+                placeholder="Password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                style="border: {wrongPassword && '2px solid red'}"
+              />
 
-            <button>Log in</button>
-          </form>
+              <Button90 buttonConfig={loginButton} mouseTracking={false} />
+            </form>
+          </div>
         {/if}
         {#if loggedIn}
-          <h4>Welcome {profile?.name}</h4>
+          <div in:fade={{ duration: 600, delay: 150 }}>
+            <div class="row">
+              <div class="column" style={"flex: 0.5;"}>
+                <div class="modalProfile" style="--borderColor: {borderColor};">
+                  <img class="avatar" src={Avatar} alt="Avatar" />
+                </div>
+              </div>
+              <div class="column">
+                <div class="profileName">
+                  {profile?.name}
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="column">
+                <div>
+                  <p style="margin-top: 0.5em;">Email: {profile?.email}</p>
+                  <p>
+                    Created: {profile && new Intl.DateTimeFormat("en-SE").format(new Date(profile.createdAt))}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-          <p style="margin-top: 0.5em;">Email: {profile?.email}</p>
-          <p>
-            Created: {profile && new Intl.DateTimeFormat("en-SE").format(new Date(profile.createdAt))}
-          </p>
-          <form on:submit|preventDefault={handleLogout} class="form">
-            <button>Log out</button>
-          </form>
+            <Button90 buttonConfig={logOutButton} mouseTracking={false} />
+          </div>
         {/if}
       </Modal>
     {/if}

@@ -50,12 +50,9 @@
     transition-duration: 1s;
     background: #000;
     opacity: 0.95;
-  }
-
-  #modalContent:hover {
-    background: radial-gradient(800px circle at var(--left) var(--top), rgba(255, 255, 255, 0.1), transparent 40%);
-    transition: all;
-    transition-duration: 1s;
+    border: 2px solid rgb(99, 136, 179, 1);
+    border-radius: 4px;
+    outline: 2px solid rgb(36, 22, 159);
   }
 
   #modalContent {
@@ -64,7 +61,7 @@
     min-height: 200px;
     background: radial-gradient(800px circle at 100px 100px, rgba(255, 255, 255, 0.05), transparent 40%);
     opacity: 0.85;
-    padding: 0.2em;
+    padding: 1em;
     transition: all;
     transition-duration: 1s;
   }
@@ -78,13 +75,20 @@
       top: 0em;
       right: 0em;
       z-index: 1;
+      justify-content: center;
+      align-content: center;
+      flex-wrap: wrap;
     }
     #modalContent {
       opacity: 1;
-      width: 98vw;
+      width: 50%;
       height: 98vh;
       background: #000;
       background-image: "";
+      justify-content: center;
+      align-content: center;
+      flex-wrap: wrap;
+      display: flex;
     }
   }
 
@@ -96,12 +100,9 @@
     flex-wrap: wrap;
     top: 0;
     width: 100%;
-    height: 20%;
+    height: 10%;
     min-height: 35px;
     background: transparent;
-    border-bottom-width: 0.2em;
-    border-bottom-style: solid;
-    border-bottom-color: rgb(105, 105, 105);
   }
 
   #headerTitle {
@@ -109,6 +110,7 @@
   }
 
   #closeBtn {
+    opacity: 0.5;
     cursor: pointer;
     position: absolute;
     right: 1px;
@@ -116,10 +118,13 @@
     width: 1.5em;
     height: 1.5em;
     border-radius: 50%;
-    border-color: #000;
-    border-style: solid;
-    border-width: 0.2em;
+    border-color: rgb(47, 167, 252, 1);
+    border-style: ridge;
+    border-width: 0.15em;
     background-color: #000;
+    transition: all;
+    transition-duration: 1s;
+    transition-timing-function: cubic-bezier(1, -2, 0.26, 1.1);
   }
 
   #closeBtn::before,
@@ -144,7 +149,12 @@
   }
 
   #closeBtn:hover {
-    transform: rotate(10deg);
+    transform: rotate(90deg);
+    transition: transform opacity;
+    transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
+    transition-duration: 1s;
+    opacity: 1;
+    border-color: rgb(47, 167, 252, 1);
   }
 </style>
 
