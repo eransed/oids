@@ -12,6 +12,7 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
   }
 
   const spaceObject: SpaceObject = {
+    sessionId: undefined,
     acceleration: { x: 0, y: 0 },
     ammo: 1000,
     angleDegree: -90,

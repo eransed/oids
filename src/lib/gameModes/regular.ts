@@ -57,6 +57,7 @@ export function initRegularGame(game: Game): void {
 
   const bodies: SpaceObject[] = []
 
+  game.remotePlayers = []
   game.all = game.all.concat(bodies)
   game.all.push(game.localPlayer)
 
@@ -66,12 +67,14 @@ export function initRegularGame(game: Game): void {
         if (!so.online) {
           console.log(`${so.name} went offline`)
         }
-        game.remotePlayers[i] = so
+        if (so.sessionId === game.localPlayer.sessionId) {
+          game.remotePlayers[i] = so
 
-        return
+          return
+        }
       }
     }
-    if (so.name !== game.localPlayer.name) {
+    if (so.name !== game.localPlayer.name && so.sessionId === game.localPlayer.sessionId) {
       game.remotePlayers.push(so)
       console.log(`New ship online: ${so.name}`)
     }

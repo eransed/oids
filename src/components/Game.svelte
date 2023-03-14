@@ -6,13 +6,7 @@
   import { onMount } from "svelte"
 
   import { createSpaceObject } from "../lib/factory"
-  import {
-    menu,
-    showLoginPage,
-    showMenu,
-    isLoggedIn,
-    showLobby,
-  } from "../lib/stores"
+  import { menu, showLoginPage, showMenu, isLoggedIn, showLobby } from "../lib/stores"
   import { getMenu } from "../lib/menu"
   import { Game } from "../lib/game"
   import { removeKeyControllers } from "../lib/input"
@@ -134,7 +128,7 @@
   <div id="menuWrapper" in:fade={{ duration: 600, delay: 150 }}>
     {#if showGameLobby}
       <div class="gameLobby">
-        <GameLobby />
+        <GameLobby {game} />
       </div>
     {/if}
     <div id="game_menu" style:display>

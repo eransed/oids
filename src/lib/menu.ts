@@ -22,24 +22,19 @@ export function getMenu(game: Game, keepLastSelected = false) {
   const createGame = createButton90Config(
     "Create game",
     async () => {
-      await game.stopGame()
-
-      // Start multiplayer on the game object
-      // Need a timeout so the welcomeScreen gets time to stop on next render()
-      game.startMultiplayer()
-      // Get and set the menu depending by the game state
-      // We dont care what the user selected the last time this menu was shown:
-      menu.set(getMenu(game, false))
-
-      // Hide the menu when starting a new game:
+      showLobby.set(true)
       showMenu.set(false)
     },
     true
   )
-  const joinGame = createButton90Config("Join game", () => {
-    showLobby.set(true)
-    showMenu.set(false)
-  })
+  const joinGame = createButton90Config(
+    "Join game",
+    () => {
+      showLobby.set(true)
+      showMenu.set(false)
+    },
+    true
+  )
 
   const spectate = createButton90Config("Spectate", () => {
     showMenu.set(false)

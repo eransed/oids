@@ -5,8 +5,14 @@
   import MenuWrapper from "./shared/MenuWrapper.svelte"
   import { connectToLobbys } from "../lib/services/auth/lobby"
   import { user } from "../lib/stores"
+  import type { Game } from "../lib/game"
+  import { hostname } from "../lib/constants"
+
+  export let game: Game
 
   let lobbyStep = 0
+
+  console.log(game)
 
   let userData: User | undefined
 
@@ -17,12 +23,26 @@
   const handleSubmit = async (e: Event) => {
     const formData = new FormData(e.target as HTMLFormElement)
     const values = Object.fromEntries(formData.entries())
-    console.log("Handle submit")
-    const response = await connectToLobbys(formData)
 
-    if (response.status === 200) {
-      lobbyStep = 1
+    const gameCode = values.gameCode.toString()
+
+    const gameCodeLength = gameCode.length
+
+    console.log(gameCode)
+
+    if (gameCodeLength >= 4) {
+      game.localPlayer.sessionId = gameCode
+      game.startMultiplayer()
+      showLobby.set(false)
+
+      //history.replaceState(null, "", `/${gameCode}`)
     }
+
+    // const response = await connectToLobbys(formData)
+
+    // if (response.status === 200) {
+    //   lobbyStep = 1
+    // }
   }
 
   const handleExit = () => {
@@ -77,16 +97,16 @@
 
 {#if lobbyStep === 0}
   <MenuWrapper>
-    <h5>Enter game code to join lobbys</h5>
+    <h5>Enter game code to create or join a game</h5>
     <form on:submit|preventDefault={handleSubmit} on:formdata>
-      <input placeholder="Game code" name="gameCode" type="text" />
+      <input placeholder="Game code" name="gameCode" type="text" minlength="4" />
       <button type="submit"><Button90 mouseTracking={false} buttonConfig={submitButton} /></button>
     </form>
     <Button90 buttonConfig={exitButton} />
   </MenuWrapper>
 {/if}
 
-{#if lobbyStep === 1}
+<!-- {#if lobbyStep === 1}
   <MenuWrapper>
     <h5>Welcome to the Lobby</h5>
 
@@ -97,4 +117,4 @@
       <div><Button90 mouseTracking={false} buttonConfig={exitButton} /></div>
     </div>
   </MenuWrapper>
-{/if}
+{/if} -->

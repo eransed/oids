@@ -54,6 +54,7 @@ export interface Motivated {
 export interface Remote {
   online: boolean
   serverVersion: string
+  sessionId: string | undefined
 }
 
 export interface Local {

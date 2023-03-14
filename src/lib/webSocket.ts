@@ -18,9 +18,7 @@ export function getConnInfo(): string {
 }
 
 export function getWsUrl(): URL {
-  return new URL(
-    `ws://${new URL(window.location.href).hostname}:${OIDS_WS_PORT}`
-  )
+  return new URL(`ws://${new URL(window.location.href).hostname}:${OIDS_WS_PORT}`)
 }
 
 function connect(): Promise<WebSocket> {
@@ -30,6 +28,7 @@ function connect(): Promise<WebSocket> {
     socket = new WebSocket(wsUrl)
     socket.onopen = function () {
       resolve(socket)
+      console.log(socket)
     }
     socket.onerror = function (err) {
       reject(err)
@@ -84,9 +83,7 @@ export function sendSpaceObjectToBroadcastServer(so: SpaceObject): void {
   sendToServer(so)
 }
 
-export const registerServerUpdate = (
-  callback: (so: SpaceObject) => void
-): void => {
+export const registerServerUpdate = (callback: (so: SpaceObject) => void): void => {
   socket.addEventListener("message", (event) => {
     const data = JSON.parse(event.data)
     if (data.serverVersion) {
