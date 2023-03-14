@@ -67,39 +67,41 @@
     --borderStyle: solid;
   }
 
+  .headerWrapper {
+    display: flex;
+    width: fit-content;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
   .header {
     position: fixed;
     top: 0;
-    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     flex-wrap: wrap;
     color: #fff;
+    overflow: hidden;
     z-index: 1;
-    padding-left: calc(100vw);
     transition: all;
-    transition-duration: 1s;
+    transition-duration: 0s;
     transition-timing-function: ease-in;
-  }
-
-  .header:hover {
-    padding: 0em;
-    transition: padding;
-    transition-duration: 0.8s;
   }
 
   .header > * {
     opacity: 0.2;
     transition: all;
-    transition-duration: 1s;
+    transition-duration: 0s;
     margin: 1em;
   }
 
   .header:hover > * {
     opacity: 0.5;
     transition: all;
-    transition-duration: 1s;
+    transition-duration: 0.5s;
+    margin-right: 1em;
   }
 
   .header:hover > *:hover {
@@ -115,11 +117,11 @@
     content: "";
     font-size: 3em;
     /* border-left: 2px solid cadetblue; */
-    position: absolute;
+    position: fixed;
     width: 0.8em;
     height: 0.2em;
-    right: 0px;
-    margin-right: 102vw;
+    right: 10px;
+    /* margin-right: 102vw; */
     margin-top: 0.65em;
     transition: all;
     transition-duration: 0.8s;
@@ -128,18 +130,22 @@
     border-bottom: 4px solid rgb(47, 167, 252);
     transform: rotate(0deg);
     transition-delay: 0.4s;
+    cursor: pointer;
   }
 
   .header:hover:first-child::before {
-    margin-right: -10vw;
-    transition: margin;
-    transition-duration: 0.8s;
+    margin-right: 0;
+    opacity: 0;
+    transition: all;
+    transition-duration: 0.5s;
+    transition-delay: 0.2s;
   }
 
   .profile {
     height: 50px;
     width: 50px;
     display: flex;
+    margin-right: -20vw;
     text-align: center;
     flex-wrap: wrap;
     justify-content: center;
@@ -150,15 +156,15 @@
     border-width: 3px;
     border-color: var(--borderColor);
     transition: var(--borderColor);
-    transition-duration: 3s;
-    transition-delay: 0.5s;
+    transition-duration: 1s;
+    transition-delay: 0.2s;
     transition-property: all;
   }
 
   .profile :hover {
     opacity: 0.8;
     transition-property: all;
-    transition: 1s;
+    transition: 0.5s;
   }
 
   .profile::after {
@@ -196,40 +202,42 @@
   }
 </style>
 
-<div class="header">
-  <div class="profile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-    <img class="avatar" src={Avatar} alt="Avatar" />
+<div class="headerWrapper">
+  <div class="header">
+    <div class="profile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
+      <img class="avatar" src={Avatar} alt="Avatar" />
+    </div>
+
+    {#if showModal}
+      <Modal
+        backDrop={false}
+        title={loggedIn ? "Profile" : "Log in"}
+        {showModal}
+        closedCallback={() => {
+          showModal = false
+        }}
+      >
+        {#if !loggedIn}
+          <form on:submit={handleSubmit} on:formdata class="form">
+            <input placeholder="Email" name="email" type="email" autocomplete="email" />
+
+            <input placeholder="Password" name="password" type="password" autocomplete="current-password" style="border: {wrongPassword && '2px solid red'}" />
+
+            <button>Log in</button>
+          </form>
+        {/if}
+        {#if loggedIn}
+          <h4>Welcome {profile?.name}</h4>
+
+          <p style="margin-top: 0.5em;">Email: {profile?.email}</p>
+          <p>
+            Created: {profile && new Intl.DateTimeFormat("en-SE").format(new Date(profile.createdAt))}
+          </p>
+          <form on:submit|preventDefault={handleLogout} class="form">
+            <button>Log out</button>
+          </form>
+        {/if}
+      </Modal>
+    {/if}
   </div>
-
-  {#if showModal}
-    <Modal
-      backDrop={false}
-      title={loggedIn ? "Profile" : "Log in"}
-      {showModal}
-      closedCallback={() => {
-        showModal = false
-      }}
-    >
-      {#if !loggedIn}
-        <form on:submit={handleSubmit} on:formdata class="form">
-          <input placeholder="Email" name="email" type="email" autocomplete="email" />
-
-          <input placeholder="Password" name="password" type="password" autocomplete="current-password" style="border: {wrongPassword && '2px solid red'}" />
-
-          <button>Log in</button>
-        </form>
-      {/if}
-      {#if loggedIn}
-        <h4>Welcome {profile?.name}</h4>
-
-        <p style="margin-top: 0.5em;">Email: {profile?.email}</p>
-        <p>
-          Created: {profile && new Intl.DateTimeFormat("en-SE").format(new Date(profile.createdAt))}
-        </p>
-        <form on:submit|preventDefault={handleLogout} class="form">
-          <button>Log out</button>
-        </form>
-      {/if}
-    </Modal>
-  {/if}
 </div>
