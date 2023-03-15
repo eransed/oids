@@ -19,30 +19,13 @@ export function getMenu(game: Game, keepLastSelected = false) {
   const settings = createButton90Config("Settings")
   const about = createButton90Config("About")
 
-  const createGame = createButton90Config(
-    "Create game",
-    async () => {
-      showLobby.set(true)
-      showMenu.set(false)
-    },
-    true
-  )
-  const joinGame = createButton90Config(
-    "Join game",
-    () => {
-      showLobby.set(true)
-      showMenu.set(false)
-    },
-    true
-  )
-
   const spectate = createButton90Config("Spectate", () => {
     showMenu.set(false)
   })
 
   const multiPlayer = createButton90Config("Multiplayer", async () => {
-    startupMenu = [createGame, joinGame, exitGame]
-    menu.set(startupMenu)
+    showLobby.set(true)
+    showMenu.set(false)
   })
 
   const exitGame = createButton90Config("Quit", async () => {

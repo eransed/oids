@@ -12,8 +12,6 @@
 
   let lobbyStep = 0
 
-  console.log(game)
-
   let userData: User | undefined
 
   user.subscribe((storedUser) => {
@@ -100,13 +98,13 @@
     <h5>Enter game code to create or join a game</h5>
     <form on:submit|preventDefault={handleSubmit} on:formdata>
       <input placeholder="Game code" name="gameCode" type="text" minlength="4" />
-      <button type="submit"><Button90 mouseTracking={false} buttonConfig={submitButton} /></button>
+      <Button90 mouseTracking={false} buttonConfig={submitButton} />
     </form>
     <Button90 buttonConfig={exitButton} />
   </MenuWrapper>
 {/if}
 
-<!-- {#if lobbyStep === 1}
+{#if lobbyStep === 1}
   <MenuWrapper>
     <h5>Welcome to the Lobby</h5>
 
@@ -117,4 +115,4 @@
       <div><Button90 mouseTracking={false} buttonConfig={exitButton} /></div>
     </div>
   </MenuWrapper>
-{/if} -->
+{/if}
