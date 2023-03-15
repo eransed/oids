@@ -84,13 +84,6 @@
     padding: 1em;
   }
 
-  button {
-    cursor: pointer;
-    background: none;
-    width: 120%;
-    margin: 0.5em;
-  }
-
   .lobbyButtons > * {
     padding: 0.5em;
   }

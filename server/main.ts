@@ -15,8 +15,9 @@ apiServer()
 start_host_server()
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const pack = require("../package.json")
-const name_ver: string = pack.name + " " + pack.version
+// const pack = require("../package.json")
+// const name_ver: string = pack.name + " " + pack.version
+const name_ver= 'oids-0.3.0'
 
 const WS_PORT = OIDS_WS_PORT
 
@@ -31,7 +32,7 @@ class Client {
   req: IncomingMessage;
   name: string;
   dateAdded: Date;
-  lastDataObject: any;
+  lastDataObject: SpaceObject | null = null;
   sessionId: string | null = null;
   private nameHasBeenUpdated = false;
 
@@ -231,6 +232,4 @@ server.on("connection", function connection(clientConnection: WebSocket, req: In
 );
 
 console.log(`Starting ${name_ver}`);
-console.log(
-  `Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`
-);
+console.log(`Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`);

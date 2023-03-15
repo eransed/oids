@@ -1,6 +1,7 @@
 'use strict';
 
 // https://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { networkInterfaces } = require('os');
 export function getLocalIp(): string {
   const nets = networkInterfaces();
