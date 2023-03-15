@@ -1,6 +1,6 @@
 import type { Game } from "./game"
 import type { Button90Config } from "../components/interface"
-import { menu, showMenu, showLobby } from "./stores"
+import { menu, showMenu, showLobby, showLoginModal as showProfile, isLoggedIn, user } from "./stores"
 import { createButton90Config } from "./factory"
 
 // Keep selected state:
@@ -13,17 +13,30 @@ export function getMenu(game: Game, keepLastSelected = false) {
   // Pick menu depending on game state:
   let stateMenu: Button90Config[]
 
+  let userLoggedIn: boolean = false
+
+  isLoggedIn.subscribe((value) => {
+    userLoggedIn = value
+    console.log("isLoggedIn ", value)
+  })
+
   // Create all buttons as variables so they can be reused in
   // multiple menu item collections (Button90Config[]'s):
   const singlePlayer = createButton90Config("Singleplayer")
   const settings = createButton90Config("Settings")
-  const about = createButton90Config("About")
+  const profile = createButton90Config("Profile", () => {
+    showProfile.set(true)
+  })
+
+  const about = createButton90Config("About", () => {
+    window.open("https://github.com/eransed/oids", "_blank")
+  })
 
   const spectate = createButton90Config("Spectate", () => {
     showMenu.set(false)
   })
 
-  const multiPlayer = createButton90Config("Multiplayer", async () => {
+  const multiPlayer = createButton90Config("Play", async () => {
     showLobby.set(true)
     showMenu.set(false)
   })
@@ -48,7 +61,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
   })
 
   //Always set startupMenu on rerender
-  startupMenu = [singlePlayer, multiPlayer, settings, about]
+  startupMenu = [multiPlayer, profile, about]
   singlePlayer.selected = true
 
   if (game.isRunning()) {
@@ -58,7 +71,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
       settings.selected = true
 
       // Set the module local variable
-      inGameMenu = [settings, exitGame]
+      inGameMenu = [exitGame]
     }
 
     // Selected menu if game is running
@@ -73,7 +86,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
     settings.selected = false
     spectate.selected = true
 
-    stateMenu = [spectate, settings, exitGame]
+    stateMenu = [spectate, exitGame]
   }
 
   // Return the collection of menu item buttons

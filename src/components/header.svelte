@@ -10,7 +10,7 @@
   import getProfile from "../lib/services/user/profile"
 
   //Stores
-  import { user, userLoading } from "../lib/stores"
+  import { user, userLoading, showLoginModal } from "../lib/stores"
 
   //Interfaces
   import type { Button90Config, User } from "./interface"
@@ -19,11 +19,15 @@
   //Svelte fx
   import { fade } from "svelte/transition"
 
-  let showModal: boolean | undefined = false
+  let showLogin: boolean | undefined = false
   let errorText: any = ""
   let wrongPassword: boolean = false
   let profile: User | undefined
   let loading: boolean
+
+  showLoginModal.subscribe((value) => {
+    showLogin = value
+  })
 
   userLoading.subscribe((value) => {
     loading = value
@@ -39,7 +43,7 @@
   })
 
   const handleClickProfile = () => {
-    showModal = true
+    showLogin = true
   }
 
   const handleSubmit = async (e: Event) => {
@@ -254,13 +258,14 @@
       <img class="avatar" src={Avatar} alt="Avatar" />
     </div>
 
-    {#if showModal}
+    {#if showLogin}
       <Modal
         backDrop={false}
         title={loggedIn ? "Profile" : "Log in"}
-        {showModal}
+        showModal={showLogin}
         closedCallback={() => {
-          showModal = false
+          showLogin = false
+          showLoginModal.set(false)
         }}
       >
         {#if !loggedIn}

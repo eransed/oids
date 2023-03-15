@@ -17,6 +17,8 @@
   import Header from "./header.svelte"
   import GameLobby from "./GameLobby.svelte"
 
+  let game: Game
+
   let menuOpen = true
   let loggedIn = false
 
@@ -47,8 +49,6 @@
   export function getCanvas(): HTMLCanvasElement {
     return <HTMLCanvasElement>document.getElementById("game_canvas")
   }
-
-  let game: Game
 
   // let localPlayer: SpaceObject
 
