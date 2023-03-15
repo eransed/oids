@@ -1,5 +1,6 @@
 //WS Setup
 import type { IncomingMessage } from "http";
+import type { SpaceObject } from "../src/lib/types";
 import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from "ws";
 import { OIDS_WS_PORT } from "./pub_config";
 import { getLocalIp, ipport } from "./net";
@@ -13,6 +14,7 @@ apiServer()
 // start host server
 start_host_server()
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pack = require("../package.json")
 const name_ver: string = pack.name + " " + pack.version
 
@@ -30,7 +32,9 @@ class Client {
   name: string;
   dateAdded: Date;
   lastDataObject: any;
+  sessionId: string | null = null;
   private nameHasBeenUpdated = false;
+
   constructor(
     _ws: WebSocket,
     _req: IncomingMessage,
@@ -42,6 +46,10 @@ class Client {
     this.name = _name;
     this.dateAdded = _dateAdded;
     this.addEventListeners();
+  }
+
+  setSessionId(id: string) {
+    this.sessionId = id;
   }
 
   updateNameOnce(newName: string) {
@@ -70,7 +78,7 @@ class Client {
       } catch (err) {
         console.error(err);
       }
-      broadcastToClients(this, globalConnectedClients, offlineMessage);
+      broadcastToAllClients(this, globalConnectedClients, offlineMessage);
       globalConnectedClients = removeDisconnectedClients(
         globalConnectedClients
       );
@@ -80,17 +88,18 @@ class Client {
     });
 
     this.ws.addEventListener("message", (event: MessageEvent) => {
-      const o: any = JSON.parse(event.data);
-      this.lastDataObject = o;
+      const so: SpaceObject = <SpaceObject>JSON.parse(event.data);
+      this.lastDataObject = so;
       if (!this.nameHasBeenUpdated) {
-        globalConnectedClients.forEach((c) => {
-          if (c === this && c.name === this.name) {
-            c.updateNameOnce(o.name);
+        globalConnectedClients.forEach((client) => {
+          if (client === this && client.name === this.name) {
+            client.updateNameOnce(so.name);
           }
         });
       }
-      o.online = true;
-      broadcastToClients(this, globalConnectedClients, o);
+      so.online = true;
+      // broadcastToAllClients(this, globalConnectedClients, so);
+      broadcastToSessionClients(this, globalConnectedClients, so);
     });
   }
 
@@ -175,10 +184,10 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
 }
 
 // object is any non-primitive object ie not string, number, boolean, undefined, null etc. added in typescript 2.2
-function broadcastToClients(
+function broadcastToAllClients(
   skipSourceClient: Client,
   connectedClients: Client[],
-  data: any
+  data: SpaceObject
 ): void {
   for (const client of connectedClients) {
     if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
@@ -187,18 +196,26 @@ function broadcastToClients(
   }
 }
 
-server.on(
-  "connection",
-  function connection(clientConnection: WebSocket, req: IncomingMessage) {
+function broadcastToSessionClients(
+  sendingClient: Client,
+  connectedClients: Client[],
+  data: SpaceObject
+): void {
+  for (const client of connectedClients) {
+    if (sendingClient !== client && sendingClient.name !== client.name) {
+      if (sendingClient.sessionId === client.sessionId) {
+        client.ws.send(JSON.stringify(data));
+      }
+    }
+  }
+}
+
+server.on("connection", function connection(clientConnection: WebSocket, req: IncomingMessage) {
+
     clientConnection.send(JSON.stringify({ serverVersion: name_ver }));
     globalConnectedClients = removeDisconnectedClients(globalConnectedClients);
 
-    const newClient: Client = new Client(
-      clientConnection,
-      req,
-      `Client-${globalConnectedClients.length}`,
-      new Date()
-    );
+    const newClient: Client = new Client(clientConnection, req, `Client-${globalConnectedClients.length}`, new Date());
     if (addNewClientIfNotExisting(globalConnectedClients, newClient)) {
       console.log(
         `Storing new client ${newClient.toString()} in broadcast list`
@@ -210,6 +227,7 @@ server.on(
       console.log(`   ${c.toString()}`);
     });
   }
+
 );
 
 console.log(`Starting ${name_ver}`);

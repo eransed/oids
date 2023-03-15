@@ -51,13 +51,13 @@ export function initRegularGame(game: Game): void {
 
   initMultiplayer()
 
-  const padding = 0
-  const pad = { x: padding, y: padding }
-  const scr = sub(getScreenRect(game.ctx), pad)
+  // const padding = 0
+  // const pad = { x: padding, y: padding }
+  // const scr = sub(getScreenRect(game.ctx), pad)
 
   const bodies: SpaceObject[] = []
 
-  game.remotePlayers = []
+  // game.remotePlayers = []
   game.all = game.all.concat(bodies)
   game.all.push(game.localPlayer)
 
@@ -67,11 +67,13 @@ export function initRegularGame(game: Game): void {
         if (!so.online) {
           console.log(`${so.name} went offline`)
         }
-        if (so.sessionId === game.localPlayer.sessionId) {
-          game.remotePlayers[i] = so
-
-          return
-        }
+        // update the remote player data object
+        game.remotePlayers[i] = so
+        return
+        // if (so.sessionId === game.localPlayer.sessionId) {
+        //   game.remotePlayers[i] = so
+        //   return
+        // }
       }
     }
     if (so.name !== game.localPlayer.name && so.sessionId === game.localPlayer.sessionId) {
@@ -128,7 +130,7 @@ export function renderFrame(game: Game, dt: number): void {
   game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx)
 
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
-  // fpsCounter(dt, getSerVer(), ctx)
+  fpsCounter(dt, getSerVer(), ctx)
 
   game.bodies.forEach((body) => {
     renderMoon(body, ctx)
@@ -157,25 +159,25 @@ export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
     spaceObjectKeyController(game.localPlayer, dt)
   }
-  bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.4, 0, 0)
+  bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.5, 0, 0)
   friction(game.localPlayer)
 
-  game.bodies.forEach((body) => {
-    game.bodies.forEach((other) => {
-      if (body !== other) {
-        gravity(body, other)
-      }
-    })
+  // game.bodies.forEach((body) => {
+  //   game.bodies.forEach((other) => {
+  //     if (body !== other) {
+  //       gravity(body, other)
+  //     }
+  //   })
 
-    gravity(body, game.localPlayer)
+  //   gravity(body, game.localPlayer)
 
-    game.localPlayer.shotsInFlight.forEach((shot) => {
-      gravity(body, shot)
-    })
+  //   game.localPlayer.shotsInFlight.forEach((shot) => {
+  //     gravity(body, shot)
+  //   })
 
-    friction(body)
-    bounceSpaceObject(body, getScreenRect(game.ctx), 0.4, 0, 0)
-  })
+  //   friction(body)
+  //   bounceSpaceObject(body, getScreenRect(game.ctx), 0.4, 0, 0)
+  // })
 
   game.remotePlayers = game.remotePlayers.filter((so) => {
     return so.online || so.isLocal

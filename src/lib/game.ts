@@ -40,6 +40,7 @@ export class Game {
   }
 
   stopGame = async (): Promise<void> => {
+    console.log('todo: build a better logger...')
     this.running = false
     this.shouldSendToServer = false
     this.localPlayer.isPlaying = false

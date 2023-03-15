@@ -28,12 +28,15 @@
 
     console.log(gameCode)
 
+    
+
     if (gameCodeLength >= 4) {
       game.localPlayer.sessionId = gameCode
+      await game.stopGame()
       game.startMultiplayer()
       showLobby.set(false)
 
-      //history.replaceState(null, "", `/${gameCode}`)
+      history.replaceState(null, "", `game?id=${gameCode}`)
     }
 
     // const response = await connectToLobbys(formData)
