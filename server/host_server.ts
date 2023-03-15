@@ -11,24 +11,13 @@ const asset_path = '/assets'
 export function start_host_server() {
     app.use(asset_path, express.static(path.join(root_dir, asset_path)))
 
-    // const roots = ['/', '/game']
-    // roots.forEach((root) => {
-    //   console.log('adding ', root)
-    //   app.get(root, (req, res) => {
-    //     console.log (`${new Date().toLocaleString()} | ${req.ip}: ${req.url}`)
-    //     res.sendFile('index.html', { root: root_dir })
-    //   })
-    // })
-
-
-    app.get('/', (req, res) => {
-      console.log (`${new Date().toLocaleString()} | ${req.ip}: ${req.url}`)
-      res.sendFile('index.html', { root: root_dir })
-    })
-
-    app.get('/game', (req, res) => {
-      console.log (`${new Date().toLocaleString()} | ${req.ip}: ${req.url}`)
-      res.sendFile('index.html', { root: root_dir })
+    const roots = ['/', '/game']
+    roots.forEach((root) => {
+      console.log('adding ', root)
+      app.get(root, (req, res) => {
+        console.log (`${new Date().toLocaleString()} | ${req.ip}: ${req.url}`)
+        res.sendFile('index.html', { root: root_dir })
+      })
     })
 
     app.listen(port, () => {
