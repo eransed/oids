@@ -1,4 +1,4 @@
-import { SpaceShape, type Damageable, type SpaceObject, type Vec2d } from "./types"
+import { SpaceShape, type Damageable, type Remote, type SpaceObject, type Vec2d } from "./types"
 import { add, degToRad, linearTransform, magnitude, rndi, round2dec, scalarMultiply, to_string } from "./math"
 import { explosionDuration, screenScale, timeScale } from "./constants"
 import { getScreenFromCanvas, getScreenRect } from "./canvas_util"
@@ -27,7 +27,14 @@ export function render(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
   }
 }
 
-export function renderFrameInfo(fps: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
+export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remote) {
+  const viewport = remotePlayer.viewport
+  ctx.strokeStyle = "#fff"
+  ctx.lineWidth = 5
+  ctx.strokeRect(0, 0, viewport.x, viewport.y)
+}
+
+export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const xpos = 26
   const xposBar = 20
   const dec = 1
@@ -43,6 +50,8 @@ export function renderFrameInfo(fps: number, frameTimeMs: number, ver: string, c
   renderProgressBar({ x: xposBar, y: 270 }, "Load", frameTimeMs, 50, ctx, -40)
   ctx.fillStyle = "#444"
   ctx.fillText("" + ver, screen.x - ver.length * 27, 50)
+
+  ctx.fillText("OPS: " + round2dec(ops, dec), xpos, 370)
 }
 
 export function loadingText(text: string, ctx: CanvasRenderingContext2D) {

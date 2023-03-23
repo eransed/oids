@@ -4,13 +4,16 @@ import { initKeyControllers, spaceObjectKeyController } from "../input"
 import { add, direction, rndfVec2d, rndi, sub } from "../math"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, gravity, handleCollisions } from "../physics"
-import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText } from "../render"
+import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText, renderViewport } from "../render"
 import { fpsCounter } from "../time"
 import { GameType, SpaceShape, type SpaceObject } from "../types"
 import { getSerVer, initMultiplayer, registerServerUpdate } from "../webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
 import { explosionDuration } from "../constants"
+
+let numberOfServerObjects = 0
+let ops = 0
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
@@ -61,7 +64,16 @@ export function initRegularGame(game: Game): void {
   game.all = game.all.concat(bodies)
   game.all.push(game.localPlayer)
 
+  let startTime = 0
+
   registerServerUpdate((so: SpaceObject) => {
+    if (performance.now() - startTime > 1000) {
+      ops = numberOfServerObjects
+      startTime = performance.now()
+      numberOfServerObjects = 0
+    } else {
+      numberOfServerObjects++
+    }
     for (let i = 0; i < game.remotePlayers.length; i++) {
       if (so.name === game.remotePlayers[i].name) {
         if (!so.online) {
@@ -113,6 +125,7 @@ function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext
         }
         return
       } else {
+        renderViewport(ctx, so)
         renderShip(so, ctx, false)
       }
     }
@@ -124,13 +137,14 @@ function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext
 export function renderFrame(game: Game, dt: number): void {
   const ctx = game.ctx
   setCanvasSize(game.ctx)
+  game.localPlayer.viewport = getScreenRect(game.ctx)
   game.lightSource.position = game.localPlayer.position
   game.lightSource.direction = direction(game.localPlayer.angleDegree)
 
   game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx)
 
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
-  fpsCounter(dt, getSerVer(), ctx)
+  fpsCounter(ops, dt, getSerVer(), ctx)
 
   game.bodies.forEach((body) => {
     renderMoon(body, ctx)
@@ -161,6 +175,10 @@ export function nextFrame(game: Game, dt: number): void {
   }
   bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.5, 0, 0)
   friction(game.localPlayer)
+
+  if (game.remotePlayers.length === 0) {
+    ops = 0
+  }
 
   // game.bodies.forEach((body) => {
   //   game.bodies.forEach((other) => {

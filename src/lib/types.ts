@@ -55,6 +55,7 @@ export interface Remote {
   online: boolean
   serverVersion: string
   sessionId: string | undefined
+  viewport: Vec2d
 }
 
 export interface Local {
