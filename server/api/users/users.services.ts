@@ -2,6 +2,7 @@ import bcrypt from "bcrypt"
 import db from "../utils/db"
 
 import { User } from "../types/user"
+import { SpaceObject } from "../../../src/lib/types"
 
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({
@@ -25,6 +26,23 @@ export const findUserById = (id: string) => {
   return db.user.findUnique({
     where: {
       id,
+    },
+  })
+}
+
+export const getGameHistory = (id: string) => {
+  return db.game.findMany({
+    where: {
+      userId: id,
+    },
+  })
+}
+
+export const saveGame = (id: string, win: boolean) => {
+  return db.game.create({
+    data: {
+      userId: id,
+      win: win,
     },
   })
 }

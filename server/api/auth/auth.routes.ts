@@ -2,12 +2,7 @@ import express from "express"
 import { v4 as uuidv4 } from "uuid"
 import bcrypt from "bcrypt"
 import { generateTokens } from "../utils/jwt"
-import {
-  addRefreshTokenToWhitelist,
-  deleteRefreshToken,
-  findRefreshTokenById,
-  revokeTokens,
-} from "./auth.services"
+import { addRefreshTokenToWhitelist, deleteRefreshToken, findRefreshTokenById, revokeTokens } from "./auth.services"
 import { findUserById } from "../users/users.services"
 import hashToken from "../utils/hashToken"
 const jwt = require("jsonwebtoken")
@@ -24,7 +19,7 @@ auth.post("/register", async (req, res, next) => {
     const { email, password, name } = req.body
     if (!email || !password || !name) {
       res.status(400)
-      throw new Error("You must provide an email and a password.")
+      throw new Error("You must provide an name, email and a password.")
     }
 
     const existingUser = await findUserByEmail(email)
@@ -96,16 +91,12 @@ auth.post("/refreshToken", async (req, res, next) => {
       throw new Error("Missing refresh token.")
     }
 
-    const payload = jwt.verify(
-      refreshToken,
-      JWT_REFRESH_SECRET,
-      (err: Error, decoded: JwtPayload) => {
-        if (err) {
-          res.status(401)
-          throw new Error("Refreshtoken is not valid")
-        } else if (decoded) return decoded
-      }
-    )
+    const payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET, (err: Error, decoded: JwtPayload) => {
+      if (err) {
+        res.status(401)
+        throw new Error("Refreshtoken is not valid")
+      } else if (decoded) return decoded
+    })
 
     const savedRefreshToken = await findRefreshTokenById(payload.jti)
 
@@ -128,10 +119,7 @@ auth.post("/refreshToken", async (req, res, next) => {
 
     await deleteRefreshToken(savedRefreshToken.id)
     const jti = uuidv4()
-    const { accessToken, refreshToken: newRefreshToken } = generateTokens(
-      user,
-      jti
-    )
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(user, jti)
     await addRefreshTokenToWhitelist({
       jti,
       refreshToken: newRefreshToken,

@@ -1,9 +1,10 @@
-import { SpaceObject } from "../../../src/lib/types"
-
-export type User = {
+export interface User {
   name: string
   id: string
   email: string
   password: string
-  gameHistory?: SpaceObject[]
+}
+
+export type Game = {
+  win: boolean
 }
