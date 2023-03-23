@@ -11,3 +11,14 @@ export interface User {
   createdAt: string
   updatedAt: string
 }
+
+export interface GameHistory {
+  id: string
+  userId: string
+  win: boolean
+}
+
+export interface Profile {
+  user: User
+  gameHistory: GameHistory[]
+}

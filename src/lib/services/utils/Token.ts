@@ -1,11 +1,13 @@
 //On mount -> validate refreshtoken and make a new auth token.
 
-import axios from "axios"
+import axios, { Axios } from "axios"
 import type { AxiosResponse } from "axios"
 import { hostname } from "../../constants"
 import getProfile from "../user/profile"
 
 import { isLoggedIn, user, userLoading } from "../../stores"
+
+import type { Profile } from "../../../components/interface"
 
 //Check if token is valid and renew
 export const validateToken = async () => {
@@ -34,10 +36,13 @@ export const validateToken = async () => {
         localStorage.setItem("refreshToken", refreshToken)
         localStorage.setItem("accessToken", accessToken)
 
-        const userProfile = await getProfile()
-        user.set(userProfile.data)
-        isLoggedIn.set(true)
-        userLoading.set(false)
+        const userProfile: Profile | null = await getProfile()
+
+        if (userProfile) {
+          user.set(userProfile.user)
+          isLoggedIn.set(true)
+          userLoading.set(false)
+        }
       } else {
         userLoading.set(false)
         return

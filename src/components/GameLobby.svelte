@@ -26,10 +26,6 @@
 
     const gameCodeLength = gameCode.length
 
-    console.log(gameCode)
-
-    
-
     if (gameCodeLength >= 4) {
       game.localPlayer.sessionId = gameCode
       await game.stopGame()
