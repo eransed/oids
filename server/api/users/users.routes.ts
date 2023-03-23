@@ -1,37 +1,30 @@
-import { Request, Response, NextFunction } from "express";
-import express from "express";
-import { isAuthenticated } from "../middleware";
-import { findUserById } from "./users.services";
-import jwt from "jsonwebtoken";
-import { JWT_ACCESS_SECRET } from "../../pub_config";
+import { Request, Response, NextFunction } from "express"
+import express from "express"
+import { isAuthenticated } from "../middleware"
+import { findUserById } from "./users.services"
+import jwt from "jsonwebtoken"
+import { JWT_ACCESS_SECRET } from "../../pub_config"
 
-export type User = {
-  id: string;
-  email: string;
-  password?: string;
-};
+import { User } from "../types/user"
 
-export const users = express.Router();
+export const users = express.Router()
 
-users.get(
-  "/profile",
-  isAuthenticated,
-  async (req: any, res: Response, next: NextFunction) => {
-    try {
-      const { authorization } = req.headers;
+users.get("/profile", isAuthenticated, async (req: any, res: Response, next: NextFunction) => {
+  try {
+    const { authorization } = req.headers
 
-      const token = authorization.split(" ")[1];
+    const token = authorization.split(" ")[1]
 
-      const payload: any = jwt.verify(token, JWT_ACCESS_SECRET);
+    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
 
-      const user: User | null = await findUserById(payload.userId);
+    const user: User | null = await findUserById(payload.userId)
 
-      if (user !== null) {
-        delete user.password;
-      }
-      res.json(user);
-    } catch (err) {
-      next(err);
+    if (user !== null) {
+      user.password = ":)"
     }
+
+    res.json(user)
+  } catch (err) {
+    next(err)
   }
-);
+})

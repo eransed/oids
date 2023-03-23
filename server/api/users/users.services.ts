@@ -12,7 +12,10 @@ export const findUserByEmail = (email: string) => {
 }
 
 export const createUser = (user: User) => {
-  user.password = bcrypt.hashSync(user.password, 12)
+  if (user.password) {
+    user.password = bcrypt.hashSync(user.password, 12)
+  }
+
   return db.user.create({
     data: user,
   })
