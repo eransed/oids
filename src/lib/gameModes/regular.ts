@@ -1,12 +1,12 @@
 import type { Game } from "../game"
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas_util"
 import { initKeyControllers, spaceObjectKeyController } from "../input"
-import { add, direction, rndfVec2d, rndi, sub } from "../math"
+import { add, direction, rndfVec2d, rndi, round2dec, sub } from "../math"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, gravity, handleCollisions } from "../physics"
-import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText, renderViewport } from "../render"
+import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText, renderViewport, renderInfoText } from "../render"
 import { fpsCounter } from "../time"
-import { GameType, SpaceShape, type SpaceObject } from "../types"
+import { GameType, SpaceShape, type ServerUpdate, type SpaceObject } from "../types"
 import { getSerVer, initMultiplayer, registerServerUpdate } from "../webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
@@ -14,6 +14,13 @@ import { explosionDuration } from "../constants"
 
 let numberOfServerObjects = 0
 let ops = 0
+let dataLen = 0
+let dataKeys = 0
+let symbolsPerSec = 0
+let byteSpeed = 0
+let bitSpeed = 0
+const symbolByteSize = 2
+const byteSize = 8
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
@@ -66,10 +73,18 @@ export function initRegularGame(game: Game): void {
 
   let startTime = 0
 
-  registerServerUpdate((so: SpaceObject) => {
+  registerServerUpdate((su: ServerUpdate) => {
+    const so: SpaceObject = su.spaceObject
+    dataLen = su.unparsedDataLength
+    dataKeys = su.numberOfSpaceObjectKeys
     if (performance.now() - startTime > 1000) {
       ops = numberOfServerObjects
       startTime = performance.now()
+      if (numberOfServerObjects > 0) {
+        symbolsPerSec = round2dec(dataLen/numberOfServerObjects, 1)
+        byteSpeed = round2dec(symbolsPerSec*symbolByteSize, 1)
+        bitSpeed = round2dec(byteSpeed*byteSize, 1)
+      }
       numberOfServerObjects = 0
     } else {
       numberOfServerObjects++
@@ -146,6 +161,13 @@ export function renderFrame(game: Game, dt: number): void {
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
   fpsCounter(ops, dt, getSerVer(), ctx)
 
+  renderInfoText(`obj/sec: ${ops}`, 450, ctx)
+  renderInfoText(`symbol size: ${dataLen}`, 500, ctx)
+  renderInfoText(`number of keys: ${dataKeys}`, 550, ctx)
+  renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
+  renderInfoText(`receive speed: ${byteSpeed} B/s`, 650, ctx)
+  renderInfoText(`receive speed: ${bitSpeed} b/s`, 700, ctx)
+
   game.bodies.forEach((body) => {
     renderMoon(body, ctx)
   })
@@ -178,6 +200,11 @@ export function nextFrame(game: Game, dt: number): void {
 
   if (game.remotePlayers.length === 0) {
     ops = 0
+    dataKeys = 0
+    dataLen = 0
+    symbolsPerSec = 0
+    byteSpeed = 0
+    bitSpeed = 0
   }
 
   // game.bodies.forEach((body) => {

@@ -144,6 +144,12 @@ export interface SpaceObject
   collidingWith: SpaceObject[]
 }
 
+export interface ServerUpdate {
+  unparsedDataLength: number
+  numberOfSpaceObjectKeys: number
+  spaceObject: SpaceObject
+}
+
 // export function applySteer(o: Steerable, deltaTime: number): void {
 //   o.angleDegree += o.steeringPower
 // }

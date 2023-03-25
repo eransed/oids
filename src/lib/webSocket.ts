@@ -1,4 +1,4 @@
-import type { SpaceObject } from "./types"
+import type { ServerUpdate, SpaceObject } from "./types"
 import { OIDS_WS_PORT } from "../../server/pub_config"
 
 let socket: WebSocket
@@ -77,13 +77,13 @@ export const sendToServer = (messageObject: object): void => {
 }
 
 export function sendSpaceObjectToBroadcastServer(so: SpaceObject): void {
-  // Remove array which could containg circular ref
+  // Remove array which could contain circular ref
   so.collidingWith = []
   so.isLocal = false
   sendToServer(so)
 }
 
-export const registerServerUpdate = (callback: (so: SpaceObject) => void): void => {
+export const registerServerUpdate = (callback: (su: ServerUpdate) => void): void => {
   socket.addEventListener("message", (event) => {
     const data = JSON.parse(event.data)
     if (data.serverVersion) {
@@ -91,7 +91,12 @@ export const registerServerUpdate = (callback: (so: SpaceObject) => void): void 
     } else {
       const spaceObjFromSrv: SpaceObject = data
       spaceObjFromSrv.isLocal = false
-      callback(spaceObjFromSrv)
+      const serverUpdate: ServerUpdate = {
+        unparsedDataLength: event.data.length,
+        numberOfSpaceObjectKeys: Object.keys(spaceObjFromSrv).length,
+        spaceObject: spaceObjFromSrv
+      }
+      callback(serverUpdate)
     }
   })
 }

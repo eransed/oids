@@ -54,6 +54,13 @@ export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, v
   ctx.fillText("OPS: " + round2dec(ops, dec), xpos, 370)
 }
 
+export function renderInfoText(text: string, ypos: number, ctx: CanvasRenderingContext2D): void {
+  const xpos = 26
+  setScaledFont(ctx)
+  ctx.fillStyle = "#fff"
+  ctx.fillText(`${text}`, xpos, ypos)
+}
+
 export function loadingText(text: string, ctx: CanvasRenderingContext2D) {
   ctx.font = "bold 80px courier"
   ctx.fillStyle = "#fff"
@@ -166,7 +173,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   const shipSize: Vec2d = { x: 60, y: 100 }
   so.size = shipSize
 
-  let shipSvg = new Image()
+  const shipSvg = new Image()
 
   shipSvg.src = ship.default
 
