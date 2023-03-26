@@ -31,7 +31,7 @@ export function getFrameTimeMs(timestamp: number): number {
 export function fpsCounter(ops: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const fps = round2dec(1000 / frameTimeMs, 0)
   addDataPoint(fpsBuf, fps)
-  renderGraph(fpsBuf, {x: 350, y: 1250}, {x: 400, y: 120}, ctx)
+  renderGraph(fpsBuf, {x: 350, y: 300}, {x: 300, y: 100}, ctx)
   const dt = round2dec(frameTimeMs, 0)
   fps_list.push(fps)
   if (fps_list.length >= fps_list_max_entries) {

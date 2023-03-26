@@ -82,7 +82,7 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
 
     so.missileDamage = 4
     so.inverseFireRate = 12
-    so.shotsPerFrame = 100
+    so.shotsPerFrame = 300
   }
 
   if (boost) {
@@ -119,8 +119,6 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
     fire(so)
   }
   if (selfDestruct) {
-    let x = 0
-
     so.health = 0
   }
 }

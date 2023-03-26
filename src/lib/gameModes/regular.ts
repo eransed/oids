@@ -6,7 +6,7 @@ import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, gravity, handleCollisions } from "../physics"
 import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText, renderViewport, renderInfoText } from "../render"
 import { fpsCounter } from "../time"
-import { GameType, SpaceShape, type ServerUpdate, type SpaceObject } from "../types"
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from "../types"
 import { getSerVer, initMultiplayer, registerServerUpdate } from "../webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
@@ -38,6 +38,23 @@ speedbuf.maxSize = 500
 const hpbuf: DataStats = newDataStats()
 hpbuf.baseUnit = 'hp'
 hpbuf.maxSize = 1000
+
+const symbuf = newDataStats()
+symbuf.maxSize = 500
+symbuf.baseUnit = 'sym'
+
+const rxByteDataBuf = newDataStats()
+rxByteDataBuf.baseUnit = 'B'
+rxByteDataBuf.maxSize = 1000
+
+const ppsbuf = newDataStats()
+ppsbuf.baseUnit = 'pps'
+ppsbuf.maxSize = 1000
+
+const renderObjBuf = newDataStats()
+renderObjBuf.maxSize = 2000
+renderObjBuf.baseUnit = 'obj'
+
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
@@ -181,20 +198,38 @@ export function renderFrame(game: Game, dt: number): void {
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
   fpsCounter(ops, dt, getSerVer(), ctx)
 
-  renderInfoText(`packets/sec: ${ops}`, 450, ctx)
-  renderInfoText(`packet symbol count: ${dataLen}`, 500, ctx)
-  renderInfoText(`object key count: ${dataKeys}`, 550, ctx)
-  renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
-  renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, ctx)
-  renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
-  renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
-  renderGraph(bitbuf, {x: 350, y: 800}, {x: 400, y: 120}, ctx)
+  // renderInfoText(`packets/sec: ${ops}`, 450, ctx)
+  // renderInfoText(`packet symbol count: ${dataLen}`, 500, ctx)
+  // renderInfoText(`object key count: ${dataKeys}`, 550, ctx)
+  // renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
+  // renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, ctx)
+  // renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
+  // renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
+
+  game.remotePlayers.forEach((p) => {
+    addDataPoint(renderObjBuf, getRenderableObjectCount(p) +  getRenderableObjectCount(game.localPlayer))
+  })
+
+  renderGraph(renderObjBuf, {x: 350, y: 450}, {x: 300, y: 100}, ctx)
+
+  addDataPoint(ppsbuf, ops)
+  renderGraph(ppsbuf, {x: 350, y: 600}, {x: 300, y: 100}, ctx)
+
+  addDataPoint(rxByteDataBuf, rxDataBytes)
+  renderGraph(rxByteDataBuf, {x: 350, y: 750}, {x: 300, y: 100}, ctx)
+
+  renderGraph(bitbuf, {x: 350, y: 900}, {x: 300, y: 100}, ctx)
 
   addDataPoint(speedbuf, 100*magnitude(game.localPlayer.velocity))
-  renderGraph(speedbuf, {x: 350, y: 950}, {x: 400, y: 120}, ctx)
+  renderGraph(speedbuf, {x: 350, y: 1050}, {x: 300, y: 100}, ctx)
 
   addDataPoint(hpbuf, game.localPlayer.health)
-  renderGraph(hpbuf, {x: 350, y: 1100}, {x: 400, y: 120}, ctx)
+  renderGraph(hpbuf, {x: 350, y: 1200}, {x: 300, y: 100}, ctx)
+
+  addDataPoint(symbuf, dataLen)
+  renderGraph(symbuf, {x: 350, y: 1350}, {x: 300, y: 100}, ctx)
+
+
 
   game.bodies.forEach((body) => {
     renderMoon(body, ctx)

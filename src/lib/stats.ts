@@ -76,7 +76,7 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
   const thickLine = 5
   const thinLine = 3
   const edgePad = 10
-  const minRenderDist = 40
+  const minRenderDist = 32
   const value = getLatestValue(ds)
   const min = getMin(ds)
   const max = getMax(ds)

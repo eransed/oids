@@ -47,11 +47,11 @@ export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, v
   ctx.fillText("DTS: " + round2dec(frameTimeMs * timeScale, dec), xpos, 150)
   ctx.fillText("RES: " + screen.x + "x" + screen.y + " (x" + screenScale + ", " + ratio + ")", xpos, 200)
   ctx.fillText(`WS: ${getReadyStateText()} ${getConnInfo()}`, xpos, 250)
-  renderProgressBar({ x: xposBar, y: 270 }, "Load", frameTimeMs, 50, ctx, -40)
+  // renderProgressBar({ x: xposBar, y: 270 }, "Load", frameTimeMs, 50, ctx, -40)
   ctx.fillStyle = "#444"
   ctx.fillText("" + ver, screen.x - ver.length * 27, 50)
 
-  ctx.fillText("OPS: " + round2dec(ops, dec), xpos, 370)
+  // ctx.fillText("OPS: " + round2dec(ops, dec), xpos, 370)
 }
 
 export function renderInfoText(text: string, ypos: number, ctx: CanvasRenderingContext2D): void {

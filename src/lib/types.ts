@@ -150,6 +150,10 @@ export interface ServerUpdate {
   spaceObject: SpaceObject
 }
 
+export function getRenderableObjectCount(so: SpaceObject): number {
+  return 1 + so.shotsInFlight.length + so.collidingWith.length
+}
+
 // export function applySteer(o: Steerable, deltaTime: number): void {
 //   o.angleDegree += o.steeringPower
 // }
