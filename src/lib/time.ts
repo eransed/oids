@@ -3,11 +3,18 @@ import { round2dec } from "./math"
 import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from "./webSocket"
 import { updateSpaceObjects } from "./physics"
 import { clearScreen, renderFrameInfo } from "./render"
+import { addDataPoint, newDataStats, renderGraph } from "./stats"
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
 const fps_list: number[] = []
 const max_dt = 80
+
+const fpsBuf = newDataStats()
+fpsBuf.maxSize = 200
+fpsBuf.accUnit = ' frames'
+fpsBuf.baseUnit = 'fps'
+fpsBuf.label = 'FPS'
 
 export function getFrameTimeMs(timestamp: number): number {
   // todo: make sure not to return nan
@@ -23,6 +30,8 @@ export function getFrameTimeMs(timestamp: number): number {
 
 export function fpsCounter(ops: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const fps = round2dec(1000 / frameTimeMs, 0)
+  addDataPoint(fpsBuf, fps)
+  renderGraph(fpsBuf, {x: 350, y: 1250}, {x: 400, y: 120}, ctx)
   const dt = round2dec(frameTimeMs, 0)
   fps_list.push(fps)
   if (fps_list.length >= fps_list_max_entries) {

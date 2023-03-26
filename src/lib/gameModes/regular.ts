@@ -1,7 +1,7 @@
 import type { Game } from "../game"
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas_util"
 import { initKeyControllers, spaceObjectKeyController } from "../input"
-import { add, direction, rndfVec2d, rndi, round2dec, sub } from "../math"
+import { add, direction, magnitude, rndfVec2d, rndi, round2dec, sub } from "../math"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, gravity, handleCollisions } from "../physics"
 import { renderMoon, renderExplosionFrame, renderShip, renderSpaceObjectStatusBar, loadingText, renderViewport, renderInfoText } from "../render"
@@ -11,6 +11,7 @@ import { getSerVer, initMultiplayer, registerServerUpdate } from "../webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
 import { explosionDuration } from "../constants"
+import { addDataPoint, siPretty, newDataStats, renderGraph, type DataStats } from "../stats"
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -19,8 +20,24 @@ let dataKeys = 0
 let symbolsPerSec = 0
 let byteSpeed = 0
 let bitSpeed = 0
+let rxDataBytes = 0
 const symbolByteSize = 2
 const byteSize = 8
+
+const bitbuf: DataStats = newDataStats()
+bitbuf.label = 'rx bit speed'
+bitbuf.baseUnit = 'bit/s'
+bitbuf.accUnit = 'bit'
+bitbuf.maxSize = 50
+
+const speedbuf: DataStats = newDataStats()
+speedbuf.baseUnit = 'm/s'
+speedbuf.accUnit = 'm'
+speedbuf.maxSize = 500
+
+const hpbuf: DataStats = newDataStats()
+hpbuf.baseUnit = 'hp'
+hpbuf.maxSize = 1000
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
@@ -77,6 +94,7 @@ export function initRegularGame(game: Game): void {
     const so: SpaceObject = su.spaceObject
     dataLen = su.unparsedDataLength
     dataKeys = su.numberOfSpaceObjectKeys
+    rxDataBytes+=dataLen * symbolByteSize
     if (performance.now() - startTime > 1000) {
       ops = numberOfServerObjects
       startTime = performance.now()
@@ -84,6 +102,8 @@ export function initRegularGame(game: Game): void {
         symbolsPerSec = round2dec(dataLen/numberOfServerObjects, 1)
         byteSpeed = round2dec(symbolsPerSec*symbolByteSize, 1)
         bitSpeed = round2dec(byteSpeed*byteSize, 1)
+        addDataPoint(bitbuf, bitSpeed)
+        
       }
       numberOfServerObjects = 0
     } else {
@@ -161,12 +181,20 @@ export function renderFrame(game: Game, dt: number): void {
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
   fpsCounter(ops, dt, getSerVer(), ctx)
 
-  renderInfoText(`obj/sec: ${ops}`, 450, ctx)
-  renderInfoText(`symbol size: ${dataLen}`, 500, ctx)
-  renderInfoText(`number of keys: ${dataKeys}`, 550, ctx)
+  renderInfoText(`packets/sec: ${ops}`, 450, ctx)
+  renderInfoText(`packet symbol count: ${dataLen}`, 500, ctx)
+  renderInfoText(`object key count: ${dataKeys}`, 550, ctx)
   renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
-  renderInfoText(`receive speed: ${byteSpeed} B/s`, 650, ctx)
-  renderInfoText(`receive speed: ${bitSpeed} b/s`, 700, ctx)
+  renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, ctx)
+  renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
+  renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
+  renderGraph(bitbuf, {x: 350, y: 800}, {x: 400, y: 120}, ctx)
+
+  addDataPoint(speedbuf, 100*magnitude(game.localPlayer.velocity))
+  renderGraph(speedbuf, {x: 350, y: 950}, {x: 400, y: 120}, ctx)
+
+  addDataPoint(hpbuf, game.localPlayer.health)
+  renderGraph(hpbuf, {x: 350, y: 1100}, {x: 400, y: 120}, ctx)
 
   game.bodies.forEach((body) => {
     renderMoon(body, ctx)
