@@ -206,9 +206,12 @@ export function renderFrame(game: Game, dt: number): void {
   // renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
   // renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
 
+  let objCount = 0
   game.remotePlayers.forEach((p) => {
-    addDataPoint(renderObjBuf, getRenderableObjectCount(p) +  getRenderableObjectCount(game.localPlayer))
+    objCount += getRenderableObjectCount(p)
   })
+  
+  addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
 
   renderGraph(renderObjBuf, {x: 350, y: 450}, {x: 300, y: 100}, ctx)
 

@@ -84,7 +84,7 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
   const spread = max-min
   ctx.strokeStyle = '#fff'
   ctx.fillStyle = '#fff'
-  ctx.lineWidth = thickLine
+  ctx.lineWidth = thinLine
   setScaledFont(ctx)
   ctx.strokeRect(0, 0, size.x, size.y)
   // ctx.fillText(`Value: ${siPretty(value, ds.baseUnit)}`, size.x + 30, 25 + 0)
@@ -101,22 +101,22 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
 
   const yval = linearTransform(value, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   ctx.fillText(`${siPretty(value, ds.baseUnit)}`, size.x + 40, 10 + yval)
-  ctx.fillRect(size.x, yval, 30, thickLine)
+  ctx.fillRect(size.x, yval, 30, thinLine)
 
   const yaver = linearTransform(a, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   ctx.fillText(`a: ${siPretty(a, ds.baseUnit)}`, leftPad, 10 + yaver)
-  ctx.fillRect(-30, yaver, 30, thickLine)
+  ctx.fillRect(-30, yaver, 30, thinLine)
 
   const ymax = linearTransform(max, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   if (ymax + minRenderDist < yaver) {
     ctx.fillText(`h: ${siPretty(max, ds.baseUnit)}`, leftPad, 10 + ymax)
-    ctx.fillRect(-30, ymax, 30, thickLine)
+    ctx.fillRect(-30, ymax, 30, thinLine)
   }
 
   const ymin = linearTransform(min, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   if (ymin - minRenderDist > yaver) {
     ctx.fillText(`l: ${siPretty(min, ds.baseUnit)}`, leftPad, 10 + ymin)
-    ctx.fillRect(-30, ymin, 30, thickLine)
+    ctx.fillRect(-30, ymin, 30, thinLine)
   }
 
   const points: Vec2d[] = []
@@ -139,7 +139,7 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
     ctx.stroke()
   } else {
     points.forEach((v) => {
-      ctx.fillRect(v.x, v.y, edgePad, thickLine)
+      ctx.fillRect(v.x, v.y, edgePad, thinLine)
     })
   }
   // ctx.fillText(`Render t: ${round2dec(performance.now() -st, 0)} ms`, size.x + 30, 25 + 350)
