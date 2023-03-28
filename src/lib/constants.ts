@@ -14,5 +14,3 @@ export const missileDamageVelocityTransferFactor = 0.1
 export const purple1 = "#90d"
 export const purple2 = "#b0e"
 export const explosionDuration = 30
-
-export const hostname = location.hostname

@@ -6,7 +6,6 @@
   import { connectToLobbys } from "../lib/services/auth/lobby"
   import { user } from "../lib/stores"
   import type { Game } from "../lib/game"
-  import { hostname } from "../lib/constants"
 
   export let game: Game
 

@@ -155,9 +155,7 @@ export interface ServerUpdate {
   spaceObject: SpaceObject
 }
 
-export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable {
-  
-}
+export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable {}
 
 export function getRenderableObjectCount(so: SpaceObject): number {
   return 1 + so.shotsInFlight.length + so.collidingWith.length

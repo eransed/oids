@@ -1,5 +1,6 @@
 import type { ServerUpdate, SpaceObject } from "./types"
 import { OIDS_WS_PORT } from "../../server/pub_config"
+import { reduceSoSize, soFromValueArray } from "./factory"
 
 let socket: WebSocket
 let serverVersion = "offline"
@@ -80,7 +81,10 @@ export function sendSpaceObjectToBroadcastServer(so: SpaceObject): void {
   // Remove array which could contain circular ref
   so.collidingWith = []
   so.isLocal = false
-  sendToServer(so)
+
+  so = reduceSoSize(so)
+
+  sendToServer(Object.values(so))
 }
 
 export const registerServerUpdate = (callback: (su: ServerUpdate) => void): void => {
@@ -89,13 +93,13 @@ export const registerServerUpdate = (callback: (su: ServerUpdate) => void): void
     if (data.serverVersion) {
       serverVersion = data.serverVersion
     } else {
-      const spaceObjFromSrv: SpaceObject = data
+      const spaceObjFromSrv: SpaceObject = soFromValueArray(data)
       spaceObjFromSrv.isLocal = false
       const serverUpdate: ServerUpdate = {
         spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(spaceObjFromSrv)).length,
         unparsedDataLength: event.data.length,
         numberOfSpaceObjectKeys: Object.keys(spaceObjFromSrv).length,
-        spaceObject: spaceObjFromSrv
+        spaceObject: spaceObjFromSrv,
       }
       callback(serverUpdate)
     }

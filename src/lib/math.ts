@@ -1,7 +1,7 @@
-import type { Vec2d } from './types'
+import type { Vec2d } from "./types"
 
 export function to_string(v: Vec2d, dec = 0): string {
-  return '(' + round2dec(v.x, dec) + ', ' + round2dec(v.y, dec) + ')'
+  return "(" + round2dec(v.x, dec) + ", " + round2dec(v.y, dec) + ")"
 }
 
 export function vec2d(): Vec2d {
@@ -42,8 +42,8 @@ export function smul(v: Vec2d, s: number): Vec2d {
 
 export function sdiv(v: Vec2d, s: number): Vec2d {
   if (s === 0) {
-    console.error('Division by 0')
-    return {x: 0, y: 0}
+    console.error("Division by 0")
+    return { x: 0, y: 0 }
   }
   const tmp: Vec2d = copy(v)
   tmp.x /= s
@@ -151,7 +151,7 @@ export function round2dec(num: number, dec = 2): number {
 }
 
 export function degToRad(deg: number): number {
-  return deg * (Math.PI  / 180.0)
+  return deg * (Math.PI / 180.0)
 }
 
 export function radToDeg(rad: number): number {
@@ -167,5 +167,5 @@ export function withinBounds(v: Vec2d, maxBound: Vec2d, minBound: Vec2d = { x: 0
 }
 
 export function linearTransform(v: number, v_lower: number, v_upper: number, t_lower: number, t_upper: number) {
-  return (v - v_lower) * ((t_upper - t_lower) / (v_upper - v_lower)) + t_lower;
+  return (v - v_lower) * ((t_upper - t_lower) / (v_upper - v_lower)) + t_lower
 }

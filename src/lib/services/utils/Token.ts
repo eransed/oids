@@ -2,7 +2,6 @@
 
 import axios, { Axios } from "axios"
 import type { AxiosResponse } from "axios"
-import { hostname } from "../../constants"
 import getProfile from "../user/profile"
 
 import { isLoggedIn, user, userLoading } from "../../stores"
@@ -28,7 +27,7 @@ export const validateToken = async () => {
   userLoading.set(true)
 
   await axios
-    .post(`http://${hostname}:6060/api/v1/auth/refreshToken`, body)
+    .post(`http://${location.hostname}:6060/api/v1/auth/refreshToken`, body)
     .then(async (response: AxiosResponse<any>) => {
       if (response.status === 200) {
         accessToken = response.data.accessToken

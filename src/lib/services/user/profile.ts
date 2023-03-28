@@ -1,6 +1,5 @@
 import axios, { Axios, type AxiosResponse } from "axios"
 import { user } from "../../stores"
-import { hostname } from "../../constants"
 
 import type { Profile } from "../../../components/interface"
 
@@ -12,7 +11,7 @@ const getProfile = async (): Promise<Profile | null> => {
   }
 
   const response: Profile | null = await axios
-    .get(`http://${hostname}:6060/api/v1/users/profile`, config)
+    .get(`http://${location.hostname}:6060/api/v1/users/profile`, config)
     .then((response: AxiosResponse<Profile>) => {
       user.set(response.data.user)
       return response.data

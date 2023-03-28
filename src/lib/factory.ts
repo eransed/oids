@@ -1,8 +1,50 @@
-import type { SpaceObject, Vec2d } from "./types"
+import type { PhotonLaser, SpaceObject, Vec2d } from "./types"
 import { SpaceShape } from "./types"
-import { rndf, rndi } from "./math"
+import { rndf, rndi, round, round2dec } from "./math"
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
 import type { Button90Config } from "../components/interface"
+
+export function reduceSoSize(so: SpaceObject): SpaceObject {
+  const dec = 2
+
+  so.acceleration = round(so.acceleration, dec)
+  so.velocity = round(so.velocity, dec)
+  so.position = round(so.position, dec)
+
+  return so
+}
+
+export function soFromValueArray(value: []): SpaceObject {
+  let so = createSpaceObject()
+  Object.keys(so).forEach((v, i) => {
+    so[v as keyof SpaceObject] = value[i]
+  })
+
+  return so
+}
+
+export function newPhotonLaser(): PhotonLaser {
+  const shot = {
+    acceleration: { x: 0, y: 0 },
+    angleDegree: -90,
+    angularVelocity: 0,
+    armedDelay: 6,
+    color: "#90d",
+    damage: 5,
+    deadFrameCount: 0,
+    didHit: false,
+    health: 100,
+    isDead: false,
+    mass: 1,
+    obliterated: false,
+    position: { x: 0, y: 0 },
+    shotBlowFrame: 16,
+    size: { x: 100, y: 100 },
+    velocity: { x: 0, y: 0 },
+  }
+
+  return shot
+}
 
 export function createSpaceObject(name = "SpaceObject"): SpaceObject {
   const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }

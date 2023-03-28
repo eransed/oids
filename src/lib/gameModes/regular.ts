@@ -12,6 +12,7 @@ import { randomAnyColor } from "../color"
 import { test } from "../test"
 import { explosionDuration } from "../constants"
 import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph, type DataStats } from "../stats"
+import { createSpaceObject, newPhotonLaser, reduceSoSize } from "../factory"
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -34,49 +35,60 @@ const ppsbuf = newDataStats()
 const speedbuf = newDataStats()
 const batbuf = newDataStats()
 const hpbuf = newDataStats()
+const shotSize = newDataStats()
+const soSize = newDataStats()
+const dataTest = newDataStats()
 
-speedbuf.baseUnit = 'm/s'
-speedbuf.accUnit = 'm'
-speedbuf.label = 'Speed'
+dataTest.baseUnit = "B"
+dataTest.label = "Reduced So Size"
+
+soSize.baseUnit = "B"
+soSize.label = "SpaceObject Size"
+
+shotSize.baseUnit = "B"
+shotSize.label = "Shot size"
+
+speedbuf.baseUnit = "m/s"
+speedbuf.accUnit = "m"
+speedbuf.label = "Speed"
 // speedbuf.maxSize = 500
 
-hpbuf.baseUnit = 'hp'
-hpbuf.label = 'Hp'
+hpbuf.baseUnit = "hp"
+hpbuf.label = "Hp"
 // hpbuf.maxSize = 1000
 
 // symbuf.maxSize = 500
-packetSizeBuf.baseUnit = 'B'
-packetSizeBuf.label = 'Packet'
+packetSizeBuf.baseUnit = "B"
+packetSizeBuf.label = "Packet"
 
-rxByteDataBuf.baseUnit = 'B'
-rxByteDataBuf.label = 'RX data'
+rxByteDataBuf.baseUnit = "B"
+rxByteDataBuf.label = "RX data"
 // rxByteDataBuf.maxSize = 1000
 
-ppsbuf.baseUnit = 'pps'
-ppsbuf.label = 'Packets/sec'
+ppsbuf.baseUnit = "pps"
+ppsbuf.label = "Packets/sec"
 // ppsbuf.maxSize = 1000
 
 // renderObjBuf.maxSize = 2000
-renderObjBuf.baseUnit = 'obj'
-renderObjBuf.label = 'Obj/frame'
+renderObjBuf.baseUnit = "obj"
+renderObjBuf.label = "Obj/frame"
 
-timebuf.baseUnit = 's'
+timebuf.baseUnit = "s"
 timebuf.prettyPrint = msPretty
 timebuf.maxSize = 60
-timebuf.label = 'Time'
+timebuf.label = "Time"
 
-downloadBuf.label = 'Download'
-downloadBuf.baseUnit = 'bit/s'
-downloadBuf.accUnit = 'bit'
+downloadBuf.label = "Download"
+downloadBuf.baseUnit = "bit/s"
+downloadBuf.accUnit = "bit"
 downloadBuf.maxSize = 60
 
-batbuf.label = 'Battery'
-batbuf.baseUnit = '%'
+batbuf.label = "Battery"
+batbuf.baseUnit = "%"
 
 // const packetSize = newDataStats()
 // packetSize.maxSize = 1000
 // packetSize.baseUnit = 'B'
-
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
@@ -133,16 +145,16 @@ export function initRegularGame(game: Game): void {
     const so: SpaceObject = su.spaceObject
     dataLen = su.unparsedDataLength
     dataKeys = su.numberOfSpaceObjectKeys
-    rxDataBytes+=dataLen * symbolByteSize
+    rxDataBytes += dataLen * symbolByteSize
     // addDataPoint(packetSize, su.spaceObjectByteSize)
     if (performance.now() - startTime >= 1000) {
       addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
       ops = numberOfServerObjects
       startTime = performance.now()
       if (numberOfServerObjects > 0) {
-        symbolsPerSec = round2dec(dataLen/numberOfServerObjects, 1)
-        byteSpeed = round2dec(symbolsPerSec*symbolByteSize, 1)
-        bitSpeed = round2dec(byteSpeed*byteSize, 1)
+        symbolsPerSec = round2dec(dataLen / numberOfServerObjects, 1)
+        byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
+        bitSpeed = round2dec(byteSpeed * byteSize, 1)
         addDataPoint(downloadBuf, bitSpeed)
       }
       numberOfServerObjects = 0
@@ -233,19 +245,21 @@ export function renderFrame(game: Game, dt: number): void {
   game.remotePlayers.forEach((p) => {
     objCount += getRenderableObjectCount(p)
   })
-  
+
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
   addDataPoint(ppsbuf, ops)
   addDataPoint(rxByteDataBuf, rxDataBytes)
-  addDataPoint(speedbuf, 100*magnitude(game.localPlayer.velocity))
+  addDataPoint(speedbuf, 100 * magnitude(game.localPlayer.velocity))
   addDataPoint(hpbuf, game.localPlayer.health)
   addDataPoint(packetSizeBuf, dataLen)
   addDataPoint(batbuf, game.localPlayer.batteryLevel)
+  addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(newPhotonLaser())).length)
+  addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(createSpaceObject())).length)
+  addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(createSpaceObject()))).length)
 
   GRAPHS.forEach((g, i) => {
-    renderGraph(g, {x: 310, y: 110 + i * 142}, {x: 200, y: 84}, ctx)
+    renderGraph(g, { x: 310, y: 110 + i * 142 }, { x: 200, y: 84 }, ctx)
   })
-
 
   game.bodies.forEach((body) => {
     renderMoon(body, ctx)
