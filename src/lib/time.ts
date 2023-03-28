@@ -11,10 +11,15 @@ const fps_list: number[] = []
 const max_dt = 80
 
 const fpsBuf = newDataStats()
-fpsBuf.maxSize = 200
+// fpsBuf.maxSize = 200
 fpsBuf.accUnit = ' frames'
 fpsBuf.baseUnit = 'fps'
 fpsBuf.label = 'FPS'
+
+const frameTimes = newDataStats()
+frameTimes.baseUnit = 'ms'
+// frameTimes.maxSize = 500
+frameTimes.label = 'Frame time'
 
 export function getFrameTimeMs(timestamp: number): number {
   // todo: make sure not to return nan
@@ -28,10 +33,13 @@ export function getFrameTimeMs(timestamp: number): number {
   }
 }
 
+
 export function fpsCounter(ops: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const fps = round2dec(1000 / frameTimeMs, 0)
   addDataPoint(fpsBuf, fps)
-  renderGraph(fpsBuf, {x: 350, y: 300}, {x: 300, y: 100}, ctx)
+  addDataPoint(frameTimes, frameTimeMs)
+  // renderGraph(fpsBuf, {x: 350, y: 100}, {x: 300, y: 70}, ctx)
+  // renderGraph(frameTimes, {x: 350, y: 200}, {x: 300, y: 70}, ctx)
   const dt = round2dec(frameTimeMs, 0)
   fps_list.push(fps)
   if (fps_list.length >= fps_list_max_entries) {

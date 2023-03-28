@@ -3,7 +3,7 @@ import { linearTransform, round2dec } from "./math"
 import { setScaledFont } from "./render"
 import type { Vec2d } from "./types"
 
-const defaultSize = 50
+const defaultSize = 700
 
 export interface DataStats {
   data: number[],
@@ -12,6 +12,7 @@ export interface DataStats {
   baseUnit: string,
   accUnit: string,
   label: string,
+  prettyPrint: (v: number, s: string) => string
 }
 
 export function addDataPoint(dataStats: DataStats, dp: number): void {
@@ -22,8 +23,10 @@ export function addDataPoint(dataStats: DataStats, dp: number): void {
   }
 }
 
-export function getLatestValue(ds: DataStats): number {
-  return ds.data[ds.data.length - 1]
+export function getLatestValue(ds: DataStats, defaultValueIfNaN = 0): number {
+  const val = ds.data[ds.data.length - 1]
+  if (isNaN(val)) return defaultValueIfNaN
+  return val
 }
 
 export function getAverage(ds: DataStats): number {
@@ -38,15 +41,32 @@ export function getMax(ds: DataStats): number {
   return  ds.data.reduce((a, b) => Math.max(a, b), -Infinity)
 }
 
+export const GRAPHS: DataStats[] = []
+
 export function newDataStats(): DataStats {
-  return {
+   const nds = {
     data: [],
     maxSize: defaultSize,
     accumulated: 0,
     baseUnit: '',
     accUnit: '',
     label: '',
+    prettyPrint: siPretty,
   }
+  GRAPHS.push(nds)
+  return nds
+}
+
+export function msPretty(ms: number): string {
+  const D = 24 * 60 * 60 * 1000
+  const H = 60 * 60 * 1000
+  const M = 60 * 1000
+  const S = 1000
+  if (ms >= D) return `${round2dec(ms/D, 2)} d`
+  if (ms >= H) return `${round2dec(ms/H, 1)} h`
+  if (ms >= M) return `${round2dec(ms/M, 1)} m`
+  if (ms >= S) return `${round2dec(ms/S, 1)} s`
+  return `${round2dec(ms, 0)} ms`
 }
 
 export function siPretty(value: number, baseUnit = ''): string {
@@ -76,58 +96,62 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
   const thickLine = 5
   const thinLine = 3
   const edgePad = 10
-  const minRenderDist = 32
+  const minRenderDist = 30
   const value = getLatestValue(ds)
   const min = getMin(ds)
   const max = getMax(ds)
   const a = getAverage(ds)
-  const spread = max-min
-  ctx.strokeStyle = '#fff'
+  const spread = ds.prettyPrint(max-min, ds.baseUnit)
   ctx.fillStyle = '#fff'
   ctx.lineWidth = thinLine
+  ctx.strokeStyle = '#777'
   setScaledFont(ctx)
   ctx.strokeRect(0, 0, size.x, size.y)
-  // ctx.fillText(`Value: ${siPretty(value, ds.baseUnit)}`, size.x + 30, 25 + 0)
-  // ctx.fillText(`Aver: ${siPretty(a, ds.baseUnit)}`, size.x + 30, 25 + 50)
-  // ctx.fillText(`Max: ${siPretty(max, ds.baseUnit)}`, size.x + 30, 25 + 100)
-  // ctx.fillText(`Min: ${siPretty(min, ds.baseUnit)}`, size.x + 30, 25 + 150)
-  // ctx.fillText(`Spread: ${siPretty(spread, ds.baseUnit)}`, size.x + 30, 25 + 200)
-  // ctx.fillText(`Acc: ${siPretty(ds.accumulated, ds.accUnit)}`, size.x + 30, 25 + 250)
+  // ctx.fillText(`Value: ${ds.prettyPrint(value, ds.baseUnit)}`, size.x + 30, 25 + 0)
+  // ctx.fillText(`Aver: ${ds.prettyPrint(a, ds.baseUnit)}`, size.x + 30, 25 + 50)
+  // ctx.fillText(`Max: ${ds.prettyPrint(max, ds.baseUnit)}`, size.x + 30, 25 + 100)
+  // ctx.fillText(`Min: ${ds.prettyPrint(min, ds.baseUnit)}`, size.x + 30, 25 + 150)
+  // ctx.fillText(`Spread: ${ds.prettyPrint(spread, ds.baseUnit)}`, size.x + 30, 25 + 200)
+  // ctx.fillText(`Acc: ${ds.prettyPrint(ds.accumulated, ds.accUnit)}`, size.x + 30, 25 + 250)
   // ctx.fillText(`Data: ${ds.data.length}/${ds.maxSize}`, size.x + 30, 25 + 300)
   // ctx.fillText(`${ds.label}`, Math.floor(size.x/2) - (ds.label.length*10), -30)
   // ctx.fillText(`[t]`, Math.floor(size.x/2) - 10, size.y + 30)
   
-  const leftPad = -300
-
+  const leftPad = -280
+  
   const yval = linearTransform(value, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
-  ctx.fillText(`${siPretty(value, ds.baseUnit)}`, size.x + 40, 10 + yval)
+  ctx.fillText(`${ds.prettyPrint(value, ds.baseUnit)}`, size.x + 40, 10 + yval)
   ctx.fillRect(size.x, yval, 30, thinLine)
-
+  
+  ctx.fillStyle = '#88e'
   const yaver = linearTransform(a, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
-  ctx.fillText(`a: ${siPretty(a, ds.baseUnit)}`, leftPad, 10 + yaver)
+  ctx.fillText(`a: ${ds.prettyPrint(a, ds.baseUnit)}`, leftPad, 10 + yaver)
   ctx.fillRect(-30, yaver, 30, thinLine)
 
   const ymax = linearTransform(max, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   if (ymax + minRenderDist < yaver) {
-    ctx.fillText(`h: ${siPretty(max, ds.baseUnit)}`, leftPad, 10 + ymax)
+    ctx.fillStyle = '#e00'
+    ctx.fillText(`h: ${ds.prettyPrint(max, ds.baseUnit)}`, leftPad, 10 + ymax)
     ctx.fillRect(-30, ymax, 30, thinLine)
   }
 
   const ymin = linearTransform(min, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   if (ymin - minRenderDist > yaver) {
-    ctx.fillText(`l: ${siPretty(min, ds.baseUnit)}`, leftPad, 10 + ymin)
+    ctx.fillStyle = '#0e0'
+    ctx.fillText(`l: ${ds.prettyPrint(min, ds.baseUnit)}`, leftPad, 10 + ymin)
     ctx.fillRect(-30, ymin, 30, thinLine)
   }
-
+  
   const points: Vec2d[] = []
-
+  
   ds.data.forEach((n, i) => {
     const xmap = linearTransform(i, 0, ds.maxSize, edgePad, size.x - edgePad)
     const ymap = linearTransform(n, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
     points.push({x: xmap, y: ymap})
   })
-
+  
   ctx.fillStyle = '#fff'
+  ctx.strokeStyle = '#fff'
 
   if (points.length > 1) {
     ctx.lineWidth = thinLine
@@ -143,5 +167,8 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
     })
   }
   // ctx.fillText(`Render t: ${round2dec(performance.now() -st, 0)} ms`, size.x + 30, 25 + 350)
+  ctx.fillStyle = '#0e0'
+  const places = (ds.data.length === ds.maxSize ? ` ~${spread}` : ` ${ds.data.length}/${ds.maxSize}`)
+  ctx.fillText(`${ds.label}${places}`, 0, -Math.floor(edgePad*1.5))
   ctx.restore()
 }

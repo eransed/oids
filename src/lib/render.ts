@@ -27,7 +27,7 @@ export function render(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
   }
 }
 
-export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remote) {
+export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remote): void {
   const viewport = remotePlayer.viewport
   ctx.strokeStyle = "#fff"
   ctx.lineWidth = 5
@@ -36,22 +36,15 @@ export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remo
 
 export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const xpos = 26
-  const xposBar = 20
   const dec = 1
   const screen: Vec2d = getScreenRect(ctx)
   const ratio: number = round2dec(screen.x / screen.y, 2)
   setScaledFont(ctx)
   ctx.fillStyle = "#fff"
-  ctx.fillText("FPS: " + round2dec(fps, dec), xpos, 50)
-  ctx.fillText("DT:  " + round2dec(frameTimeMs, dec) + "ms", xpos, 100)
-  ctx.fillText("DTS: " + round2dec(frameTimeMs * timeScale, dec), xpos, 150)
-  ctx.fillText("RES: " + screen.x + "x" + screen.y + " (x" + screenScale + ", " + ratio + ")", xpos, 200)
-  ctx.fillText(`WS: ${getReadyStateText()} ${getConnInfo()}`, xpos, 250)
-  // renderProgressBar({ x: xposBar, y: 270 }, "Load", frameTimeMs, 50, ctx, -40)
+  const info = `WS: ${getReadyStateText()} ${getConnInfo()}   RES: ${screen.x}x${screen.y} (x${screenScale}, ${ratio})   DTS: ${round2dec(frameTimeMs * timeScale, dec)}`
+  ctx.fillText(info, xpos, 50)
   ctx.fillStyle = "#444"
   ctx.fillText("" + ver, screen.x - ver.length * 27, 50)
-
-  // ctx.fillText("OPS: " + round2dec(ops, dec), xpos, 370)
 }
 
 export function renderInfoText(text: string, ypos: number, ctx: CanvasRenderingContext2D): void {

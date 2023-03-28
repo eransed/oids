@@ -42,6 +42,10 @@ export interface Shapable {
   shape: SpaceShape
 }
 
+export interface Colorable {
+  color: string
+}
+
 export interface Boostable {
   booster: number
 }
@@ -135,19 +139,24 @@ export interface SpaceObject
     Fireable,
     Collidable,
     Bounceable,
-    Boostable {
+    Boostable,
+    Colorable {
   isPlaying: boolean
   framesSinceLastServerUpdate: number
   name: string
-  color: string
-  shotsInFlight: SpaceObject[]
+  shotsInFlight: PhotonLaser[]
   collidingWith: SpaceObject[]
 }
 
 export interface ServerUpdate {
+  spaceObjectByteSize: number
   unparsedDataLength: number
   numberOfSpaceObjectKeys: number
   spaceObject: SpaceObject
+}
+
+export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable {
+  
 }
 
 export function getRenderableObjectCount(so: SpaceObject): number {

@@ -1,4 +1,4 @@
-import type { Boostable, Bounceable, Damageable, Damager, Physical, Positionable, SpaceObject, Thrustable, Vec2d } from "./types"
+import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical, Positionable, Rotatable, SpaceObject, Thrustable, Vec2d } from "./types"
 import type { Steerable } from "./traits/Steerable"
 
 import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from "./math"
@@ -44,7 +44,7 @@ export function wrapSpaceObject(so: Positionable, screen: Vec2d): void {
 }
 
 export function decayDeadShots(so: SpaceObject) {
-  so.shotsInFlight = <SpaceObject[]>decayDeadSpaceObjects(so.shotsInFlight)
+  so.shotsInFlight = <PhotonLaser[]>decayDeadSpaceObjects(so.shotsInFlight)
 }
 
 export function coolDown(so: SpaceObject) {
@@ -59,8 +59,9 @@ export function coolDown(so: SpaceObject) {
   }
 }
 
-export function generateMissileFrom(so: SpaceObject): SpaceObject {
-  const shot: SpaceObject = createSpaceObject()
+export function generateMissileFrom(so: SpaceObject): PhotonLaser {
+  // what is the type of the shot?
+  const shot: PhotonLaser = <PhotonLaser>createSpaceObject()
   shot.mass = 10
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
@@ -117,7 +118,9 @@ export function fire(so: SpaceObject): void {
   so.ammo -= shotLeftToFire
 }
 
-export function handleHittingShot(shot: SpaceObject, ctx: CanvasRenderingContext2D): void {
+
+
+export function handleHittingShot(shot: PhotonLaser, ctx: CanvasRenderingContext2D): void {
   if (shot.didHit) {
     shot.shotBlowFrame--
     shot.velocity = scalarMultiply(shot.velocity, shotHitReversFactor)

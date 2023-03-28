@@ -92,6 +92,7 @@ export const registerServerUpdate = (callback: (su: ServerUpdate) => void): void
       const spaceObjFromSrv: SpaceObject = data
       spaceObjFromSrv.isLocal = false
       const serverUpdate: ServerUpdate = {
+        spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(spaceObjFromSrv)).length,
         unparsedDataLength: event.data.length,
         numberOfSpaceObjectKeys: Object.keys(spaceObjFromSrv).length,
         spaceObject: spaceObjFromSrv

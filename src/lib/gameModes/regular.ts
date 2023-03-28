@@ -11,7 +11,7 @@ import { getSerVer, initMultiplayer, registerServerUpdate } from "../webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
 import { explosionDuration } from "../constants"
-import { addDataPoint, siPretty, newDataStats, renderGraph, type DataStats } from "../stats"
+import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph, type DataStats } from "../stats"
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -24,36 +24,58 @@ let rxDataBytes = 0
 const symbolByteSize = 2
 const byteSize = 8
 
-const bitbuf: DataStats = newDataStats()
-bitbuf.label = 'rx bit speed'
-bitbuf.baseUnit = 'bit/s'
-bitbuf.accUnit = 'bit'
-bitbuf.maxSize = 50
+const timebuf = newDataStats()
+const downloadBuf = newDataStats()
+const packetSizeBuf = newDataStats()
+const rxByteDataBuf = newDataStats()
+const renderObjBuf = newDataStats()
+const ppsbuf = newDataStats()
 
-const speedbuf: DataStats = newDataStats()
+const speedbuf = newDataStats()
+const batbuf = newDataStats()
+const hpbuf = newDataStats()
+
 speedbuf.baseUnit = 'm/s'
 speedbuf.accUnit = 'm'
-speedbuf.maxSize = 500
+speedbuf.label = 'Speed'
+// speedbuf.maxSize = 500
 
-const hpbuf: DataStats = newDataStats()
 hpbuf.baseUnit = 'hp'
-hpbuf.maxSize = 1000
+hpbuf.label = 'Hp'
+// hpbuf.maxSize = 1000
 
-const symbuf = newDataStats()
-symbuf.maxSize = 500
-symbuf.baseUnit = 'sym'
+// symbuf.maxSize = 500
+packetSizeBuf.baseUnit = 'B'
+packetSizeBuf.label = 'Packet'
 
-const rxByteDataBuf = newDataStats()
 rxByteDataBuf.baseUnit = 'B'
-rxByteDataBuf.maxSize = 1000
+rxByteDataBuf.label = 'RX data'
+// rxByteDataBuf.maxSize = 1000
 
-const ppsbuf = newDataStats()
 ppsbuf.baseUnit = 'pps'
-ppsbuf.maxSize = 1000
+ppsbuf.label = 'Packets/sec'
+// ppsbuf.maxSize = 1000
 
-const renderObjBuf = newDataStats()
-renderObjBuf.maxSize = 2000
+// renderObjBuf.maxSize = 2000
 renderObjBuf.baseUnit = 'obj'
+renderObjBuf.label = 'Obj/frame'
+
+timebuf.baseUnit = 's'
+timebuf.prettyPrint = msPretty
+timebuf.maxSize = 60
+timebuf.label = 'Time'
+
+downloadBuf.label = 'Download'
+downloadBuf.baseUnit = 'bit/s'
+downloadBuf.accUnit = 'bit'
+downloadBuf.maxSize = 60
+
+batbuf.label = 'Battery'
+batbuf.baseUnit = '%'
+
+// const packetSize = newDataStats()
+// packetSize.maxSize = 1000
+// packetSize.baseUnit = 'B'
 
 
 export function initRegularGame(game: Game): void {
@@ -112,15 +134,16 @@ export function initRegularGame(game: Game): void {
     dataLen = su.unparsedDataLength
     dataKeys = su.numberOfSpaceObjectKeys
     rxDataBytes+=dataLen * symbolByteSize
-    if (performance.now() - startTime > 1000) {
+    // addDataPoint(packetSize, su.spaceObjectByteSize)
+    if (performance.now() - startTime >= 1000) {
+      addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
       ops = numberOfServerObjects
       startTime = performance.now()
       if (numberOfServerObjects > 0) {
         symbolsPerSec = round2dec(dataLen/numberOfServerObjects, 1)
         byteSpeed = round2dec(symbolsPerSec*symbolByteSize, 1)
         bitSpeed = round2dec(byteSpeed*byteSize, 1)
-        addDataPoint(bitbuf, bitSpeed)
-        
+        addDataPoint(downloadBuf, bitSpeed)
       }
       numberOfServerObjects = 0
     } else {
@@ -212,26 +235,16 @@ export function renderFrame(game: Game, dt: number): void {
   })
   
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
-
-  renderGraph(renderObjBuf, {x: 350, y: 450}, {x: 300, y: 100}, ctx)
-
   addDataPoint(ppsbuf, ops)
-  renderGraph(ppsbuf, {x: 350, y: 600}, {x: 300, y: 100}, ctx)
-
   addDataPoint(rxByteDataBuf, rxDataBytes)
-  renderGraph(rxByteDataBuf, {x: 350, y: 750}, {x: 300, y: 100}, ctx)
-
-  renderGraph(bitbuf, {x: 350, y: 900}, {x: 300, y: 100}, ctx)
-
   addDataPoint(speedbuf, 100*magnitude(game.localPlayer.velocity))
-  renderGraph(speedbuf, {x: 350, y: 1050}, {x: 300, y: 100}, ctx)
-
   addDataPoint(hpbuf, game.localPlayer.health)
-  renderGraph(hpbuf, {x: 350, y: 1200}, {x: 300, y: 100}, ctx)
+  addDataPoint(packetSizeBuf, dataLen)
+  addDataPoint(batbuf, game.localPlayer.batteryLevel)
 
-  addDataPoint(symbuf, dataLen)
-  renderGraph(symbuf, {x: 350, y: 1350}, {x: 300, y: 100}, ctx)
-
+  GRAPHS.forEach((g, i) => {
+    renderGraph(g, {x: 310, y: 110 + i * 142}, {x: 200, y: 84}, ctx)
+  })
 
 
   game.bodies.forEach((body) => {
