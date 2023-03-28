@@ -15,12 +15,44 @@ export function reduceSoSize(so: SpaceObject): SpaceObject {
 }
 
 export function soFromValueArray(value: []): SpaceObject {
+  console.log(value)
   let so = createSpaceObject()
   Object.keys(so).forEach((v, i) => {
-    so[v as keyof SpaceObject] = value[i]
+    if ((v as keyof SpaceObject) === "shotsInFlightValues") {
+      so[v as keyof SpaceObject] = value[i]
+
+      so.shotsInFlightValues.forEach((shot) => {
+        console.log(shot)
+        so.shotsInFlight.push(photonLaserFromValueArray(shot))
+      })
+    } else {
+      so[v as keyof SpaceObject] = value[i]
+    }
+  })
+  return so
+}
+
+export function photonLaserFromValueArray(values: []): PhotonLaser {
+  let pl = newPhotonLaser()
+
+  Object.keys(pl).forEach((v, i) => {
+    pl[v as keyof PhotonLaser] = values[i]
   })
 
-  return so
+  return pl
+}
+
+export function soToValueArray(so: SpaceObject): any[] {
+  let shots: any[] = []
+
+  so.shotsInFlight.forEach((shot) => {
+    shots.push(Object.values(shot))
+  })
+
+  so.shotsInFlight = []
+  so.shotsInFlightValues = shots
+
+  return Object.values(so)
 }
 
 export function newPhotonLaser(): PhotonLaser {
@@ -98,6 +130,7 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     shape: SpaceShape.SmallShip,
     shotBlowFrame: 16,
     shotsInFlight: [],
+    shotsInFlightValues: [],
     shotsPerFrame: 1,
     size: { x: 100, y: 100 },
     steer: function (direction: number, deltaTime: number): void {

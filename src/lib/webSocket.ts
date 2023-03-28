@@ -1,6 +1,6 @@
 import type { ServerUpdate, SpaceObject } from "./types"
 import { OIDS_WS_PORT } from "../../server/pub_config"
-import { reduceSoSize, soFromValueArray } from "./factory"
+import { reduceSoSize, soFromValueArray, soToValueArray } from "./factory"
 
 let socket: WebSocket
 let serverVersion = "offline"
@@ -84,7 +84,7 @@ export function sendSpaceObjectToBroadcastServer(so: SpaceObject): void {
 
   so = reduceSoSize(so)
 
-  sendToServer(Object.values(so))
+  sendToServer(soToValueArray(so))
 }
 
 export const registerServerUpdate = (callback: (su: ServerUpdate) => void): void => {

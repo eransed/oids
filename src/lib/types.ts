@@ -145,6 +145,7 @@ export interface SpaceObject
   framesSinceLastServerUpdate: number
   name: string
   shotsInFlight: PhotonLaser[]
+  shotsInFlightValues: any[]
   collidingWith: SpaceObject[]
 }
 

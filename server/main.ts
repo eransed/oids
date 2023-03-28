@@ -1,7 +1,7 @@
 //WS Setup
 import type { IncomingMessage } from "http"
 import type { SpaceObject } from "../src/lib/types"
-import { soFromValueArray } from "../src/lib/factory"
+import { soFromValueArray, soToValueArray } from "../src/lib/factory"
 import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from "ws"
 import { OIDS_WS_PORT } from "./pub_config"
 import { getLocalIp, ipport } from "./net"
@@ -170,7 +170,7 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
 function broadcastToAllClients(skipSourceClient: Client, connectedClients: Client[], data: SpaceObject): void {
   for (const client of connectedClients) {
     if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
-      client.ws.send(JSON.stringify(Object.values(data)))
+      client.ws.send(JSON.stringify(soToValueArray(data)))
     }
   }
 }
@@ -179,7 +179,7 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        client.ws.send(JSON.stringify(Object.values(data)))
+        client.ws.send(JSON.stringify(soToValueArray(data)))
       }
     }
   }
