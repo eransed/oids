@@ -12,7 +12,7 @@ import { randomAnyColor } from "../color"
 import { test } from "../test"
 import { explosionDuration } from "../constants"
 import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph, type DataStats } from "../stats"
-import { createSpaceObject, newPhotonLaser, reduceSoSize } from "../factory"
+import { createSpaceObject, newPhotonLaser, reduceShotSize, reduceSoSize } from "../factory"
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -253,7 +253,7 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(hpbuf, game.localPlayer.health)
   addDataPoint(packetSizeBuf, dataLen)
   addDataPoint(batbuf, game.localPlayer.batteryLevel)
-  addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(newPhotonLaser())).length)
+  addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)
   addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(createSpaceObject())).length)
   addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(createSpaceObject()))).length)
 

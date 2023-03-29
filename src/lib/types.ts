@@ -159,7 +159,7 @@ export interface ServerUpdate {
 export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable {}
 
 export function getRenderableObjectCount(so: SpaceObject): number {
-  return 1 + so.shotsInFlight.length + so.collidingWith.length
+  return 1 + so.shotsInFlight.length + so.collidingWith.length + so.shotsInFlightValues.length
 }
 
 // export function applySteer(o: Steerable, deltaTime: number): void {

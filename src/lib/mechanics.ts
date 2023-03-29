@@ -4,7 +4,7 @@ import type { Steerable } from "./traits/Steerable"
 import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from "./math"
 import { maxHeat, shotHitReversFactor } from "./constants"
 import { renderExplosionFrame, renderHitExplosion } from "./render"
-import { createSpaceObject } from "./factory"
+import { createSpaceObject, newPhotonLaser } from "./factory"
 import { getHeading } from "./physics"
 import { randomLightGreen } from "./color"
 
@@ -61,7 +61,7 @@ export function coolDown(so: SpaceObject) {
 
 export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   // what is the type of the shot?
-  const shot: PhotonLaser = <PhotonLaser>createSpaceObject()
+  const shot: PhotonLaser = newPhotonLaser()
   shot.mass = 10
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
@@ -116,9 +116,9 @@ export function fire(so: SpaceObject): void {
   }
 
   so.ammo -= shotLeftToFire
+
+  console.log(so)
 }
-
-
 
 export function handleHittingShot(shot: PhotonLaser, ctx: CanvasRenderingContext2D): void {
   if (shot.didHit) {

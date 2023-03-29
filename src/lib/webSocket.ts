@@ -1,6 +1,6 @@
 import type { ServerUpdate, SpaceObject } from "./types"
 import { OIDS_WS_PORT } from "../../server/pub_config"
-import { reduceSoSize, soFromValueArray, soToValueArray } from "./factory"
+import { reduceShotSize, reduceSoSize, soFromValueArray, soToValueArray } from "./factory"
 
 let socket: WebSocket
 let serverVersion = "offline"
@@ -83,6 +83,9 @@ export function sendSpaceObjectToBroadcastServer(so: SpaceObject): void {
   so.isLocal = false
 
   so = reduceSoSize(so)
+  so.shotsInFlight.forEach((v) => {
+    v = reduceShotSize(v)
+  })
 
   sendToServer(soToValueArray(so))
 }

@@ -3,6 +3,7 @@ import { SpaceShape } from "./types"
 import { rndf, rndi, round, round2dec } from "./math"
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
 import type { Button90Config } from "../components/interface"
+import type { Physical } from "./traits/Physical"
 
 export function reduceSoSize(so: SpaceObject): SpaceObject {
   const dec = 2
@@ -14,15 +15,22 @@ export function reduceSoSize(so: SpaceObject): SpaceObject {
   return so
 }
 
+export function reduceShotSize(photonLaser: PhotonLaser): PhotonLaser {
+  const dec = 2
+
+  photonLaser.acceleration = round(photonLaser.acceleration, dec)
+  photonLaser.velocity = round(photonLaser.velocity, dec)
+  photonLaser.position = round(photonLaser.position, dec)
+
+  return photonLaser
+}
+
 export function soFromValueArray(value: []): SpaceObject {
-  console.log(value)
   let so = createSpaceObject()
   Object.keys(so).forEach((v, i) => {
     if ((v as keyof SpaceObject) === "shotsInFlightValues") {
-      so[v as keyof SpaceObject] = value[i]
-
-      so.shotsInFlightValues.forEach((shot) => {
-        console.log(shot)
+      console.log(value[i])
+      ;(value[i] as any[]).forEach((shot) => {
         so.shotsInFlight.push(photonLaserFromValueArray(shot))
       })
     } else {
@@ -42,17 +50,26 @@ export function photonLaserFromValueArray(values: []): PhotonLaser {
   return pl
 }
 
-export function soToValueArray(so: SpaceObject): any[] {
-  let shots: any[] = []
+export function soShotsInFlightValueArray(so: SpaceObject): any[] {
+  const shotList: any[] = []
 
   so.shotsInFlight.forEach((shot) => {
-    shots.push(Object.values(shot))
+    shotList.push(Object.values(shot))
   })
 
-  so.shotsInFlight = []
-  so.shotsInFlightValues = shots
+  return shotList
+}
 
-  return Object.values(so)
+export function soToValueArray(so: SpaceObject): any[] {
+  const soValues = Object.values(so)
+
+  Object.keys(so).forEach((key, i) => {
+    if (key === "shotsInFlightValues") {
+      soValues[i] = soShotsInFlightValueArray(so)
+    }
+  })
+
+  return soValues
 }
 
 export function newPhotonLaser(): PhotonLaser {
