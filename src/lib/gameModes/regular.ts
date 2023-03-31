@@ -24,6 +24,7 @@ let bitSpeed = 0
 let rxDataBytes = 0
 const symbolByteSize = 2
 const byteSize = 8
+let bytesRecievedLastSecond = 0
 
 const timebuf = newDataStats()
 const downloadBuf = newDataStats()
@@ -62,7 +63,7 @@ packetSizeBuf.baseUnit = "B"
 packetSizeBuf.label = "Packet"
 
 rxByteDataBuf.baseUnit = "B"
-rxByteDataBuf.label = "RX data"
+rxByteDataBuf.label = "Data downloaded"
 // rxByteDataBuf.maxSize = 1000
 
 ppsbuf.baseUnit = "pps"
@@ -144,6 +145,7 @@ export function initRegularGame(game: Game): void {
   registerServerUpdate((su: ServerUpdate) => {
     const so: SpaceObject = su.spaceObject
     dataLen = su.unparsedDataLength
+    bytesRecievedLastSecond += dataLen
     dataKeys = su.numberOfSpaceObjectKeys
     rxDataBytes += dataLen * symbolByteSize
     // addDataPoint(packetSize, su.spaceObjectByteSize)
@@ -152,12 +154,13 @@ export function initRegularGame(game: Game): void {
       ops = numberOfServerObjects
       startTime = performance.now()
       if (numberOfServerObjects > 0) {
-        symbolsPerSec = round2dec(dataLen / numberOfServerObjects, 1)
+        symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
         byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
         bitSpeed = round2dec(byteSpeed * byteSize, 1)
         addDataPoint(downloadBuf, bitSpeed)
       }
       numberOfServerObjects = 0
+      bytesRecievedLastSecond = 0
     } else {
       numberOfServerObjects++
     }
@@ -166,8 +169,16 @@ export function initRegularGame(game: Game): void {
         if (!so.online) {
           console.log(`${so.name} went offline`)
         }
+
+        // Store every previously shots fired
+        const cachePhotonLasers = game.remotePlayers[i].shotsInFlight
+
         // update the remote player data object
         game.remotePlayers[i] = so
+
+        // Makes sure to return the previously shots fired on the copy of remote player
+        game.remotePlayers[i].shotsInFlight = game.remotePlayers[i].shotsInFlight.concat(cachePhotonLasers)
+
         return
         // if (so.sessionId === game.localPlayer.sessionId) {
         //   game.remotePlayers[i] = so

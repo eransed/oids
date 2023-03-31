@@ -12,14 +12,14 @@ const max_dt = 80
 
 const fpsBuf = newDataStats()
 // fpsBuf.maxSize = 200
-fpsBuf.accUnit = ' frames'
-fpsBuf.baseUnit = 'fps'
-fpsBuf.label = 'FPS'
+fpsBuf.accUnit = " frames"
+fpsBuf.baseUnit = "fps"
+fpsBuf.label = "FPS"
 
 const frameTimes = newDataStats()
-frameTimes.baseUnit = 'ms'
+frameTimes.baseUnit = "ms"
 // frameTimes.maxSize = 500
-frameTimes.label = 'Frame time'
+frameTimes.label = "Frame time"
 
 export function getFrameTimeMs(timestamp: number): number {
   // todo: make sure not to return nan
@@ -32,7 +32,6 @@ export function getFrameTimeMs(timestamp: number): number {
     return max_dt
   }
 }
-
 
 export function fpsCounter(ops: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const fps = round2dec(1000 / frameTimeMs, 0)
@@ -64,6 +63,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     if (isConnectedToWsServer() && game.shouldSendToServer) {
       sendSpaceObjectToBroadcastServer(game.localPlayer)
     }
+    game.localPlayer.shotsFiredThisFrame = false
     fid = requestAnimationFrame(update)
     nextFrame(game, dt)
   }

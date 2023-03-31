@@ -108,6 +108,8 @@ export function fire(so: SpaceObject): void {
     return
   }
 
+  so.shotsFiredThisFrame = true
+
   so.framesSinceLastShot += so.inverseFireRate
 
   const shotLeftToFire = so.ammo - so.shotsPerFrame < 0 ? so.shotsPerFrame - so.ammo : so.shotsPerFrame
@@ -116,8 +118,6 @@ export function fire(so: SpaceObject): void {
   }
 
   so.ammo -= shotLeftToFire
-
-  console.log(so)
 }
 
 export function handleHittingShot(shot: PhotonLaser, ctx: CanvasRenderingContext2D): void {

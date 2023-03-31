@@ -41,7 +41,10 @@ export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, v
   const ratio: number = round2dec(screen.x / screen.y, 2)
   setScaledFont(ctx)
   ctx.fillStyle = "#fff"
-  const info = `WS: ${getReadyStateText()} ${getConnInfo()}   RES: ${screen.x}x${screen.y} (x${screenScale}, ${ratio})   DTS: ${round2dec(frameTimeMs * timeScale, dec)}`
+  const info = `WS: ${getReadyStateText()} ${getConnInfo()}   RES: ${screen.x}x${screen.y} (x${screenScale}, ${ratio})   DTS: ${round2dec(
+    frameTimeMs * timeScale,
+    dec
+  )}`
   ctx.fillText(info, xpos, 50)
   ctx.fillStyle = "#444"
   ctx.fillText("" + ver, screen.x - ver.length * 27, 50)
@@ -176,26 +179,26 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
-  ctx.lineWidth = 2 * screenScale
+  ctx.lineWidth = 3 * screenScale
 
   // Hull
   ctx.strokeStyle = so.colliding ? "#f00" : so.color
   ctx.fillStyle = so.colliding ? "#f00" : so.color
   ctx.beginPath()
-  // ctx.moveTo(0, (-shipSize.y / 3) * scale)
-  // ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
-  // ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
-  // ctx.lineTo(0, (-shipSize.y / 3) * scale)
+  ctx.moveTo(0, (-shipSize.y / 3) * scale)
+  ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
+  ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
+  ctx.lineTo(0, (-shipSize.y / 3) * scale)
 
   ctx.closePath()
 
   if (renderAsLocalPlayer) {
     ctx.filter = "hue-rotate(250deg)"
-    ctx.drawImage(shipSvg, -75, -75, 150, 150)
+    // ctx.drawImage(shipSvg, -75, -75, 150, 150)
     ctx.stroke()
   } else {
     ctx.filter = "hue-rotate(360deg)"
-    ctx.drawImage(shipSvg, -75, -75, 150, 150)
+    // ctx.drawImage(shipSvg, -75, -75, 150, 150)
     ctx.fill()
   }
 

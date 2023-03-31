@@ -146,6 +146,7 @@ export interface SpaceObject
   name: string
   shotsInFlight: PhotonLaser[]
   shotsInFlightValues: any[]
+  shotsFiredThisFrame: boolean
   collidingWith: SpaceObject[]
 }
 
