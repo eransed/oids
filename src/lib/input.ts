@@ -1,6 +1,6 @@
-import type { SpaceObject, Vec2d } from './types'
-import { applyEngineThrust, applySteer, fire } from './mechanics'
-import { timeScale } from './constants'
+import type { SpaceObject, Vec2d } from "./types"
+import { applyEngineThrust, applySteer, fire } from "./mechanics"
+import { timeScale } from "./constants"
 
 let boost = false
 let halt = false
@@ -15,50 +15,50 @@ let spacePressed = false
 let selfDestruct = false
 
 function arrowControl(e: KeyboardEvent, value: boolean) {
-  if (e.key === 'ArrowUp') {
+  if (e.key === "ArrowUp") {
     upPressed = value
   }
-  if (e.key === 'q' || e.code === 'PageUp') {
+  if (e.key === "q" || e.code === "PageUp") {
     leftStrafePressed = value
   }
-  if (e.key === 'e' || e.code === 'PageDown') {
+  if (e.key === "e" || e.code === "PageDown") {
     rightStrafePressed = value
   }
-  if (e.key === 'w') {
+  if (e.key === "w") {
     upPressed = value
   }
-  if (e.key === 'ArrowDown') {
+  if (e.key === "ArrowDown") {
     downPressed = value
   }
-  if (e.key === 's') {
+  if (e.key === "s") {
     downPressed = value
   }
-  if (e.key === 'ArrowLeft') {
+  if (e.key === "ArrowLeft") {
     leftPressed = value
   }
-  if (e.key === 'ArrowRight') {
+  if (e.key === "ArrowRight") {
     rightPressed = value
   }
-  if (e.key === 'a') {
+  if (e.key === "a") {
     leftPressed = value
   }
-  if (e.key === 'd') {
+  if (e.key === "d") {
     rightPressed = value
   }
-  if (e.code === 'Space' || e.key === 'n') {
+  if (e.code === "Space" || e.key === "n") {
     // wtf code...
     spacePressed = value
   }
-  if (e.key === 'b') {
+  if (e.key === "b") {
     boost = value
   }
-  if (e.key === 'v') {
+  if (e.key === "v") {
     halt = value
   }
-  if (e.key === 'r') {
+  if (e.key === "r") {
     reset = value
   }
-  if (e.key === 'k') {
+  if (e.key === "k") {
     selfDestruct = value
   }
 }
@@ -75,14 +75,14 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
 
   if (reset) {
     // so.canonCoolDown = 0
-    so.ammo = 1000
+    so.ammo = 1000000
     so.health = 250
     so.batteryLevel = 500
     so.booster = 5
 
     so.missileDamage = 4
     so.inverseFireRate = 12
-    so.shotsPerFrame = 10
+    so.shotsPerFrame = 300
   }
 
   if (boost) {
@@ -119,25 +119,24 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
     fire(so)
   }
   if (selfDestruct) {
-    let x = 0
-    console.log(x++)
     so.health = 0
   }
 }
 
 export function initKeyControllers(): void {
-  console.log('adds game event listeners')
-  document.addEventListener('keydown', (event) => arrowControl(event, true))
-  document.addEventListener('keyup', (event) => arrowControl(event, false))
+  document.addEventListener("keydown", (event) => arrowControl(event, true))
+  document.addEventListener("keyup", (event) => arrowControl(event, false))
 }
 
 export function removeKeyControllers(): void {
-  console.log('remove game event listeners')
-  document.removeEventListener('keydown', (event) => arrowControl(event, true))
-  document.removeEventListener('keyup', (event) => arrowControl(event, false))
+  document.removeEventListener("keydown", (event) => arrowControl(event, true))
+  document.removeEventListener("keyup", (event) => arrowControl(event, false))
 }
 
-export function getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEvent): Vec2d {
+export function getMousePosition(
+  canvas: HTMLCanvasElement,
+  mouseEvent: MouseEvent
+): Vec2d {
   const rect = canvas.getBoundingClientRect()
   const scaleX = canvas.width / rect.width
   const scaleY = canvas.height / rect.height

@@ -1,7 +1,17 @@
-import type { Vec2d } from '../types'
-import { angularFriction, linearFriction, timeScale } from '../constants'
-import { sub, magnitude, scalarMultiply, add, smul, degToRad, radToDeg, withinBounds, limitv } from '../math'
-import type { Testable, TestFunction, TestModule } from './Testable'
+import type { Vec2d } from "../types"
+import { angularFriction, linearFriction, timeScale } from "../constants"
+import {
+  sub,
+  magnitude,
+  scalarMultiply,
+  add,
+  smul,
+  degToRad,
+  radToDeg,
+  withinBounds,
+  limitv,
+} from "../math"
+import type { Testable, TestFunction, TestModule } from "./Testable"
 
 export interface Positionable {
   position: Vec2d
@@ -20,9 +30,7 @@ export class Physical implements Positionable, Testable {
   angleDegree = 120
   angularVelocity = 0
 
-  constructor() {
-    console.log('Creates a Physical...')
-  }
+  constructor() {}
 
   update(deltaTime: number): void {
     if (isNaN(deltaTime)) {
@@ -81,10 +89,13 @@ export class Physical implements Positionable, Testable {
 
   getTestModule(): TestModule {
     return {
-      name: 'Physical',
+      name: "Physical",
       moduleTestFunctions: [
-        { desc: 'Test of the Physical.update method', func: this.testUpdate },
-        { desc: 'Test of the Physical.onScreen method', func: this.testOnScreen },
+        { desc: "Test of the Physical.update method", func: this.testUpdate },
+        {
+          desc: "Test of the Physical.onScreen method",
+          func: this.testOnScreen,
+        },
       ],
     }
   }

@@ -1,12 +1,15 @@
-import { SpaceShape, type SpaceObject, type Vec2d } from './types'
-import { add, degToRad, linearTransform, magnitude, rndi, round2dec, scalarMultiply, to_string } from './math'
-import { screenScale, timeScale } from './constants'
-import { getScreenFromCanvas, getScreenRect } from './canvas_util'
-import { getConnInfo, getReadyStateText } from './webSocket'
-import { LineSegment } from './shapes'
-import type { Game } from './game'
+import { SpaceShape, type Damageable, type Remote, type SpaceObject, type Vec2d } from "./types"
+import { add, degToRad, linearTransform, magnitude, rndi, round2dec, scalarMultiply, to_string } from "./math"
+import { explosionDuration, screenScale, timeScale } from "./constants"
+import { getScreenFromCanvas, getScreenRect } from "./canvas_util"
+import { getConnInfo, getReadyStateText } from "./webSocket"
+import { LineSegment } from "./shapes"
+import type { Game } from "./game"
+import { delayFrames } from "./time"
+import * as ship from "../assets/ship.svg"
+import "../app.css"
 
-export function clearScreen(ctx: CanvasRenderingContext2D, color = '#000') {
+export function clearScreen(ctx: CanvasRenderingContext2D, color = "#000") {
   ctx.fillStyle = color
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
@@ -24,42 +27,54 @@ export function render(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
   }
 }
 
-export function renderFrameInfo(fps: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
+export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remote): void {
+  const viewport = remotePlayer.viewport
+  ctx.strokeStyle = "#fff"
+  ctx.lineWidth = 5
+  ctx.strokeRect(0, 0, viewport.x, viewport.y)
+}
+
+export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
   const xpos = 26
-  const xposBar = 20
   const dec = 1
   const screen: Vec2d = getScreenRect(ctx)
   const ratio: number = round2dec(screen.x / screen.y, 2)
   setScaledFont(ctx)
-  ctx.fillStyle = '#fff'
-  ctx.fillText('FPS: ' + round2dec(fps, dec), xpos, 50)
-  ctx.fillText('DT:  ' + round2dec(frameTimeMs, dec) + 'ms', xpos, 100)
-  ctx.fillText('DTS: ' + round2dec(frameTimeMs * timeScale, dec), xpos, 150)
-  ctx.fillText('RES: ' + screen.x + 'x' + screen.y + ' (x' + screenScale + ', ' + ratio + ')', xpos, 200)
-  ctx.fillText(`WS: ${getReadyStateText()} ${getConnInfo()}`, xpos, 250)
-  renderProgressBar({ x: xposBar, y: 270 }, 'Load', frameTimeMs, 50, ctx, -40)
-  ctx.fillStyle = '#444'
-  ctx.fillText('' + ver, screen.x - ver.length * 27, 50)
+  ctx.fillStyle = "#fff"
+  const info = `WS: ${getReadyStateText()} ${getConnInfo()}   RES: ${screen.x}x${screen.y} (x${screenScale}, ${ratio})   DTS: ${round2dec(
+    frameTimeMs * timeScale,
+    dec
+  )}`
+  ctx.fillText(info, xpos, 50)
+  ctx.fillStyle = "#444"
+  ctx.fillText("" + ver, screen.x - ver.length * 27, 50)
+}
+
+export function renderInfoText(text: string, ypos: number, ctx: CanvasRenderingContext2D): void {
+  const xpos = 26
+  setScaledFont(ctx)
+  ctx.fillStyle = "#fff"
+  ctx.fillText(`${text}`, xpos, ypos)
 }
 
 export function loadingText(text: string, ctx: CanvasRenderingContext2D) {
-  ctx.font = 'bold 80px courier'
-  ctx.fillStyle = '#fff'
+  ctx.font = "bold 80px courier"
+  ctx.fillStyle = "#fff"
   const ppt = 15
   ctx.fillText(text, getScreenRect(ctx).x / 2 - text.length * ppt, getScreenRect(ctx).y / 2)
 }
 
-export function getNamesAsString(sos: SpaceObject[], label = ''): string {
+export function getNamesAsString(sos: SpaceObject[], label = ""): string {
   const arr: string[] = []
   sos.forEach((e) => {
     arr.push(`(${e.name}, ${e.health}hp)`)
   })
-  return label + arr.join(', ')
+  return label + arr.join(", ")
 }
 
 const renderSpeedometer = (screen: Vec2d, so: SpaceObject, ctx: CanvasRenderingContext2D) => {
-  renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 150, 'y m/s')
-  renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 150, 'x m/s')
+  renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 150, "y m/s")
+  renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 150, "x m/s")
 }
 
 export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: SpaceObject, ctx: CanvasRenderingContext2D): void {
@@ -78,31 +93,31 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   //Speedometer
   // renderSpeedometer(screen, so, ctx)
 
-  ctx.fillStyle = '#fff'
+  ctx.fillStyle = "#fff"
   ctx.fillText(`Local: ${so.name}`, xpos, yrow1)
   // ctx.fillText(`---------------------`, xpos, yrow3)
   ctx.fillText(getNamesAsString(serverObjects, `Online (${serverObjects.length}): `), xpos, yrow2)
-  ctx.fillText('SIF: ' + so.shotsInFlight.length, xpos + 360, yrow1)
+  ctx.fillText("SIF: " + so.shotsInFlight.length, xpos + 360, yrow1)
   // ctx.fillText(so.health + 'hp', xpos + offset * 0.5, yrow1)
   // ctx.fillText('Ammo: ' + so.ammo, xpos + offset * 0.9, yrow1)
   // ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', xpos + offset * 1.5, ypos)
-  ctx.fillText('P' + to_string(so.position, 0), xpos + 600, yrow1)
-  ctx.fillText('V' + to_string(so.velocity, 1), xpos + 1000, yrow1)
-  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), xpos + 1400, yrow1)
+  ctx.fillText("P" + to_string(so.position, 0), xpos + 600, yrow1)
+  ctx.fillText("V" + to_string(so.velocity, 1), xpos + 1000, yrow1)
+  ctx.fillText("A" + to_string(scalarMultiply(so.acceleration, 1000), 1), xpos + 1400, yrow1)
   const firstBar = 170
   const barDiff = 80
-  renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, 'hp', so.health, 250, ctx, 75)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, 'Bat', so.batteryLevel, 500, ctx, 250)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, 'Amm', so.ammo, 1000, ctx, 200)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
-  const cstate: string = so.canonOverHeat ? 'Overheat' : 'Heat'
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 4) }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, '#d44')
+  renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, "hp", so.health, 250, ctx, 75)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, "Bat", so.batteryLevel, 500, ctx, 250)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, "Amm", so.ammo, 1000, ctx, 200)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, "Speed", magnitude(so.velocity), 20, ctx, -15)
+  const cstate: string = so.canonOverHeat ? "Overheat" : "Heat"
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 4) }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, "#d44")
   // renderProgressBar({ x: xpos, y: yrow1 - 500 }, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
   // renderProgressBar({ x: xpos, y: yrow1 - 700 }, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
   ctx.restore()
 }
 
-export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContext2D, scale = 10000, color = '#fff', offset: Vec2d = { x: 0, y: 0 }) {
+export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContext2D, scale = 10000, color = "#fff", offset: Vec2d = { x: 0, y: 0 }) {
   ctx.save()
   ctx.translate(origin.x + offset.x, origin.y + offset.y)
   ctx.beginPath()
@@ -132,7 +147,7 @@ export function renderHitBox(so: SpaceObject, ctx: CanvasRenderingContext2D): vo
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
-  ctx.strokeStyle = '#fff'
+  ctx.strokeStyle = "#fff"
   ctx.strokeRect(0, 0, so.size.x, so.size.y)
   ctx.restore()
 }
@@ -140,7 +155,7 @@ export function renderHitBox(so: SpaceObject, ctx: CanvasRenderingContext2D): vo
 export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
-  ctx.strokeStyle = '#447'
+  ctx.strokeStyle = "#447"
   ctx.lineWidth = 3
   ctx.beginPath()
   ctx.arc(0, 0, so.hitRadius, 0, Math.PI * 2)
@@ -154,35 +169,44 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   const shipSize: Vec2d = { x: 60, y: 100 }
   so.size = shipSize
 
+  const shipSvg = new Image()
+
+  shipSvg.src = ship.default
+
   // Render hit box of ship after contex restore
   //renderHitRadius(so, ctx)
 
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
-  ctx.lineWidth = 2 * screenScale
+  ctx.lineWidth = 3 * screenScale
 
   // Hull
-  ctx.strokeStyle = so.colliding ? '#f00' : so.color
-  ctx.fillStyle = so.colliding ? '#f00' : so.color
+  ctx.strokeStyle = so.colliding ? "#f00" : so.color
+  ctx.fillStyle = so.colliding ? "#f00" : so.color
   ctx.beginPath()
   ctx.moveTo(0, (-shipSize.y / 3) * scale)
   ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
   ctx.lineTo(0, (-shipSize.y / 3) * scale)
+
   ctx.closePath()
 
   if (renderAsLocalPlayer) {
+    ctx.filter = "hue-rotate(250deg)"
+    // ctx.drawImage(shipSvg, -75, -75, 150, 150)
     ctx.stroke()
   } else {
+    ctx.filter = "hue-rotate(360deg)"
+    // ctx.drawImage(shipSvg, -75, -75, 150, 150)
     ctx.fill()
   }
 
-  ctx.fillStyle = '#f00'
+  ctx.fillStyle = "#f00"
   ctx.rotate((20 * Math.PI) / 180)
   if (!so.online && !renderAsLocalPlayer) {
     ctx.fillText(so.name, (-1.2 * so.size.x) / 2, -30)
-    ctx.fillText('offline', (-1.2 * so.size.x) / 2, 30)
+    ctx.fillText("offline", (-1.2 * so.size.x) / 2, 30)
   }
 
   // Restore drawing
@@ -192,13 +216,13 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   renderShot(so, ctx)
 }
 
-export function renderExplosionFrame(pos: Vec2d, ctx: CanvasRenderingContext2D) {
+export function renderHitExplosion(pos: Vec2d, ctx: CanvasRenderingContext2D) {
   const offset = 20
   const minSize = 1
   const maxSize = 30
   ctx.save()
   ctx.translate(pos.x, pos.y)
-  for (const c of ['#ff0', '#f00', '#ee0', '#e00', '#dd0', '#d00', '#008', '#000', '#444', '#fee', '#f66,', '#f99', '#fbb']) {
+  for (const c of ["#ff0", "#f00", "#ee0", "#e00", "#dd0", "#d00", "#008", "#000", "#444", "#fee", "#f66,", "#f99", "#fbb"]) {
     const center = add({ x: 0, y: 0 }, { x: rndi(-offset, offset), y: rndi(-offset, offset) })
     const size = add({ x: 0, y: 0 }, { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) })
     ctx.fillStyle = c
@@ -207,18 +231,51 @@ export function renderExplosionFrame(pos: Vec2d, ctx: CanvasRenderingContext2D) 
   ctx.restore()
 }
 
+export function renderExplosionFrame(so: SpaceObject, ctx: CanvasRenderingContext2D) {
+  //delayFrames(5000)
+  const offset = 50
+  const minSize = 1
+  const maxSize = 30 * so.deadFrameCount * 0.03
+  ctx.save()
+  ctx.translate(so.position.x - so.size.x / 2, so.position.y - so.size.y / 2)
+  const colors = ["#ff0", "#f00", "#ee0", "#e00", "#dd0", "#d00", "#008", "#000", "#444", "#fee", "#f66,", "#f99", "#fbb"]
+
+  if (so.deadFrameCount < explosionDuration * 1) {
+    for (const c of colors) {
+      const center = add({ x: 0, y: 0 }, { x: rndi(-offset, offset), y: rndi(-offset, offset) })
+      const size = add({ x: 0, y: 0 }, { x: rndi(minSize, maxSize), y: rndi(minSize, maxSize) })
+      ctx.fillStyle = c
+      ctx.fillRect(center.x, center.y, size.x, size.y)
+    }
+  }
+  for (let i = 2; i < 3; i += 0.7) {
+    ctx.beginPath()
+
+    ctx.arc(0, 0, so.deadFrameCount * i * i * i, 0, degToRad(360))
+
+    ctx.closePath()
+    ctx.strokeStyle = "#fff"
+    // ctx.lineWidth = (100 / Math.sqrt(so.deadFrameCount ?? 1)) * 2
+    ctx.lineWidth = (explosionDuration - so.deadFrameCount) / i
+    // ctx.lineWidth = so.deadFrameCount + 10
+    ctx.stroke()
+  }
+
+  ctx.restore()
+}
+
 export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D) {
   ctx.save()
   for (const shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#fff' : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? "#fff" : "#fff"
     } else if (Math.random() > 0.9) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#f0f' : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? "#f0f" : "#fff"
     } else if (Math.random() > 0.8) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#0f0' : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? "#0f0" : "#fff"
     } else {
-      ctx.fillStyle = shot.armedDelay < 0 ? shot.color : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? shot.color : "#fff"
     }
     ctx.save()
     ctx.translate(shot.position.x, shot.position.y)
@@ -238,7 +295,7 @@ export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void 
   ctx.closePath()
   ctx.fill()
   setScaledFont(ctx)
-  ctx.fillStyle = '#ccc'
+  ctx.fillStyle = "#ccc"
   //ctx.fillText(`${s.health}hp`, 0, 0)
   ctx.restore()
 }
@@ -252,7 +309,7 @@ export function renderComet(s: SpaceObject, ctx: CanvasRenderingContext2D): void
   ctx.closePath()
   ctx.fill()
   setScaledFont(ctx)
-  ctx.fillStyle = '#ccc'
+  ctx.fillStyle = "#ccc"
   //ctx.fillText(`${s.health}hp`, 0, 0)
   ctx.restore()
 }
@@ -271,7 +328,7 @@ export function renderProgressBar(
   ctx: CanvasRenderingContext2D,
   redLevel = 60,
   warn = false,
-  textWarnColor = '#7b7b7b'
+  textWarnColor = "#7b7b7b"
 ): void {
   ctx.save()
   ctx.translate(pos.x, pos.y)
@@ -280,12 +337,12 @@ export function renderProgressBar(
   const h = 50
 
   ctx.lineWidth = linew
-  ctx.strokeStyle = '#fff'
-  ctx.fillStyle = '#fff'
+  ctx.strokeStyle = "#fff"
+  ctx.fillStyle = "#fff"
 
   if (amount < redLevel || (redLevel < 0 && amount > Math.abs(redLevel))) {
     // ctx.fillStyle = '#ffa500'
-    ctx.fillStyle = '#ff0'
+    ctx.fillStyle = "#ff0"
   } else if (redLevel < 0 && amount < Math.abs(redLevel)) {
     // ctx.fillStyle = '#090'
   }
@@ -300,7 +357,7 @@ export function renderProgressBar(
   let p: number = (w * amount) / max - linew
   if (p < 0) p = 0
   if (p > w) {
-    ctx.fillStyle = '#600'
+    ctx.fillStyle = "#600"
     p = w - linew
   }
 
@@ -311,7 +368,7 @@ export function renderProgressBar(
   ctx.strokeRect(Math.floor(linew / 2), Math.floor(linew / 2) + 1, 1, h - Math.floor(linew / 2) - 1)
 
   setScaledFont(ctx)
-  ctx.fillStyle = '#7b7b7b'
+  ctx.fillStyle = "#7b7b7b"
   if (percent_n > 56) {
     // ctx.fillStyle = '#000'
   }
@@ -329,8 +386,8 @@ export function renderNumber(num: number, pos: Vec2d, ctx: CanvasRenderingContex
   ctx.translate(pos.x, pos.y)
   ctx.rotate(degToRad(angleAdjDeg))
   ctx.font = `bold 22px courier`
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
+  ctx.textAlign = "center"
+  ctx.textBaseline = "middle"
   ctx.fillText(`${num}`, 0, 0)
   ctx.restore()
 }
@@ -348,13 +405,13 @@ export function renderRoundIndicator(
   ctx.save()
   ctx.translate(centerPos.x, centerPos.y)
   ctx.beginPath()
-  ctx.strokeStyle = '#fff'
-  ctx.fillStyle = '#fff'
+  ctx.strokeStyle = "#fff"
+  ctx.fillStyle = "#fff"
   ctx.lineWidth = 8
 
   const ang1 = -240
   const meterAngleTest = round2dec(linearTransform(value, min, max, 0, -ang1), 0)
-  const meterAngleTestStr = meterAngleTest + ''
+  const meterAngleTestStr = meterAngleTest + ""
   const roundVal = `${round2dec(value, 0)}`
   ctx.fillText(`${meterAngleTest}`, -8 * meterAngleTestStr.length, radius / 2)
   // ctx.fillText(`${roundVal}`, -8 * roundVal.length , radius/2)
@@ -404,7 +461,7 @@ export function renderRoundIndicator(
   ctx.lineTo(radius - 25, 0)
   ctx.moveTo(-needleWith / 2, 0)
   ctx.lineWidth = needleWith
-  ctx.strokeStyle = '#c00'
+  ctx.strokeStyle = "#c00"
   ctx.closePath()
   ctx.stroke()
   ctx.restore()
@@ -414,9 +471,9 @@ const render3DFrame = (game: Game) => {
   const scr = getScreenRect(game.ctx)
   const padding = 0
   const pad: Vec2d = { x: padding, y: padding }
-  game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
-  game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
-  game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
+  game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, "#f00"))
+  game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, "#00f"))
+  game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, "#0f0"))
   game.segments.push(new LineSegment({ x: padding, y: scr.y }, { x: padding, y: padding }))
 
   const viewSlices = game.lightSource.shine(game.segments, game.ctx)
@@ -425,7 +482,7 @@ const render3DFrame = (game: Game) => {
   const viewSlizeWidth = Math.floor(viewSize.x / viewSlices.length)
   game.ctx.save()
 
-  game.ctx.fillStyle = '#000'
+  game.ctx.fillStyle = "#000"
   game.ctx.fillRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
   game.ctx.fill()
 
@@ -438,7 +495,7 @@ const render3DFrame = (game: Game) => {
     game.ctx.fillStyle = viewSlices[i].color
     game.ctx.fillRect(viewTopLeft.x + viewSlizeWidth * i, y, viewSlizeWidth, h)
   }
-  game.ctx.strokeStyle = '#f00'
+  game.ctx.strokeStyle = "#f00"
   game.ctx.lineWidth = 10
   game.ctx.strokeRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
   game.ctx.stroke()

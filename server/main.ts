@@ -1,10 +1,24 @@
-import type { IncomingMessage } from 'http'
-import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from 'ws'
-import { OIDS_WS_PORT } from './pub_config'
-import { getLocalIp, ipport } from './net'
+//WS Setup
+import type { IncomingMessage } from "http"
+import type { SpaceObject } from "../src/lib/types"
+import { soFromValueArray, soToValueArray } from "../src/lib/factory"
+import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from "ws"
+import { OIDS_WS_PORT } from "./pub_config"
+import { getLocalIp, ipport } from "./net"
 
-const pack = require('../package.json')
-const name_ver: string = pack.name + ' ' + pack.version
+import { apiServer } from "./apiServer"
+import { start_host_server } from "./host_server"
+
+// start ApiServer
+apiServer()
+
+// start host server
+start_host_server()
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const pack = require("../package.json")
+// const name_ver: string = pack.name + " " + pack.version
+const name_ver = "oids-0.3.0"
 
 const WS_PORT = OIDS_WS_PORT
 
@@ -14,20 +28,25 @@ const server: WebSocketServer = new WebSocketServer({
 
 let globalConnectedClients: Client[] = []
 
-
 class Client {
   ws: WebSocket
   req: IncomingMessage
   name: string
   dateAdded: Date
-  lastDataObject: any
+  lastDataObject: SpaceObject | null = null
+  sessionId: string | null = null
   private nameHasBeenUpdated = false
+
   constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded: Date) {
     this.ws = _ws
     this.req = _req
     this.name = _name
     this.dateAdded = _dateAdded
     this.addEventListeners()
+  }
+
+  setSessionId(id: string) {
+    this.sessionId = id
   }
 
   updateNameOnce(newName: string) {
@@ -43,7 +62,7 @@ class Client {
 
   addEventListeners(): void {
     // console.log(`Adding event-listeners for ${this.toString()}`)
-    this.ws.addEventListener('close', () => {
+    this.ws.addEventListener("close", () => {
       // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
       console.log(`${this.toString()} has been disconnected, sending goodbye message`)
       const offlineMessage: any = this.lastDataObject
@@ -52,25 +71,26 @@ class Client {
       } catch (err) {
         console.error(err)
       }
-      broadcastToClients(this, globalConnectedClients, offlineMessage)
+      broadcastToAllClients(this, globalConnectedClients, offlineMessage)
       globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
       if (globalConnectedClients.length === 0) {
-        console.log('No clients connected :(')
+        console.log("No clients connected :(")
       }
     })
-  
-    this.ws.addEventListener('message', (event: MessageEvent) => {
-      const o: any = JSON.parse(event.data)
-      this.lastDataObject = o
+
+    this.ws.addEventListener("message", (event: MessageEvent) => {
+      const so: SpaceObject = soFromValueArray(JSON.parse(event.data))
+      this.lastDataObject = so
       if (!this.nameHasBeenUpdated) {
-        globalConnectedClients.forEach((c) => {
-          if (c === this && c.name === this.name) {
-            c.updateNameOnce(o.name)
+        globalConnectedClients.forEach((client) => {
+          if (client === this && client.name === this.name) {
+            client.updateNameOnce(so.name)
           }
         })
       }
-      o.online = true
-      broadcastToClients(this, globalConnectedClients, o)
+      so.online = true
+      // broadcastToAllClients(this, globalConnectedClients, so);
+      broadcastToSessionClients(this, globalConnectedClients, so)
     })
   }
 
@@ -83,18 +103,17 @@ function getReadyStateText(ws: WebSocket): string {
   const s: number = ws.readyState
   switch (s) {
     case CONNECTING:
-      return 'CONNECTING'
+      return "CONNECTING"
     case CLOSED:
-      return 'CLOSED'
+      return "CLOSED"
     case OPEN:
-      return 'OPEN'
+      return "OPEN"
     case CLOSING:
-      return 'CLOSING'
+      return "CLOSING"
     default:
-      return 'UNKNOWN (' + s + ')'
+      return "UNKNOWN (" + s + ")"
   }
 }
-
 
 function addNewClientIfNotExisting(clients: Client[], clientConnection: Client): boolean {
   for (const c of clients) {
@@ -122,13 +141,12 @@ function removeClientIfExisting(clients: Client[], clientConnection: Client): Cl
   return clients
 }
 
-
 function removeDisconnectedClients(clients: Client[]): Client[] {
   // const lengthBefore: number = clients.length
   const disconnectedClients: Client[] = clients.filter((c: Client) => {
     return c.ws.readyState === CLOSED || c.ws.readyState === CLOSING
   })
-  
+
   const connectedClients: Client[] = clients.filter((c: Client) => {
     return c.ws.readyState === OPEN || c.ws.readyState === CONNECTING
   })
@@ -148,19 +166,27 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
   return connectedClients
 }
 
-
 // object is any non-primitive object ie not string, number, boolean, undefined, null etc. added in typescript 2.2
-function broadcastToClients (skipSourceClient: Client, connectedClients: Client[], data: any): void {
+function broadcastToAllClients(skipSourceClient: Client, connectedClients: Client[], data: SpaceObject): void {
   for (const client of connectedClients) {
     if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
-      client.ws.send(JSON.stringify(data))
+      client.ws.send(JSON.stringify(soToValueArray(data)))
     }
   }
 }
 
+function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: SpaceObject): void {
+  for (const client of connectedClients) {
+    if (sendingClient !== client && sendingClient.name !== client.name) {
+      if (sendingClient.sessionId === client.sessionId) {
+        client.ws.send(JSON.stringify(soToValueArray(data)))
+      }
+    }
+  }
+}
 
-server.on('connection', function connection(clientConnection: WebSocket, req: IncomingMessage) {
-  clientConnection.send(JSON.stringify({serverVersion: name_ver}))
+server.on("connection", function connection(clientConnection: WebSocket, req: IncomingMessage) {
+  clientConnection.send(JSON.stringify({ serverVersion: name_ver }))
   globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
 
   const newClient: Client = new Client(clientConnection, req, `Client-${globalConnectedClients.length}`, new Date())
@@ -173,7 +199,6 @@ server.on('connection', function connection(clientConnection: WebSocket, req: In
     console.log(`   ${c.toString()}`)
   })
 })
-
 
 console.log(`Starting ${name_ver}`)
 console.log(`Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`)

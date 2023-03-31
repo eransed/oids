@@ -1,10 +1,34 @@
-import type { SpaceObject, Vec2d } from './types'
-import { SpaceShape } from './types'
-import { rndf, rndi } from './math'
-import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
-import type { Button90Config } from '../components/interface'
+import type { PhotonLaser, SpaceObject, Vec2d } from "./types"
+import { SpaceShape } from "./types"
+import { rndf, rndi, round, round2dec } from "./math"
+import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
+import type { Button90Config } from "../components/interface"
+import type { Physical } from "./traits/Physical"
 
-export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
+export function newPhotonLaser(): PhotonLaser {
+  const shot = {
+    acceleration: { x: 0, y: 0 },
+    angleDegree: -90,
+    angularVelocity: 0,
+    armedDelay: 6,
+    color: "#90d",
+    damage: 5,
+    deadFrameCount: 0,
+    didHit: false,
+    health: 100,
+    isDead: false,
+    mass: 1,
+    obliterated: false,
+    position: { x: 0, y: 0 },
+    shotBlowFrame: 16,
+    size: { x: 100, y: 100 },
+    velocity: { x: 0, y: 0 },
+  }
+
+  return shot
+}
+
+export function createSpaceObject(name = "SpaceObject"): SpaceObject {
   const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2d = {
     x: rndi(0, 100),
@@ -12,60 +36,68 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   }
 
   const spaceObject: SpaceObject = {
-    isDead: false,
-    mass: 1,
-    size: { x: 100, y: 100 },
-    color: '#90d',
-    position: initPos,
-    velocity: initVel,
+    viewport: { x: 0, y: 0 },
+    sessionId: undefined,
     acceleration: { x: 0, y: 0 },
-    name: name,
+    ammo: 1000,
     angleDegree: -90,
     angularVelocity: 0,
-    health: 100,
-    killCount: 0,
+    armedDelay: 6,
     batteryLevel: 500,
-    enginePower: 0.2,
-    steeringPower: 1.2,
-    ammo: 1000,
-    shotsInFlight: [],
-    missileDamage: 2,
+    booster: 2,
+    bounceCount: 0,
     canonCoolDown: 0,
+    canonCoolDownSpeed: 1.4,
+    canonHeatAddedPerShot: 1.7,
     canonOverHeat: false,
     colliding: false,
     collidingWith: [],
+    color: "#90d",
     damage: 5,
-    armedDelay: 6,
-    bounceCount: 0,
+    deadFrameCount: 0,
     didHit: false,
-    shotBlowFrame: 16,
-    steer: function (direction: number, deltaTime: number): void {
-      throw new Error('Steer not implemented.')
-    },
-    motivatorBroken: false,
-    motivationLevel: 100,
-    online: false,
-    isLocal: false,
-    shape: SpaceShape.SmallShip,
-    hitRadius: 60,
-    serverVersion: '',
-    booster: 2,
+    enginePower: 0.2,
+    framesSinceLastServerUpdate: 0,
     framesSinceLastShot: 0,
-    missileSpeed: 20,
-    canonCoolDownSpeed: 1.4,
-    canonHeatAddedPerShot: 1.7,
+    health: 100,
+    hitRadius: 60,
     inverseFireRate: 6,
+    isDead: false,
+    isLocal: false,
+    isPlaying: false,
+    killCount: 0,
+    mass: 1,
+    missileDamage: 2,
+    missileSpeed: 20,
+    motivationLevel: 100,
+    motivatorBroken: false,
+    name: name,
+    obliterated: false,
+    online: false,
+    photonColor: "#0f0",
+    position: initPos,
+    serverVersion: "",
+    shape: SpaceShape.SmallShip,
+    shotBlowFrame: 16,
+    shotsInFlight: [],
+    shotsInFlightValues: [],
+    shotsFiredThisFrame: false,
     shotsPerFrame: 1,
-    photonColor: '#0f0',
+    size: { x: 100, y: 100 },
+    steer: function (direction: number, deltaTime: number): void {
+      throw new Error("Steer not implemented.")
+    },
+    steeringPower: 1.2,
+    velocity: initVel,
   }
 
   return spaceObject
 }
 
 export function createButton90Config(
-  buttonText = 'Button90',
+  buttonText = "Button90",
   clickCallback = () => {
-    alert(`${buttonText} selected`)
+    console.log(`${buttonText} selected`)
   },
   selected = false
 ): Button90Config {
@@ -74,4 +106,84 @@ export function createButton90Config(
     clickCallback: clickCallback,
     selected: selected,
   }
+}
+
+export function reduceSoSize(so: SpaceObject): SpaceObject {
+  const dec = 2
+
+  so.canonCoolDown = round2dec(so.canonCoolDown, dec)
+  so.acceleration = round(so.acceleration, dec)
+  so.velocity = round(so.velocity, dec)
+  so.position = round(so.position, dec)
+
+  return so
+}
+
+export function reduceShotSize(photonLaser: PhotonLaser): PhotonLaser {
+  const dec = 2
+
+  photonLaser.acceleration = round(photonLaser.acceleration, dec)
+  photonLaser.velocity = round(photonLaser.velocity, dec)
+  photonLaser.position = round(photonLaser.position, dec)
+
+  return photonLaser
+}
+
+//Incoming messages
+export function soFromValueArray(value: []): SpaceObject {
+  let so = createSpaceObject()
+  Object.keys(so).forEach((v, i) => {
+    if ((v as keyof SpaceObject) === "shotsInFlightValues") {
+      // if ((value[i] as any[]).length > 0) {
+      //   debugger
+      // }
+      ;(value[i] as any[]).forEach((shot) => {
+        so.shotsInFlight.push(photonLaserFromValueArray(shot))
+      })
+    } else {
+      so[v as keyof SpaceObject] = value[i]
+    }
+  })
+  so.shotsInFlightValues = []
+  return so
+}
+
+//Creates one shot from valuearray
+export function photonLaserFromValueArray(values: []): PhotonLaser {
+  let pl = newPhotonLaser()
+
+  Object.keys(pl).forEach((v, i) => {
+    pl[v as keyof PhotonLaser] = values[i]
+  })
+
+  return pl
+}
+
+//Outgoing messages
+export function soToValueArray(so: SpaceObject): any[] {
+  const soValues = Object.values(so)
+
+  Object.keys(so).forEach((key, i) => {
+    if (key === "shotsInFlightValues" && so.shotsFiredThisFrame) {
+      soValues[i] = soShotsInFlightValueArray(so)
+    }
+    if (key === "shotsInFlight") {
+      soValues[i] = []
+    }
+  })
+
+  // if (so.shotsInFlight.length > 0) debugger
+
+  return soValues
+}
+
+//Creates an value array from shotsInFlight on space object
+export function soShotsInFlightValueArray(so: SpaceObject): any[] {
+  const shotList: any[] = []
+
+  so.shotsInFlight.forEach((shot) => {
+    shotList.push(Object.values(shot))
+  })
+
+  return shotList
 }
