@@ -81,6 +81,7 @@ class Client {
     this.ws.addEventListener("message", (event: MessageEvent) => {
       const so: SpaceObject = soFromValueArray(JSON.parse(event.data))
       this.lastDataObject = so
+      if (so.sessionId) this.sessionId = so.sessionId
       if (!this.nameHasBeenUpdated) {
         globalConnectedClients.forEach((client) => {
           if (client === this && client.name === this.name) {

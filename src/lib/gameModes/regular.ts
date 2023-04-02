@@ -180,13 +180,9 @@ export function initRegularGame(game: Game): void {
         game.remotePlayers[i].shotsInFlight = game.remotePlayers[i].shotsInFlight.concat(cachePhotonLasers)
 
         return
-        // if (so.sessionId === game.localPlayer.sessionId) {
-        //   game.remotePlayers[i] = so
-        //   return
-        // }
       }
     }
-    if (so.name !== game.localPlayer.name && so.sessionId === game.localPlayer.sessionId) {
+    if (so.name !== game.localPlayer.name) {
       game.remotePlayers.push(so)
       console.log(`New ship online: ${so.name}`)
     }
