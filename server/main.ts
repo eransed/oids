@@ -1,7 +1,7 @@
 //WS Setup
 import type { IncomingMessage } from "http"
 import type { SpaceObject } from "../src/lib/types"
-import { soFromValueArray, soToValueArray } from "../src/lib/factory"
+import { soFromValueArray, soToValueArray } from "../src/lib/websocket/util"
 import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from "ws"
 import { OIDS_WS_PORT } from "./pub_config"
 import { getLocalIp, ipport } from "./net"

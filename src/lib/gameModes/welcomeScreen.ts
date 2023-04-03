@@ -1,18 +1,15 @@
-import {
-  setCanvasSize,
-  getScreenCenterPosition,
-  getScreenRect,
-  getScreenCenterPositionFromClient,
-} from "../canvas_util"
-import { randomAnyLightColor, randomBlue, randomAnyColor } from "../color"
+import { setCanvasSize, getScreenCenterPosition, getScreenRect, getScreenCenterPositionFromClient } from "../canvas_util"
+import { randomBlue, randomAnyColor } from "../color"
 import { initKeyControllers, spaceObjectKeyController } from "../input"
 import { createSpaceObject } from "../factory"
 import type { Game } from "../game"
 import { add, rndfVec2d, rndi } from "../math"
 import { bounceSpaceObject } from "../mechanics"
 import { gravity } from "../physics"
-import { loadingText, renderComet, renderMoon, renderShip } from "../render"
-import { GameType, SpaceShape, type SpaceObject, type Vec2d } from "../types"
+import { loadingText } from "../render/render2d"
+import { GameType, SpaceShape } from "../types"
+import { renderComet, renderMoon } from "../render/renderDebris"
+import { renderShip } from "../render/renderShip"
 
 export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
@@ -66,10 +63,7 @@ export function initWelcomeScreen(game: Game): void {
   initKeyControllers()
 
   const offset = 2000
-  game.localPlayer.position = add(
-    getScreenCenterPosition(game.ctx),
-    rndfVec2d(-offset, offset)
-  )
+  game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
 
   const screenCenter = getScreenCenterPositionFromClient()
 
@@ -100,10 +94,7 @@ export function initWelcomeScreen(game: Game): void {
     s.acceleration.x = 0
     s.acceleration.y = 0
     s.health = 0
-    s.position = add(
-      getScreenCenterPosition(game.ctx),
-      rndfVec2d(-offset, offset)
-    )
+    s.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
     game.bodies.push(s)
   }
 

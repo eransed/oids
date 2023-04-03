@@ -1,9 +1,10 @@
 import type { Game } from "./game"
 import { round2dec } from "./math"
-import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from "./webSocket"
+import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from "./websocket/webSocket"
 import { updateSpaceObjects } from "./physics"
-import { clearScreen, renderFrameInfo } from "./render"
-import { addDataPoint, newDataStats, renderGraph } from "./stats"
+import { clearScreen } from "./render/render2d"
+import { addDataPoint, newDataStats } from "./stats"
+import { renderFrameInfo } from "./render/renderUI"
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -88,10 +89,4 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   }
 
   return stopper
-}
-
-export function delayFrames(time: number) {
-  for (let i = 0; i < time; i++) {
-    console.log("Delay")
-  }
 }

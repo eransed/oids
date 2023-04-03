@@ -1,11 +1,24 @@
 import type { Game } from "./game"
 import type { Button90Config } from "../components/interface"
-import { menu, showMenu, showLobby, showLoginModal as showProfile, isLoggedIn, user } from "./stores"
-import { createButton90Config } from "./factory"
+import { menu, showMenu, showLobby, showLoginModal as showProfile, isLoggedIn } from "./stores"
 
 // Keep selected state:
 let inGameMenu: Button90Config[]
 let startupMenu: Button90Config[]
+
+export function createButton90Config(
+  buttonText = "Button90",
+  clickCallback = () => {
+    console.log(`${buttonText} selected`)
+  },
+  selected = false
+): Button90Config {
+  return {
+    buttonText: buttonText,
+    clickCallback: clickCallback,
+    selected: selected,
+  }
+}
 
 // Function returns the correct menu configuration depending on
 // the current game state:

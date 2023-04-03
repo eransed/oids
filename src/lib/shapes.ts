@@ -1,6 +1,6 @@
-import type { Vec2d } from "./types";
-import { add, angle, degToRad, direction, dist, norm, smul, sub, vec2d } from "./math";
-import { renderPoint, renderVector } from "./render";
+import type { Vec2d } from "./types"
+import { angle, degToRad, direction, dist, norm, smul, sub, vec2d } from "./math"
+import { renderPoint } from "./render/render2d"
 
 export interface ViewSlice {
   distance: number
@@ -26,15 +26,15 @@ export class LightSource {
     this.rays = []
     // min diff from 0 and 180 that wont cause issues with vertical lines:
     // const startAngle = Number.EPSILON * 14680 // = ~3.259e-12
-    const startAngle = 0.000001 + angle(this.direction) - this.fovDegrees/2
-    const stopAngle = angle(this.direction) + this.fovDegrees/2
+    const startAngle = 0.000001 + angle(this.direction) - this.fovDegrees / 2
+    const stopAngle = angle(this.direction) + this.fovDegrees / 2
     for (let a = startAngle; a <= stopAngle; a += this.rayAngleDiff) {
       this.rays.push(new Ray(this.position, direction(a)))
     }
     for (const ray of this.rays) {
-      let min = Infinity;
+      let min = Infinity
       let nearestIntersect: Vec2d | null = null
-      let color = '#000'
+      let color = "#000"
       for (const segment of segments) {
         const p = ray.cast(segment)
         if (p) {
@@ -49,9 +49,9 @@ export class LightSource {
         }
       }
       if (nearestIntersect) {
-        new LineSegment(this.position, nearestIntersect, '#50503a').render(ctx)
-        renderPoint(ctx, nearestIntersect, '#ff0', 20)
-        slices.push({distance: min, color: color})
+        new LineSegment(this.position, nearestIntersect, "#50503a").render(ctx)
+        renderPoint(ctx, nearestIntersect, "#ff0", 20)
+        slices.push({ distance: min, color: color })
       }
     }
     return slices
@@ -64,14 +64,13 @@ export class LightSource {
   //   renderPoint(ctx, this.position, '#50503a', 8)
   //   // renderVector(this.direction, this.position, ctx, 100, '#0f0')
   // }
-
 }
 
 export class Ray {
   position: Vec2d
   direction: Vec2d
 
-  constructor (_position: Vec2d, _direction: Vec2d) {
+  constructor(_position: Vec2d, _direction: Vec2d) {
     this.position = _position
     this.direction = _direction
   }
@@ -116,7 +115,7 @@ export class Ray {
     const dirScaled = smul(this.direction, scale)
     ctx.save()
     ctx.lineWidth = 6
-    ctx.strokeStyle = '#555'
+    ctx.strokeStyle = "#555"
     ctx.translate(this.position.x, this.position.y)
     ctx.beginPath()
     ctx.moveTo(0, 0)
@@ -125,7 +124,6 @@ export class Ray {
     ctx.stroke()
     ctx.restore()
   }
-
 }
 
 export class LineSegment {
@@ -133,7 +131,7 @@ export class LineSegment {
   p1: Vec2d
   color: string
 
-  constructor (_p0: Vec2d, _p1: Vec2d, _color = '#fff') {
+  constructor(_p0: Vec2d, _p1: Vec2d, _color = "#fff") {
     this.p0 = _p0
     this.p1 = _p1
     this.color = _color
@@ -154,5 +152,4 @@ export class LineSegment {
     ctx.stroke()
     ctx.restore()
   }
-
 }

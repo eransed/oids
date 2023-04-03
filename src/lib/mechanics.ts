@@ -3,10 +3,9 @@ import type { Steerable } from "./traits/Steerable"
 
 import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from "./math"
 import { maxHeat, shotHitReversFactor } from "./constants"
-import { renderExplosionFrame, renderHitExplosion } from "./render"
-import { createSpaceObject, newPhotonLaser } from "./factory"
+import { renderHitExplosion } from "./render/renderFx"
+import { newPhotonLaser } from "./factory"
 import { getHeading } from "./physics"
-import { randomLightGreen } from "./color"
 
 export function applyEngine(so: Thrustable & Boostable, boost = false): number {
   const consumption: number = so.enginePower * (boost ? so.booster : 1)
