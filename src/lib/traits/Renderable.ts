@@ -1,7 +1,8 @@
 import type { Positionable, Sizeable } from './Physical'
-import type { Damager, Vec2d } from '../types'
+import type { Damager } from '../interface'
 import type { Steerable } from './Steerable'
 import { steerImpl } from './Steerable'
+import type { Vec2d } from '../math'
 
 export interface Renderable extends Positionable, Sizeable {
   color: string

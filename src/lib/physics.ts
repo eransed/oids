@@ -1,9 +1,27 @@
-import type { Bounceable, Damager, Physical, Rotatable, SpaceObject, Vec2d } from "./types"
-import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub } from "./math"
+import type { Bounceable, Damager, Physical, Rotatable, SpaceObject } from "./interface"
+import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from "./math"
 import { getScreenFromCanvas } from "./canvas_util"
 import { renderHitExplosion } from "./render/renderFx"
 import { coolDown, decayDeadShots, handleHittingShot } from "./mechanics"
 import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from "./constants"
+import type { Shape } from "./shapes/Shape"
+
+export function updateShape(shape: Shape, dt: number): void {
+  if (isNaN(dt)) return
+  const deltaTime: number = dt * timeScale
+  const v: Vec2d = scalarMultiply(shape.velocity, deltaTime)
+  const a: Vec2d = scalarMultiply(shape.acceleration, deltaTime)
+  shape.velocity = add(shape.velocity, a)
+  shape.position = add(shape.position, v)
+  shape.acceleration = { x: 0, y: 0 }
+  shape.velocity = limitv(shape.velocity, { x: 200, y: 200 })
+}
+
+export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
+  shapes.forEach((s) => {
+    updateShape(s, frameTimeMs)
+  })
+}
 
 export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
   // If assigning nan to so.velocity, position or acceleration it will stay nan for ever

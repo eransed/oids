@@ -7,7 +7,7 @@ import { add, rndfVec2d, rndi } from "../math"
 import { bounceSpaceObject } from "../mechanics"
 import { gravity } from "../physics"
 import { loadingText } from "../render/render2d"
-import { GameType, SpaceShape } from "../types"
+import { GameType, SpaceShape } from "../interface"
 import { renderComet, renderMoon } from "../render/renderDebris"
 import { renderShip } from "../render/renderShip"
 

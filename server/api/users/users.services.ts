@@ -2,7 +2,6 @@ import bcrypt from "bcrypt"
 import db from "../utils/db"
 
 import { User } from "../types/user"
-import { SpaceObject } from "../../../src/lib/types"
 
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({

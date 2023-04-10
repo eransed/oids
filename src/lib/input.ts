@@ -1,6 +1,7 @@
-import type { SpaceObject, Vec2d } from "./types"
+import type { SpaceObject } from "./interface"
 import { applyEngineThrust, applySteer, fire } from "./mechanics"
 import { timeScale } from "./constants"
+import type { Vec2d } from "./math"
 
 let boost = false
 let halt = false

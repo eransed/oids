@@ -1,4 +1,4 @@
-import type { PhotonLaser, SpaceObject } from "..//types"
+import type { PhotonLaser, SpaceObject } from "../interface"
 import { round, round2dec } from "../math"
 import { createSpaceObject, newPhotonLaser } from "../factory"
 
@@ -27,13 +27,13 @@ export function reduceShotSize(photonLaser: PhotonLaser): PhotonLaser {
 
 //Incoming messages
 export function soFromValueArray(value: []): SpaceObject {
-  let so = createSpaceObject()
+  const so = createSpaceObject()
   Object.keys(so).forEach((v, i) => {
     if ((v as keyof SpaceObject) === "shotsInFlightValues") {
       // if ((value[i] as any[]).length > 0) {
       //   debugger
       // }
-      ;(value[i] as any[]).forEach((shot) => {
+      (value[i] as any[]).forEach((shot) => {
         so.shotsInFlight.push(photonLaserFromValueArray(shot))
       })
     } else {
@@ -46,7 +46,7 @@ export function soFromValueArray(value: []): SpaceObject {
 
 //Creates one shot from valuearray
 export function photonLaserFromValueArray(values: []): PhotonLaser {
-  let pl = newPhotonLaser()
+  const pl = newPhotonLaser()
 
   Object.keys(pl).forEach((v, i) => {
     pl[v as keyof PhotonLaser] = values[i]

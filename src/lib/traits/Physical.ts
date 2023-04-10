@@ -1,4 +1,4 @@
-import type { Vec2d } from "../types"
+import type { Vec2d } from "../math"
 import { angularFriction, linearFriction, timeScale } from "../constants"
 import {
   sub,
@@ -30,7 +30,7 @@ export class Physical implements Positionable, Testable {
   angleDegree = 120
   angularVelocity = 0
 
-  constructor() {}
+  // constructor() {}
 
   update(deltaTime: number): void {
     if (isNaN(deltaTime)) {

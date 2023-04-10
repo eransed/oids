@@ -1,4 +1,4 @@
-import type { SpaceObject } from "../types"
+import type { SpaceObject } from "../interface"
 import { setScaledFont } from "./render2d"
 
 export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void {

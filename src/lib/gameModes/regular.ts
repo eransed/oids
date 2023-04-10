@@ -3,10 +3,10 @@ import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas
 import { initKeyControllers, spaceObjectKeyController } from "../input"
 import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from "../math"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
-import { friction, gravity, handleCollisions } from "../physics"
+import { friction, handleCollisions, updateSpaceObject } from "../physics"
 import { loadingText } from "../render/render2d"
 import { fpsCounter } from "../time"
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from "../types"
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from "../interface"
 import { getSerVer, initMultiplayer, registerServerUpdate } from "../websocket/webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
@@ -18,6 +18,10 @@ import { renderMoon } from "../render/renderDebris"
 import { renderShip } from "../render/renderShip"
 import { renderViewport } from "../render/renderUI"
 import { renderExplosionFrame } from "../render/renderFx"
+import { newMoon } from "../shapes/Moon"
+import type { Shape } from "../shapes/Shape"
+
+
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -135,6 +139,10 @@ export function initRegularGame(game: Game): void {
 
   initMultiplayer()
 
+  for (let i = 0; i < 100; i++) {
+    game.testShapes.push(newMoon())
+  }
+
   // const padding = 0
   // const pad = { x: padding, y: padding }
   // const scr = sub(getScreenRect(game.ctx), pad)
@@ -240,6 +248,10 @@ export function renderFrame(game: Game, dt: number): void {
   game.lightSource.position = game.localPlayer.position
   game.lightSource.direction = direction(game.localPlayer.angleDegree)
 
+  game.testShapes.forEach((s) => {
+    s.render(ctx)
+  })
+
   game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx)
 
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
@@ -302,6 +314,9 @@ export function nextFrame(game: Game, dt: number): void {
   }
   bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), 0.5, 0, 0)
   friction(game.localPlayer)
+  game.testShapes.forEach((s) => {
+    friction(s)
+  })
 
   if (game.remotePlayers.length === 0) {
     ops = 0
@@ -311,6 +326,7 @@ export function nextFrame(game: Game, dt: number): void {
     byteSpeed = 0
     bitSpeed = 0
   }
+
 
   // game.bodies.forEach((body) => {
   //   game.bodies.forEach((other) => {

@@ -1,4 +1,4 @@
-import type { Vec2d } from "../types"
+import type { Vec2d } from "../math"
 import { linearTransform } from "../math"
 import { getScreenRect } from "../canvas_util"
 import type { Game } from "../game"

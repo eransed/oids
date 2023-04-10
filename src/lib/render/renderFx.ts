@@ -1,6 +1,6 @@
 import { explosionDuration } from "../constants"
-import { add, rndi, degToRad } from "../math"
-import type { SpaceObject, Vec2d } from "../types"
+import { add, rndi, degToRad, type Vec2d } from "../math"
+import type { SpaceObject } from "../interface"
 
 export function renderHitExplosion(pos: Vec2d, ctx: CanvasRenderingContext2D) {
   const offset = 20

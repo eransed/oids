@@ -1,11 +1,22 @@
-import type { Vec2d } from "./types"
+export interface Vec2d {
+  x: number
+  y: number
+}
 
 export function to_string(v: Vec2d, dec = 0): string {
   return "(" + round2dec(v.x, dec) + ", " + round2dec(v.y, dec) + ")"
 }
 
-export function vec2d(): Vec2d {
+export function newVec2d(): Vec2d {
   return { x: 0, y: 0 }
+}
+
+export function maxElem(v: Vec2d): number {
+  return Math.max(v.x, v.y)
+}
+
+export function minElem(v: Vec2d): number {
+  return Math.min(v.x, v.y)
 }
 
 export function copy(from: Vec2d): Vec2d {

@@ -1,4 +1,4 @@
-import type { ServerUpdate, SpaceObject } from "../types"
+import type { ServerUpdate, SpaceObject } from "../interface"
 import { OIDS_WS_PORT } from "../../../server/pub_config"
 import { reduceShotSize, reduceSoSize, soFromValueArray, soToValueArray } from "./util"
 

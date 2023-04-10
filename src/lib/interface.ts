@@ -1,3 +1,4 @@
+import type { Vec2d } from "./math"
 import type { Steerable } from "./traits/Steerable"
 
 export enum GameType {
@@ -21,10 +22,7 @@ export enum MenuEnum {
 //   localPlayer: SpaceObject
 // }
 
-export interface Vec2d {
-  x: number
-  y: number
-}
+
 
 export enum SpaceShape {
   Comet,

@@ -1,5 +1,4 @@
-import type { Vec2d } from "./types"
-import { floor } from "./math"
+import { floor, type Vec2d } from "./math"
 import { screenScale } from "./constants"
 
 export const getScreenRect = (ctx: CanvasRenderingContext2D): Vec2d => {

@@ -1,5 +1,5 @@
-import type { Vec2d } from "./types"
-import { angle, degToRad, direction, dist, norm, smul, sub, vec2d } from "./math"
+import type { Vec2d } from "./math"
+import { angle, degToRad, direction, dist, norm, smul, sub, newVec2d } from "./math"
 import { renderPoint } from "./render/render2d"
 
 export interface ViewSlice {
@@ -102,7 +102,7 @@ export class Ray {
     const u = -(numerator_u / denominator)
 
     if (t > 0 && t < 1 && u > 0) {
-      const intersect = vec2d()
+      const intersect = newVec2d()
       intersect.x = x1 + t * (x2 - x1)
       intersect.y = y1 + t * (y2 - y1)
       return intersect

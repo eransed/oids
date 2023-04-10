@@ -1,4 +1,4 @@
-import { GameType, type SpaceObject } from "./types"
+import { GameType, type SpaceObject } from "./interface"
 
 import { getContext } from "./canvas_util"
 
@@ -6,8 +6,10 @@ import { LightSource, LineSegment } from "./shapes"
 import { renderLoop } from "./time"
 import * as WelcomeScreen from "./gameModes/welcomeScreen"
 import * as Regular from "./gameModes/regular"
+import type { Shape } from "./shapes/Shape"
 
 export class Game {
+  testShapes: Shape[] = []
   private running = false
   type: GameType = GameType.SinglePlayer
   ctx: CanvasRenderingContext2D

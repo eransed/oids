@@ -1,7 +1,7 @@
 import type { Game } from "./game"
 import { round2dec } from "./math"
 import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from "./websocket/webSocket"
-import { updateSpaceObjects } from "./physics"
+import { updateShapes, updateSpaceObjects } from "./physics"
 import { clearScreen } from "./render/render2d"
 import { addDataPoint, newDataStats } from "./stats"
 import { renderFrameInfo } from "./render/renderUI"
@@ -61,6 +61,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     // updateSpaceObject(game.localPlayer, dt, game.ctx)
     updateSpaceObjects(game.remotePlayers, dt, game.ctx)
     updateSpaceObjects(game.all, dt, game.ctx)
+    updateShapes(game.testShapes, dt)
     if (isConnectedToWsServer() && game.shouldSendToServer) {
       sendSpaceObjectToBroadcastServer(game.localPlayer)
     }

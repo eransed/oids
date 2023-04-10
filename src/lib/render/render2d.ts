@@ -1,5 +1,5 @@
-import { SpaceShape, type Remote, type SpaceObject, type Vec2d } from "../types"
-import { add, degToRad, linearTransform, rndi, round2dec } from "../math"
+import { SpaceShape, type Remote, type SpaceObject } from "../interface"
+import { add, degToRad, linearTransform, rndi, round2dec, type Vec2d } from "../math"
 import { explosionDuration, screenScale } from "../constants"
 import { getScreenRect } from "../canvas_util"
 import "../../app.css"

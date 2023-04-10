@@ -1,6 +1,5 @@
 //WS Setup
 import type { IncomingMessage } from "http"
-import type { SpaceObject } from "../src/lib/types"
 import { soFromValueArray, soToValueArray } from "../src/lib/websocket/util"
 import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from "ws"
 import { OIDS_WS_PORT } from "./pub_config"
@@ -8,6 +7,7 @@ import { getLocalIp, ipport } from "./net"
 
 import { apiServer } from "./apiServer"
 import { start_host_server } from "./host_server"
+import { SpaceObject } from "../src/lib/interface"
 
 // start ApiServer
 apiServer()

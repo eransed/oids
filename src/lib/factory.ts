@@ -1,6 +1,6 @@
-import type { PhotonLaser, SpaceObject, Vec2d } from "./types"
-import { SpaceShape } from "./types"
-import { rndf, rndi } from "./math"
+import type { PhotonLaser, SpaceObject } from "./interface"
+import { SpaceShape } from "./interface"
+import { rndf, rndi, type Vec2d } from "./math"
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
 
 export function newPhotonLaser(): PhotonLaser {

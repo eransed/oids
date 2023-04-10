@@ -1,6 +1,5 @@
-import { linearTransform, round2dec } from "./math"
+import { linearTransform, round2dec, type Vec2d } from "./math"
 import { setScaledFont } from "./render/render2d"
-import type { Vec2d } from "./types"
 
 const defaultSize = 700
 

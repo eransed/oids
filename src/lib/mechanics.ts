@@ -1,7 +1,7 @@
-import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical, Positionable, Rotatable, SpaceObject, Thrustable, Vec2d } from "./types"
+import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical, Positionable, Rotatable, SpaceObject, Thrustable } from "./interface"
 import type { Steerable } from "./traits/Steerable"
 
-import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad } from "./math"
+import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2d } from "./math"
 import { maxHeat, shotHitReversFactor } from "./constants"
 import { renderHitExplosion } from "./render/renderFx"
 import { newPhotonLaser } from "./factory"
