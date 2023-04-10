@@ -22,7 +22,7 @@
   let menuOpen = true
   let loggedIn = false
 
-  let showGameLobby = false
+  let showGameLobby = true
 
   showLobby.subscribe((showLobbyValue: boolean) => {
     showGameLobby = showLobbyValue
@@ -43,7 +43,7 @@
   $: display = menuOpen ? "flex" : "none"
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !showGameLobby) menuOpen = !menuOpen
+    if (e.key === "Escape") showLobby.set(true)
   })
 
   export function getCanvas(): HTMLCanvasElement {
@@ -62,7 +62,7 @@
     game = new Game(getCanvas(), localPlayer, showDeadMenu)
 
     // Setting welcome menu
-    menu.set(getMenu(game))
+    // menu.set(getMenu(game))
     showLoginPage.set(false)
     // Subscribing on store
     menu.subscribe((value) => {
@@ -132,7 +132,7 @@
       </div>
     {/if}
     <div id="game_menu" style:display>
-      <Menu90 {menuOpen} buttons={chosenMenu} />
+      <!-- <Menu90 {menuOpen} buttons={chosenMenu} /> -->
     </div>
   </div>
 {/if}

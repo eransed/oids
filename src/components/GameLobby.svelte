@@ -47,7 +47,7 @@
   }
 
   const exitButton: Button90Config = {
-    buttonText: "Quit",
+    buttonText: "Back",
     clickCallback: handleExit,
     selected: false,
   }

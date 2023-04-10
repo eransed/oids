@@ -3,7 +3,7 @@ import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas
 import { initKeyControllers, spaceObjectKeyController } from "../input"
 import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from "../math"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
-import { friction, handleCollisions, updateSpaceObject } from "../physics"
+import { friction, handleCollisions } from "../physics"
 import { loadingText } from "../render/render2d"
 import { fpsCounter } from "../time"
 import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from "../interface"
@@ -19,7 +19,6 @@ import { renderShip } from "../render/renderShip"
 import { renderViewport } from "../render/renderUI"
 import { renderExplosionFrame } from "../render/renderFx"
 import { newMoon } from "../shapes/Moon"
-import type { Shape } from "../shapes/Shape"
 
 
 

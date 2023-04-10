@@ -26,7 +26,7 @@ export function getMenu(game: Game, keepLastSelected = false) {
   // Pick menu depending on game state:
   let stateMenu: Button90Config[]
 
-  let userLoggedIn: boolean = false
+  let userLoggedIn = false
 
   isLoggedIn.subscribe((value) => {
     userLoggedIn = value

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { xlink_attr } from "svelte/internal"
   import type { Button90Config } from "../../interface"
 
   export let mouseTracking: boolean = true
