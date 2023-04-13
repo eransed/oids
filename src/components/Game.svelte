@@ -68,7 +68,7 @@
     menu.subscribe((value) => {
       chosenMenu = value
     })
-    game.startWelcomeScreen()
+    // game.startWelcomeScreen()
   })
 
   const showDeadMenu = (): void => {
@@ -90,7 +90,8 @@
     max-height: 3000px;
     width: 100vw;
     height: 100vh;
-    position: absolute;
+    top: 0;
+    position: fixed;
     /* cursor: none; */
   }
 
