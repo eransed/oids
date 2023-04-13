@@ -161,7 +161,7 @@
     transition-delay: 0.2s;
   }
 
-  .profile,
+  .menuItem,
   .modalProfile {
     height: 50px;
     width: 50px;
@@ -199,13 +199,13 @@
     width: fit-content;
   }
 
-  .profile:hover {
+  .menuItem:hover {
     opacity: 0.8;
     transition-property: all;
     transition: 0.5s;
   }
 
-  .profile::after {
+  .menuItem::after {
     display: block;
     background-color: red;
     position: absolute;
@@ -253,8 +253,9 @@
 </style>
 
 <div class="headerWrapper">
+  
   <div class="header">
-    <div class="profile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
+    <div class="menuItem" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
       <img class="avatar" src={Avatar} alt="Avatar" />
     </div>
 

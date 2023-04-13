@@ -1,15 +1,11 @@
 <script lang="ts">
-  import Game from './components/Game.svelte'
+    import LandingPage from './components/LandingPage.svelte'
 </script>
-
-<body>
-<main>
-  <div>
-    <Game/>
-  </div>
-</main>
-</body>
 
 <style>
 
 </style>
+
+<body>
+  <LandingPage/>
+</body>

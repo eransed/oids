@@ -56,7 +56,7 @@
   let chosenMenu: Button90Config[]
 
   onMount(() => {
-    validateToken()
+    
 
     const localPlayer = createSpaceObject("LocalPlayer")
     game = new Game(getCanvas(), localPlayer, showDeadMenu)
@@ -119,8 +119,6 @@
     flex-wrap: wrap;
   }
 </style>
-
-<Header />
 
 <canvas id="game_canvas" />
 
