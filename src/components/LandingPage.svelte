@@ -28,7 +28,7 @@
         validateToken()
     })
 
-    let welcomeMessage = 'Welcome to OIDS ' + userData?.name
+    let welcomeMessage = 'Welcome to OIDS ' + `${userData ? userData?.name : 'Player'}`
     let typeWriterText = ''
     let i = 0
     
