@@ -30,7 +30,7 @@
 
     let userName = userData ? userData?.name : `Player ${rndi(1,100)}`
 
-    let welcomeMessage = `Welcome to OIDS ${userName} \r Wanna play a game?`
+    let welcomeMessage = `Welcome to OIDS ${userName}`
     let typeWriterText = ''
     let i = 0
     let removeText = false
