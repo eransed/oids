@@ -90,91 +90,51 @@
   .headerWrapper {
     display: flex;
     width: fit-content;
-    justify-content: flex-end;
+    justify-content: space-evenly;
     flex-wrap: wrap;
     width: 100%;
   }
 
   .header {
-    position: fixed;
     top: 0;
+    position: fixed;
     display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
     flex-wrap: wrap;
     color: #fff;
     overflow: hidden;
+    justify-content: space-between;
+    width: 100%;
     z-index: 2;
     transition: all;
     transition-duration: 0s;
     transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
+    background: linear-gradient(rgba(50, 82, 225, 0.1), rgba(0, 0, 0, 0.4));
   }
 
   .header > * {
-    opacity: 0.2;
+    opacity: 0.8;
     transition: all;
     transition-duration: 0s;
     margin: 1em;
   }
 
   .header:hover > * {
-    opacity: 0.5;
     transition: all;
     transition-duration: 0.5s;
     margin-right: 1em;
   }
 
-  .header:hover > *:hover {
-    filter: saturate(5);
-    opacity: 1;
-    margin-top: 1.2em;
-    transition: all;
-    transition-duration: 1s;
-  }
-
-  .header:first-child::before {
-    opacity: 0.35;
-    content: "";
-    font-size: 3em;
-    /* border-left: 2px solid cadetblue; */
-    position: fixed;
-    width: 0.8em;
-    height: 0.2em;
-    right: 10px;
-    /* margin-right: 102vw; */
-    margin-top: 0.65em;
-    transition: all;
-    transition-duration: 0.8s;
-    transition-timing-function: ease;
-    border-top: 4px solid rgb(47, 167, 252);
-    border-bottom: 4px solid rgb(47, 167, 252);
-    transform: rotate(0deg);
-    transition-delay: 0.4s;
-    cursor: pointer;
-  }
-
-  .header:hover:first-child::before {
-    margin-right: 0;
-    opacity: 0;
-    transition: all;
-    transition-duration: 0.5s;
-    transition-delay: 0.2s;
-  }
 
   .menuItem,
   .modalProfile {
     height: 50px;
-    width: 50px;
     display: flex;
-    margin-right: -20vw;
     text-align: center;
     flex-wrap: wrap;
     justify-content: center;
+    flex-direction: row;
     align-content: center;
     cursor: pointer;
-    border-radius: 100%;
-    border-style: solid;
-    border-width: 3px;
     border-color: var(--borderColor);
     transition: var(--borderColor);
     transition-duration: 1s;
@@ -183,35 +143,56 @@
     transition-timing-function: cubic-bezier(1, -0.53, 0.26, 1.1);
   }
 
+  .menuItem{
+    width: fit-content;
+  }
+
+  .navButtons {
+    opacity: 0.8;
+    padding: 1em;
+    text-transform: uppercase;
+    font-weight: bolder;
+    color: rgba(255, 255, 255, 0.6);
+    transition-property: all;
+    transition: 0.6s;
+    border-bottom: 1px solid rgba(255,255,255,0);
+    
+  }
+
+  .navButtons:hover {
+    opacity: 1;
+    transition-property: all;
+    color: rgb(255, 255, 255);
+    transition: 0.6s;
+    border-bottom: 1px solid #fff;
+  }
+
   .modalProfile {
-    height: 40px;
-    width: 40px;
+    width: 50px;
     top: 0.5em;
     left: 6em;
     cursor: auto;
     filter: saturate(2);
+    border-radius: 100%;
+    border-style: solid;
+    border-width: 3px;
+    border-color: var(--borderColor);
+    transition: var(--borderColor);
+    transition: all;
+    transition-duration: 1s;
   }
 
   .modalProfile:hover {
+    filter: saturate(5);
+    opacity: 1;
+    
     transition-property: all;
-    transition: 0.5s;
+    transition: 1s;
     cursor: pointer;
     width: fit-content;
   }
 
-  .menuItem:hover {
-    opacity: 0.8;
-    transition-property: all;
-    transition: 0.5s;
-  }
 
-  .menuItem::after {
-    display: block;
-    background-color: red;
-    position: absolute;
-    height: 100px;
-    content: "";
-  }
 
   .avatar {
     height: 100%;
@@ -255,7 +236,18 @@
 <div class="headerWrapper">
   
   <div class="header">
-    <div class="menuItem" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
+    <div class="menuItem">
+      <div class="navButtons">
+        Play
+      </div>
+      <div class="navButtons">
+        Play
+      </div>
+      <div class="navButtons">
+        Play
+      </div>
+    </div>
+    <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
       <img class="avatar" src={Avatar} alt="Avatar" />
     </div>
 
