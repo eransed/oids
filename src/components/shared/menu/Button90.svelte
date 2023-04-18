@@ -23,8 +23,10 @@
   }
 
   const handleMouseLeave = (event: MouseEvent) => {
-    m.x = "0px"
-    m.y = "0px"
+    if (mouseTracking) {
+      m.x = "0px"
+      m.y = "0px"
+    }
   }
 </script>
 

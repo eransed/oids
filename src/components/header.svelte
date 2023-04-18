@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { isLoggedIn } from "../lib/stores"
+  import { isLoggedIn, showLobby } from "../lib/stores"
 
   //Avatar imgs
   import Avatar from "../assets/avatar.png"
@@ -78,6 +78,22 @@
   }
 
   $: borderColor = loggedIn ? "rgb(144, 238, 144)" : "rgb(255, 165, 0)"
+
+  const Play: Button90Config = {
+    buttonText: "Play",
+    clickCallback: function (): void {
+      console.log("Go to create a game component")
+    },
+    selected: false,
+  }
+
+  const Profile: Button90Config = {
+    buttonText: "Profile",
+    clickCallback: function (): void {
+      console.log("go to profile")
+    },
+    selected: false,
+  }
 </script>
 
 <style>
@@ -124,7 +140,6 @@
     margin-right: 1em;
   }
 
-
   .menuItem,
   .modalProfile {
     height: 50px;
@@ -143,20 +158,19 @@
     transition-timing-function: cubic-bezier(1, -0.53, 0.26, 1.1);
   }
 
-  .menuItem{
+  .menuItem {
     width: fit-content;
   }
 
   .navButtons {
-    opacity: 0.8;
+    cursor: default;
+    opacity: 1;
     padding: 1em;
-    text-transform: uppercase;
     font-weight: bolder;
     color: rgba(255, 255, 255, 0.6);
     transition-property: all;
     transition: 0.6s;
-    border-bottom: 1px solid rgba(255,255,255,0);
-    
+    border-color: rgb(161, 211, 247, 0.5);
   }
 
   .navButtons:hover {
@@ -164,7 +178,7 @@
     transition-property: all;
     color: rgb(255, 255, 255);
     transition: 0.6s;
-    border-bottom: 1px solid #fff;
+    /* border-bottom: 1px solid #fff; */
   }
 
   .modalProfile {
@@ -185,14 +199,12 @@
   .modalProfile:hover {
     filter: saturate(5);
     opacity: 1;
-    
+
     transition-property: all;
     transition: 1s;
     cursor: pointer;
     width: fit-content;
   }
-
-
 
   .avatar {
     height: 100%;
@@ -234,19 +246,18 @@
 </style>
 
 <div class="headerWrapper">
-  
   <div class="header">
-    <div class="menuItem">
-      <div class="navButtons">
-        Play
+    <nav>
+      <div class="menuItem">
+        <div class="navButtons">
+          <Button90 mouseTracking={false} buttonConfig={Play} />
+        </div>
+        <div class="navButtons">
+          <Button90 mouseTracking={false} buttonConfig={Profile} />
+        </div>
       </div>
-      <div class="navButtons">
-        Play
-      </div>
-      <div class="navButtons">
-        Play
-      </div>
-    </div>
+    </nav>
+
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
       <img class="avatar" src={Avatar} alt="Avatar" />
     </div>
