@@ -1,16 +1,19 @@
 <script lang="ts">
-  import { isLoggedIn, showLobby } from "../lib/stores"
-
+  //Routes
+  import { Router, Link } from "svelte-routing";
+  
+  
   //Avatar imgs
   import Avatar from "../assets/avatar.png"
   import Modal from "./shared/Modal.svelte"
-
+  
   //Services
   import login from "../lib/services/auth/login"
   import getProfile from "../lib/services/user/profile"
-
+  
   //Stores
   import { user, userLoading, showLoginModal } from "../lib/stores"
+  import { isLoggedIn, showLobby } from "../lib/stores"
 
   //Interfaces
   import type { Button90Config, User } from "./interface"
@@ -82,7 +85,7 @@
   const Play: Button90Config = {
     buttonText: "Play",
     clickCallback: function (): void {
-      console.log("Go to create a game component")
+      console.log("Play button")
     },
     selected: false,
   }
@@ -90,7 +93,7 @@
   const Profile: Button90Config = {
     buttonText: "Profile",
     clickCallback: function (): void {
-      console.log("go to profile")
+      console.log("Profile button")
     },
     selected: false,
   }
@@ -120,11 +123,12 @@
     overflow: hidden;
     justify-content: space-between;
     width: 100%;
+    max-width: 1500px;
     z-index: 2;
     transition: all;
     transition-duration: 0s;
     transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
-    background: linear-gradient(rgba(50, 82, 225, 0.1), rgba(0, 0, 0, 0.4));
+    /* background: linear-gradient(rgba(50, 82, 225, 0.1), rgba(0, 0, 0, 0.4)); */
   }
 
   .header > * {
@@ -250,10 +254,19 @@
     <nav>
       <div class="menuItem">
         <div class="navButtons">
-          <Button90 mouseTracking={false} buttonConfig={Play} />
+          <Router>
+          <Link to='play'>
+            <Button90 mouseTracking={false} buttonConfig={Play} />
+          </Link>
+        </Router>
         </div>
         <div class="navButtons">
-          <Button90 mouseTracking={false} buttonConfig={Profile} />
+          <Router>
+            <Link to='profile'>
+              <Button90 mouseTracking={false} buttonConfig={Profile} />
+            </Link>
+          </Router>
+          
         </div>
       </div>
     </nav>

@@ -3,17 +3,13 @@
     import { onMount } from "svelte"
 
     //Components
-    import Header from "./header.svelte"
-    import Game from "./Game.svelte";
+
 
     //Stores
     import { user } from "../lib/stores";
 
     //Interfaces
     import type { User } from "./interface"
-
-    //Services
-    import { validateToken } from "../lib/services/utils/Token"
 
     //Utils
     import { rndi } from "../lib/math";
@@ -24,13 +20,8 @@
         userData = v
     })
 
-    onMount(() => {
-        validateToken()
-    })
 
-    let userName = userData ? userData?.name : `Player ${rndi(1,100)}`
-
-    let welcomeMessage = `Welcome to OIDS ${userName}`
+    let welcomeMessage = `This is the Play page!`
     let typeWriterText = ''
     let i = 0
     let removeText = false
@@ -42,7 +33,7 @@
             if (i < welcomeMessage.length && !removeText) {
                 typeWriterText += welcomeMessage.charAt(i)
                 i++
-                typeWriter(rndi(100, 200))
+                typeWriter(rndi(50, 75))
                 if (i === welcomeMessage.length) {
                     removeText = true
                     
@@ -79,20 +70,12 @@
     font-family: 'Courier New', Courier, monospace;
 }
 
-.game{
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0
-}
-</style>
 
-<div class="game">
-    <Game/>
-</div>
+</style>
 
 
 <div class="wrapper">
     {typeWriterText}
+    
 </div>
 
