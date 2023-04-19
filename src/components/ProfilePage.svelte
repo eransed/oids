@@ -20,6 +20,8 @@
         userData = v
     })
 
+    export let location
+
 
     let welcomeMessage = `This is the Profile page!`
     let typeWriterText = ''

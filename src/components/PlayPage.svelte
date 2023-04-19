@@ -14,6 +14,9 @@
     //Utils
     import { rndi } from "../lib/math";
 
+    //Svelte-routing needs a location
+    export let location
+
     let userData: User | undefined
 
     user.subscribe((v) => {
