@@ -2,10 +2,6 @@
     //Svelte
     import { onMount } from "svelte"
 
-    //Components
-    import Header from "./header.svelte"
-    import Game from "./Game.svelte";
-
     //Stores
     import { user } from "../lib/stores";
 
@@ -78,19 +74,7 @@
     width: 100vw;
     font-family: 'Courier New', Courier, monospace;
 }
-
-.game{
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0
-}
 </style>
-
-<div class="game">
-    <Game/>
-</div>
-
 
 <div class="wrapper">
     {typeWriterText}
