@@ -1,26 +1,30 @@
 <script lang="ts">
-    
-    import { Router, Route } from "svelte-routing";
+  import { Router, Route } from "svelte-routing"
+  import { onMount } from "svelte"
 
-    //Components
-    import LandingPage from './components/LandingPage.svelte'
-    import PlayPage from "./components/PlayPage.svelte";
-    import ProfilePage from "./components/ProfilePage.svelte";
-    import Header from "./components/header.svelte";
+  //Components
+  import LandingPage from "./pages/LandingPage.svelte"
+  import GamePage from "./pages/GamePage.svelte"
+  import ProfilePage from "./pages/ProfilePage.svelte"
+  import Header from "./components/header.svelte"
 
+  //Services
+  import { validateToken } from "./lib/services/utils/Token"
 
+  //Validate user token from localstorage
+  onMount(() => {
+    validateToken()
+  })
 </script>
 
 <style>
-
 </style>
 
 <body>
-  <Header/>
+  <Header />
   <Router>
-    <Route path='/' component={LandingPage} />
-    <Route path='/play' component={PlayPage} />
-    <Route path='/profile' component={ProfilePage} />
-
+    <Route path="/" component={LandingPage} />
+    <Route path="/play" component={GamePage} />
+    <Route path="/profile" component={ProfilePage} />
   </Router>
 </body>

@@ -1,16 +1,15 @@
 <script lang="ts">
   //Routes
-  import { Router, Link } from "svelte-routing";
-  
-  
+  import { Router, Link } from "svelte-routing"
+
   //Avatar imgs
   import Avatar from "../assets/avatar.png"
   import Modal from "./shared/Modal.svelte"
-  
+
   //Services
   import login from "../lib/services/auth/login"
   import getProfile from "../lib/services/user/profile"
-  
+
   //Stores
   import { user, userLoading, showLoginModal } from "../lib/stores"
   import { isLoggedIn, showLobby } from "../lib/stores"
@@ -255,18 +254,17 @@
       <div class="menuItem">
         <div class="navButtons">
           <Router>
-          <Link to='play'>
-            <Button90 mouseTracking={false} buttonConfig={Play} />
-          </Link>
-        </Router>
+            <Link to="play">
+              <Button90 mouseTracking={false} buttonConfig={Play} />
+            </Link>
+          </Router>
         </div>
         <div class="navButtons">
           <Router>
-            <Link to='profile'>
+            <Link to="profile">
               <Button90 mouseTracking={false} buttonConfig={Profile} />
             </Link>
           </Router>
-          
         </div>
       </div>
     </nav>
