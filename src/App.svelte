@@ -1,4 +1,4 @@
-<script lang="js">
+<script lang="ts">
   import { Router, Route } from "svelte-routing"
   import { onMount } from "svelte"
 
@@ -12,7 +12,7 @@
   import Header from "./components/header/header.svelte"
 
   onMount(() => {
-    //Functions to run on startup of App
+    //Functions to run on startup of App.
     onAppMount()
   })
 </script>
@@ -23,8 +23,8 @@
 <body>
   <Header />
   <Router>
-    <Route path="/" component={LandingPage} />
-    <Route path="/play" component={GamePage} />
-    <Route path="/profile" component={ProfilePage} />
+    <Route path="/"><LandingPage /></Route>
+    <Route path="/play"><GamePage /></Route>
+    <Route path="/profile"><ProfilePage /></Route>
   </Router>
 </body>
