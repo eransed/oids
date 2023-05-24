@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios"
 
-import { user, isLoggedIn } from "../../stores"
+import { isLoggedIn } from "../../../stores/stores"
 
 const login = async (req: FormData) => {
   let status

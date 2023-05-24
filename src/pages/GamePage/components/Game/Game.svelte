@@ -1,8 +1,5 @@
 <script lang="ts">
-  import Menu90 from "./shared/menu/Menu90.svelte"
-
-  import type { Button90Config, User } from "./interface"
-
+  import type { Button90Config } from "../interfaces/menu"
   import { onMount } from "svelte"
 
   import { createSpaceObject } from "../lib/factory"
@@ -12,9 +9,6 @@
   import { removeKeyControllers } from "../lib/input"
 
   import { fade } from "svelte/transition"
-
-  import { validateToken } from "../lib/services/utils/Token"
-  import Header from "./header.svelte"
   import GameLobby from "./GameLobby.svelte"
 
   let game: Game
@@ -56,8 +50,6 @@
   let chosenMenu: Button90Config[]
 
   onMount(() => {
-    
-
     const localPlayer = createSpaceObject("LocalPlayer")
     game = new Game(getCanvas(), localPlayer, showDeadMenu)
 

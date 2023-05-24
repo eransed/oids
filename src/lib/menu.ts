@@ -1,6 +1,6 @@
 import type { Game } from "./game"
-import type { Button90Config } from "../components/interface"
-import { menu, showMenu, showLobby, showLoginModal as showProfile, isLoggedIn } from "./stores"
+import type { Button90Config } from "../interfaces/menu"
+import { menu, showMenu, showLobby, showLoginModal as showProfile, isLoggedIn } from "../stores/stores"
 
 // Keep selected state:
 let inGameMenu: Button90Config[]

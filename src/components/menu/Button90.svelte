@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Button90Config } from "../../interface"
+  import type { Button90Config } from "../../interfaces/menu"
 
   export let mouseTracking: boolean = true
 

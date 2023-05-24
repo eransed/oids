@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { showLobby, showMenu } from "../lib/stores"
-  import type { Button90Config, User } from "./interface"
-  import Button90 from "./shared/menu/Button90.svelte"
-  import MenuWrapper from "./shared/MenuWrapper.svelte"
-  import { connectToLobbys } from "../lib/services/auth/lobby"
-  import { user } from "../lib/stores"
-  import type { Game } from "../lib/game"
+  import { showLobby, showMenu } from "../../../../stores/stores"
+  import type { Button90Config } from "../../../../interfaces/menu"
+  import type { User } from "../../../../interfaces/user"
+  import Button90 from "../../../../components/menu/Button90.svelte"
+  import MenuWrapper from "../../../../components/menu/MenuWrapper.svelte"
+  import { connectToLobbys } from "../../../../lib/services/auth/lobby"
+  import { user } from "../../../../stores/stores"
+  import type { Game } from "../../../../lib/game"
 
   export let game: Game
 

@@ -1,17 +1,13 @@
 <script lang="ts">
   //Svelte
-  import { onMount } from "svelte"
-
-  //Components
 
   //Stores
-  import { user } from "../lib/stores"
+  import { user } from "../../stores/stores"
 
   //Interfaces
-  import type { User } from "../components/interface"
-
+  import type { User } from "../../interfaces/user"
   //Utils
-  import { rndi } from "../lib/math"
+  import { rndi } from "../../lib/math"
 
   let userData: User | undefined
 
@@ -19,7 +15,9 @@
     userData = v
   })
 
-  let welcomeMessage = `This is the GamePage`
+  let userName = userData ? userData?.name : `Player ${rndi(1, 100)}`
+
+  let welcomeMessage = `Welcome to OIDS ${userName}`
   let typeWriterText = ""
   let i = 0
   let removeText = false
@@ -29,7 +27,7 @@
       if (i < welcomeMessage.length && !removeText) {
         typeWriterText += welcomeMessage.charAt(i)
         i++
-        typeWriter(rndi(50, 75))
+        typeWriter(rndi(100, 200))
         if (i === welcomeMessage.length) {
           removeText = true
         }

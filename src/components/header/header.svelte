@@ -3,20 +3,23 @@
   import { Router, Link } from "svelte-routing"
 
   //Avatar imgs
-  import Avatar from "../assets/avatar.png"
-  import Modal from "./shared/Modal.svelte"
+  import Avatar from "../../assets/avatar.png"
+
+  //Components
+  import Modal from "../modal/Modal.svelte"
+  import Button90 from "../menu/Button90.svelte"
 
   //Services
-  import login from "../lib/services/auth/login"
-  import getProfile from "../lib/services/user/profile"
+  import login from "../../lib/services/auth/login"
+  import getProfile from "../../lib/services/user/profile"
 
   //Stores
-  import { user, userLoading, showLoginModal } from "../lib/stores"
-  import { isLoggedIn, showLobby } from "../lib/stores"
+  import { user, userLoading, showLoginModal } from "../../stores/stores"
+  import { isLoggedIn, showLobby } from "../../stores/stores"
 
   //Interfaces
-  import type { Button90Config, User } from "./interface"
-  import Button90 from "./shared/menu/Button90.svelte"
+  import type { Button90Config } from "../../interfaces/menu"
+  import type { User } from "../../interfaces/user"
 
   //Svelte fx
   import { fade } from "svelte/transition"

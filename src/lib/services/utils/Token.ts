@@ -4,9 +4,9 @@ import axios, { Axios } from "axios"
 import type { AxiosResponse } from "axios"
 import getProfile from "../user/profile"
 
-import { isLoggedIn, user, userLoading } from "../../stores"
+import { isLoggedIn, user, userLoading } from "../../../stores/stores"
 
-import type { Profile } from "../../../components/interface"
+import type { Profile } from "../../../interfaces/user"
 
 //Check if token is valid and renew
 export const validateToken = async () => {

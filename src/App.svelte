@@ -1,19 +1,19 @@
-<script lang="ts">
+<script lang="js">
   import { Router, Route } from "svelte-routing"
   import { onMount } from "svelte"
 
+  //Helpers
+  import { onAppMount } from "./helpers/onAppMount"
+
   //Components
-  import LandingPage from "./pages/LandingPage.svelte"
-  import GamePage from "./pages/GamePage.svelte"
-  import ProfilePage from "./pages/ProfilePage.svelte"
-  import Header from "./components/header.svelte"
+  import LandingPage from "./pages/LandingPage/LandingPage.svelte"
+  import GamePage from "./pages/GamePage/GamePage.svelte"
+  import ProfilePage from "./pages/ProfilePage/ProfilePage.svelte"
+  import Header from "./components/header/header.svelte"
 
-  //Services
-  import { validateToken } from "./lib/services/utils/Token"
-
-  //Validate user token from localstorage
   onMount(() => {
-    validateToken()
+    //Functions to run on startup of App
+    onAppMount()
   })
 </script>
 

@@ -1,7 +1,7 @@
 import axios, { Axios, type AxiosResponse } from "axios"
-import { user } from "../../stores"
+import { user } from "../../../stores/stores"
 
-import type { Profile } from "../../../components/interface"
+import type { Profile } from "../../../interfaces/user"
 
 const getProfile = async (): Promise<Profile | null> => {
   const token = localStorage.getItem("accessToken")

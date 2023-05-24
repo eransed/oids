@@ -5,13 +5,13 @@
   //Components
 
   //Stores
-  import { user } from "../lib/stores"
+  import { user } from "../../stores/stores"
 
   //Interfaces
-  import type { User } from "../components/interface"
+  import type { User } from "../../interfaces/user"
 
   //Utils
-  import { rndi } from "../lib/math"
+  import { rndi } from "../../lib/math"
 
   let userData: User | undefined
 
