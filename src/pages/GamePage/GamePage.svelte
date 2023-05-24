@@ -3,6 +3,7 @@
   import { onMount } from "svelte"
 
   //Components
+  import Game from "./components/Game/Game.svelte"
 
   //Stores
   import { user } from "../../stores/stores"
@@ -46,6 +47,12 @@
   }
 
   typeWriter(300)
+
+  let game: any
+
+  onMount(() => {
+    game = Game
+  })
 </script>
 
 <style>
@@ -62,5 +69,5 @@
 </style>
 
 <div class="wrapper">
-  {typeWriterText}
+  <Game />
 </div>

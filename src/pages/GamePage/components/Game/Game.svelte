@@ -1,15 +1,22 @@
 <script lang="ts">
-  import type { Button90Config } from "../interfaces/menu"
+  //Interfaces
+  import type { Button90Config } from "../../../../interfaces/menu"
+
+  //Svelte
   import { onMount } from "svelte"
 
-  import { createSpaceObject } from "../lib/factory"
-  import { menu, showLoginPage, showMenu, isLoggedIn, showLobby } from "../lib/stores"
-  import { getMenu } from "../lib/menu"
-  import { Game } from "../lib/game"
-  import { removeKeyControllers } from "../lib/input"
+  //Stores
+  import { menu, showLoginPage, showMenu, isLoggedIn, showLobby } from "../../../../stores/stores"
+
+  import { createSpaceObject } from "../../../../lib/factory"
+  import { getMenu } from "../../../../lib/menu"
+  import { Game } from "../../../../lib/game"
+  import { removeKeyControllers } from "../../../../lib/input"
 
   import { fade } from "svelte/transition"
-  import GameLobby from "./GameLobby.svelte"
+
+  //Components
+  import GameLobby from "../GameLobby/GameLobby.svelte"
 
   let game: Game
 
@@ -60,7 +67,7 @@
     menu.subscribe((value) => {
       chosenMenu = value
     })
-    // game.startWelcomeScreen()
+    game.startWelcomeScreen()
   })
 
   const showDeadMenu = (): void => {
@@ -122,8 +129,5 @@
         <GameLobby {game} />
       </div>
     {/if}
-    <div id="game_menu" style:display>
-      <!-- <Menu90 {menuOpen} buttons={chosenMenu} /> -->
-    </div>
   </div>
 {/if}

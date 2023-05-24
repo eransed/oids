@@ -14,6 +14,6 @@ export const user: Writable<User | undefined> = writable()
 
 export const userLoading: Writable<boolean> = writable()
 
-export const showLobby: Writable<boolean> = writable(false)
+export const showLobby: Writable<boolean> = writable(true)
 
 export const showLoginModal: Writable<boolean> = writable(false)
