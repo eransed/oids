@@ -5,13 +5,16 @@
   //Components
 
   //Stores
-  import { user } from "../../stores/stores"
+  import { currentLocation, user } from "../../stores/stores"
 
   //Interfaces
   import type { User } from "../../interfaces/user"
 
   //Utils
   import { rndi } from "../../lib/math"
+
+  //Location update
+  currentLocation.set("/profile")
 
   let userData: User | undefined
 

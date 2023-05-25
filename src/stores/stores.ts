@@ -17,3 +17,9 @@ export const userLoading: Writable<boolean> = writable()
 export const showLobby: Writable<boolean> = writable(true)
 
 export const showLoginModal: Writable<boolean> = writable(false)
+
+export const pageHasHeader: Writable<boolean> = writable(true)
+
+export const currentLocation = writable("")
+
+export const gameSessionId: Writable<string | undefined> = writable("")

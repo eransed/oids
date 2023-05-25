@@ -1,12 +1,12 @@
 <script lang="ts">
-  //Components
-  import Game from "../GamePage/components/Game/Game.svelte"
-
   //Stores
-  import { currentLocation, gameSessionId } from "../../stores/stores"
+  import { currentLocation } from "../../stores/stores"
+
+  //Components
+  import GameLobby from "./components/GameLobby/GameLobby.svelte"
 
   //Location update
-  currentLocation.set("/play/game")
+  currentLocation.set("/play")
 </script>
 
 <style>
@@ -16,12 +16,10 @@
     align-content: center;
     flex-wrap: wrap;
     color: #fff;
-    height: 100vh;
+    height: 50vh;
     width: 100vw;
     font-family: "Courier New", Courier, monospace;
   }
 </style>
 
-<div class="wrapper">
-  <Game sessionId={$gameSessionId} />
-</div>
+<div class="wrapper"><GameLobby /></div>

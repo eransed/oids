@@ -1,17 +1,18 @@
 <script lang="ts">
-  //Svelte
+  //Components
+  import Game from "../GamePage/components/Game/Game.svelte"
 
   //Stores
-  import { currentLocation, user } from "../../stores/stores"
+  import { currentLocation, gameSessionId, user } from "../../stores/stores"
 
-  //Interfaces
+  //Interface
   import type { User } from "../../interfaces/user"
 
-  //Utils
+  //utils
   import { rndi } from "../../lib/math"
 
   //Location update
-  currentLocation.set("/")
+  currentLocation.set("/play/game/end")
 
   let userData: User | undefined
 
@@ -21,7 +22,7 @@
 
   let userName = userData ? userData?.name : `Player ${rndi(1, 100)}`
 
-  let welcomeMessage = `Welcome to OIDS ${userName}`
+  let welcomeMessage = `Did you win ${userName}?`
   let typeWriterText = ""
   let i = 0
   let removeText = false
@@ -64,6 +65,5 @@
 </style>
 
 <div class="wrapper">
-  <slot />
   {typeWriterText}
 </div>

@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { showLobby, showMenu } from "../../../../stores/stores"
+  import { currentLocation, gameSessionId, showLobby, showMenu } from "../../../../stores/stores"
   import type { Button90Config } from "../../../../interfaces/menu"
   import type { User } from "../../../../interfaces/user"
   import Button90 from "../../../../components/menu/Button90.svelte"
   import MenuWrapper from "../../../../components/menu/MenuWrapper.svelte"
   import { connectToLobbys } from "../../../../lib/services/auth/lobby"
   import { user } from "../../../../stores/stores"
-  import type { Game } from "../../../../lib/game"
-
-  export let game: Game
+  import { navigate } from "svelte-routing"
 
   let lobbyStep = 0
 
@@ -27,12 +25,11 @@
     const gameCodeLength = gameCode.length
 
     if (gameCodeLength >= 4) {
-      game.localPlayer.sessionId = gameCode
-      await game.stopGame()
-      game.startMultiplayer()
+      console.log(gameCode)
+      gameSessionId.set(gameCode)
       showLobby.set(false)
-
-      history.replaceState(null, "", `game?id=${gameCode}`)
+      navigate("/play/game")
+      // history.replaceState(null, "", `game?id=${gameCode}`)
     }
 
     // const response = await connectToLobbys(formData)
@@ -40,17 +37,6 @@
     // if (response.status === 200) {
     //   lobbyStep = 1
     // }
-  }
-
-  const handleExit = () => {
-    showLobby.set(false)
-    showMenu.set(true)
-  }
-
-  const exitButton: Button90Config = {
-    buttonText: "Back",
-    clickCallback: handleExit,
-    selected: false,
   }
 
   const submitButton: Button90Config = {
@@ -83,28 +69,33 @@
   .lobbyButtons > * {
     padding: 0.5em;
   }
+
+  .gameLobby {
+    display: flex;
+    justify-content: center;
+  }
 </style>
 
-{#if lobbyStep === 0}
-  <MenuWrapper>
-    <h5>Enter game code to create or join a game</h5>
-    <form on:submit|preventDefault={handleSubmit} on:formdata>
-      <input placeholder="Game code" name="gameCode" type="text" minlength="4" />
-      <Button90 mouseTracking={false} buttonConfig={submitButton} />
-    </form>
-    <Button90 buttonConfig={exitButton} />
-  </MenuWrapper>
-{/if}
+<div class="gameLobby">
+  {#if lobbyStep === 0}
+    <MenuWrapper>
+      <h5>Enter game code to create or join a game</h5>
+      <form on:submit|preventDefault={handleSubmit} on:formdata>
+        <input placeholder="Game code" name="gameCode" type="text" minlength="4" />
+        <Button90 mouseTracking={false} buttonConfig={submitButton} />
+      </form>
+    </MenuWrapper>
+  {/if}
 
-{#if lobbyStep === 1}
-  <MenuWrapper>
-    <h5>Welcome to the Lobby</h5>
+  {#if lobbyStep === 1}
+    <MenuWrapper>
+      <h5>Welcome to the Lobby</h5>
 
-    <p>Players in lobby</p>
-    <p>{userData?.name ?? "Guest"}</p>
-    <div class="lobbyButtons">
-      <div><Button90 mouseTracking={false} buttonConfig={readyButton} /></div>
-      <div><Button90 mouseTracking={false} buttonConfig={exitButton} /></div>
-    </div>
-  </MenuWrapper>
-{/if}
+      <p>Players in lobby</p>
+      <p>{userData?.name ?? "Guest"}</p>
+      <div class="lobbyButtons">
+        <div><Button90 mouseTracking={false} buttonConfig={readyButton} /></div>
+      </div>
+    </MenuWrapper>
+  {/if}
+</div>

@@ -15,14 +15,19 @@
 
   //Stores
   import { user, userLoading, showLoginModal } from "../../stores/stores"
-  import { isLoggedIn, showLobby } from "../../stores/stores"
+  import { isLoggedIn } from "../../stores/stores"
 
   //Interfaces
-  import type { Button90Config } from "../../interfaces/menu"
   import type { User } from "../../interfaces/user"
+
+  //navButtons
+  import { logOutButton, loginButton, Play, Profile } from "./navButtons"
 
   //Svelte fx
   import { fade } from "svelte/transition"
+
+  //css
+  import "./style.css"
 
   let showLogin: boolean | undefined = false
   let errorText: any = ""
@@ -64,192 +69,8 @@
     }
   }
 
-  const handleLogout = () => {
-    localStorage.clear()
-    isLoggedIn.set(false)
-    user.set(undefined)
-  }
-
-  const logOutButton: Button90Config = {
-    buttonText: "Log out",
-    clickCallback: () => handleLogout(),
-    selected: false,
-  }
-
-  const loginButton: Button90Config = {
-    buttonText: "Log in",
-    clickCallback: () => {},
-    selected: false,
-  }
-
   $: borderColor = loggedIn ? "rgb(144, 238, 144)" : "rgb(255, 165, 0)"
-
-  const Play: Button90Config = {
-    buttonText: "Play",
-    clickCallback: function (): void {
-      console.log("Play button")
-    },
-    selected: false,
-  }
-
-  const Profile: Button90Config = {
-    buttonText: "Profile",
-    clickCallback: function (): void {
-      console.log("Profile button")
-    },
-    selected: false,
-  }
 </script>
-
-<style>
-  :root {
-    --borderColor: rgb(255, 165, 0);
-    --borderSize: 3px;
-    --borderStyle: solid;
-  }
-
-  .headerWrapper {
-    display: flex;
-    width: fit-content;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-
-  .header {
-    top: 0;
-    position: fixed;
-    display: flex;
-    flex-wrap: wrap;
-    color: #fff;
-    overflow: hidden;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1500px;
-    z-index: 2;
-    transition: all;
-    transition-duration: 0s;
-    transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
-    /* background: linear-gradient(rgba(50, 82, 225, 0.1), rgba(0, 0, 0, 0.4)); */
-  }
-
-  .header > * {
-    opacity: 0.8;
-    transition: all;
-    transition-duration: 0s;
-    margin: 1em;
-  }
-
-  .header:hover > * {
-    transition: all;
-    transition-duration: 0.5s;
-    margin-right: 1em;
-  }
-
-  .menuItem,
-  .modalProfile {
-    height: 50px;
-    display: flex;
-    text-align: center;
-    flex-wrap: wrap;
-    justify-content: center;
-    flex-direction: row;
-    align-content: center;
-    cursor: pointer;
-    border-color: var(--borderColor);
-    transition: var(--borderColor);
-    transition-duration: 1s;
-    transition-delay: 0.2s;
-    transition-property: all;
-    transition-timing-function: cubic-bezier(1, -0.53, 0.26, 1.1);
-  }
-
-  .menuItem {
-    width: fit-content;
-  }
-
-  .navButtons {
-    cursor: default;
-    opacity: 1;
-    padding: 1em;
-    font-weight: bolder;
-    color: rgba(255, 255, 255, 0.6);
-    transition-property: all;
-    transition: 0.6s;
-    border-color: rgb(161, 211, 247, 0.5);
-  }
-
-  .navButtons:hover {
-    opacity: 1;
-    transition-property: all;
-    color: rgb(255, 255, 255);
-    transition: 0.6s;
-    /* border-bottom: 1px solid #fff; */
-  }
-
-  .modalProfile {
-    width: 50px;
-    top: 0.5em;
-    left: 6em;
-    cursor: auto;
-    filter: saturate(2);
-    border-radius: 100%;
-    border-style: solid;
-    border-width: 3px;
-    border-color: var(--borderColor);
-    transition: var(--borderColor);
-    transition: all;
-    transition-duration: 1s;
-  }
-
-  .modalProfile:hover {
-    filter: saturate(5);
-    opacity: 1;
-
-    transition-property: all;
-    transition: 1s;
-    cursor: pointer;
-    width: fit-content;
-  }
-
-  .avatar {
-    height: 100%;
-  }
-
-  .form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-content: center;
-  }
-
-  .form input {
-    width: 80%;
-    padding: 8px;
-    margin: 8px;
-  }
-
-  .row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-
-  .column {
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    flex-basis: 100%;
-    flex: 1;
-    justify-content: center;
-  }
-
-  .column p {
-    padding-left: 0.6em;
-  }
-</style>
 
 <div class="headerWrapper">
   <div class="header">
