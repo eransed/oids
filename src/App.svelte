@@ -13,6 +13,7 @@
   import PostGamePage from "./pages/PostGamePage/PostGamePage.svelte"
   import ProfilePage from "./pages/ProfilePage/ProfilePage.svelte"
   import Header from "./components/header/header.svelte"
+  import { fade } from "svelte/transition"
 
   onMount(() => {
     //Functions to run on startup of App.
@@ -28,10 +29,11 @@
   }
 </script>
 
+{#if $currentLocation !== routes.game}
+  <Header />
+{/if}
+
 <body>
-  {#if $currentLocation !== routes.game}
-    <Header />
-  {/if}
   <Router>
     <Route path={routes.home}><LandingPage /></Route>
     <Route path={routes.play}><PlayPage /></Route>

@@ -24,7 +24,7 @@
   import { logOutButton, loginButton, Play, Profile } from "./navButtons"
 
   //Svelte fx
-  import { fade } from "svelte/transition"
+  import { fade, slide } from "svelte/transition"
 
   //css
   import "./style.css"
@@ -72,7 +72,7 @@
   $: borderColor = loggedIn ? "rgb(144, 238, 144)" : "rgb(255, 165, 0)"
 </script>
 
-<div class="headerWrapper">
+<div transition:slide class="headerWrapper">
   <div class="header">
     <nav>
       <div class="menuItem">

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fade, slide, fly, blur } from "svelte/transition"
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
 
   //Stores
@@ -6,6 +7,7 @@
 
   //Components
   import GameLobby from "./components/GameLobby/GameLobby.svelte"
+  import SunRise from "../../components/sunRise/SunRise.svelte"
 
   //Location update
   currentLocation.set("/play")
@@ -18,7 +20,7 @@
     align-content: center;
     flex-wrap: wrap;
     color: #fff;
-    height: 25vh;
+    min-height: 25vh;
     width: 100vw;
     font-family: "Courier New", Courier, monospace;
   }

@@ -12,6 +12,8 @@
 
   //component
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
+  import SunRise from "../../components/sunRise/SunRise.svelte"
+  import { fade } from "svelte/transition"
 
   //Location update
   currentLocation.set("/")
@@ -40,7 +42,6 @@
   }
 </style>
 
-<div class="wrapper">
-  <slot />
+<div out:fade class="wrapper">
   <TypeWriter text={welcomeMessage} />
 </div>

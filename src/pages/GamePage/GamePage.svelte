@@ -1,4 +1,7 @@
 <script lang="ts">
+  //Svelte
+  import { fade } from "svelte/transition"
+
   //Components
   import Game from "../GamePage/components/Game/Game.svelte"
 
@@ -22,6 +25,6 @@
   }
 </style>
 
-<div class="wrapper">
+<div class="wrapper" in:fade={{ delay: 300 }} out:fade>
   <Game sessionId={$gameSessionId} />
 </div>

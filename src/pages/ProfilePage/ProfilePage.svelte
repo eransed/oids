@@ -1,7 +1,4 @@
 <script lang="ts">
-  //Svelte
-  import { onMount } from "svelte"
-
   //Components
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
 
@@ -10,6 +7,7 @@
 
   //Interfaces
   import type { User } from "../../interfaces/user"
+  import { fade, fly } from "svelte/transition"
 
   //Location update
   currentLocation.set("/profile")
@@ -36,6 +34,6 @@
   }
 </style>
 
-<div class="wrapper">
+<div class="wrapper" in:fade={{ delay: 300 }} out:fade>
   <TypeWriter text={pageMessage} />
 </div>

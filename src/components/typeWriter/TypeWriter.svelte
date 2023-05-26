@@ -1,19 +1,64 @@
 <script lang="ts">
+  import { fade } from "svelte/transition"
+
   //Util
   import { rndi } from "../../lib/math"
 
+  /**
+   * The text that will be written out by the TypeWriter
+   *
+   * @type {string}
+   */
   export let text: string
+
+  /**
+   * A higher number equals slower type speed
+   *
+   * @type {number}
+   * @optional
+   */
   export let speed: number = 100
+
+  /**
+   * If true, a random number will make the speed change.
+   * Which mimicks the inconsistency of a human typing.
+   *
+   * @type {number}
+   * @optional
+   */
   export let humanRandomeness: boolean = false
+
+  /**
+   *
+   * Deleting the message one letter at a time after it's done printing it.
+   *
+   * @type {boolean | undefined}
+   * @optional
+   */
   export let deleteMessage: boolean = false
 
-  let i = 0
+  /**
+   * A higher number equals slower speed
+   *
+   * @type {number}
+   * @optional
+   */
+  export let deleteSpeed: number = speed
+
+  export let callback: () => void = () => {}
+
+  /**
+   * At first its empty, then slowly (or fast) we have a message by the typeWriter function.
+   */
   let typeWriterText: string = ""
   let finished: boolean = false
+  let i = 0
 
+  /**
+   * This is the typewriter. For every 'pass' it puts a new letter in variable typeWriterText
+   * which outputs in the html.
+   */
   const typeWriter = (): void => {
-    //This is the typewriter. For every 'pass' it puts a new letter in variable typeWriterText
-    //which outputs in the html.
     if (!finished) {
       setTimeout(() => {
         if (i < text.length) {
@@ -21,6 +66,7 @@
           i++
           if (i === text.length) {
             finished = true
+            callback()
             if (!deleteMessage) return
           }
           typeWriter()
@@ -40,7 +86,7 @@
           }
           typeWriter()
         }
-      }, speed * 0.5)
+      }, deleteSpeed)
     }
   }
 
@@ -53,12 +99,14 @@
     margin: auto;
     inset: 0;
     min-height: 100vh;
-    max-width: 50vw;
+    max-width: 300px;
     display: flex;
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
+    line-break: strict;
+    line-height: 1.5;
   }
 </style>
 
-<div class="wrapper">{typeWriterText}</div>
+<div in:fade={{ delay: 150 }} out:fade class="wrapper">{typeWriterText}</div>

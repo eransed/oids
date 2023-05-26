@@ -1,4 +1,7 @@
 <script lang="ts">
+  //Svelte
+  import { fade } from "svelte/transition"
+
   //Components
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
 
@@ -10,6 +13,7 @@
 
   //utils
   import { rndi } from "../../lib/math"
+  import SunRise from "../../components/sunRise/SunRise.svelte"
 
   //Location update
   currentLocation.set("/play/game/end")
@@ -22,7 +26,9 @@
 
   let userName = userData ? userData?.name : `Player ${rndi(1, 100)}`
 
-  let typeWriterMessage = `Did you win ${userName}?`
+  let typeWriterMessage = `Did you win ${userName}? Well, atleast here is a sunrise to make you happy! Ready? 3 ......... 2 ........... 1`
+
+  let makeItShine = false
 </script>
 
 <style>
@@ -38,6 +44,9 @@
   }
 </style>
 
-<div class="wrapper">
-  <TypeWriter text={typeWriterMessage} />
+{#if makeItShine}
+  <SunRise />
+{/if}
+<div class="wrapper" in:fade={{ delay: 300 }} out:fade>
+  <TypeWriter text={typeWriterMessage} callback={() => (makeItShine = true)} />
 </div>

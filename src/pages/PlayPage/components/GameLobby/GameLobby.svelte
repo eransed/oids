@@ -7,6 +7,7 @@
   import { connectToLobbys } from "../../../../lib/services/auth/lobby"
   import { user } from "../../../../stores/stores"
   import { navigate } from "svelte-routing"
+  import { fade } from "svelte/transition"
 
   let lobbyStep = 0
 
@@ -76,7 +77,7 @@
   }
 </style>
 
-<div class="gameLobby">
+<div class="gameLobby" in:fade={{ duration: 1000, delay: 300 }} out:fade>
   {#if lobbyStep === 0}
     <MenuWrapper>
       <h5>Enter game code to create or join a game</h5>
