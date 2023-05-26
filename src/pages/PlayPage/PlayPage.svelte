@@ -27,6 +27,10 @@
 </style>
 
 <div class="wrapper">
-  <TypeWriter speed={100} text={"Help....      We are dying!          Please help us kill the invading space ships and save us!"} />
+  <TypeWriter
+    humanRandomeness
+    speed={40}
+    text={`Urgent plea for assistance!!        Our lives hang in the balance as we face a dire threat from invading space ships. We humbly implore your expertise and strength to aid us in combating this perilous situation and safeguarding our existence. Your valiant efforts would make all the difference in saving our lives.`}
+  />
   <GameLobby />
 </div>
