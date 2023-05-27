@@ -14,6 +14,4 @@ export const showLobby: Writable<boolean> = writable(true)
 
 export const pageHasHeader: Writable<boolean> = writable(true)
 
-export const currentLocation = writable("")
-
 export const gameSessionId: Writable<string | undefined> = writable("")

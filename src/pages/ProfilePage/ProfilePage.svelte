@@ -3,7 +3,7 @@
   import { fade } from "svelte/transition"
 
   //Stores
-  import { currentLocation, user } from "../../stores/stores"
+  import { pageHasHeader, user } from "../../stores/stores"
 
   //Interfaces
   import type { User } from "../../interfaces/user"
@@ -11,8 +11,7 @@
   //Components
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
 
-  //Location update
-  currentLocation.set("/profile")
+  pageHasHeader.set(true)
 
   let userData: User | undefined
 

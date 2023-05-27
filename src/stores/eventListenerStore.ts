@@ -1,21 +1,19 @@
-import { writable } from "svelte/store"
-import type { Writable } from "svelte/store"
 
-//Type definition for cleanup function
-export type CleanupFunction = () => void
+/**
+ * This function adds a keydown listener and calls your callback function.
+ * It returns a cleanup function that you should call whenever your component goes out of scope :)
+ * @param callback 
+ * @returns cleanupFunction
+ */
+export function addEventListener_test(callback: (event: KeyboardEvent) => void): () => void {
 
-//Writable store to manage the event listener state
-export const eventListenerStore: Writable<CleanupFunction | null> = writable(null)
+  document.addEventListener("keydown", callback)
+  console.log ("add key listener")
 
-//Function to add the event listener and store the cleanup function
-export const addEventListener = (callback: (event: KeyboardEvent) => void): void => {
-  const handleKeyDown = (event: KeyboardEvent) => {
-    callback(event)
+  function cleanup() {
+    document.removeEventListener("keydown", callback)
+    console.log ("cleanup")
   }
 
-  document.addEventListener("keydown", handleKeyDown)
-
-  eventListenerStore.set(() => {
-    document.removeEventListener("keydown", handleKeyDown)
-  })
+  return cleanup
 }

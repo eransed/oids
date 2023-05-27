@@ -1,22 +1,21 @@
 <script lang="ts">
-  //Svelte
+  // Svelte
   import { fade } from "svelte/transition"
 
-  //Components
+  // Components
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
   import SunRise from "../../components/sunRise/SunRise.svelte"
 
-  //Stores
-  import { currentLocation, user } from "../../stores/stores"
+  // Stores
+  import { pageHasHeader, user } from "../../stores/stores"
 
-  //Interface
+  // Interface
   import type { User } from "../../interfaces/user"
 
-  //utils
+  // Utils
   import { rndi } from "../../lib/math"
 
-  //Location update
-  currentLocation.set("/play/game/end")
+  pageHasHeader.set(true)
 
   let userData: User | undefined
 

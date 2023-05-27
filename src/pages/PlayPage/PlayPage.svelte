@@ -1,13 +1,13 @@
 <script lang="ts">
   //Stores
-  import { currentLocation } from "../../stores/stores"
+  import { pageHasHeader } from "../../stores/stores"
 
   //Components
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
   import GameLobby from "./components/GameLobby/GameLobby.svelte"
 
-  //Location update
-  currentLocation.set("/play")
+  pageHasHeader.set(true)
+  
 </script>
 
 <style>

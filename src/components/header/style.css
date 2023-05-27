@@ -64,7 +64,7 @@
   width: fit-content;
 }
 
-.navButtons {
+.navButton {
   cursor: default;
   opacity: 1;
   padding: 1em;
@@ -75,7 +75,7 @@
   border-color: rgb(161, 211, 247, 0.5);
 }
 
-.navButtons:hover {
+.navButton:hover {
   opacity: 1;
   transition-property: all;
   color: rgb(255, 255, 255);

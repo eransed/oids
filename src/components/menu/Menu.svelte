@@ -4,8 +4,10 @@
   import type { Button90Config } from "../../interfaces/menu"
   import MenuWrapper from "./MenuWrapper.svelte"
   import { onDestroy } from "svelte"
-  import { addEventListener, eventListenerStore } from "../../stores/eventListenerStore"
-  import type { CleanupFunction } from "../../stores/eventListenerStore"
+  import { addEventListener_test } from "../../stores/eventListenerStore"
+
+  // used to disable game controllers while menu is open
+  import { initKeyControllers, removeKeyControllers } from "../../lib/input"
 
   //Exports
   export let menuOpen: boolean = false
@@ -14,10 +16,14 @@
 
   const toggleMenu = (): void => {
     menuOpen = !menuOpen
+    if (menuOpen) {
+      removeKeyControllers()
+    } else {
+      initKeyControllers()
+    }
   }
 
   const handleKeyDown = (event: KeyboardEvent): void => {
-    console.log("Key pressed")
     if (event.key === "Escape") {
       console.log("Escape")
       toggleMenu()
@@ -25,14 +31,12 @@
   }
 
   //Add the event listener using the reusable function
-  addEventListener(handleKeyDown)
+  const cleanup = addEventListener_test(handleKeyDown)
 
   onDestroy(() => {
-    //Retrieve and call the cleanup function from the store
-    const cleanup: CleanupFunction | null = $eventListenerStore
-    if (cleanup) {
-      cleanup()
-    }
+    //Call the cleanup function
+    cleanup()
+    document.removeEventListener("keydown", handleMenuSelection)
   })
 
   const rotate = (index: number, size: number): number => {

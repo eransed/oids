@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router, Route } from "svelte-routing"
   import { onMount } from "svelte"
-  import { currentLocation } from "./stores/stores"
+  import { pageHasHeader } from "./stores/stores"
 
   //Helpers
   import { onAppMount } from "./helpers/onAppMount"
@@ -29,7 +29,7 @@
   }
 </script>
 
-{#if $currentLocation !== routes.game}
+{#if $pageHasHeader }
   <Header />
 {/if}
 

@@ -6,10 +6,9 @@
   import Game from "../GamePage/components/Game/Game.svelte"
 
   //Stores
-  import { currentLocation, gameSessionId } from "../../stores/stores"
+  import { gameSessionId, pageHasHeader } from "../../stores/stores"
 
-  //Location update
-  currentLocation.set("/play/game")
+  pageHasHeader.set(false)
 </script>
 
 <style>

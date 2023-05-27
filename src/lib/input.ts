@@ -15,6 +15,20 @@ let leftPressed = false
 let spacePressed = false
 let selfDestruct = false
 
+function resetState() {
+  halt = false
+  reset = false
+  upPressed = false
+  downPressed = false
+  rightPressed = false
+  rightStrafePressed = false
+  leftStrafePressed = false
+  leftPressed = false
+  spacePressed = false
+  selfDestruct = false
+  boost = false
+}
+
 function arrowControl(e: KeyboardEvent, value: boolean) {
   if (e.key === "ArrowUp") {
     upPressed = value
@@ -124,14 +138,25 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 }
 
+function keydownArrowControl(event: KeyboardEvent) {
+  arrowControl(event, true)
+}
+
+function keyupArrowControl(event: KeyboardEvent) {
+  arrowControl(event, false)
+}
+
 export function initKeyControllers(): void {
-  document.addEventListener("keydown", (event) => arrowControl(event, true))
-  document.addEventListener("keyup", (event) => arrowControl(event, false))
+  console.log("Inits game key input control")
+  document.addEventListener("keydown", keydownArrowControl)
+  document.addEventListener("keyup", keyupArrowControl)
 }
 
 export function removeKeyControllers(): void {
-  document.removeEventListener("keydown", (event) => arrowControl(event, true))
-  document.removeEventListener("keyup", (event) => arrowControl(event, false))
+  console.log("Removes game key input control")
+  resetState()
+  document.removeEventListener("keydown", keydownArrowControl)
+  document.removeEventListener("keyup", keyupArrowControl)
 }
 
 export function getMousePosition(

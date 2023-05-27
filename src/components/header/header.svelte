@@ -40,14 +40,14 @@
   <div class="header">
     <nav>
       <div class="menuItem">
-        <div class="navButtons">
+        <div class="navButton">
           <Router>
             <Link to="play">
               <Button90 mouseTracking={false} buttonConfig={Play} />
             </Link>
           </Router>
         </div>
-        <div class="navButtons">
+        <div class="navButton">
           <Router>
             <Link to="profile">
               <Button90 mouseTracking={false} buttonConfig={Profile} />
