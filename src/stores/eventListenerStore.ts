@@ -5,7 +5,7 @@
  * @param callback 
  * @returns cleanupFunction
  */
-export function addEventListener_test(callback: (event: KeyboardEvent) => void): () => void {
+export function addKeyDownListener(callback: (event: KeyboardEvent) => void): () => void {
 
   document.addEventListener("keydown", callback)
   console.log ("add key listener")

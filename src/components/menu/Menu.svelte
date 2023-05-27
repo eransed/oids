@@ -4,7 +4,7 @@
   import type { Button90Config } from "../../interfaces/menu"
   import MenuWrapper from "./MenuWrapper.svelte"
   import { onDestroy } from "svelte"
-  import { addEventListener_test } from "../../stores/eventListenerStore"
+  import { addKeyDownListener } from "../../stores/eventListenerStore"
 
   // used to disable game controllers while menu is open
   import { initKeyControllers, removeKeyControllers } from "../../lib/input"
@@ -31,7 +31,7 @@
   }
 
   //Add the event listener using the reusable function
-  const cleanup = addEventListener_test(handleKeyDown)
+  const cleanup = addKeyDownListener(handleKeyDown)
 
   onDestroy(() => {
     //Call the cleanup function
