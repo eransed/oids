@@ -1,13 +1,18 @@
 <script lang="ts">
-  import { currentLocation, gameSessionId, showLobby, showMenu } from "../../../../stores/stores"
-  import type { Button90Config } from "../../../../interfaces/menu"
-  import type { User } from "../../../../interfaces/user"
-  import Button90 from "../../../../components/menu/Button90.svelte"
-  import MenuWrapper from "../../../../components/menu/MenuWrapper.svelte"
-  import { connectToLobbys } from "../../../../lib/services/auth/lobby"
-  import { user } from "../../../../stores/stores"
+  //Svelte
   import { navigate } from "svelte-routing"
   import { fade } from "svelte/transition"
+
+  //Stores
+  import { gameSessionId, showLobby, user } from "../../../../stores/stores"
+
+  //Interfaces
+  import type { Button90Config } from "../../../../interfaces/menu"
+  import type { User } from "../../../../interfaces/user"
+
+  //Components
+  import Button90 from "../../../../components/menu/Button90.svelte"
+  import MenuWrapper from "../../../../components/menu/MenuWrapper.svelte"
 
   let lobbyStep = 0
 

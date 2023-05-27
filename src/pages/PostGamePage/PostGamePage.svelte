@@ -4,6 +4,7 @@
 
   //Components
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
+  import SunRise from "../../components/sunRise/SunRise.svelte"
 
   //Stores
   import { currentLocation, user } from "../../stores/stores"
@@ -13,7 +14,6 @@
 
   //utils
   import { rndi } from "../../lib/math"
-  import SunRise from "../../components/sunRise/SunRise.svelte"
 
   //Location update
   currentLocation.set("/play/game/end")
@@ -48,5 +48,5 @@
   <SunRise />
 {/if}
 <div class="postGamePage" in:fade={{ delay: 300 }} out:fade>
-  <TypeWriter text={typeWriterMessage} callback={() => (makeItShine = true)} speed={50} humanRandomeness />
+  <TypeWriter text={typeWriterMessage} doneCallback={() => (makeItShine = true)} speed={50} humanRandomeness />
 </div>

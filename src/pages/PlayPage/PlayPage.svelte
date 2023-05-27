@@ -1,13 +1,10 @@
 <script lang="ts">
-  import { fade, slide, fly, blur } from "svelte/transition"
-  import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
-
   //Stores
   import { currentLocation } from "../../stores/stores"
 
   //Components
+  import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
   import GameLobby from "./components/GameLobby/GameLobby.svelte"
-  import SunRise from "../../components/sunRise/SunRise.svelte"
 
   //Location update
   currentLocation.set("/play")

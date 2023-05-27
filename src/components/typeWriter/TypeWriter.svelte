@@ -45,7 +45,10 @@
    */
   export let deleteSpeed: number = speed
 
-  export let callback: () => void = () => {}
+  /**
+   * A callback that fires when typeWriter is done printing
+   */
+  export let doneCallback: () => void = () => {}
 
   /**
    * At first its empty, then slowly (or fast) we have a message by the typeWriter function.
@@ -66,7 +69,7 @@
           i++
           if (i === text.length) {
             finished = true
-            callback()
+            doneCallback()
             if (!deleteMessage) return
           }
           typeWriter()
@@ -109,4 +112,4 @@
   }
 </style>
 
-<div in:fade={{ delay: 150 }} out:fade class="wrapper">{typeWriterText}</div>
+<div in:fade={{ delay: 150 }} out:fade class="wrapper"><p>{typeWriterText}</p></div>

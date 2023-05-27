@@ -1,13 +1,15 @@
 <script lang="ts">
-  //Components
-  import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
+  //Svelte
+  import { fade } from "svelte/transition"
 
   //Stores
   import { currentLocation, user } from "../../stores/stores"
 
   //Interfaces
   import type { User } from "../../interfaces/user"
-  import { fade, fly } from "svelte/transition"
+
+  //Components
+  import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
 
   //Location update
   currentLocation.set("/profile")

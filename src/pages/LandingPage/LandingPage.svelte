@@ -1,5 +1,6 @@
 <script lang="ts">
   //Svelte
+  import { fade } from "svelte/transition"
 
   //Stores
   import { currentLocation, user } from "../../stores/stores"
@@ -10,9 +11,8 @@
   //Utils
   import { rndi } from "../../lib/math"
 
-  //component
+  //Components
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
-  import { fade } from "svelte/transition"
 
   //Location update
   currentLocation.set("/")
