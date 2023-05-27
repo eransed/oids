@@ -6,7 +6,7 @@
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
 
   //Stores
-  import { currentLocation, gameSessionId, user } from "../../stores/stores"
+  import { currentLocation, user } from "../../stores/stores"
 
   //Interface
   import type { User } from "../../interfaces/user"
@@ -26,13 +26,13 @@
 
   let userName = userData ? userData?.name : `Player ${rndi(1, 100)}`
 
-  let typeWriterMessage = `This is Echo-9, calling out to ${userName}! Regardless of the outcome, here's a glimmer of hope for you, Alex. Witness the majestic sunrise painting the horizon in hues of gold and warmth. It's a symbol of resilience and new beginnings. Ready? 3... 2... 1...`
+  let typeWriterMessage = `This is Echo-9, calling out to ${userName}! Regardless of the outcome, here's a glimmer of hope for you, ${userName}. Witness the majestic sunrise painting the horizon in hues of gold and warmth. It's a symbol of resilience and new beginnings. Ready? 3... 2... 1...`
 
   let makeItShine = false
 </script>
 
 <style>
-  .wrapper {
+  .postGamePage {
     display: flex;
     justify-content: center;
     align-content: center;
@@ -47,6 +47,6 @@
 {#if makeItShine}
   <SunRise />
 {/if}
-<div class="wrapper" in:fade={{ delay: 300 }} out:fade>
+<div class="postGamePage" in:fade={{ delay: 300 }} out:fade>
   <TypeWriter text={typeWriterMessage} callback={() => (makeItShine = true)} speed={50} humanRandomeness />
 </div>

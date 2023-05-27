@@ -3,12 +3,37 @@
   import Button90 from "./Button90.svelte"
   import type { Button90Config } from "../../interfaces/menu"
   import MenuWrapper from "./MenuWrapper.svelte"
-  import { fade } from "svelte/transition"
+  import { onDestroy } from "svelte"
+  import { addEventListener, eventListenerStore } from "../../stores/eventListenerStore"
+  import type { CleanupFunction } from "../../stores/eventListenerStore"
 
   //Exports
-  export let menuOpen: boolean
+  export let menuOpen: boolean = false
   export let buttons: Button90Config[]
   export let menuHeader: string = "Menu"
+
+  const toggleMenu = (): void => {
+    menuOpen = !menuOpen
+  }
+
+  const handleKeyDown = (event: KeyboardEvent): void => {
+    console.log("Key pressed")
+    if (event.key === "Escape") {
+      console.log("Escape")
+      toggleMenu()
+    }
+  }
+
+  //Add the event listener using the reusable function
+  addEventListener(handleKeyDown)
+
+  onDestroy(() => {
+    //Retrieve and call the cleanup function from the store
+    const cleanup: CleanupFunction | null = $eventListenerStore
+    if (cleanup) {
+      cleanup()
+    }
+  })
 
   const rotate = (index: number, size: number): number => {
     if (index < 0) return (size + (index % size)) % size
@@ -113,13 +138,15 @@
   }
 </style>
 
-<MenuWrapper>
-  <ul class="buttonList">
-    <h3 class="menuHeader">{menuHeader}</h3>
-    {#each buttons as button}
-      <li class="button">
-        <Button90 buttonConfig={button} />
-      </li>
-    {/each}
-  </ul>
-</MenuWrapper>
+{#if menuOpen}
+  <MenuWrapper>
+    <ul class="buttonList">
+      <h3 class="menuHeader">{menuHeader}</h3>
+      {#each buttons as button}
+        <li class="button">
+          <Button90 buttonConfig={button} />
+        </li>
+      {/each}
+    </ul>
+  </MenuWrapper>
+{/if}

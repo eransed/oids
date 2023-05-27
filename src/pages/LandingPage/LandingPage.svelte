@@ -12,7 +12,6 @@
 
   //component
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
-  import SunRise from "../../components/sunRise/SunRise.svelte"
   import { fade } from "svelte/transition"
 
   //Location update
@@ -30,7 +29,7 @@
 </script>
 
 <style>
-  .wrapper {
+  .landingPage {
     display: flex;
     justify-content: center;
     align-content: center;
@@ -42,6 +41,6 @@
   }
 </style>
 
-<div out:fade class="wrapper">
+<div out:fade class="landingPage">
   <TypeWriter text={welcomeMessage} />
 </div>

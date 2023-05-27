@@ -1,9 +1,7 @@
 <script lang="ts">
   import type { Button90Config } from "../../interfaces/menu"
 
-  export let mouseTracking: boolean = true
-
-  //Name explained: Tribute to 90's game button styles
+  export let mouseTracking: boolean = false
 
   export let buttonConfig: Button90Config = {
     buttonText: "",

@@ -3,11 +3,12 @@
   import { navigate } from "svelte-routing"
 
   //Svelte
-  import { onMount } from "svelte"
+  import { onDestroy, onMount } from "svelte"
 
   import { createSpaceObject } from "../../../../lib/factory"
   import { Game } from "../../../../lib/game"
   import { removeKeyControllers } from "../../../../lib/input"
+  import GameMenu from "../Menu/GameMenu.svelte"
 
   let game: Game
 
@@ -43,4 +44,5 @@
   }
 </style>
 
+<GameMenu currentGame={game} />
 <canvas id="game_canvas" />

@@ -14,7 +14,7 @@
 </script>
 
 <style>
-  .wrapper {
+  .playPage {
     display: flex;
     justify-content: center;
     align-content: center;
@@ -26,7 +26,7 @@
   }
 </style>
 
-<div class="wrapper">
+<div class="playPage">
   <TypeWriter
     humanRandomeness
     speed={40}

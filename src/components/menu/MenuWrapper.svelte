@@ -5,19 +5,16 @@
   }
 
   .menuWrapper {
+    position: absolute;
+    inset: 0;
+    margin: auto;
     zoom: 1.5;
     padding: 20px;
-    min-width: 250px;
-    min-height: fit-content;
+    max-width: 300px;
+    height: fit-content;
     list-style-type: none;
-    position: absolute;
-    opacity: 0.8;
+    opacity: 0.85;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
-    flex-wrap: wrap;
     border-radius: 4px;
     border-style: solid;
     border-width: 2px;

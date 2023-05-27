@@ -13,7 +13,7 @@
 </script>
 
 <style>
-  .wrapper {
+  .gamePage {
     display: flex;
     justify-content: center;
     align-content: center;
@@ -25,6 +25,6 @@
   }
 </style>
 
-<div class="wrapper" in:fade={{ delay: 300 }} out:fade>
+<div class="gamePage" in:fade={{ delay: 300 }} out:fade>
   <Game sessionId={$gameSessionId} />
 </div>

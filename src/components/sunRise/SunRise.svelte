@@ -31,7 +31,7 @@
 
   .wrapper {
     display: flex;
-    z-index: -1;
+    position: absolute;
     height: 100vh;
     width: 100vw;
     font-family: "Courier New", Courier, monospace;
@@ -42,6 +42,5 @@
 
 <div class="wrapper" out:fade in:fade>
   <Sun />
-
   <slot />
 </div>

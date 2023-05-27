@@ -2,6 +2,8 @@ import { writable, type Writable } from "svelte/store"
 import type { Button90Config } from "../interfaces/menu"
 import type { User } from "../interfaces/user"
 
+import type { Game } from "../lib/game"
+
 export const menu: Writable<Button90Config[]> = writable()
 
 export const showMenu: Writable<boolean> = writable()

@@ -23,7 +23,7 @@
    * If true, a random number will make the speed change.
    * Which mimicks the inconsistency of a human typing.
    *
-   * @type {number}
+   * @type {boolean}
    * @optional
    */
   export let humanRandomeness: boolean = false
@@ -95,14 +95,14 @@
 
 <style>
   .wrapper {
-    position: absolute;
+    /* position: absolute;
     margin: auto;
     inset: 0;
     min-height: 100vh;
-    max-width: 300px;
     display: flex;
     justify-content: center;
-    align-content: center;
+    align-content: center; */
+    max-width: 450px;
     flex-wrap: wrap;
     line-break: strict;
     line-height: 1.5;
