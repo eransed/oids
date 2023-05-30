@@ -1,81 +1,47 @@
-import type { SpaceObject } from "./interface"
+import type { KeyFunctionMap, SpaceObject } from "./interface"
 import { applyEngineThrust, applySteer, fire } from "./mechanics"
 import { timeScale } from "./constants"
 import type { Vec2d } from "./math"
 
-let boost = false
-let halt = false
-let reset = false
-let upPressed = false
-let downPressed = false
-let rightPressed = false
-let rightStrafePressed = false
-let leftStrafePressed = false
-let leftPressed = false
-let spacePressed = false
-let selfDestruct = false
-
-function resetState() {
-  halt = false
-  reset = false
-  upPressed = false
-  downPressed = false
-  rightPressed = false
-  rightStrafePressed = false
-  leftStrafePressed = false
-  leftPressed = false
-  spacePressed = false
-  selfDestruct = false
-  boost = false
+const DefaultKeyMap: KeyFunctionMap = {
+  thrust: { activators: ["w", "ArrowUp"], keyStatus: false },
+  reverseThrust: { activators: ["s", "ArrowDown"], keyStatus: false },
+  boost: { activators: ["b"], keyStatus: false },
+  halt: { activators: ["h"], keyStatus: false },
+  turnLeft: { activators: ["a", "ArrowLeft"], keyStatus: false },
+  turnRight: { activators: ["d", "ArrowRight"], keyStatus: false },
+  strafeLeft: { activators: ["q", "PageUp"], keyStatus: false },
+  strafeRight: { activators: ["e", "PageDown"], keyStatus: false },
+  fire: { activators: [" "], keyStatus: false },
+  reload: { activators: ["r"], keyStatus: false },
+  selfDestroy: { activators: ["k"], keyStatus: false },
+  leaderBoard: { activators: ["Tab"], keyStatus: false },
 }
 
-function arrowControl(e: KeyboardEvent, value: boolean) {
-  if (e.key === "ArrowUp") {
-    upPressed = value
-  }
-  if (e.key === "q" || e.code === "PageUp") {
-    leftStrafePressed = value
-  }
-  if (e.key === "e" || e.code === "PageDown") {
-    rightStrafePressed = value
-  }
-  if (e.key === "w") {
-    upPressed = value
-  }
-  if (e.key === "ArrowDown") {
-    downPressed = value
-  }
-  if (e.key === "s") {
-    downPressed = value
-  }
-  if (e.key === "ArrowLeft") {
-    leftPressed = value
-  }
-  if (e.key === "ArrowRight") {
-    rightPressed = value
-  }
-  if (e.key === "a") {
-    leftPressed = value
-  }
-  if (e.key === "d") {
-    rightPressed = value
-  }
-  if (e.code === "Space" || e.key === "n") {
-    // wtf code...
-    spacePressed = value
-  }
-  if (e.key === "b") {
-    boost = value
-  }
-  if (e.key === "v") {
-    halt = value
-  }
-  if (e.key === "r") {
-    reset = value
-  }
-  if (e.key === "k") {
-    selfDestruct = value
-  }
+let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
+
+export function setKeyMap(Keys: KeyFunctionMap) {
+  ActiveKeyMap = Keys
+}
+
+function arrowControl(e: KeyboardEvent, keyInUse: boolean) {
+  Object.values(ActiveKeyMap).forEach((keyFunction) => {
+    keyFunction.activators.map((activator: string) => {
+      if (activator === e.key) {
+        if (keyInUse && keyFunction.toggleAble) {
+          keyFunction.keyStatus = !keyFunction.keyStatus
+        } else {
+          keyFunction.keyStatus = keyInUse
+        }
+      }
+    })
+  })
+}
+
+function resetState() {
+  Object.values(ActiveKeyMap).forEach((keyFunction) => {
+    keyFunction.keyStatus = false
+  })
 }
 
 export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
@@ -83,12 +49,12 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
 
   const dts: number = dt * timeScale
 
-  if (halt) {
+  if (ActiveKeyMap.halt.keyStatus) {
     so.velocity = { x: 0, y: 0 }
     so.acceleration = { x: 0, y: 0 }
   }
 
-  if (reset) {
+  if (ActiveKeyMap.reload.keyStatus) {
     // so.canonCoolDown = 0
     so.ammo = 1000000
     so.health = 250
@@ -100,40 +66,40 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
     so.shotsPerFrame = 300
   }
 
-  if (boost) {
+  if (ActiveKeyMap.boost.keyStatus) {
     //so.afterBurnerEnabled = true
     applyEngineThrust(so, 0, true)
   }
 
-  if (upPressed) {
+  if (ActiveKeyMap.thrust.keyStatus) {
     //so.afterBurnerEnabled = true
     applyEngineThrust(so, 0)
   }
 
-  if (downPressed) {
+  if (ActiveKeyMap.reverseThrust.keyStatus) {
     applyEngineThrust(so, 180)
   }
 
-  if (leftStrafePressed) {
+  if (ActiveKeyMap.strafeLeft.keyStatus) {
     applyEngineThrust(so, -90)
   }
 
-  if (rightStrafePressed) {
+  if (ActiveKeyMap.strafeRight.keyStatus) {
     applyEngineThrust(so, 90)
   }
 
-  if (rightPressed) {
+  if (ActiveKeyMap.turnRight.keyStatus) {
     applySteer(so, 1, dts)
   }
 
-  if (leftPressed) {
+  if (ActiveKeyMap.turnLeft.keyStatus) {
     applySteer(so, -1, dts)
   }
 
-  if (spacePressed) {
+  if (ActiveKeyMap.fire.keyStatus) {
     fire(so)
   }
-  if (selfDestruct) {
+  if (ActiveKeyMap.selfDestroy.keyStatus) {
     so.health = 0
   }
 }
@@ -159,10 +125,7 @@ export function removeKeyControllers(): void {
   document.removeEventListener("keyup", keyupArrowControl)
 }
 
-export function getMousePosition(
-  canvas: HTMLCanvasElement,
-  mouseEvent: MouseEvent
-): Vec2d {
+export function getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEvent): Vec2d {
   const rect = canvas.getBoundingClientRect()
   const scaleX = canvas.width / rect.width
   const scaleY = canvas.height / rect.height
