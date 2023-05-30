@@ -20,8 +20,6 @@ import { renderViewport } from "../render/renderUI"
 import { renderExplosionFrame } from "../render/renderFx"
 import { newMoon } from "../shapes/Moon"
 
-
-
 let numberOfServerObjects = 0
 let ops = 0
 let dataLen = 0
@@ -137,14 +135,6 @@ export function initRegularGame(game: Game): void {
   console.log("Your ship name is: " + game.localPlayer.name + "\nAnd your color is: " + game.localPlayer.color)
 
   initMultiplayer()
-
-  for (let i = 0; i < 100; i++) {
-    game.testShapes.push(newMoon())
-  }
-
-  // const padding = 0
-  // const pad = { x: padding, y: padding }
-  // const scr = sub(getScreenRect(game.ctx), pad)
 
   const bodies: SpaceObject[] = []
 
@@ -325,7 +315,6 @@ export function nextFrame(game: Game, dt: number): void {
     byteSpeed = 0
     bitSpeed = 0
   }
-
 
   // game.bodies.forEach((body) => {
   //   game.bodies.forEach((other) => {

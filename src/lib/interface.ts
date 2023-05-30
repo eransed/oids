@@ -22,8 +22,6 @@ export enum MenuEnum {
 //   localPlayer: SpaceObject
 // }
 
-
-
 export enum SpaceShape {
   Comet,
   Moon,
@@ -164,3 +162,28 @@ export function getRenderableObjectCount(so: SpaceObject): number {
 // export function applySteer(o: Steerable, deltaTime: number): void {
 //   o.angleDegree += o.steeringPower
 // }
+
+export interface GameSettings {
+  showSystemGraphs: boolean
+  keyMap: KeyFunctionMap
+}
+
+export interface KeyFunctionMap {
+  thrust: KeyFunction
+  reverseThrust: KeyFunction
+  boost: KeyFunction
+  halt: KeyFunction
+  turnLeft: KeyFunction
+  turnRight: KeyFunction
+  strafeLeft: KeyFunction
+  strafeRight: KeyFunction
+  fire: KeyFunction
+  reload: KeyFunction
+  selfDestroy: KeyFunction
+  leaderBoard: KeyFunction
+}
+
+export interface KeyFunction {
+  activators: string[]
+  keyStatus: boolean
+}

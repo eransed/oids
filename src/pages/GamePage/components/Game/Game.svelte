@@ -8,19 +8,20 @@
   import { createSpaceObject } from "../../../../lib/factory"
   import { Game } from "../../../../lib/game"
   import { removeKeyControllers } from "../../../../lib/input"
+
+  //Components
   import GameMenu from "../Menu/GameMenu.svelte"
 
   let game: Game
 
+  //Props
   export let sessionId: string | undefined
 
-  export function getCanvas(): HTMLCanvasElement {
-    return <HTMLCanvasElement>document.getElementById("game_canvas")
-  }
+  let canvas: HTMLCanvasElement
 
   onMount(() => {
     const localPlayer = createSpaceObject("LocalPlayer")
-    game = new Game(getCanvas(), localPlayer, showDeadMenu)
+    game = new Game(canvas, localPlayer, showDeadMenu)
     game.localPlayer.sessionId = sessionId
     game.startMultiplayer()
   })
@@ -33,7 +34,7 @@
 </script>
 
 <style>
-  #game_canvas {
+  .game_canvas {
     max-width: 4000px;
     max-height: 3000px;
     width: 100vw;
@@ -45,4 +46,4 @@
 </style>
 
 <GameMenu currentGame={game} />
-<canvas id="game_canvas" />
+<canvas class="game_canvas" bind:this={canvas} />
