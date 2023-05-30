@@ -37,6 +37,10 @@ function connect(): Promise<WebSocket> {
   })
 }
 
+export function disconnect(): void {
+  socket.close()
+}
+
 export const initMultiplayer = async () => {
   try {
     await connect()

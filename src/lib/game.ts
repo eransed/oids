@@ -1,4 +1,4 @@
-import { GameType, type SpaceObject } from "./interface"
+import { GameType, type GameSettings, type SpaceObject } from "./interface"
 
 import { getContext } from "./canvas_util"
 
@@ -23,14 +23,16 @@ export class Game {
   all: SpaceObject[] = []
   shouldSendToServer = false
   hasCalledCallback = false
+  gameSettings: GameSettings
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
 
-  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _OnDeadLocalPlayerCallBack: () => void) {
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, gameSettings: GameSettings, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
     this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
     this.ctx = getContext(this.canvas)
+    this.gameSettings = gameSettings
   }
 
   isRunning(): boolean {
@@ -42,7 +44,7 @@ export class Game {
   }
 
   stopGame = async (): Promise<void> => {
-    console.log('todo: build a better logger...')
+    console.log("todo: build a better logger...")
     this.running = false
     this.shouldSendToServer = false
     this.localPlayer.isPlaying = false

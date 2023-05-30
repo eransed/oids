@@ -170,6 +170,8 @@ export function initRegularGame(game: Game): void {
       if (so.name === game.remotePlayers[i].name) {
         if (!so.online) {
           console.log(`${so.name} went offline`)
+          game.remotePlayers.splice(i)
+          continue
         }
 
         // Store every previously shots fired
@@ -244,7 +246,10 @@ export function renderFrame(game: Game, dt: number): void {
   game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx)
 
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
-  fpsCounter(ops, dt, getSerVer(), ctx)
+
+  if (game.gameSettings.showSystemGraphs.keyStatus) {
+    fpsCounter(ops, dt, getSerVer(), ctx)
+  }
 
   // renderInfoText(`packets/sec: ${ops}`, 450, ctx)
   // renderInfoText(`packet symbol count: ${dataLen}`, 500, ctx)
@@ -270,9 +275,11 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(createSpaceObject())).length)
   addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(createSpaceObject()))).length)
 
-  GRAPHS.forEach((g, i) => {
-    renderGraph(g, { x: 310, y: 110 + i * 142 }, { x: 200, y: 84 }, ctx)
-  })
+  if (game.gameSettings.showSystemGraphs.keyStatus) {
+    GRAPHS.forEach((g, i) => {
+      renderGraph(g, { x: 310, y: 110 + i * 142 }, { x: 200, y: 84 }, ctx)
+    })
+  }
 
   game.bodies.forEach((body) => {
     renderMoon(body, ctx)

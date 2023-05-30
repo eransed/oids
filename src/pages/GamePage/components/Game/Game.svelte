@@ -11,6 +11,10 @@
 
   //Components
   import GameMenu from "../Menu/GameMenu.svelte"
+  import { initSettingsControl, gameSettings } from "./GameSettings"
+
+  //Websocket
+  import { disconnect } from "../../../../lib/websocket/webSocket"
 
   let game: Game
 
@@ -18,10 +22,12 @@
   export let sessionId: string | undefined
 
   let canvas: HTMLCanvasElement
+  let cleanup: () => void
 
   onMount(() => {
+    cleanup = initSettingsControl()
     const localPlayer = createSpaceObject("LocalPlayer")
-    game = new Game(canvas, localPlayer, showDeadMenu)
+    game = new Game(canvas, localPlayer, gameSettings, showDeadMenu)
     game.localPlayer.sessionId = sessionId
     game.startMultiplayer()
   })
@@ -31,6 +37,13 @@
     game.stopGame()
     navigate("/play/game/end")
   }
+
+  onDestroy(() => {
+    disconnect()
+    if (cleanup) {
+      cleanup()
+    }
+  })
 </script>
 
 <style>
