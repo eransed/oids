@@ -28,11 +28,7 @@ function arrowControl(e: KeyboardEvent, keyInUse: boolean) {
   Object.values(ActiveKeyMap).forEach((keyFunction) => {
     keyFunction.activators.map((activator: string) => {
       if (activator === e.key) {
-        if (keyInUse && keyFunction.toggleAble) {
-          keyFunction.keyStatus = !keyFunction.keyStatus
-        } else {
-          keyFunction.keyStatus = keyInUse
-        }
+        keyFunction.keyStatus = keyInUse
       }
     })
   })
