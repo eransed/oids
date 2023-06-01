@@ -65,16 +65,17 @@ class Client {
     this.ws.addEventListener("close", () => {
       // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
       console.log(`${this.toString()} has been disconnected, sending goodbye message`)
-      const offlineMessage: any = this.lastDataObject
-      try {
+      const offlineMessage: SpaceObject | null = this.lastDataObject
+      if (offlineMessage) {
         offlineMessage.online = false
-      } catch (err) {
-        console.error(err)
-      }
-      broadcastToAllClients(this, globalConnectedClients, offlineMessage)
-      globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
-      if (globalConnectedClients.length === 0) {
-        console.log("No clients connected :(")
+        offlineMessage.isPlaying = false
+        broadcastToAllClients(this, globalConnectedClients, offlineMessage)
+        globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
+        if (globalConnectedClients.length === 0) {
+          console.log("No clients connected :(")
+        }
+      } else {
+        console.error("Can't send offlineMessage: No data has been recieved")
       }
     })
 

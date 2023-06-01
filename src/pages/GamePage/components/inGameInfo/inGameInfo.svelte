@@ -3,7 +3,7 @@
   import { slide } from "svelte/transition"
 
   //Component
-  import Modal from "../modal/Modal.svelte"
+  import Modal from "../../../../components/modal/Modal.svelte"
 
   //Propts
   export let closedCallback: () => void

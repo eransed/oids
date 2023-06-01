@@ -12,18 +12,17 @@
   //Components
   import GameMenu from "../Menu/GameMenu.svelte"
   import { initSettingsControl, gameSettings } from "./GameSettings"
+  import InGameInfo from "../inGameInfo/inGameInfo.svelte"
+  import HotKeys from "../Hotkeys/hotKeys.svelte"
 
   //Websocket
   import { disconnect } from "../../../../lib/websocket/webSocket"
   import ScoreScreen from "../scoreScreen/ScoreScreen.svelte"
-  import type { ScoreScreenData } from "../scoreScreen/ScoreScreen.types"
 
   //Stores
   import { showHotKeys, showScoreScreen } from "./store/gameStores"
-  import InGameInfo from "../../../../components/inGameInfo/inGameInfo.svelte"
-  import HotKeys from "../Hotkeys/hotKeys.svelte"
 
-  let currentGame: Game
+  let game: Game
 
   //Props
   export let sessionId: string | undefined
@@ -34,14 +33,14 @@
   onMount(() => {
     cleanup = initSettingsControl()
     const localPlayer = createSpaceObject("LocalPlayer")
-    currentGame = new Game(canvas, localPlayer, gameSettings, showDeadMenu)
-    currentGame.localPlayer.sessionId = sessionId
-    currentGame.startMultiplayer()
+    game = new Game(canvas, localPlayer, gameSettings, showDeadMenu)
+    game.localPlayer.sessionId = sessionId
+    game.startMultiplayer()
   })
 
   const showDeadMenu = (): void => {
     removeKeyControllers()
-    currentGame.stopGame()
+    game.stopGame()
     navigate("/play/game/end")
   }
 
@@ -52,15 +51,6 @@
       cleanup()
     }
   })
-
-  let ScoreScreenData: ScoreScreenData
-
-  ScoreScreenData = {
-    players: [
-      { name: "erik", alive: false },
-      { name: "Alex", alive: true },
-    ],
-  }
 </script>
 
 <style>
@@ -98,7 +88,7 @@
 <div class="gameInfo">
   <InGameInfo title={"Score screen"} showModal={$showScoreScreen} closedCallback={() => {}}>
     <div class="scoreScreen">
-      <ScoreScreen {ScoreScreenData} />
+      <ScoreScreen />
     </div>
   </InGameInfo>
 
@@ -109,5 +99,5 @@
   </InGameInfo>
 </div>
 
-<GameMenu {currentGame} />
+<GameMenu currentGame={game} />
 <canvas class="game_canvas" bind:this={canvas} />

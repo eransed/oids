@@ -6,7 +6,7 @@ import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, handleCollisions } from "../physics"
 import { loadingText } from "../render/render2d"
 import { fpsCounter } from "../time"
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from "../interface"
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject, type Player, type Damageable, type Colorable } from "../interface"
 import { getSerVer, initMultiplayer, registerServerUpdate } from "../websocket/webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
@@ -19,6 +19,9 @@ import { renderShip } from "../render/renderShip"
 import { renderViewport } from "../render/renderUI"
 import { renderExplosionFrame } from "../render/renderFx"
 import { newMoon } from "../shapes/Moon"
+
+//Stores
+import { gameState } from "../../pages/GamePage/components/Game/store/gameStores"
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -232,7 +235,49 @@ function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext
   return stillPlaying
 }
 
+export class Every {
+  private currentTick: number = 0
+  maxTicks: number = 1
+
+  constructor(maxTicks: number) {
+    this.maxTicks = maxTicks
+  }
+
+  tick(callback: () => void) {
+    this.currentTick++
+    if (this.currentTick >= this.maxTicks) {
+      callback()
+      this.currentTick = 0
+    }
+  }
+}
+
+const every = new Every(100)
+
+function copyPlayerFromSo(so: SpaceObject): Player & Damageable & Colorable {
+  return {
+    name: so.name,
+    health: so.health,
+    isDead: so.isDead,
+    deadFrameCount: so.deadFrameCount,
+    obliterated: so.obliterated,
+    position: so.position,
+    color: so.color,
+  }
+}
+
 export function renderFrame(game: Game, dt: number): void {
+  every.tick(() => {
+    const remotePlayers: (Player & Damageable & Colorable)[] = []
+
+    game.remotePlayers.forEach((player) => {
+      remotePlayers.push(copyPlayerFromSo(player))
+    })
+
+    gameState.set({ scoreScreenData: { player: copyPlayerFromSo(game.localPlayer), remotePlayers: remotePlayers } })
+    console.log("Gamestate updated")
+  })
+
   const ctx = game.ctx
   setCanvasSize(game.ctx)
   game.localPlayer.viewport = getScreenRect(game.ctx)

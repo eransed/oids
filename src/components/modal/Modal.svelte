@@ -64,7 +64,7 @@
     min-height: 200px;
     background: radial-gradient(800px circle at 100px 100px, rgba(255, 255, 255, 0.05), transparent 40%);
     opacity: 0.85;
-    padding: 1em;
+    /* padding: 1em; */
     transition: all;
     transition-duration: 1s;
   }
@@ -97,11 +97,12 @@
 
   #header {
     position: relative;
+    inset: 0;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    top: 0;
+    top: 1em;
     width: 100%;
     height: 10%;
     min-height: 35px;

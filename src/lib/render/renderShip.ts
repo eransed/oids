@@ -33,11 +33,11 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   ctx.closePath()
 
   if (renderAsLocalPlayer) {
-    ctx.filter = "hue-rotate(250deg)"
+    // ctx.filter = "hue-rotate(250deg)"
     // ctx.drawImage(shipSvg, -75, -75, 150, 150)
     ctx.stroke()
   } else {
-    ctx.filter = "hue-rotate(360deg)"
+    // ctx.filter = "hue-rotate(360deg)"
     // ctx.drawImage(shipSvg, -75, -75, 150, 150)
     ctx.fill()
   }

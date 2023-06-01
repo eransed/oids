@@ -1,4 +1,4 @@
-import type { KeyFunctionMap, SpaceObject } from "./interface"
+import type { KeyFunction, KeyFunctionMap, SpaceObject } from "./interface"
 import { applyEngineThrust, applySteer, fire } from "./mechanics"
 import { timeScale } from "./constants"
 import type { Vec2d } from "./math"
@@ -17,6 +17,10 @@ const DefaultKeyMap: KeyFunctionMap = {
   selfDestroy: { activators: ["k"], keyStatus: false },
   leaderBoard: { activators: ["Tab"], keyStatus: false },
 }
+
+Object.entries(DefaultKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
+  value.displayText = key
+})
 
 export let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
 

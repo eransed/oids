@@ -137,10 +137,10 @@ export interface SpaceObject
     Collidable,
     Bounceable,
     Boostable,
-    Colorable {
+    Colorable,
+    Player {
   isPlaying: boolean
   framesSinceLastServerUpdate: number
-  name: string
   shotsInFlight: PhotonLaser[]
   shotsInFlightValues: any[]
   shotsFiredThisFrame: boolean
@@ -188,5 +188,34 @@ export interface KeyFunctionMap {
 export interface KeyFunction {
   activators: string[]
   keyStatus: boolean
+  displayText?: string
   store?: Writable<boolean>
 }
+
+export interface GameState {
+  scoreScreenData: ScoreScreenData
+}
+
+export interface ScoreScreenData {
+  player: Damageable & Player & Colorable
+  remotePlayers: (Damageable & Player & Colorable)[]
+}
+
+export interface Player {
+  name: string
+}
+
+// export interface CurrentGame {
+//   sessionId: string | undefined
+//   LeaderBoard: LeaderBoard
+// }
+
+// export interface LeaderBoard {
+//   players: Player[]
+// }
+
+// export interface Player {
+//   name: string
+//   alive: boolean
+//   kills: number
+// }
