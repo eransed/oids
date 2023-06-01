@@ -15,11 +15,13 @@
 
   //Websocket
   import { disconnect } from "../../../../lib/websocket/webSocket"
-  import ScoreScreen from "../../../../components/scoreScreen/ScoreScreen.svelte"
-  import type { ScoreScreenData } from "../../../../components/scoreScreen/ScoreScreen.types"
+  import ScoreScreen from "../scoreScreen/ScoreScreen.svelte"
+  import type { ScoreScreenData } from "../scoreScreen/ScoreScreen.types"
 
   //Stores
-  import { showModal } from "./store/gameStores"
+  import { showHotKeys, showScoreScreen } from "./store/gameStores"
+  import InGameInfo from "../../../../components/inGameInfo/inGameInfo.svelte"
+  import HotKeys from "../Hotkeys/hotKeys.svelte"
 
   let currentGame: Game
 
@@ -46,7 +48,7 @@
   onDestroy(() => {
     disconnect()
     if (cleanup) {
-      gameSettings.showScoreScreen.store?.set(false)
+      gameSettings.scoreScreen.store?.set(false)
       cleanup()
     }
   })
@@ -62,6 +64,10 @@
 </script>
 
 <style>
+  :root {
+    --height: "";
+  }
+
   .game_canvas {
     max-width: 4000px;
     max-height: 3000px;
@@ -71,8 +77,37 @@
     position: fixed;
     /* cursor: none; */
   }
+  .gameInfo {
+    display: flex;
+    flex-flow: column;
+    align-items: end;
+    grid-template-rows: 50% auto;
+    transition: all;
+    transition-duration: 0.6s;
+    transition-timing-function: ease-in;
+    position: absolute;
+    right: 0;
+    top: 0em;
+  }
+
+  .gameInfo:has(.scoreScreen):has(.hotKeys) {
+    grid-template-rows: 50% auto;
+  }
 </style>
 
-<ScoreScreen showModal={$showModal} {ScoreScreenData} closedCallback={() => console.log("closed")} />
+<div class="gameInfo">
+  <InGameInfo title={"Score screen"} showModal={$showScoreScreen} closedCallback={() => {}}>
+    <div class="scoreScreen">
+      <ScoreScreen {ScoreScreenData} />
+    </div>
+  </InGameInfo>
+
+  <InGameInfo title={"Hotkeys"} showModal={$showHotKeys} closedCallback={() => {}}>
+    <div class="hotKeys">
+      <HotKeys />
+    </div>
+  </InGameInfo>
+</div>
+
 <GameMenu {currentGame} />
 <canvas class="game_canvas" bind:this={canvas} />

@@ -1,5 +1,5 @@
 //Interfaces
-import { showModal } from "./store/gameStores"
+import { showHotKeys, showScoreScreen } from "./store/gameStores"
 
 import type { GameSettings, KeyFunction } from "../../../../lib/interface"
 
@@ -19,8 +19,9 @@ function handleKeyPress(e: KeyboardEvent) {
 }
 
 export const gameSettings: GameSettings = {
-  showSystemGraphs: { activators: ["g"], keyStatus: false },
-  showScoreScreen: { activators: ["p"], keyStatus: false, store: showModal },
+  systemGraphs: { activators: ["g"], keyStatus: false },
+  scoreScreen: { activators: ["p"], keyStatus: false, store: showScoreScreen },
+  hotKeys: { activators: ["o"], keyStatus: false, store: showHotKeys },
 }
 
 export function initSettingsControl(): () => void {

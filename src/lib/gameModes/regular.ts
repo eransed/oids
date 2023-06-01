@@ -247,7 +247,7 @@ export function renderFrame(game: Game, dt: number): void {
 
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
 
-  if (game.gameSettings.showSystemGraphs.keyStatus) {
+  if (game.gameSettings.systemGraphs.keyStatus) {
     fpsCounter(ops, dt, getSerVer(), ctx)
   }
 
@@ -275,7 +275,7 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(createSpaceObject())).length)
   addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(createSpaceObject()))).length)
 
-  if (game.gameSettings.showSystemGraphs.keyStatus) {
+  if (game.gameSettings.systemGraphs.keyStatus) {
     GRAPHS.forEach((g, i) => {
       renderGraph(g, { x: 310, y: 110 + i * 142 }, { x: 200, y: 84 }, ctx)
     })

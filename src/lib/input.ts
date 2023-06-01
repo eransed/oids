@@ -18,7 +18,7 @@ const DefaultKeyMap: KeyFunctionMap = {
   leaderBoard: { activators: ["Tab"], keyStatus: false },
 }
 
-let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
+export let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
 
 export function setKeyMap(Keys: KeyFunctionMap) {
   ActiveKeyMap = Keys

@@ -165,8 +165,9 @@ export function getRenderableObjectCount(so: SpaceObject): number {
 // }
 
 export interface GameSettings {
-  showSystemGraphs: KeyFunction
-  showScoreScreen: KeyFunction
+  systemGraphs: KeyFunction
+  scoreScreen: KeyFunction
+  hotKeys: KeyFunction
 }
 
 export interface KeyFunctionMap {

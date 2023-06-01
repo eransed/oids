@@ -1,3 +1,4 @@
 import { writable, type Writable } from "svelte/store"
 
-export const showModal: Writable<boolean> = writable(false)
+export const showScoreScreen: Writable<boolean> = writable(false)
+export const showHotKeys: Writable<boolean> = writable(false)

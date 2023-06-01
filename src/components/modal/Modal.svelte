@@ -1,15 +1,19 @@
 <script lang="ts">
+  type positionType = "fixed" | "absolute" | "relative"
+
   export let title: string = "Title"
   export let closeBtn: boolean = true
   export let showModal: boolean = true
   export let isEditable: boolean = false
   export let closedCallback: () => void = () => {}
   export let backDrop: boolean = true
+  export let position: positionType = "fixed"
 
   import { fade } from "svelte/transition"
 
   $: width = backDrop ? "100%" : "fit-content"
   $: height = backDrop ? "100vh" : "fit-content"
+  $: position = position
 
   function handleClick() {
     showModal = false
@@ -55,7 +59,7 @@
   }
 
   #modalContent {
-    width: 15%;
+    width: 100%;
     min-width: 200px;
     min-height: 200px;
     background: radial-gradient(800px circle at 100px 100px, rgba(255, 255, 255, 0.05), transparent 40%);
@@ -158,7 +162,14 @@
 </style>
 
 {#if showModal}
-  <div id="modal" style="--width: {width}; --height: {height}" contenteditable={isEditable} in:fade={{ delay: 50 }} out:fade on:mousemove={handleMousemove}>
+  <div
+    id="modal"
+    style="--width: {width}; --height: {height}; position: {position}"
+    contenteditable={isEditable}
+    in:fade={{ delay: 50 }}
+    out:fade
+    on:mousemove={handleMousemove}
+  >
     <div id="modalContent" style="--left: {m.x}; --top: {m.y};">
       <div id="header">
         <div id="headerTitle"><h3>{title}</h3></div>
