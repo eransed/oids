@@ -1,3 +1,4 @@
+import type { Writable } from "svelte/store"
 import type { Vec2d } from "./math"
 import type { Steerable } from "./traits/Steerable"
 
@@ -165,6 +166,7 @@ export function getRenderableObjectCount(so: SpaceObject): number {
 
 export interface GameSettings {
   showSystemGraphs: KeyFunction
+  showScoreScreen: KeyFunction
 }
 
 export interface KeyFunctionMap {
@@ -185,4 +187,5 @@ export interface KeyFunctionMap {
 export interface KeyFunction {
   activators: string[]
   keyStatus: boolean
+  store?: Writable<boolean>
 }

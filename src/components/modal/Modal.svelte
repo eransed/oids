@@ -8,7 +8,6 @@
 
   import { fade } from "svelte/transition"
 
-  $: display = showModal ? "flex" : "none"
   $: width = backDrop ? "100%" : "fit-content"
   $: height = backDrop ? "100vh" : "fit-content"
 
@@ -158,21 +157,16 @@
   }
 </style>
 
-<div
-  id="modal"
-  style="  display:  {display}; --width: {width}; --height: {height}"
-  contenteditable={isEditable}
-  in:fade={{ delay: 50 }}
-  out:fade
-  on:mousemove={handleMousemove}
->
-  <div id="modalContent" style="--left: {m.x}; --top: {m.y};">
-    <div id="header">
-      <div id="headerTitle"><h3>{title}</h3></div>
+{#if showModal}
+  <div id="modal" style="--width: {width}; --height: {height}" contenteditable={isEditable} in:fade={{ delay: 50 }} out:fade on:mousemove={handleMousemove}>
+    <div id="modalContent" style="--left: {m.x}; --top: {m.y};">
+      <div id="header">
+        <div id="headerTitle"><h3>{title}</h3></div>
 
-      {#if closeBtn}<div on:click={() => handleClick()} on:keydown={() => {}} id="closeBtn" />{/if}
+        {#if closeBtn}<div on:click={() => handleClick()} on:keydown={() => {}} id="closeBtn" />{/if}
+      </div>
+
+      <slot><p>{modalExplain}</p></slot>
     </div>
-
-    <slot><p>{modalExplain}</p></slot>
   </div>
-</div>
+{/if}

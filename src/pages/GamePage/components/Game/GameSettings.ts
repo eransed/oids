@@ -1,15 +1,18 @@
 //Interfaces
-import type { GameSettings } from "../../../../lib/interface"
+import { showModal } from "./store/gameStores"
+
+import type { GameSettings, KeyFunction } from "../../../../lib/interface"
 
 //Utils
 import { addKeyDownListener } from "../../../../stores/eventListenerStore"
 
 function handleKeyPress(e: KeyboardEvent) {
-  Object.values(gameSettings).map((keyFunction) => {
+  Object.values(gameSettings).map((keyFunction: KeyFunction) => {
     keyFunction.activators.forEach((key: string) => {
       if (e.key === key) {
-        console.log(keyFunction.keyStatus)
-        keyFunction.keyStatus = !keyFunction.keyStatus
+        if (keyFunction.store) {
+          keyFunction.store.set((keyFunction.keyStatus = !keyFunction.keyStatus))
+        } else keyFunction.keyStatus = !keyFunction.keyStatus
       }
     })
   })
@@ -17,6 +20,7 @@ function handleKeyPress(e: KeyboardEvent) {
 
 export const gameSettings: GameSettings = {
   showSystemGraphs: { activators: ["g"], keyStatus: false },
+  showScoreScreen: { activators: ["p"], keyStatus: false, store: showModal },
 }
 
 export function initSettingsControl(): () => void {

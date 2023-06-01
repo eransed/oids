@@ -15,8 +15,13 @@
 
   //Websocket
   import { disconnect } from "../../../../lib/websocket/webSocket"
+  import ScoreScreen from "../../../../components/scoreScreen/ScoreScreen.svelte"
+  import type { ScoreScreenData } from "../../../../components/scoreScreen/ScoreScreen.types"
 
-  let game: Game
+  //Stores
+  import { showModal } from "./store/gameStores"
+
+  let currentGame: Game
 
   //Props
   export let sessionId: string | undefined
@@ -27,23 +32,33 @@
   onMount(() => {
     cleanup = initSettingsControl()
     const localPlayer = createSpaceObject("LocalPlayer")
-    game = new Game(canvas, localPlayer, gameSettings, showDeadMenu)
-    game.localPlayer.sessionId = sessionId
-    game.startMultiplayer()
+    currentGame = new Game(canvas, localPlayer, gameSettings, showDeadMenu)
+    currentGame.localPlayer.sessionId = sessionId
+    currentGame.startMultiplayer()
   })
 
   const showDeadMenu = (): void => {
     removeKeyControllers()
-    game.stopGame()
+    currentGame.stopGame()
     navigate("/play/game/end")
   }
 
   onDestroy(() => {
     disconnect()
     if (cleanup) {
+      gameSettings.showScoreScreen.store?.set(false)
       cleanup()
     }
   })
+
+  let ScoreScreenData: ScoreScreenData
+
+  ScoreScreenData = {
+    players: [
+      { name: "erik", alive: false },
+      { name: "Alex", alive: true },
+    ],
+  }
 </script>
 
 <style>
@@ -58,5 +73,6 @@
   }
 </style>
 
-<GameMenu currentGame={game} />
+<ScoreScreen showModal={$showModal} {ScoreScreenData} closedCallback={() => console.log("closed")} />
+<GameMenu {currentGame} />
 <canvas class="game_canvas" bind:this={canvas} />
