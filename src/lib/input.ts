@@ -3,6 +3,9 @@ import { applyEngineThrust, applySteer, fire } from "./mechanics"
 import { timeScale } from "./constants"
 import type { Vec2d } from "./math"
 
+//Stores
+import { activeKey } from "../pages/GamePage/components/Game/store/gameStores"
+
 const DefaultKeyMap: KeyFunctionMap = {
   thrust: { activators: ["w", "ArrowUp"], keyStatus: false },
   reverseThrust: { activators: ["s", "ArrowDown"], keyStatus: false },
@@ -33,6 +36,12 @@ function arrowControl(e: KeyboardEvent, keyInUse: boolean) {
     keyFunction.activators.map((activator: string) => {
       if (activator === e.key) {
         keyFunction.keyStatus = keyInUse
+
+        if (keyInUse) {
+          activeKey.set(keyFunction.displayText)
+        } else {
+          activeKey.set("")
+        }
       }
     })
   })

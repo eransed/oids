@@ -2,6 +2,10 @@
   import { ActiveKeyMap } from "../../../../lib/input"
   import type { KeyFunction } from "../../../../lib/interface"
 
+  import { gameState } from "../Game/store/gameStores"
+
+  import { activeKey } from "../Game/store/gameStores"
+
   let keyValues: KeyFunction[] = []
 
   Object.values(ActiveKeyMap).forEach((value) => {
@@ -45,7 +49,7 @@
     {#each keyValues as keyFunction}
       <tbody>
         <tr>
-          <td>{keyFunction.displayText}</td>
+          <td style="color: {$activeKey === keyFunction.displayText ? $gameState.scoreScreenData.player.color : 'grey'}">{keyFunction.displayText}</td>
           <td>{keyFunction.activators.map((v) => " " + v)}</td>
         </tr>
       </tbody>

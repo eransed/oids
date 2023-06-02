@@ -1,5 +1,10 @@
 <script lang="ts">
+  import { onMount } from "svelte"
+
   type positionType = "fixed" | "absolute" | "relative"
+
+  import { gameState } from "../../pages/GamePage/components/Game/store/gameStores"
+  import { getScreenFromCanvas } from "../../lib/canvas_util"
 
   export let title: string = "Title"
   export let closeBtn: boolean = true
@@ -13,7 +18,7 @@
 
   $: width = backDrop ? "100%" : "fit-content"
   $: height = backDrop ? "100vh" : "fit-content"
-  $: position = position
+  $: position = backDrop ? "absolute" : position
 
   function handleClick() {
     showModal = false
@@ -23,11 +28,37 @@
   const modalExplain = "This will be deleted if you give the <Modal> component any children </Modal>"
 
   $: m = { x: "", y: "" }
-
-  function handleMousemove(event: MouseEvent) {
-    m.x = event.offsetX + "px"
-    m.y = event.offsetY + "px"
+  $: shipLocation = {
+    x: $gameState ? $gameState.scoreScreenData.player.position.x / 3 : 0,
+    y: $gameState ? $gameState.scoreScreenData.player.position.y / 3 : 0,
   }
+
+  let modalPosition: { startX: number; endX: number; startY: number; endY: number }
+  let shipInsideModal: boolean
+
+  $: if (showModal) {
+    const modalFrame = { x: document.getElementById(title)?.offsetWidth, y: document.getElementById(title)?.offsetHeight }
+    const modalBoundries = document.getElementById(title)?.getBoundingClientRect()
+
+    const modalStartX = modalBoundries?.left
+    const modalStartY = modalBoundries?.top
+
+    if (modalStartX && modalStartY && modalFrame.x && modalFrame.y) {
+      const modalEndX = modalStartX + modalFrame.x
+      const modalEndY = modalStartY + modalFrame.y
+
+      modalPosition = { startX: modalStartX, endX: modalEndX, startY: modalStartY, endY: modalEndY }
+      shipInsideModal =
+        shipLocation.x > modalPosition.startX &&
+        shipLocation.x < modalPosition.endX &&
+        shipLocation.y < modalPosition.endY &&
+        shipLocation.y > modalPosition.startY
+    }
+  }
+
+  // if (showModal) {
+  //   $: shipTouchModal = modal.offsetTop === shipLocation.y && modal.offsetLeft === shipLocation.x
+  // }
 </script>
 
 <style>
@@ -38,7 +69,7 @@
     --top: 0;
   }
 
-  #modal {
+  .modal {
     position: fixed;
     justify-content: center;
     align-content: center;
@@ -50,7 +81,7 @@
     top: 0.2em;
     right: 0.2em;
     transition: all;
-    transition-duration: 1s;
+    transition-duration: 0.5s;
     background: #000;
     opacity: 0.95;
     border: 2px solid rgb(99, 136, 179, 1);
@@ -62,7 +93,7 @@
     width: 100%;
     min-width: 200px;
     min-height: 200px;
-    background: radial-gradient(800px circle at 100px 100px, rgba(255, 255, 255, 0.05), transparent 40%);
+    background: radial-gradient(800px circle at 50% 50%, rgba(255, 255, 255, 0.03), transparent 40%);
     opacity: 0.85;
     /* padding: 1em; */
     transition: all;
@@ -70,7 +101,7 @@
   }
 
   @media screen and (max-width: 600px) {
-    #modal {
+    .modal {
       opacity: 1;
       width: 100vw;
       height: 100vh;
@@ -164,14 +195,14 @@
 
 {#if showModal}
   <div
-    id="modal"
-    style="--width: {width}; --height: {height}; position: {position}"
+    class="modal"
+    id={title}
+    style="--width: {width}; --height: {height}; position: {position}; opacity: {shipInsideModal ? '0.5' : '1'}"
     contenteditable={isEditable}
     in:fade={{ delay: 50 }}
     out:fade
-    on:mousemove={handleMousemove}
   >
-    <div id="modalContent" style="--left: {m.x}; --top: {m.y};">
+    <div id="modalContent" style="--left: {m.x}; --top: {m.y}; ">
       <div id="header">
         <div id="headerTitle"><h3>{title}</h3></div>
 

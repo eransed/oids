@@ -38,12 +38,6 @@
   tr {
     padding: 20px;
   } */
-
-  thead,
-  tfoot {
-    background-color: #333;
-    color: #fff;
-  }
 </style>
 
 <div class="scoreTable">

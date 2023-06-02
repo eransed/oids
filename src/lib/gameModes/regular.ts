@@ -252,7 +252,7 @@ export class Every {
   }
 }
 
-const every = new Every(100)
+const every = new Every(50)
 
 function copyPlayerFromSo(so: SpaceObject): Player & Damageable & Colorable {
   return {
@@ -275,7 +275,6 @@ export function renderFrame(game: Game, dt: number): void {
     })
 
     gameState.set({ scoreScreenData: { player: copyPlayerFromSo(game.localPlayer), remotePlayers: remotePlayers } })
-    console.log("Gamestate updated")
   })
 
   const ctx = game.ctx
