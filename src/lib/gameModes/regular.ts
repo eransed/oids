@@ -236,8 +236,8 @@ function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext
 }
 
 export class Every {
-  private currentTick: number = 0
-  maxTicks: number = 1
+  private currentTick = 0
+  maxTicks = 1
 
   constructor(maxTicks: number) {
     this.maxTicks = maxTicks

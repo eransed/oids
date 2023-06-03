@@ -6,6 +6,8 @@ import type { Vec2d } from "./math"
 //Stores
 import { activeKey } from "../pages/GamePage/components/Game/store/gameStores"
 
+
+
 const DefaultKeyMap: KeyFunctionMap = {
   thrust: { activators: ["w", "ArrowUp"], keyStatus: false },
   reverseThrust: { activators: ["s", "ArrowDown"], keyStatus: false },
@@ -21,8 +23,20 @@ const DefaultKeyMap: KeyFunctionMap = {
   leaderBoard: { activators: ["Tab"], keyStatus: false },
 }
 
+// Input helper functions
+export function keyDisplayName(key: string) {
+  if (key === " ") return "Spacebar"
+  return key
+}
+
+export function capitalFirstChar(str: string) {
+  if (str.length === 0) return str
+  if (str.length === 1) return str.charAt(0).toUpperCase()
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 Object.entries(DefaultKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
-  value.displayText = key
+  value.displayText = capitalFirstChar(key)
 })
 
 export let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap

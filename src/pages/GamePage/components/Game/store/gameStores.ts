@@ -1,6 +1,6 @@
 import { writable, type Writable } from "svelte/store"
 
-import type { GameState, KeyFunction } from "../../../../../lib/interface"
+import type { GameState } from "../../../../../lib/interface"
 
 export const showScoreScreen: Writable<boolean> = writable(false)
 export const showHotKeys: Writable<boolean> = writable(false)

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ActiveKeyMap } from "../../../../lib/input"
+  import { ActiveKeyMap, keyDisplayName } from "../../../../lib/input"
   import type { KeyFunction } from "../../../../lib/interface"
 
   import { gameState } from "../Game/store/gameStores"
@@ -50,7 +50,7 @@
       <tbody>
         <tr>
           <td style="color: {$activeKey === keyFunction.displayText ? $gameState.scoreScreenData.player.color : 'grey'}">{keyFunction.displayText}</td>
-          <td>{keyFunction.activators.map((v) => " " + v)}</td>
+          <td>{keyFunction.activators.map((v) => " " + keyDisplayName(v))}</td>
         </tr>
       </tbody>
     {/each}
