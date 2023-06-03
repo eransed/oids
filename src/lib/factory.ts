@@ -29,6 +29,10 @@ export function newPhotonLaser(): PhotonLaser {
   return shot
 }
 
+export function currentTimeDate(): string {
+  return new Date().toLocaleString('sv-SE')
+}
+
 export function createSpaceObject(name = "SpaceObject"): SpaceObject {
   const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2d = {
@@ -93,7 +97,8 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     steeringPower: 1.2,
     velocity: initVel,
     ownerName: "",
-    lastDamagedByName: ""
+    lastDamagedByName: "",
+    joinedGame: currentTimeDate(),
   }
 
   return spaceObject

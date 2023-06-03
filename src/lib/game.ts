@@ -1,4 +1,4 @@
-import { GameType, type GameSettings, type SpaceObject } from "./interface"
+import { GameType, type SpaceObject, type KeyFunctionMap } from "./interface"
 
 import { getContext } from "./canvas_util"
 
@@ -23,16 +23,16 @@ export class Game {
   all: SpaceObject[] = []
   shouldSendToServer = false
   hasCalledCallback = false
-  gameSettings: GameSettings
+  keyFuncMap: KeyFunctionMap
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
 
-  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, gameSettings: GameSettings, _OnDeadLocalPlayerCallBack: () => void) {
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, keyFuncMap: KeyFunctionMap, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
     this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
     this.ctx = getContext(this.canvas)
-    this.gameSettings = gameSettings
+    this.keyFuncMap = keyFuncMap
   }
 
   isRunning(): boolean {

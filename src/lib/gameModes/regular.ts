@@ -1,6 +1,6 @@
 import type { Game } from "../game"
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas_util"
-import { initKeyControllers, spaceObjectKeyController } from "../input"
+import { initKeyControllers, setKeyStateStore, spaceObjectKeyController } from "../input"
 import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from "../math"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, handleCollisions } from "../physics"
@@ -252,7 +252,7 @@ export class Every {
   }
 }
 
-const every = new Every(50)
+const every = new Every(25)
 
 export function renderFrame(game: Game, dt: number): void {
   every.tick(() => {
@@ -279,7 +279,7 @@ export function renderFrame(game: Game, dt: number): void {
 
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
 
-  if (game.gameSettings.systemGraphs.keyStatus) {
+  if (game.keyFuncMap.systemGraphs.keyStatus) {
     fpsCounter(ops, dt, getSerVer(), ctx)
   }
 
@@ -307,7 +307,7 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(createSpaceObject())).length)
   addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(createSpaceObject()))).length)
 
-  if (game.gameSettings.systemGraphs.keyStatus) {
+  if (game.keyFuncMap.systemGraphs.keyStatus) {
     GRAPHS.forEach((g, i) => {
       renderGraph(g, { x: 310, y: 110 + i * 142 }, { x: 200, y: 84 }, ctx)
     })

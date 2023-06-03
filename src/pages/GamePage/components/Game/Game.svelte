@@ -5,19 +5,18 @@
   //Svelte
   import { onDestroy, onMount } from "svelte"
 
-  import { createSpaceObject } from "../../../../lib/factory"
+  import { createSpaceObject, currentTimeDate } from "../../../../lib/factory"
   import { Game } from "../../../../lib/game"
-  import { removeKeyControllers } from "../../../../lib/input"
+  import { getKeyMap, removeKeyControllers } from "../../../../lib/input"
 
   //Components
   import GameMenu from "../Menu/GameMenu.svelte"
-  import { initSettingsControl, gameSettings } from "./GameSettings"
   import InGameInfo from "../inGameInfo/inGameInfo.svelte"
   import HotKeys from "../Hotkeys/hotKeys.svelte"
 
   //Websocket
   import { disconnect } from "../../../../lib/websocket/webSocket"
-  import ScoreScreen from "../scoreScreen/ScoreScreen.svelte"
+  import ScoreScreen from "../leaderBoardScreen/ScoreScreen.svelte"
 
   //Stores
   import { showHotKeys, showScoreScreen } from "./store/gameStores"
@@ -29,12 +28,13 @@
 
   let canvas: HTMLCanvasElement
   let cleanup: () => void
+  const localPlayer = createSpaceObject("LocalPlayer")
 
   onMount(() => {
-    cleanup = initSettingsControl()
-    const localPlayer = createSpaceObject("LocalPlayer")
-    game = new Game(canvas, localPlayer, gameSettings, showDeadMenu)
+    // cleanup = initSettingsControl()
+    game = new Game(canvas, localPlayer, getKeyMap(), showDeadMenu)
     game.localPlayer.sessionId = sessionId
+    game.localPlayer.joinedGame = currentTimeDate()
     game.startMultiplayer()
   })
 
@@ -46,10 +46,10 @@
 
   onDestroy(() => {
     disconnect()
-    if (cleanup) {
-      gameSettings.scoreScreen.store?.set(false)
-      cleanup()
-    }
+    // if (cleanup) {
+    //   getKeyMap().leaderBoard.store?.set(false)
+    //   cleanup()
+    // }
   })
 </script>
 
@@ -86,15 +86,15 @@
 </style>
 
 <div class="gameInfo">
-  <InGameInfo title={"Score screen"} showModal={$showScoreScreen} closedCallback={() => {}}>
+  <InGameInfo title={"Leaderboard"} showModal={$showScoreScreen} closedCallback={() => {}}>
     <div class="scoreScreen">
       <ScoreScreen />
     </div>
   </InGameInfo>
 
-  <InGameInfo title={"Hotkeys"} showModal={$showHotKeys} closedCallback={() => {}}>
+  <InGameInfo title={"Key Map"} showModal={$showHotKeys} closedCallback={() => {}}>
     <div class="hotKeys">
-      <HotKeys />
+      <HotKeys activeColor={localPlayer.color} />
     </div>
   </InGameInfo>
 </div>

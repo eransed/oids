@@ -57,6 +57,7 @@ export interface Remote {
   serverVersion: string
   sessionId: string | undefined
   viewport: Vec2d
+  joinedGame: string
 }
 
 export interface Local {
@@ -187,6 +188,8 @@ export interface KeyFunctionMap {
   reload: KeyFunction
   selfDestroy: KeyFunction
   leaderBoard: KeyFunction
+  systemGraphs: KeyFunction
+  hotKeys: KeyFunction
 }
 
 export interface KeyFunction {
@@ -194,6 +197,7 @@ export interface KeyFunction {
   keyStatus: boolean
   displayText?: string
   store?: Writable<boolean>
+  toggle?: boolean
 }
 
 export interface GameState {

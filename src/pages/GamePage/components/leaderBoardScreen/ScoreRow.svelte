@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { Damageable, Player, Colorable, Fireable } from "../../../../lib/interface"
+    import type { SpaceObject } from "../../../../lib/interface"
 
-    export let player: Damageable & Player & Colorable & Fireable
+    export let player: SpaceObject
     export let theLocalPlayer: boolean
-    const killArray = Array.from(player.kills)
+    // const killArray = Array.from(player.kills)
 
 </script>
   
@@ -22,6 +22,9 @@
 {/if}
 <td>{player.killCount}</td>
 <td>{player.health}</td>
+<td>{player.joinedGame}</td>
+<td>{player.sessionId}</td>
+<!-- <td>{player.serverVersion}</td> -->
 <!-- <td>{!player.isDead}</td> -->
 <!-- <td>{player.lastDamagedByName}</td> -->
 <!-- <td>{player.killedByName}</td> -->

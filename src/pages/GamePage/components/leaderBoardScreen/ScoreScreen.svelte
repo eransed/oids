@@ -39,6 +39,9 @@
         <th colspan="1">Name</th>
         <th colspan="1">Kills</th>
         <th colspan="1">Hp</th>
+        <th colspan="1">Joined</th>
+        <th colspan="1">Session</th>
+        <!-- <th colspan="1">Server</th> -->
         <!-- <th colspan="1">Alive</th> -->
         <!-- <th colspan="1">LastDamagedBy</th> -->
         <!-- <th colspan="1">KilledBy</th> -->

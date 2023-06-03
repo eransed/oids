@@ -4,15 +4,14 @@ import { timeScale } from "./constants"
 import type { Vec2d } from "./math"
 
 //Stores
-import { activeKeyStates } from "../pages/GamePage/components/Game/store/gameStores"
-
-
+import { activeKeyStates, showHotKeys, showScoreScreen } from "../pages/GamePage/components/Game/store/gameStores"
+import { addKeyDownListener } from "../stores/eventListenerStore"
 
 const DefaultKeyMap: KeyFunctionMap = {
   thrust: { activators: ["w", "ArrowUp"], keyStatus: false },
   reverseThrust: { activators: ["s", "ArrowDown"], keyStatus: false },
   boost: { activators: ["b"], keyStatus: false },
-  halt: { activators: ["h"], keyStatus: false },
+  halt: { activators: ["h"], keyStatus: false, toggle: true },
   turnLeft: { activators: ["a", "ArrowLeft"], keyStatus: false },
   turnRight: { activators: ["d", "ArrowRight"], keyStatus: false },
   strafeLeft: { activators: ["q", "PageUp"], keyStatus: false },
@@ -20,8 +19,30 @@ const DefaultKeyMap: KeyFunctionMap = {
   fire: { activators: [" "], keyStatus: false },
   reload: { activators: ["r"], keyStatus: false },
   selfDestroy: { activators: ["k"], keyStatus: false },
-  leaderBoard: { activators: ["Tab"], keyStatus: false },
+  systemGraphs: { activators: ["g"], keyStatus: false, toggle: true  },
+  leaderBoard: { activators: ["p"], keyStatus: false, store: showScoreScreen, toggle: true  },
+  hotKeys: { activators: ["o"], keyStatus: false, store: showHotKeys, toggle: true },
 }
+
+
+// function handleKeyPressWithStore(e: KeyboardEvent) {
+//   Object.values(getKeyMap()).map((keyFunction: KeyFunction) => {
+//     keyFunction.activators.forEach((key: string) => {
+//       if (e.key === key) {
+//         if (keyFunction.store) {
+//           keyFunction.store.set((keyFunction.keyStatus = !keyFunction.keyStatus))
+//         } else {
+//           keyFunction.keyStatus = !keyFunction.keyStatus
+//         }
+//       }
+//     })
+//   })
+// }
+
+// export function initSettingsControl(): () => void {
+//   const cleanup = addKeyDownListener(handleKeyPressWithStore)
+//   return cleanup
+// }
 
 // Input helper functions
 export function keyDisplayName(key: string) {
@@ -39,10 +60,24 @@ Object.entries(DefaultKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
   value.displayText = capitalFirstChar(key)
 })
 
-export let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
+let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
+
+export function setKeyStateStore() {
+  activeKeyStates.set(keyFuncArrayFromKeyFunctionMap(ActiveKeyMap))
+}
+
+setKeyStateStore()
 
 export function setKeyMap(Keys: KeyFunctionMap) {
   ActiveKeyMap = Keys
+}
+
+export function getKeyMap(): KeyFunctionMap {
+  return ActiveKeyMap
+}
+
+export function getKeyBindings(): KeyFunction[] {
+  return keyFuncArrayFromKeyFunctionMap(ActiveKeyMap)
 }
 
 function keyFuncArrayFromKeyFunctionMap(kfm: KeyFunctionMap) {
@@ -53,15 +88,24 @@ function keyFuncArrayFromKeyFunctionMap(kfm: KeyFunctionMap) {
   return keyValues
 }
 
-function arrowControl(e: KeyboardEvent, keyInUse: boolean) {
-  Object.values(ActiveKeyMap).forEach((keyFunction) => {
+function arrowControl(e: KeyboardEvent, keyUseState: boolean) {
+  Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunction) => {
     keyFunction.activators.map((activator: string) => {
       if (activator === e.key) {
-        keyFunction.keyStatus = keyInUse
-        activeKeyStates.set(keyFuncArrayFromKeyFunctionMap(ActiveKeyMap))
+        if (keyFunction.toggle && keyUseState) {
+          keyFunction.keyStatus = !keyFunction.keyStatus
+        } else if (!keyFunction.toggle) {
+          keyFunction.keyStatus = keyUseState
+        }
+
+        if (keyFunction.store) {
+          keyFunction.store.set(keyFunction.keyStatus)
+        }
+
       }
     })
   })
+  setKeyStateStore()
 }
 
 function resetState() {

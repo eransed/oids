@@ -141,7 +141,8 @@
   }
 
   #headerTitle {
-    padding: 0.5em;
+    padding-bottom: 0.5em;
+    margin-bottom: 1em;;
   }
 
   #closeBtn {
