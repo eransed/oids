@@ -90,6 +90,7 @@ export interface Thrustable extends Positionable, Physical {
 }
 
 export interface Fireable extends Positionable, Physical {
+  kills: Set<string>
   killCount: number
   ammo: number
   missileSpeed: number
@@ -113,6 +114,7 @@ export interface Damager extends Positionable {
   armedDelay: number
   didHit: boolean
   shotBlowFrame: number
+  ownerName: string
 }
 
 export interface Damageable extends Positionable {
@@ -120,6 +122,8 @@ export interface Damageable extends Positionable {
   isDead: boolean
   deadFrameCount: number
   obliterated: boolean
+  lastDamagedByName: string
+  killedByName: string
 }
 
 export interface SpaceObject
@@ -197,8 +201,8 @@ export interface GameState {
 }
 
 export interface ScoreScreenData {
-  player: Damageable & Player & Colorable
-  remotePlayers: (Damageable & Player & Colorable)[]
+  player: SpaceObject
+  remotePlayers: SpaceObject[]
 }
 
 export interface Player {

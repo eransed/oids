@@ -1,15 +1,11 @@
 <script lang="ts">
   import { gameState } from "../Game/store/gameStores"
 
+  import ScoreRow from "./ScoreRow.svelte";
+
   $: remotePlayers = $gameState.scoreScreenData.remotePlayers
   $: player = $gameState.scoreScreenData.player
 </script>
-
-<!-- <table>
-  <thead></thead>
-  <tr><th>Health</th><th>Alive</th></tr>
-  <tr><th>{player.health}hp</th><th>{player.isDead}</th></tr>
-</table> -->
 
 <style>
   .scoreTable {
@@ -34,10 +30,6 @@
     font-size: 14px;
   }
 
-  /* table,
-  tr {
-    padding: 20px;
-  } */
 </style>
 
 <div class="scoreTable">
@@ -45,21 +37,24 @@
     <thead>
       <tr>
         <th colspan="1">Name</th>
+        <th colspan="1">Kills</th>
         <th colspan="1">Hp</th>
+        <!-- <th colspan="1">Alive</th> -->
+        <!-- <th colspan="1">LastDamagedBy</th> -->
+        <!-- <th colspan="1">KilledBy</th> -->
+        <!-- <th colspan="1">Kills</th> -->
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td style="color: {player.color}; font-weight: bold; font-style: italic">{player.name}</td>
-        <td>{player.health}</td>
+        <ScoreRow player={player} theLocalPlayer={true}></ScoreRow>
       </tr>
     </tbody>
-
-    {#each remotePlayers as player}
+    
+    {#each remotePlayers as remotePlayer}
       <tbody>
         <tr>
-          <td style="color: {player.color}">{player.name}</td>
-          <td>{player.health}</td>
+          <ScoreRow player={remotePlayer} theLocalPlayer={false}></ScoreRow>
         </tr>
       </tbody>
     {/each}

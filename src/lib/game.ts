@@ -77,6 +77,7 @@ export class Game {
   }
 
   reset(): void {
+    console.log('Local player reset game')
     this.hasCalledCallback = false
     this.localPlayer.isDead = false
     this.localPlayer.obliterated = false

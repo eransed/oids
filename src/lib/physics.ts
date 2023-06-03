@@ -210,15 +210,17 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
       for (const shot of so0.shotsInFlight) {
         if (shot.armedDelay < 0) {
           const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
-          if (isWithinRadius(shot, so0, so0.hitRadius) && shot.didHit === false) {
-            so0.health -= shot.damage
-            so0.velocity = add(so0.velocity, heading)
-            shot.didHit = true
-          }
           if (isWithinRadius(shot, so1, so1.hitRadius) && shot.didHit === false) {
             so1.health -= shot.damage
             so1.velocity = add(so1.velocity, heading)
+            so1.lastDamagedByName = shot.ownerName
             shot.didHit = true
+            if (so1.health < 1) {
+              so0.kills.add(so1.name)
+              so0.killCount = so0.kills.size
+              so1.killedByName = so0.name
+              so1.isDead = true
+            }
           }
         }
 

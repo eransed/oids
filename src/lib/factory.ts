@@ -4,7 +4,7 @@ import { rndf, rndi, type Vec2d } from "./math"
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
 
 export function newPhotonLaser(): PhotonLaser {
-  const shot = {
+  const shot: PhotonLaser = {
     acceleration: { x: 0, y: 0 },
     angleDegree: -90,
     angularVelocity: 0,
@@ -21,6 +21,9 @@ export function newPhotonLaser(): PhotonLaser {
     shotBlowFrame: 16,
     size: { x: 100, y: 100 },
     velocity: { x: 0, y: 0 },
+    ownerName: "",
+    lastDamagedByName: "",
+    killedByName: ""
   }
 
   return shot
@@ -63,6 +66,8 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     isDead: false,
     isLocal: false,
     isPlaying: false,
+    killedByName: "",
+    kills: new Set<string>(),
     killCount: 0,
     mass: 1,
     missileDamage: 2,
@@ -87,6 +92,8 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     },
     steeringPower: 1.2,
     velocity: initVel,
+    ownerName: "",
+    lastDamagedByName: ""
   }
 
   return spaceObject

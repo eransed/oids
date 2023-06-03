@@ -88,6 +88,7 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
 
   shot.position = head
   shot.angleDegree = so.angleDegree
+  shot.ownerName = so.name
 
   return shot
 }

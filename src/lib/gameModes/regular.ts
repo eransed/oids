@@ -254,27 +254,15 @@ export class Every {
 
 const every = new Every(50)
 
-function copyPlayerFromSo(so: SpaceObject): Player & Damageable & Colorable {
-  return {
-    name: so.name,
-    health: so.health,
-    isDead: so.isDead,
-    deadFrameCount: so.deadFrameCount,
-    obliterated: so.obliterated,
-    position: so.position,
-    color: so.color,
-  }
-}
-
 export function renderFrame(game: Game, dt: number): void {
   every.tick(() => {
-    const remotePlayers: (Player & Damageable & Colorable)[] = []
+    const remotePlayers: SpaceObject[] = []
 
     game.remotePlayers.forEach((player) => {
-      remotePlayers.push(copyPlayerFromSo(player))
+      remotePlayers.push(player)
     })
 
-    gameState.set({ scoreScreenData: { player: copyPlayerFromSo(game.localPlayer), remotePlayers: remotePlayers } })
+    gameState.set({ scoreScreenData: { player: game.localPlayer, remotePlayers: remotePlayers } })
   })
 
   const ctx = game.ctx
@@ -331,7 +319,6 @@ export function renderFrame(game: Game, dt: number): void {
 
   if (game.localPlayer.health <= 0) {
     //Local player is dead
-    game.localPlayer.isDead = true
 
     handleDeathExplosion(game.localPlayer, explosionDuration)
     if (!game.localPlayer.obliterated) {
@@ -343,6 +330,7 @@ export function renderFrame(game: Game, dt: number): void {
     }
 
     return
+    
   } else {
     renderShip(game.localPlayer, ctx, true)
   }
