@@ -4,7 +4,7 @@ import { timeScale } from "./constants"
 import type { Vec2d } from "./math"
 
 //Stores
-import { activeKey } from "../pages/GamePage/components/Game/store/gameStores"
+import { activeKeyStates } from "../pages/GamePage/components/Game/store/gameStores"
 
 
 
@@ -45,17 +45,20 @@ export function setKeyMap(Keys: KeyFunctionMap) {
   ActiveKeyMap = Keys
 }
 
+function keyFuncArrayFromKeyFunctionMap(kfm: KeyFunctionMap) {
+  const keyValues: KeyFunction[] = []
+  Object.values(kfm).forEach((value) => {
+    keyValues.push(value)
+  })
+  return keyValues
+}
+
 function arrowControl(e: KeyboardEvent, keyInUse: boolean) {
   Object.values(ActiveKeyMap).forEach((keyFunction) => {
     keyFunction.activators.map((activator: string) => {
       if (activator === e.key) {
         keyFunction.keyStatus = keyInUse
-
-        if (keyInUse) {
-          activeKey.set(keyFunction.displayText)
-        } else {
-          activeKey.set("")
-        }
+        activeKeyStates.set(keyFuncArrayFromKeyFunctionMap(ActiveKeyMap))
       }
     })
   })

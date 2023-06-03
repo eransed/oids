@@ -1,16 +1,13 @@
 <script lang="ts">
-  import { ActiveKeyMap, keyDisplayName } from "../../../../lib/input"
-  import type { KeyFunction } from "../../../../lib/interface"
+  import { keyDisplayName } from "../../../../lib/input"
+  import type { KeyFunction, KeyFunctionMap } from "../../../../lib/interface"
 
   import { gameState } from "../Game/store/gameStores"
 
-  import { activeKey } from "../Game/store/gameStores"
+  import { activeKeyStates } from "../Game/store/gameStores"
 
-  let keyValues: KeyFunction[] = []
+  let keyValues: KeyFunction[] = $activeKeyStates
 
-  Object.values(ActiveKeyMap).forEach((value) => {
-    keyValues.push(value)
-  })
 </script>
 
 <style>
@@ -49,7 +46,7 @@
     {#each keyValues as keyFunction}
       <tbody>
         <tr>
-          <td style="color: {$activeKey === keyFunction.displayText ? $gameState.scoreScreenData.player.color : 'grey'}">{keyFunction.displayText}</td>
+          <td style="color: {keyFunction.keyStatus ? $gameState.scoreScreenData.player.color : 'grey'}">{keyFunction.displayText}</td>
           <td>{keyFunction.activators.map((v) => " " + keyDisplayName(v))}</td>
         </tr>
       </tbody>
