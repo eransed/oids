@@ -3,9 +3,6 @@
 
   type positionType = "fixed" | "absolute" | "relative"
 
-  import { gameState } from "../../pages/GamePage/components/Game/store/gameStores"
-  import { getScreenFromCanvas } from "../../lib/canvas_util"
-
   export let title: string = "Title"
   export let closeBtn: boolean = true
   export let showModal: boolean = true
@@ -15,6 +12,7 @@
   export let position: positionType = "fixed"
 
   import { fade } from "svelte/transition"
+  import { gameState } from "../../lib/input"
 
   $: width = backDrop ? "100%" : "fit-content"
   $: height = backDrop ? "100vh" : "fit-content"

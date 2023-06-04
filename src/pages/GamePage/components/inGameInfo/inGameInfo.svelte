@@ -6,7 +6,7 @@
   import Modal from "../../../../components/modal/Modal.svelte"
 
   //Propts
-  export let closedCallback: () => void
+  export let closedCallback: () => void = () => {}
   export let showModal: boolean
   export let title: string
 </script>

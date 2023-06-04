@@ -1,27 +1,26 @@
 import type { Game } from "../game"
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas_util"
-import { initKeyControllers, setKeyStateStore, spaceObjectKeyController } from "../input"
+import { gameState, initKeyControllers, spaceObjectKeyController } from "../input"
 import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from "../math"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, handleCollisions } from "../physics"
 import { loadingText } from "../render/render2d"
 import { fpsCounter } from "../time"
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject, type Player, type Damageable, type Colorable } from "../interface"
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject} from "../interface"
 import { getSerVer, initMultiplayer, registerServerUpdate } from "../websocket/webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
 import { explosionDuration } from "../constants"
-import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph, type DataStats } from "../stats"
+import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from "../stats"
 import { createSpaceObject, newPhotonLaser } from "../factory"
 import { reduceShotSize, reduceSoSize } from "../websocket/util"
 import { renderMoon } from "../render/renderDebris"
 import { renderShip } from "../render/renderShip"
 import { renderViewport } from "../render/renderUI"
 import { renderExplosionFrame } from "../render/renderFx"
-import { newMoon } from "../shapes/Moon"
 
 //Stores
-import { gameState } from "../../pages/GamePage/components/Game/store/gameStores"
+
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -123,7 +122,8 @@ export function initRegularGame(game: Game): void {
   //Local player init
   game.reset()
   game.localPlayer.mass = 0.1
-  game.localPlayer.missileDamage = 5
+  game.localPlayer.missileDamage = 1
+  game.localPlayer.missileSpeed = 2
   game.localPlayer.angleDegree = -120
   game.localPlayer.health = 100
   game.localPlayer.batteryLevel = 500
@@ -133,7 +133,8 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = "#f0f"
   game.localPlayer.isLocal = true
-  game.localPlayer.hitRadius = 50
+  game.localPlayer.hitRadius = 120
+  game.localPlayer.color = '#db8'
 
   console.log("Your ship name is: " + game.localPlayer.name + "\nAnd your color is: " + game.localPlayer.color)
 

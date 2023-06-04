@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { keyDisplayName as keyDisplayText } from "../../../../lib/input"
-  import { activeKeyStates } from "../Game/store/gameStores"
+  import { activeKeyStates, keyDisplayName as keyDisplayText } from "../../../../lib/input"
   export let activeColor: string
   console.log (`hotkey color: ${activeColor}`)
 </script>
@@ -27,22 +26,27 @@
     font-weight: bold;
     font-size: 14px;
   }
+
 </style>
 
 <div class="scoreTable">
   <table>
     <thead>
       <tr>
-        <th colspan="1">Function</th>
-        <th colspan="1">Key</th>
-        <th colspan="1">Type</th>
+        <th style="color: {activeColor}" colspan="1">Function</th>
+        <th style="color: {activeColor}" colspan="1">Key</th>
+        <th style="color: {activeColor}" colspan="1">Type</th>
       </tr>
     </thead>
 
     {#each $activeKeyStates as keyFunction}
       <tbody>
         <tr>
-          <td style="color: {keyFunction.keyStatus ? activeColor : 'grey'}">{keyFunction.displayText}</td>
+          {#if keyFunction.keyStatus}
+            <td style="color: {activeColor}">{'+ ' + keyFunction.displayText}</td>
+          {:else}
+            <td style="color: 'grey'">{'- ' + keyFunction.displayText}</td>
+          {/if}
           <td>{keyFunction.activators.map((v) => " " + keyDisplayText(v))}</td>
           <td>{keyFunction.toggle ? '<toggle>': '<momentary>'}</td>
         </tr>

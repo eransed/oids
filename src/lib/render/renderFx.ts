@@ -18,9 +18,9 @@ export function renderHitExplosion(pos: Vec2d, ctx: CanvasRenderingContext2D) {
 }
 
 export function renderExplosionFrame(so: SpaceObject, ctx: CanvasRenderingContext2D) {
-  const offset = 50
+  const offset = 80
   const minSize = 1
-  const maxSize = 30 * so.deadFrameCount * 0.03
+  const maxSize = 36 * so.deadFrameCount * 0.03
   ctx.save()
   ctx.translate(so.position.x - so.size.x / 2, so.position.y - so.size.y / 2)
   const colors = ["#ff0", "#f00", "#ee0", "#e00", "#dd0", "#d00", "#008", "#000", "#444", "#fee", "#f66,", "#f99", "#fbb"]

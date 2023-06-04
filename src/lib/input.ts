@@ -1,11 +1,11 @@
-import type { KeyFunction, KeyFunctionMap, SpaceObject } from "./interface"
+import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject } from "./interface"
 import { applyEngineThrust, applySteer, fire } from "./mechanics"
 import { timeScale } from "./constants"
 import type { Vec2d } from "./math"
+import { writable, type Writable } from "svelte/store"
 
-//Stores
-import { activeKeyStates, showHotKeys, showScoreScreen } from "../pages/GamePage/components/Game/store/gameStores"
-import { addKeyDownListener } from "../stores/eventListenerStore"
+export const activeKeyStates: Writable<KeyFunction[]> = writable()
+export const gameState: Writable<GameState> = writable()
 
 const DefaultKeyMap: KeyFunctionMap = {
   thrust: { activators: ["w", "ArrowUp"], keyStatus: false },
@@ -20,29 +20,10 @@ const DefaultKeyMap: KeyFunctionMap = {
   reload: { activators: ["r"], keyStatus: false },
   selfDestroy: { activators: ["k"], keyStatus: false },
   systemGraphs: { activators: ["g"], keyStatus: false, toggle: true  },
-  leaderBoard: { activators: ["p"], keyStatus: false, store: showScoreScreen, toggle: true  },
-  hotKeys: { activators: ["o"], keyStatus: false, store: showHotKeys, toggle: true },
+  leaderBoard: { activators: ["p"], keyStatus: false, store: writable<boolean>(false), toggle: true  },
+  hotKeys: { activators: ["o"], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  shipSettings: { activators: ["i"], keyStatus: false, store: writable<boolean>(false), toggle: true },
 }
-
-
-// function handleKeyPressWithStore(e: KeyboardEvent) {
-//   Object.values(getKeyMap()).map((keyFunction: KeyFunction) => {
-//     keyFunction.activators.forEach((key: string) => {
-//       if (e.key === key) {
-//         if (keyFunction.store) {
-//           keyFunction.store.set((keyFunction.keyStatus = !keyFunction.keyStatus))
-//         } else {
-//           keyFunction.keyStatus = !keyFunction.keyStatus
-//         }
-//       }
-//     })
-//   })
-// }
-
-// export function initSettingsControl(): () => void {
-//   const cleanup = addKeyDownListener(handleKeyPressWithStore)
-//   return cleanup
-// }
 
 // Input helper functions
 export function keyDisplayName(key: string) {
@@ -89,9 +70,10 @@ function keyFuncArrayFromKeyFunctionMap(kfm: KeyFunctionMap) {
 }
 
 function arrowControl(e: KeyboardEvent, keyUseState: boolean) {
-  Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunction) => {
+  Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunctionStore) => {
     keyFunction.activators.map((activator: string) => {
       if (activator === e.key) {
+
         if (keyFunction.toggle && keyUseState) {
           keyFunction.keyStatus = !keyFunction.keyStatus
         } else if (!keyFunction.toggle) {
@@ -114,6 +96,17 @@ function resetState() {
   })
 }
 
+function reloadSpaceObject(so: SpaceObject) {
+  // so.canonCoolDown = 0
+  so.ammo = 1000
+  so.health = 1000
+  so.batteryLevel = 1000
+  so.booster = 5
+  so.missileDamage = 1
+  so.inverseFireRate = 3
+  so.shotsPerFrame = 10
+}
+
 export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   //so.afterBurnerEnabled = false
 
@@ -125,15 +118,7 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 
   if (ActiveKeyMap.reload.keyStatus) {
-    // so.canonCoolDown = 0
-    so.ammo = 1000000
-    so.health = 250
-    so.batteryLevel = 500
-    so.booster = 5
-
-    so.missileDamage = 4
-    so.inverseFireRate = 12
-    so.shotsPerFrame = 300
+    reloadSpaceObject(so)
   }
 
   if (ActiveKeyMap.boost.keyStatus) {

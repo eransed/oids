@@ -15,14 +15,6 @@ export enum MenuEnum {
   GameOver,
 }
 
-// export interface Game {
-//   gameType: GameType
-//   canvas: HTMLCanvasElement
-//   id: string
-//   startedById: string
-//   localPlayer: SpaceObject
-// }
-
 export enum SpaceShape {
   Comet,
   Moon,
@@ -187,17 +179,21 @@ export interface KeyFunctionMap {
   fire: KeyFunction
   reload: KeyFunction
   selfDestroy: KeyFunction
-  leaderBoard: KeyFunction
   systemGraphs: KeyFunction
-  hotKeys: KeyFunction
+  leaderBoard: KeyFunctionStore
+  hotKeys: KeyFunctionStore
+  shipSettings: KeyFunctionStore
 }
 
 export interface KeyFunction {
   activators: string[]
   keyStatus: boolean
   displayText?: string
-  store?: Writable<boolean>
   toggle?: boolean
+}
+
+export interface KeyFunctionStore extends KeyFunction {
+  store: Writable<boolean>
 }
 
 export interface GameState {
@@ -212,18 +208,3 @@ export interface ScoreScreenData {
 export interface Player {
   name: string
 }
-
-// export interface CurrentGame {
-//   sessionId: string | undefined
-//   LeaderBoard: LeaderBoard
-// }
-
-// export interface LeaderBoard {
-//   players: Player[]
-// }
-
-// export interface Player {
-//   name: string
-//   alive: boolean
-//   kills: number
-// }

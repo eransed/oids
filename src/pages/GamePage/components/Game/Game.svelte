@@ -11,15 +11,17 @@
 
   //Components
   import GameMenu from "../Menu/GameMenu.svelte"
-  import InGameInfo from "../inGameInfo/inGameInfo.svelte"
+  import InGameInfo from "../InGameInfo/inGameInfo.svelte"
   import HotKeys from "../Hotkeys/hotKeys.svelte"
+  import ShipSettings from "../ShipSettings/ShipSettings.svelte"
 
   //Websocket
   import { disconnect } from "../../../../lib/websocket/webSocket"
-  import ScoreScreen from "../leaderBoardScreen/ScoreScreen.svelte"
+  import ScoreScreen from "../LeaderBoardScreen/ScoreScreen.svelte"
 
-  //Stores
-  import { showHotKeys, showScoreScreen } from "./store/gameStores"
+  const showScoreScreen = getKeyMap().leaderBoard.store
+  const showHotKeys = getKeyMap().hotKeys.store
+  const shipSettings = getKeyMap().shipSettings.store
 
   let game: Game
 
@@ -27,7 +29,7 @@
   export let sessionId: string | undefined
 
   let canvas: HTMLCanvasElement
-  let cleanup: () => void
+  // let cleanup: () => void
   const localPlayer = createSpaceObject("LocalPlayer")
 
   onMount(() => {
@@ -86,17 +88,24 @@
 </style>
 
 <div class="gameInfo">
-  <InGameInfo title={"Leaderboard"} showModal={$showScoreScreen} closedCallback={() => {}}>
+  <InGameInfo title={"Leaderboard"} showModal={$showScoreScreen}>
     <div class="scoreScreen">
       <ScoreScreen />
     </div>
   </InGameInfo>
 
-  <InGameInfo title={"Key Map"} showModal={$showHotKeys} closedCallback={() => {}}>
+  <InGameInfo title={"Key Map"} showModal={$showHotKeys}>
     <div class="hotKeys">
       <HotKeys activeColor={localPlayer.color} />
     </div>
   </InGameInfo>
+
+  <InGameInfo title={"Ship Settings"} showModal={$shipSettings}>
+    <div class="hotKeys">
+      <ShipSettings />
+    </div>
+  </InGameInfo>
+
 </div>
 
 <GameMenu currentGame={game} />

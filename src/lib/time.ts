@@ -5,6 +5,8 @@ import { updateShapes, updateSpaceObjects } from "./physics"
 import { clearScreen } from "./render/render2d"
 import { addDataPoint, newDataStats } from "./stats"
 import { renderFrameInfo } from "./render/renderUI"
+import { Every } from "./gameModes/regular"
+import { localPlayerStore } from "../pages/GamePage/components/Game/Utils/gameUtils"
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -51,10 +53,13 @@ export function fpsCounter(ops: number, frameTimeMs: number, ver: string, ctx: C
   }
 }
 
+const every20: Every = new Every(20)
+
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
 
   function update(timestamp: number): void {
+    every20.tick(() => localPlayerStore.set (game.localPlayer))
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx)
     renderFrame(game, dt)

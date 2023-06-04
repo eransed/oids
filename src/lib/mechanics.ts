@@ -1,4 +1,4 @@
-import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical, Positionable, Rotatable, SpaceObject, Thrustable } from "./interface"
+import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical, Positionable, SpaceObject, Thrustable } from "./interface"
 import type { Steerable } from "./traits/Steerable"
 
 import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2d } from "./math"
@@ -64,13 +64,13 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   shot.mass = 10
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
-  shot.size = { x: rndi(4, 5), y: rndi(19, 25) }
+  shot.size = { x: rndi(4, 6), y: rndi(20, 30) }
   // shot.color = randomLightGreen()
   shot.color = so.photonColor
   let head: Vec2d = copy(so.position)
-  const aimError = 6 // 8
-  const headError = 0.32 // 0.019
-  const speedError = 7 // 1.8
+  const aimError = 8 // 8
+  const headError = 0.34 // 0.019
+  const speedError = 3 // 1.8
 
   head = add(head, scalarMultiply(getHeading(so), 0))
 

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { gameState } from "../Game/store/gameStores"
+    import { gameState } from "../../../../lib/input"
+
 
   import ScoreRow from "./ScoreRow.svelte";
 
@@ -17,14 +18,10 @@
     inset: 0;
     margin: auto;
   }
-
+  
   table {
     max-height: 70%;
     display: block;
-  }
-
-  table,
-  td {
     padding: 8px;
     font-weight: bold;
     font-size: 14px;
@@ -36,16 +33,7 @@
   <table>
     <thead>
       <tr>
-        <th colspan="1">Name</th>
-        <th colspan="1">Kills</th>
-        <th colspan="1">Hp</th>
-        <th colspan="1">Joined</th>
-        <th colspan="1">Session</th>
-        <!-- <th colspan="1">Server</th> -->
-        <!-- <th colspan="1">Alive</th> -->
-        <!-- <th colspan="1">LastDamagedBy</th> -->
-        <!-- <th colspan="1">KilledBy</th> -->
-        <!-- <th colspan="1">Kills</th> -->
+        <ScoreRow header={true}></ScoreRow>
       </tr>
     </thead>
     <tbody>
@@ -57,7 +45,7 @@
     {#each remotePlayers as remotePlayer}
       <tbody>
         <tr>
-          <ScoreRow player={remotePlayer} theLocalPlayer={false}></ScoreRow>
+          <ScoreRow player={remotePlayer}></ScoreRow>
         </tr>
       </tbody>
     {/each}
