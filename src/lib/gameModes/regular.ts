@@ -3,10 +3,10 @@ import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas
 import { gameState, initKeyControllers, spaceObjectKeyController } from "../input"
 import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from "../math"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
-import { friction, handleCollisions } from "../physics"
+import { friction, gravity, handleCollisions } from "../physics"
 import { loadingText } from "../render/render2d"
 import { fpsCounter } from "../time"
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject} from "../interface"
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from "../interface"
 import { getSerVer, initMultiplayer, registerServerUpdate } from "../websocket/webSocket"
 import { randomAnyColor } from "../color"
 import { test } from "../test"
@@ -20,7 +20,6 @@ import { renderViewport } from "../render/renderUI"
 import { renderExplosionFrame } from "../render/renderFx"
 
 //Stores
-
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -117,6 +116,8 @@ export function initRegularGame(game: Game): void {
 
   const offset = 500
 
+  setCanvasSize(game.ctx)
+
   game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
 
   //Local player init
@@ -134,17 +135,32 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.photonColor = "#f0f"
   game.localPlayer.isLocal = true
   game.localPlayer.hitRadius = 120
-  game.localPlayer.color = '#db8'
+  game.localPlayer.color = "#db8"
 
   console.log("Your ship name is: " + game.localPlayer.name + "\nAnd your color is: " + game.localPlayer.color)
 
   initMultiplayer()
 
-  const bodies: SpaceObject[] = []
+  //Shootable non-player objects
+  const asterois: SpaceObject[] = []
+
+  const asteroids = 10
+
+  for (let i = 0; i < asteroids; i++) {
+    const asteroid = createSpaceObject()
+
+    asteroid.position = rndfVec2d(0, 1200)
+    asteroid.health = 1
+    asteroid.name = "asteroid-" + i
+
+    game.bodies.push(asteroid)
+  }
 
   // game.remotePlayers = []
-  game.all = game.all.concat(bodies)
+  game.all = game.all.concat(game.bodies)
   game.all.push(game.localPlayer)
+
+  console.log(game.all)
 
   let startTime = 0
 
@@ -257,6 +273,8 @@ const every = new Every(25)
 
 export function renderFrame(game: Game, dt: number): void {
   every.tick(() => {
+    game.localPlayer.viewport = getScreenRect(game.ctx)
+    setCanvasSize(game.ctx)
     const remotePlayers: SpaceObject[] = []
 
     game.remotePlayers.forEach((player) => {
@@ -267,8 +285,6 @@ export function renderFrame(game: Game, dt: number): void {
   })
 
   const ctx = game.ctx
-  setCanvasSize(game.ctx)
-  game.localPlayer.viewport = getScreenRect(game.ctx)
   game.lightSource.position = game.localPlayer.position
   game.lightSource.direction = direction(game.localPlayer.angleDegree)
 
@@ -315,7 +331,22 @@ export function renderFrame(game: Game, dt: number): void {
   }
 
   game.bodies.forEach((body) => {
-    renderMoon(body, ctx)
+    if (body.health < 1) {
+      handleDeathExplosion(body, explosionDuration)
+      if (!body.obliterated) {
+        renderExplosionFrame(body, ctx)
+      }
+    } else {
+      renderMoon(body, ctx)
+    }
+  })
+
+  game.bodies = game.bodies.filter((body) => {
+    return !body.obliterated
+  })
+
+  game.all = game.all.filter((body) => {
+    return !body.obliterated
   })
 
   if (game.localPlayer.health <= 0) {
@@ -331,7 +362,6 @@ export function renderFrame(game: Game, dt: number): void {
     }
 
     return
-    
   } else {
     renderShip(game.localPlayer, ctx, true)
   }
@@ -356,22 +386,23 @@ export function nextFrame(game: Game, dt: number): void {
     bitSpeed = 0
   }
 
-  // game.bodies.forEach((body) => {
-  //   game.bodies.forEach((other) => {
-  //     if (body !== other) {
-  //       gravity(body, other)
-  //     }
-  //   })
+  game.bodies.forEach((body) => {
+    bounceSpaceObject(body, getScreenRect(game.ctx), 0.4, 0, 0)
 
-  //   gravity(body, game.localPlayer)
+    // game.bodies.forEach((other) => {
+    //   if (body !== other) {
+    //     gravity(body, other)
+    //   }
+    // })
 
-  //   game.localPlayer.shotsInFlight.forEach((shot) => {
-  //     gravity(body, shot)
-  //   })
+    // gravity(body, game.localPlayer)
 
-  //   friction(body)
-  //   bounceSpaceObject(body, getScreenRect(game.ctx), 0.4, 0, 0)
-  // })
+    // game.localPlayer.shotsInFlight.forEach((shot) => {
+    //   gravity(body, shot)
+    // })
+
+    // friction(body)
+  })
 
   game.remotePlayers = game.remotePlayers.filter((so) => {
     return so.online || so.isLocal

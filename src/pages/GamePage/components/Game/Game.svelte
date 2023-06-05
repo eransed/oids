@@ -43,7 +43,7 @@
   const showDeadMenu = (): void => {
     removeKeyControllers()
     game.stopGame()
-    navigate("/play/game/end")
+    navigate("/play")
   }
 
   onDestroy(() => {
@@ -105,7 +105,6 @@
       <ShipSettings />
     </div>
   </InGameInfo>
-
 </div>
 
 <GameMenu currentGame={game} />

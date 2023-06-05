@@ -23,14 +23,14 @@ export function newPhotonLaser(): PhotonLaser {
     velocity: { x: 0, y: 0 },
     ownerName: "",
     lastDamagedByName: "",
-    killedByName: ""
+    killedByName: "",
   }
 
   return shot
 }
 
 export function currentTimeDate(): string {
-  return new Date().toLocaleString('sv-SE')
+  return new Date().toLocaleString("sv-SE")
 }
 
 export function createSpaceObject(name = "SpaceObject"): SpaceObject {
@@ -79,6 +79,7 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     motivationLevel: 100,
     motivatorBroken: false,
     name: name,
+    id: rndi(1, 500).toString(),
     obliterated: false,
     online: false,
     photonColor: "#0f0",

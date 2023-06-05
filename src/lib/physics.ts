@@ -196,7 +196,10 @@ export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen
 export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D): void {
   resetCollisions(spaceObjects)
   for (const so0 of spaceObjects) {
+    if (so0.isDead) continue
+
     for (const so1 of spaceObjects) {
+      if (so1.isDead) continue
       if (isColliding(so0, so1) && so0.name !== so1.name) {
         so0.colliding = true
         so1.colliding = true
@@ -211,19 +214,18 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
         if (shot.armedDelay < 0) {
           const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
           if (isWithinRadius(shot, so1, so1.hitRadius) && shot.didHit === false) {
-
+            so1.health -= shot.damage
+            so1.velocity = add(so1.velocity, heading)
+            so1.lastDamagedByName = shot.ownerName
+            shot.didHit = true
             if (so1.health < 1) {
+              console.log(so1.name)
               so0.kills.add(so1.name)
               so0.killCount = so0.kills.size
-              so1.killedByName = so0.name
+              so1.killedByName = so1.lastDamagedByName
               so1.isDead = true
-            } else {
-              so1.health -= shot.damage
-              so1.velocity = add(so1.velocity, heading)
-              so1.lastDamagedByName = shot.ownerName
-              shot.didHit = true
+              so1.health = 0
             }
-            
           }
         }
 

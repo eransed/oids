@@ -135,7 +135,8 @@ export interface SpaceObject
     Bounceable,
     Boostable,
     Colorable,
-    Player {
+    Player,
+    Unique {
   isPlaying: boolean
   framesSinceLastServerUpdate: number
   shotsInFlight: PhotonLaser[]
@@ -207,4 +208,8 @@ export interface ScoreScreenData {
 
 export interface Player {
   name: string
+}
+
+export interface Unique {
+  id: string
 }

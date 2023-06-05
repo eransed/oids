@@ -140,7 +140,7 @@
 
   #headerTitle {
     padding-bottom: 0.5em;
-    margin-bottom: 1em;;
+    margin-bottom: 1em;
   }
 
   #closeBtn {
@@ -196,7 +196,7 @@
   <div
     class="modal"
     id={title}
-    style="--width: {width}; --height: {height}; position: {position}; opacity: {shipInsideModal ? '0.5' : '1'}"
+    style="--width: {width}; --height: {height}; position: {position}; opacity: {shipInsideModal ? '0.2' : '0.7'}"
     contenteditable={isEditable}
     in:fade={{ delay: 50 }}
     out:fade
