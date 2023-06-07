@@ -28,7 +28,7 @@ const server: WebSocketServer = new WebSocketServer({
 
 let globalConnectedClients: Client[] = []
 
-class Client {
+export class Client {
   ws: WebSocket
   req: IncomingMessage
   name: string
@@ -185,6 +185,18 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
       }
     }
   }
+}
+
+export function getPlayersFromSessionId(sessionId: string | null): Client[] {
+  const playerList = []
+
+  for (const client of globalConnectedClients) {
+    if (sessionId === client.sessionId) {
+      playerList.push(client)
+    }
+  }
+
+  return playerList
 }
 
 server.on("connection", function connection(clientConnection: WebSocket, req: IncomingMessage) {
