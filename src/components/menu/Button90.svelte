@@ -39,7 +39,7 @@
     color: #fff;
     /* border: solid; */
     padding: 10px;
-    width: 100%;
+    width: fit-content;
     /* margin: 5px; */
     height: 4em;
     /* font-family: 'Courier New', Courier, monospace; */
