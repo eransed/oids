@@ -27,6 +27,12 @@ export function nextFrame(game: Game, dt: number): void {
 }
 
 export function renderFrame(game: Game, dt: number): void {
+  if (game.keyFuncMap.boost.keyStatus === true) {
+    setTimeout(() => {
+      game.keyFuncMap.boost.keyStatus = false
+      game.keyFuncMap.turnLeft.keyStatus = false
+    }, 1000)
+  }
   setCanvasSize(game.ctx)
   game.ctx.save()
   game.ctx.fillStyle = "#000"
@@ -45,8 +51,8 @@ export function renderFrame(game: Game, dt: number): void {
       renderMoon(body, game.ctx)
     }
 
-    if (body.shape === SpaceShape.Comet) {
-      renderComet(body, game.ctx)
+    if (body.shape === SpaceShape.SmallShip) {
+      renderShip(body, game.ctx)
     }
   })
 }
@@ -60,10 +66,10 @@ export function initWelcomeScreen(game: Game): void {
 
   loadingText("Loading...", game.ctx)
 
-  initKeyControllers()
+  // initKeyControllers()
 
-  const offset = 2000
-  game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
+  const offset = 4000
+  game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-1000, 1000))
 
   const screenCenter = getScreenCenterPositionFromClient()
 
@@ -75,6 +81,7 @@ export function initWelcomeScreen(game: Game): void {
   game.localPlayer.batteryLevel = 500
   game.localPlayer.steeringPower = 1.6
   game.localPlayer.enginePower = 0.25
+  game.localPlayer.canonOverHeat = true
   game.localPlayer.name = `P-${rndi(0, 900000)}`
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = "#f0f"
@@ -82,11 +89,27 @@ export function initWelcomeScreen(game: Game): void {
   game.localPlayer.hitRadius = 50
   game.localPlayer.position.x = screenCenter.x
   game.localPlayer.position.y = screenCenter.y
+  game.keyFuncMap.fire.keyStatus = true
 
   //Moons
   for (let n = 0; n < 10; n++) {
     const s = createSpaceObject()
     s.shape = SpaceShape.Moon
+    s.color = randomBlue()
+    s.mass = 1
+    s.isLocal = true
+    s.size.y = rndi(10, 70)
+    s.acceleration.x = 0
+    s.acceleration.y = 0
+    s.health = 0
+    s.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
+    game.bodies.push(s)
+  }
+
+  for (let n = 0; n < 2; n++) {
+    const s = createSpaceObject()
+    s.shape = SpaceShape.SmallShip
+    s.online = true
     s.color = randomBlue()
     s.mass = 1
     s.isLocal = true

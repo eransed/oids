@@ -104,8 +104,14 @@
   }
 
   .gameLobby {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    justify-content: flex-start;
+    align-content: center;
+    flex-wrap: wrap;
+    height: fit-content;
+    min-width: 300px;
+    min-height: 300px;
+    margin: 1em;
   }
 </style>
 

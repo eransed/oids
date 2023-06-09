@@ -5,7 +5,7 @@
   }
 
   .menuWrapper {
-    position: absolute;
+    position: relative;
     inset: 0;
     margin: auto;
     zoom: 1.5;

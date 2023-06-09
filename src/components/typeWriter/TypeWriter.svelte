@@ -46,6 +46,14 @@
   export let deleteSpeed: number = speed
 
   /**
+   * Delay until text starts to print (in milleseconds)
+   *
+   * @type {number}
+   * @optional
+   */
+  export let delaySpeed: number = 0
+
+  /**
    * A callback that fires when typeWriter is done printing
    */
   export let doneCallback: () => void = () => {}
@@ -92,8 +100,9 @@
       }, deleteSpeed)
     }
   }
-
-  typeWriter()
+  setTimeout(() => {
+    typeWriter()
+  }, delaySpeed)
 </script>
 
 <style>
