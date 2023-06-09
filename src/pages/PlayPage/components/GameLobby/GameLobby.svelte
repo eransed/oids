@@ -5,22 +5,36 @@
 
   //Stores
   import { gameSessionId, showLobby, user } from "../../../../stores/stores"
+  import { gameState } from "../../../../lib/input"
 
   //Interfaces
   import type { Button90Config } from "../../../../interfaces/menu"
   import type { User } from "../../../../interfaces/user"
+  import type { SpaceObject } from "../../../../lib/interface"
 
   //Components
   import Button90 from "../../../../components/menu/Button90.svelte"
   import MenuWrapper from "../../../../components/menu/MenuWrapper.svelte"
+  import ScoreScreen from "../../../GamePage/components/LeaderBoardScreen/ScoreScreen.svelte"
+  import TypeWriter from "../../../../components/typeWriter/TypeWriter.svelte"
+
+  //Services
+  import { playersInSession, type Session } from "../../../../lib/services/game/playersInSession"
+  import { createSpaceObject } from "../../../../lib/factory"
+  import type { AxiosResponse } from "axios"
 
   let lobbyStep = 0
+  let players: SpaceObject[]
 
   let userData: User | undefined
 
   user.subscribe((storedUser) => {
     userData = storedUser
   })
+
+  const getPlayerList = async (sessionId: string): Promise<AxiosResponse<Session>> => {
+    return await playersInSession(sessionId)
+  }
 
   const handleSubmit = async (e: Event) => {
     const formData = new FormData(e.target as HTMLFormElement)
@@ -31,18 +45,25 @@
     const gameCodeLength = gameCode.length
 
     if (gameCodeLength >= 4) {
-      console.log(gameCode)
+      const localPlayer = createSpaceObject()
+
       gameSessionId.set(gameCode)
       showLobby.set(false)
-      navigate("/play/game")
-      // history.replaceState(null, "", `game?id=${gameCode}`)
+
+      const playerList = await getPlayerList(gameCode)
+      if (playerList.status === 200) {
+        players = playerList.data.players
+
+        gameState.set({ scoreScreenData: { player: localPlayer, remotePlayers: players } })
+        if (players.length > 0) {
+          lobbyStep = 1
+        } else lobbyStep = 2
+      }
     }
+  }
 
-    // const response = await connectToLobbys(formData)
-
-    // if (response.status === 200) {
-    //   lobbyStep = 1
-    // }
+  const joinSession = () => {
+    navigate(`/play/game/${$gameSessionId}`)
   }
 
   const submitButton: Button90Config = {
@@ -53,7 +74,13 @@
 
   const readyButton: Button90Config = {
     buttonText: "I'm ready!",
-    clickCallback: () => handleSubmit,
+    clickCallback: () => (lobbyStep = 2),
+    selected: false,
+  }
+
+  const back: Button90Config = {
+    buttonText: "Back",
+    clickCallback: () => (lobbyStep = 0),
     selected: false,
   }
 </script>
@@ -86,8 +113,9 @@
   {#if lobbyStep === 0}
     <MenuWrapper>
       <h5>Enter game code to create or join a game</h5>
+
       <form on:submit|preventDefault={handleSubmit} on:formdata>
-        <input placeholder="Game code" name="gameCode" type="text" minlength="4" />
+        <input placeholder="Game code" value={$gameSessionId} name="gameCode" type="text" minlength="4" />
         <Button90 mouseTracking={false} buttonConfig={submitButton} />
       </form>
     </MenuWrapper>
@@ -95,13 +123,21 @@
 
   {#if lobbyStep === 1}
     <MenuWrapper>
-      <h5>Welcome to the Lobby</h5>
+      <h4>Game already in progress, want to join?</h4>
+      {#if players.length > 0}
+        <ScoreScreen showLocalPlayer={false} />
+      {/if}
 
-      <p>Players in lobby</p>
-      <p>{userData?.name ?? "Guest"}</p>
       <div class="lobbyButtons">
         <div><Button90 mouseTracking={false} buttonConfig={readyButton} /></div>
+        <div><Button90 mouseTracking={false} buttonConfig={back} /></div>
       </div>
+    </MenuWrapper>
+  {/if}
+
+  {#if lobbyStep === 2}
+    <MenuWrapper>
+      <TypeWriter speed={80} text={players.length > 0 ? "Joining session..." : "Creating session..."} doneCallback={joinSession} />
     </MenuWrapper>
   {/if}
 </div>

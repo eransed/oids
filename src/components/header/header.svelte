@@ -41,18 +41,10 @@
     <nav>
       <div class="menuItem">
         <div class="navButton">
-          <Router>
-            <Link to="play">
-              <Button90 mouseTracking={false} buttonConfig={Play} />
-            </Link>
-          </Router>
+          <Button90 mouseTracking={false} buttonConfig={Play} />
         </div>
         <div class="navButton">
-          <Router>
-            <Link to="profile">
-              <Button90 mouseTracking={false} buttonConfig={Profile} />
-            </Link>
-          </Router>
+          <Button90 mouseTracking={false} buttonConfig={Profile} />
         </div>
       </div>
     </nav>

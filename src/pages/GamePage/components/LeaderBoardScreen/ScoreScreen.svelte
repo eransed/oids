@@ -1,8 +1,9 @@
 <script lang="ts">
-    import { gameState } from "../../../../lib/input"
+  import { gameState } from "../../../../lib/input"
 
+  import ScoreRow from "./ScoreRow.svelte"
 
-  import ScoreRow from "./ScoreRow.svelte";
+  export let showLocalPlayer = true
 
   $: remotePlayers = $gameState.scoreScreenData.remotePlayers
   $: player = $gameState.scoreScreenData.player
@@ -18,7 +19,7 @@
     inset: 0;
     margin: auto;
   }
-  
+
   table {
     max-height: 70%;
     display: block;
@@ -26,26 +27,27 @@
     font-weight: bold;
     font-size: 14px;
   }
-
 </style>
 
 <div class="scoreTable">
   <table>
     <thead>
       <tr>
-        <ScoreRow header={true}></ScoreRow>
+        <ScoreRow header={true} />
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <ScoreRow player={player} theLocalPlayer={true}></ScoreRow>
-      </tr>
-    </tbody>
-    
+    {#if showLocalPlayer}
+      <tbody>
+        <tr>
+          <ScoreRow {player} theLocalPlayer={true} />
+        </tr>
+      </tbody>
+    {/if}
+
     {#each remotePlayers as remotePlayer}
       <tbody>
         <tr>
-          <ScoreRow player={remotePlayer}></ScoreRow>
+          <ScoreRow player={remotePlayer} />
         </tr>
       </tbody>
     {/each}

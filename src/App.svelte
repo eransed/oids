@@ -24,12 +24,12 @@
     home: "/",
     play: "/play",
     profile: "/profile",
-    game: "/play/game",
+    game: "/play/game/:id",
     end: "/play/game/end",
   }
 </script>
 
-{#if $pageHasHeader }
+{#if $pageHasHeader}
   <Header />
 {/if}
 
@@ -37,7 +37,7 @@
   <Router>
     <Route path={routes.home}><LandingPage /></Route>
     <Route path={routes.play}><PlayPage /></Route>
-    <Route path={routes.game}><GamePage /></Route>
+    <Route path={routes.game} let:params><GamePage gameIdParam={params.id} /></Route>
     <Route path={routes.end}><PostGamePage /></Route>
     <Route path={routes.profile}><ProfilePage /></Route>
   </Router>

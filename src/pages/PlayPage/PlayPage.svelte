@@ -7,7 +7,6 @@
   import GameLobby from "./components/GameLobby/GameLobby.svelte"
 
   pageHasHeader.set(true)
-  
 </script>
 
 <style>
@@ -24,10 +23,10 @@
 </style>
 
 <div class="playPage">
-  <TypeWriter
+  <!-- <TypeWriter
     humanRandomeness
     speed={40}
     text={`Urgent plea for assistance!!        Our lives hang in the balance as we face a dire threat from invading space ships. We humbly implore your expertise and strength to aid us in combating this perilous situation and safeguarding our existence. Your valiant efforts would make all the difference in saving our lives.`}
-  />
+  /> -->
   <GameLobby />
 </div>

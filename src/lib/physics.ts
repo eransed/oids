@@ -219,7 +219,7 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
             so1.lastDamagedByName = shot.ownerName
             shot.didHit = true
             if (so1.health < 1) {
-              console.log(so1.name)
+              console.log("You killed: " + so1.name)
               so0.kills.add(so1.name)
               so0.killCount = so0.kills.size
               so1.killedByName = so1.lastDamagedByName

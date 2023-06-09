@@ -160,8 +160,6 @@ export function initRegularGame(game: Game): void {
   game.all = game.all.concat(game.bodies)
   game.all.push(game.localPlayer)
 
-  console.log(game.all)
-
   let startTime = 0
 
   registerServerUpdate((su: ServerUpdate) => {

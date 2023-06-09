@@ -16,7 +16,7 @@
   import ShipSettings from "../ShipSettings/ShipSettings.svelte"
 
   //Websocket
-  import { disconnect } from "../../../../lib/websocket/webSocket"
+  import { disconnect, initMultiplayer } from "../../../../lib/websocket/webSocket"
   import ScoreScreen from "../LeaderBoardScreen/ScoreScreen.svelte"
 
   const showScoreScreen = getKeyMap().leaderBoard.store
@@ -26,7 +26,7 @@
   let game: Game
 
   //Props
-  export let sessionId: string | undefined
+  export let sessionId: string
 
   let canvas: HTMLCanvasElement
   // let cleanup: () => void

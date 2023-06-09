@@ -6,19 +6,18 @@ import { getPlayerListFromSessionId } from "./game.services"
 export const game = express.Router()
 
 game.post("/players", async (req: Request, res: Response, next: NextFunction) => {
-  console.log("getting players")
   try {
-    const { sessionId } = req.body
+    const sessionId = req.query.sessionId
 
     if (!sessionId) {
       res.status(400)
       throw new Error("You must provide a sessionId.")
     }
 
-    const playerList = await getPlayerListFromSessionId(sessionId)
+    const players = await getPlayerListFromSessionId(sessionId.toString())
 
     res.json({
-      playerList,
+      players,
     })
   } catch (err) {
     next(err)

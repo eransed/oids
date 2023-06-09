@@ -1,6 +1,7 @@
 <script lang="ts">
   //Svelte
   import { fade } from "svelte/transition"
+  import type { RouteParams } from "svelte-routing/types/Route"
 
   //Components
   import Game from "../GamePage/components/Game/Game.svelte"
@@ -9,6 +10,10 @@
   import { gameSessionId, pageHasHeader } from "../../stores/stores"
 
   pageHasHeader.set(false)
+
+  export let gameIdParam: string
+
+  let sessionId: string = $gameSessionId ? $gameSessionId : gameIdParam
 </script>
 
 <style>
@@ -25,5 +30,5 @@
 </style>
 
 <div class="gamePage" in:fade={{ delay: 300 }} out:fade>
-  <Game sessionId={$gameSessionId} />
+  <Game {sessionId} />
 </div>

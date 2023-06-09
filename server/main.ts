@@ -187,12 +187,12 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   }
 }
 
-export function getPlayersFromSessionId(sessionId: string | null): Client[] {
+export function getPlayersFromSessionId(sessionId: string | null): (SpaceObject | null)[] {
   const playerList = []
 
   for (const client of globalConnectedClients) {
     if (sessionId === client.sessionId) {
-      playerList.push(client)
+      playerList.push(client.lastDataObject)
     }
   }
 

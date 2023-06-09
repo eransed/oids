@@ -1,7 +1,6 @@
+import { SpaceObject } from "../../../src/lib/interface"
 import { getPlayersFromSessionId } from "../../main"
 
-import type { Client } from "../../main"
-
-export const getPlayerListFromSessionId = (sessionId: string | null): Client[] => {
+export const getPlayerListFromSessionId = (sessionId: string | null): (SpaceObject | null)[] => {
   return getPlayersFromSessionId(sessionId)
 }
