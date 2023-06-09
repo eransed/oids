@@ -101,26 +101,32 @@
   @media screen and (max-width: 600px) {
     .modal {
       opacity: 1;
-      width: 100vw;
+      width: 100%;
       height: 100vh;
       background: #000;
-      top: 0em;
+      top: -5em;
       right: 0em;
       z-index: 1;
-      justify-content: center;
-      align-content: center;
-      flex-wrap: wrap;
+      margin: 0px;
+      padding: 0px;
+      border: none;
+      outline: none;
+      display: flex;
     }
     #modalContent {
       opacity: 1;
-      width: 50%;
-      height: 98vh;
+      max-width: 100%;
+      width: 90%;
+
       background: #000;
       background-image: "";
       justify-content: center;
       align-content: center;
       flex-wrap: wrap;
       display: flex;
+    }
+    #header :hover {
+      margin: 0;
     }
   }
 
@@ -196,7 +202,7 @@
   <div
     class="modal"
     id={title}
-    style="--width: {width}; --height: {height}; position: {position}; opacity: {shipInsideModal ? '0.2' : '0.7'}"
+    style="--width: {width}; --height: {height}; position: {position}; opacity: {shipInsideModal ? '0.2' : ''}"
     contenteditable={isEditable}
     in:fade={{ delay: 50 }}
     out:fade

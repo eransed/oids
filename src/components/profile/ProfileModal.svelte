@@ -57,20 +57,69 @@
   $: borderColor = loggedIn ? "rgb(144, 238, 144)" : "rgb(255, 165, 0)"
 </script>
 
+<style>
+  .profileModal {
+    display: grid;
+    flex-direction: column;
+    width: 100%;
+    margin: 0.85em;
+  }
+
+  .row1 {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .column {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .column p {
+    padding-left: 0.6em;
+  }
+  .button {
+    width: fit-content;
+    justify-self: center;
+    margin-top: 10px;
+  }
+
+  input {
+    /* Need to set font-size to 16px and above to disable autozoom on mobile devices */
+    font-size: 16px;
+  }
+</style>
+
 {#if !loggedIn}
-  <div in:fade={{ duration: 600, delay: 150 }}>
+  <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <form on:submit|preventDefault={handleSubmit} on:formdata class="form">
       <input placeholder="Email" name="email" type="email" autocomplete="email" />
 
       <input placeholder="Password" name="password" type="password" autocomplete="current-password" style="border: {wrongPassword && '2px solid red'}" />
-
-      <Button90 buttonConfig={loginButton} mouseTracking={false} />
+      <div class="button">
+        <Button90 buttonConfig={loginButton} mouseTracking={false} />
+      </div>
     </form>
   </div>
 {/if}
 {#if loggedIn}
-  <div in:fade={{ duration: 600, delay: 150 }}>
-    <div class="row">
+  <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
+    <div class="row1">
       <div class="column" style={"flex: 0.5;"}>
         <div class="modalProfile" style="--borderColor: {borderColor};">
           <img class="avatar" src={Avatar} alt="Avatar" />
@@ -82,7 +131,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row2">
       <div class="column">
         <div>
           <p style="margin-top: 0.5em;">Email: {profile?.email}</p>
@@ -92,7 +141,8 @@
         </div>
       </div>
     </div>
-
-    <Button90 buttonConfig={logOutButton} mouseTracking={false} />
+    <div class="button">
+      <Button90 buttonConfig={logOutButton} mouseTracking={false} />
+    </div>
   </div>
 {/if}

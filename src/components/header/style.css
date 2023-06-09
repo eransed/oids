@@ -30,7 +30,6 @@
 }
 
 .header > * {
-  opacity: 0.8;
   transition: all;
   transition-duration: 0s;
   margin: 1em;
@@ -113,7 +112,7 @@
 }
 
 .form {
-  display: flex;
+  display: grid;
   flex-direction: column;
   justify-content: center;
   flex-wrap: wrap;
@@ -126,22 +125,20 @@
   margin: 8px;
 }
 
-.row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+nav {
+  display: grid;
   width: 100%;
+  grid-template-columns: 1fr auto;
 }
 
-.column {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  flex-basis: 100%;
-  flex: 1;
-  justify-content: center;
-}
+@media screen and (max-width: 400px) {
+  nav {
+    display: grid;
+    width: 100%;
+    flex-direction: column;
+  }
 
-.column p {
-  padding-left: 0.6em;
+  .profileBtn {
+    display: none;
+  }
 }

@@ -43,27 +43,27 @@
         <div class="navButton">
           <Button90 mouseTracking={false} buttonConfig={Play} />
         </div>
-        <div class="navButton">
+        <div class="navButton profileBtn">
           <Button90 mouseTracking={false} buttonConfig={Profile} />
         </div>
       </div>
+
+      <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
+        <img class="avatar" src={Avatar} alt="Avatar" />
+      </div>
+
+      {#if showLogin}
+        <Modal
+          backDrop={false}
+          title={loggedIn ? "Profile" : "Log in"}
+          showModal={showLogin}
+          closedCallback={() => {
+            showLogin = false
+          }}
+        >
+          <ProfileModal />
+        </Modal>
+      {/if}
     </nav>
-
-    <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-      <img class="avatar" src={Avatar} alt="Avatar" />
-    </div>
-
-    {#if showLogin}
-      <Modal
-        backDrop={false}
-        title={loggedIn ? "Profile" : "Log in"}
-        showModal={showLogin}
-        closedCallback={() => {
-          showLogin = false
-        }}
-      >
-        <ProfileModal />
-      </Modal>
-    {/if}
   </div>
 </div>
