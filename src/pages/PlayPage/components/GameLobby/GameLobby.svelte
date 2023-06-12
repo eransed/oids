@@ -109,7 +109,7 @@
     align-content: center;
     flex-wrap: wrap;
     height: fit-content;
-    min-width: 300px;
+
     min-height: 300px;
     margin: 1em;
   }

@@ -26,6 +26,8 @@
       m.y = "0px"
     }
   }
+
+  export let selected: boolean = false
 </script>
 
 <style>
@@ -89,7 +91,7 @@
 </style>
 
 <div on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
-  {#if buttonConfig.selected}
+  {#if buttonConfig.selected || selected}
     <button style="--left: {m.x}; --top: {m.y}" class="selected" on:click={buttonConfig.clickCallback}>{buttonConfig.buttonText}</button>
   {:else}
     <button style="--left: {m.x}; --top: {m.y}" class="notSelected" on:click={buttonConfig.clickCallback}>{buttonConfig.buttonText} </button>

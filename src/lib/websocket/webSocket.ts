@@ -29,7 +29,6 @@ function connect(): Promise<WebSocket> {
     socket = new WebSocket(wsUrl)
     socket.onopen = function () {
       resolve(socket)
-      console.log(socket)
     }
     socket.onerror = function (err) {
       reject(err)

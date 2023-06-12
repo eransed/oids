@@ -48,10 +48,6 @@
 
   onDestroy(() => {
     disconnect()
-    // if (cleanup) {
-    //   getKeyMap().leaderBoard.store?.set(false)
-    //   cleanup()
-    // }
   })
 </script>
 

@@ -25,7 +25,6 @@
 
   const handleKeyDown = (event: KeyboardEvent): void => {
     if (event.key === "Escape") {
-      console.log("Escape")
       toggleMenu()
     }
   }

@@ -44,7 +44,6 @@ export class Game {
   }
 
   stopGame = async (): Promise<void> => {
-    console.log("todo: build a better logger...")
     this.running = false
     this.shouldSendToServer = false
     this.localPlayer.isPlaying = false
@@ -77,7 +76,6 @@ export class Game {
   }
 
   reset(): void {
-    console.log('Local player reset game')
     this.hasCalledCallback = false
     this.localPlayer.isDead = false
     this.localPlayer.obliterated = false

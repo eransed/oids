@@ -8,3 +8,27 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  position: absolute;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #888;
+  border-radius: 0.5em;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(47, 167, 252, 0.5);
+
+  border-radius: 0.5em;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(47, 167, 252, 1);
+}

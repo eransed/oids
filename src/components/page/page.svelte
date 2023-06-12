@@ -1,4 +1,6 @@
 <script lang="ts">
+  //Svelte-fx
+  import { fade, slide } from "svelte/transition"
 </script>
 
 <style>
@@ -7,15 +9,21 @@
     width: 100vw;
     top: 88px;
     display: flex;
-    padding: 0.8em;
+    margin: 2em;
     position: relative;
     align-content: flex-start;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
   }
+
+  @media screen and (max-width: 600px) {
+    .pageWrapper {
+      margin: 1em;
+    }
+  }
 </style>
 
-<div class="pageWrapper">
+<div class="pageWrapper" in:slide={{ duration: 750 }}>
   <slot />
 </div>

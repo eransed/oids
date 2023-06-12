@@ -36,34 +36,32 @@
   $: borderColor = loggedIn ? "rgb(144, 238, 144)" : "rgb(255, 165, 0)"
 </script>
 
-<div transition:slide class="headerWrapper">
-  <div class="header">
-    <nav>
-      <div class="menuItem">
-        <div class="navButton">
-          <Button90 mouseTracking={false} buttonConfig={Play} />
-        </div>
-        <div class="navButton profileBtn">
-          <Button90 mouseTracking={false} buttonConfig={Profile} />
-        </div>
+<div class="header">
+  <nav>
+    <div class="menuItem">
+      <div class="navButton">
+        <Button90 mouseTracking={false} buttonConfig={Play} />
       </div>
-
-      <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-        <img class="avatar" src={Avatar} alt="Avatar" />
+      <div class="navButton profileBtn">
+        <Button90 mouseTracking={false} buttonConfig={Profile} />
       </div>
+    </div>
 
-      {#if showLogin}
-        <Modal
-          backDrop={false}
-          title={loggedIn ? "Profile" : "Log in"}
-          showModal={showLogin}
-          closedCallback={() => {
-            showLogin = false
-          }}
-        >
-          <ProfileModal />
-        </Modal>
-      {/if}
-    </nav>
-  </div>
+    <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
+      <img class="avatar" src={Avatar} alt="Avatar" />
+    </div>
+
+    {#if showLogin}
+      <Modal
+        backDrop={false}
+        title={loggedIn ? "Profile" : "Log in"}
+        showModal={showLogin}
+        closedCallback={() => {
+          showLogin = false
+        }}
+      >
+        <ProfileModal />
+      </Modal>
+    {/if}
+  </nav>
 </div>

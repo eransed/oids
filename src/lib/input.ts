@@ -19,8 +19,8 @@ const DefaultKeyMap: KeyFunctionMap = {
   fire: { activators: [" "], keyStatus: false },
   reload: { activators: ["r"], keyStatus: false },
   selfDestroy: { activators: ["k"], keyStatus: false },
-  systemGraphs: { activators: ["g"], keyStatus: false, toggle: true  },
-  leaderBoard: { activators: ["p"], keyStatus: false, store: writable<boolean>(false), toggle: true  },
+  systemGraphs: { activators: ["g"], keyStatus: false, toggle: true },
+  leaderBoard: { activators: ["p"], keyStatus: false, store: writable<boolean>(false), toggle: true },
   hotKeys: { activators: ["o"], keyStatus: false, store: writable<boolean>(false), toggle: true },
   shipSettings: { activators: ["i"], keyStatus: false, store: writable<boolean>(false), toggle: true },
 }
@@ -34,7 +34,7 @@ export function keyDisplayName(key: string) {
 export function capitalFirstChar(str: string) {
   if (str.length === 0) return str
   if (str.length === 1) return str.charAt(0).toUpperCase()
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 Object.entries(DefaultKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
@@ -73,7 +73,6 @@ function arrowControl(e: KeyboardEvent, keyUseState: boolean) {
   Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunctionStore) => {
     keyFunction.activators.map((activator: string) => {
       if (activator === e.key) {
-
         if (keyFunction.toggle && keyUseState) {
           keyFunction.keyStatus = !keyFunction.keyStatus
         } else if (!keyFunction.toggle) {
@@ -83,7 +82,6 @@ function arrowControl(e: KeyboardEvent, keyUseState: boolean) {
         if (keyFunction.store) {
           keyFunction.store.set(keyFunction.keyStatus)
         }
-
       }
     })
   })
@@ -168,13 +166,11 @@ function keyupArrowControl(event: KeyboardEvent) {
 }
 
 export function initKeyControllers(): void {
-  console.log("Inits game key input control")
   document.addEventListener("keydown", keydownArrowControl)
   document.addEventListener("keyup", keyupArrowControl)
 }
 
 export function removeKeyControllers(): void {
-  console.log("Removes game key input control")
   resetState()
   document.removeEventListener("keydown", keydownArrowControl)
   document.removeEventListener("keyup", keyupArrowControl)

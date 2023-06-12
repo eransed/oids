@@ -4,14 +4,6 @@
   --borderStyle: solid;
 }
 
-.headerWrapper {
-  display: flex;
-  width: fit-content;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
 .header {
   top: 0;
   position: fixed;
@@ -21,7 +13,7 @@
   overflow: hidden;
   justify-content: space-between;
   width: 100%;
-  max-width: 1500px;
+
   z-index: 2;
   transition: all;
   transition-duration: 0s;

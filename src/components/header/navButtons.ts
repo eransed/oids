@@ -12,7 +12,7 @@ export const Play: Button90Config = {
 export const Profile: Button90Config = {
   buttonText: "Profile",
   clickCallback: function (): void {
-    navigate("/profile")
+    navigate("/profile/summary")
   },
   selected: false,
 }
