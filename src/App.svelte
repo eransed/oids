@@ -13,6 +13,7 @@
   import PostGamePage from "./pages/PostGamePage/PostGamePage.svelte"
   import ProfilePage from "./pages/ProfilePage/ProfilePage.svelte"
   import Header from "./components/header/header.svelte"
+  import GameLobby from "./pages/PlayPage/components/GameLobby/GameLobby.svelte"
 
   onMount(() => {
     //Functions to run on startup of App.
@@ -23,8 +24,9 @@
     home: "/",
     play: "/play",
     profile: "/profile/:content",
-    game: "/play/game/:id",
-    end: "/play/game/end",
+    game: "/play/multiplayer/:id",
+    multiplayer: "/play/multiplayer",
+    end: "/play/multiplayer/end",
   }
 </script>
 
@@ -42,6 +44,9 @@
     <Route path={routes.end}><PostGamePage /></Route>
     <Route path={routes.profile} let:params>
       <ProfilePage params={params.content} />
+    </Route>
+    <Route path={routes.multiplayer}>
+      <GameLobby />
     </Route>
   </Router>
 </body>

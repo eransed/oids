@@ -25,7 +25,7 @@ export const GameMenuButtons = (Game: Game): Button90Config[] => {
     buttonText: "Exit game",
     clickCallback() {
       stopGame(Game)
-      navigate("/play/game/end")
+      navigate("/play/multiplayer/end")
     },
     selected: false,
   }

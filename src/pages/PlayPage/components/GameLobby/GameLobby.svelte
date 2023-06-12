@@ -17,6 +17,7 @@
   import MenuWrapper from "../../../../components/menu/MenuWrapper.svelte"
   import ScoreScreen from "../../../GamePage/components/LeaderBoardScreen/ScoreScreen.svelte"
   import TypeWriter from "../../../../components/typeWriter/TypeWriter.svelte"
+  import Page from "../../../../components/page/page.svelte"
 
   //Services
   import { playersInSession, type Session } from "../../../../lib/services/game/playersInSession"
@@ -63,7 +64,7 @@
   }
 
   const joinSession = () => {
-    navigate(`/play/game/${$gameSessionId}`)
+    navigate(`/play/multiplayer/${$gameSessionId}`)
   }
 
   const submitButton: Button90Config = {
@@ -115,35 +116,37 @@
   }
 </style>
 
-<div class="gameLobby" in:fade={{ duration: 1000, delay: 300 }} out:fade>
-  {#if lobbyStep === 0}
-    <MenuWrapper>
-      <h5>Enter game code to create or join a game</h5>
+<Page>
+  <div class="gameLobby" in:fade={{ duration: 1000, delay: 300 }} out:fade>
+    {#if lobbyStep === 0}
+      <MenuWrapper>
+        <h5>Enter game code to create or join a game</h5>
 
-      <form on:submit|preventDefault={handleSubmit} on:formdata>
-        <input placeholder="Game code" value={$gameSessionId} name="gameCode" type="text" minlength="4" />
-        <Button90 mouseTracking={false} buttonConfig={submitButton} />
-      </form>
-    </MenuWrapper>
-  {/if}
+        <form on:submit|preventDefault={handleSubmit} on:formdata>
+          <input placeholder="Game code" value={$gameSessionId} name="gameCode" type="text" minlength="4" />
+          <Button90 mouseTracking={false} buttonConfig={submitButton} />
+        </form>
+      </MenuWrapper>
+    {/if}
 
-  {#if lobbyStep === 1}
-    <MenuWrapper>
-      <h4>Game already in progress, want to join?</h4>
-      {#if players.length > 0}
-        <ScoreScreen showLocalPlayer={false} />
-      {/if}
+    {#if lobbyStep === 1}
+      <MenuWrapper>
+        <h4>Game already in progress, want to join?</h4>
+        {#if players.length > 0}
+          <ScoreScreen showLocalPlayer={false} />
+        {/if}
 
-      <div class="lobbyButtons">
-        <div><Button90 mouseTracking={false} buttonConfig={readyButton} /></div>
-        <div><Button90 mouseTracking={false} buttonConfig={back} /></div>
-      </div>
-    </MenuWrapper>
-  {/if}
+        <div class="lobbyButtons">
+          <div><Button90 mouseTracking={false} buttonConfig={readyButton} /></div>
+          <div><Button90 mouseTracking={false} buttonConfig={back} /></div>
+        </div>
+      </MenuWrapper>
+    {/if}
 
-  {#if lobbyStep === 2}
-    <MenuWrapper>
-      <TypeWriter speed={80} text={players.length > 0 ? "Joining session..." : "Creating session..."} doneCallback={joinSession} />
-    </MenuWrapper>
-  {/if}
-</div>
+    {#if lobbyStep === 2}
+      <MenuWrapper>
+        <TypeWriter speed={80} text={players.length > 0 ? "Joining session..." : "Creating session..."} doneCallback={joinSession} />
+      </MenuWrapper>
+    {/if}
+  </div>
+</Page>

@@ -2,10 +2,20 @@
   /**
    * Different types of cursors allowed
    *
-   * help, wait, crosshair, not-allowed, zoom-in, grab, pointer
+   * default, help, wait, crosshair, not-allowed, zoom-in, grab, pointer
    */
   export let cursor = "pointer"
   export let clickedOnCard: () => void = () => {}
+  export let hoverEffect: boolean = true
+
+  function shouldEffectHover() {
+    if (hoverEffect) {
+      return "hoverEffect"
+    }
+    if (!hoverEffect) {
+      return ""
+    }
+  }
 </script>
 
 <style>
@@ -33,11 +43,11 @@
     transition: all 0.5s;
   }
 
-  #cardWrapper:hover {
+  #cardWrapper:is(.hoverEffect):hover {
     --cardShadow: 1;
   }
 </style>
 
-<div id="cardWrapper" style="cursor: {cursor}" on:click={clickedOnCard} on:keydown={() => {}}>
+<div id="cardWrapper" class={shouldEffectHover()} style="cursor: {cursor}" on:click={clickedOnCard} on:keydown={() => {}}>
   <slot />
 </div>

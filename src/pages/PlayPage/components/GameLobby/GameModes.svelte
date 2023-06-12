@@ -15,6 +15,7 @@
   //Utils
   import { createSpaceObject } from "../../../../lib/factory"
   import { getKeyMap, removeKeyControllers } from "../../../../lib/input"
+  import { navigate } from "svelte-routing"
 
   let gameMode: Game
   let canvas: HTMLCanvasElement
@@ -43,6 +44,7 @@
     gameMode.stopGame()
 
     multiplayer = true
+    navigate("/play/multiplayer")
   }
 </script>
 
@@ -87,5 +89,6 @@
 {#if multiplayer}
   <Page>
     <GameLobby />
+    <Card>Online sessions:</Card>
   </Page>
 {/if}

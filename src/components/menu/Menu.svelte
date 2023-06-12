@@ -81,6 +81,7 @@
 <style>
   :root {
     --color: rgb(99, 136, 179, 1);
+    --outlineColor: rgb(36, 22, 159);
     --opacity: 0.6;
   }
 

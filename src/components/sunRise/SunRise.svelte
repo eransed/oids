@@ -34,7 +34,6 @@
     position: absolute;
     height: 100vh;
     width: 100vw;
-    font-family: "Courier New", Courier, monospace;
     color: rgb(0, 0, 0) 000;
     background-image: linear-gradient(121deg, rgb(0, 0, 0, var(--_transparency)) 0%, rgb(255, 204, 112, var(--_transparency)) 100%);
   }

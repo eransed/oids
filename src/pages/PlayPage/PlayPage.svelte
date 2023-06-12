@@ -15,7 +15,6 @@
     color: #fff;
     height: 100vh;
     width: 100vw;
-    font-family: "Courier New", Courier, monospace;
   }
 </style>
 

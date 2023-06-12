@@ -1,7 +1,6 @@
 <script lang="ts">
-  //Svelte
+  //Svelte-fx
   import { fade } from "svelte/transition"
-  import { Route, Router } from "svelte-routing"
 
   //Stores
   import { pageHasHeader, user } from "../../stores/stores"
@@ -14,6 +13,7 @@
   import Page from "../../components/page/page.svelte"
   import Button90 from "../../components/menu/Button90.svelte"
   import { ProfileButtons } from "./ProfileButtons"
+  import Card from "../../components/card/card.svelte"
 
   pageHasHeader.set(true)
 
@@ -27,13 +27,12 @@
 </script>
 
 <style>
-  .profileHeader {
+  .profileWrapper {
     display: grid;
     justify-self: center;
     align-self: center;
     flex-wrap: wrap;
     color: #fff;
-    font-family: "Courier New", Courier, monospace;
     grid-template-columns: 1fr auto;
   }
 
@@ -43,6 +42,11 @@
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 80vh;
+    transition: all;
+    transition-duration: 2s;
+    border-left-style: ridge;
+    border-left-width: 2px;
+    border-left-color: var(--color);
   }
 
   .buttons > * {
@@ -56,7 +60,7 @@
   }
 
   @media screen and (max-width: 600px) {
-    .profileHeader {
+    .profileWrapper {
       grid-template-columns: 1fr;
     }
 
@@ -66,19 +70,15 @@
   }
 </style>
 
-{#if $user}
-  <Page>
-    <div class="profileHeader">
+<Page>
+  {#if $user}
+    <div class="profileWrapper">
       <div class="buttons">
-        <div>
-          <Button90 buttonConfig={ProfileButtons.summary} selected={params === "summary"} />
-        </div>
-        <div>
-          <Button90 buttonConfig={ProfileButtons.matchHistory} selected={params === "matchHistory"} />
-        </div>
-        <div>
-          <Button90 buttonConfig={ProfileButtons.settings} selected={params === "settings"} />
-        </div>
+        {#each Object.values(ProfileButtons) as button}
+          <div>
+            <Button90 buttonConfig={button} selected={params === button.routeParam} />
+          </div>
+        {/each}
       </div>
       <div class="content" style="padding: 1em">
         {#if params === "summary"}
@@ -92,10 +92,8 @@
         {/if}
       </div>
     </div>
-  </Page>
-{:else}
-  <Page>
+  {:else}
     <p style="color: #fff">Please login to see your profile</p>
     <ProfileModal />
-  </Page>
-{/if}
+  {/if}
+</Page>
