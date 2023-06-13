@@ -80,19 +80,31 @@ export class Client {
     })
 
     this.ws.addEventListener("message", (event: MessageEvent) => {
-      const so: SpaceObject = soFromValueArray(JSON.parse(event.data))
-      this.lastDataObject = so
-      if (so.sessionId) this.sessionId = so.sessionId
-      if (!this.nameHasBeenUpdated) {
-        globalConnectedClients.forEach((client) => {
-          if (client === this && client.name === this.name) {
-            client.updateNameOnce(so.name)
-          }
-        })
+      if (!event.data) {
+        console.log("No data sent by connected client")
+        return
       }
-      so.online = true
-      // broadcastToAllClients(this, globalConnectedClients, so);
-      broadcastToSessionClients(this, globalConnectedClients, so)
+
+      try {
+        const so: SpaceObject = soFromValueArray(JSON.parse(event.data))
+        this.lastDataObject = so
+        if (so.sessionId) this.sessionId = so.sessionId
+        if (!this.nameHasBeenUpdated) {
+          if (globalConnectedClients.length > 0) {
+            globalConnectedClients.forEach((client) => {
+              if (client === this && client.name === this.name) {
+                client.updateNameOnce(so.name)
+              }
+            })
+            so.online = true
+            broadcastToSessionClients(this, globalConnectedClients, so)
+          } else {
+            console.log("No clients connected")
+          }
+        }
+      } catch (e) {
+        console.log(`Failed with: ${e}`)
+      }
     })
   }
 

@@ -4,7 +4,7 @@
   import { fade } from "svelte/transition"
 
   //Stores
-  import { gameSessionId, showLobby, user } from "../../../../stores/stores"
+  import { gameSessionId, guestUserName, showLobby, user } from "../../../../stores/stores"
   import { gameState } from "../../../../lib/input"
 
   //Interfaces
@@ -23,6 +23,7 @@
   import { playersInSession, type Session } from "../../../../lib/services/game/playersInSession"
   import { createSpaceObject } from "../../../../lib/factory"
   import type { AxiosResponse } from "axios"
+  import { initMultiplayer } from "../../../../lib/websocket/webSocket"
 
   let lobbyStep = 0
   let players: SpaceObject[]
@@ -37,6 +38,8 @@
     return await playersInSession(sessionId)
   }
 
+  function connectToLobby() {}
+
   const handleSubmit = async (e: Event) => {
     const formData = new FormData(e.target as HTMLFormElement)
     const values = Object.fromEntries(formData.entries())
@@ -46,7 +49,9 @@
     const gameCodeLength = gameCode.length
 
     if (gameCodeLength >= 4) {
-      const localPlayer = createSpaceObject()
+      const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
+
+      initMultiplayer()
 
       gameSessionId.set(gameCode)
       showLobby.set(false)
@@ -56,9 +61,10 @@
         players = playerList.data.players
 
         gameState.set({ scoreScreenData: { player: localPlayer, remotePlayers: players } })
-        if (players.length > 0) {
-          lobbyStep = 1
-        } else lobbyStep = 2
+        lobbyStep = 1
+        // if (players.length > 0) {
+        //   lobbyStep = 1
+        // } else lobbyStep = 2
       }
     }
   }

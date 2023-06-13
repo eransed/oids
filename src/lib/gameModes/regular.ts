@@ -130,7 +130,6 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.batteryLevel = 500
   game.localPlayer.steeringPower = 1.6
   game.localPlayer.enginePower = 0.25
-  game.localPlayer.name = `P-${rndi(0, 900000)}`
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = "#f0f"
   game.localPlayer.isLocal = true

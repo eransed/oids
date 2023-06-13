@@ -26,7 +26,7 @@ export function reduceShotSize(photonLaser: PhotonLaser): PhotonLaser {
 }
 
 //Incoming messages
-export function soFromValueArray(value: never []): SpaceObject {
+export function soFromValueArray(value: never[]): SpaceObject {
   const so = createSpaceObject()
   Object.keys(so).forEach((v, i) => {
     if ((v as keyof SpaceObject) === "shotsInFlightValues") {
@@ -37,7 +37,7 @@ export function soFromValueArray(value: never []): SpaceObject {
       // console.log(typeof value[i])
       // console.log(value[i])
       // console.log ('Test end:');
-      (value[i] as any[]).forEach((shot) => {
+      ;(value[i] as any[]).forEach((shot) => {
         so.shotsInFlight.push(photonLaserFromValueArray(shot))
       })
     } else {

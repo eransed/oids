@@ -8,6 +8,7 @@
 
   //Stores
   import { gameSessionId, pageHasHeader } from "../../stores/stores"
+  import type { SpaceObject } from "../../lib/interface"
 
   pageHasHeader.set(false)
 

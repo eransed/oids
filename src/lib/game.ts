@@ -5,8 +5,8 @@ import { getContext } from "./canvas_util"
 import { LightSource, LineSegment } from "./shapes"
 import { renderLoop } from "./time"
 import * as WelcomeScreen from "./gameModes/welcomeScreen"
-import * as Regular from "./gameModes/regular"
 import type { Shape } from "./shapes/Shape"
+import { initRegularGame, nextFrame, renderFrame } from "./gameModes/regular"
 
 export class Game {
   testShapes: Shape[] = []
@@ -87,11 +87,22 @@ export class Game {
     // init a regular game
     this.shouldSendToServer = true
     this.localPlayer.isPlaying = true
-    Regular.initRegularGame(this)
+    initRegularGame(this)
 
     this.running = true
 
     // start the animation loop
-    this.stopper = renderLoop(this, Regular.renderFrame, Regular.nextFrame)
+    this.stopper = renderLoop(this, renderFrame, nextFrame)
+  }
+
+  startGame(initFn: any, renderFn: any, nextFn: any): void {
+    this.shouldSendToServer = true
+    this.localPlayer.isPlaying = true
+    initFn(this)
+
+    this.running = true
+
+    // start the animation loop
+    this.stopper = renderLoop(this, renderFn, nextFn)
   }
 }

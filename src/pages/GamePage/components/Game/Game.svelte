@@ -1,6 +1,7 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from "svelte-routing"
+  import type { SpaceObject } from "../../../../lib/interface"
 
   //Svelte
   import { onDestroy, onMount } from "svelte"
@@ -19,6 +20,10 @@
   import { disconnect, initMultiplayer } from "../../../../lib/websocket/webSocket"
   import ScoreScreen from "../LeaderBoardScreen/ScoreScreen.svelte"
 
+  // Game variants
+  import { initRegularGame, nextFrame, renderFrame } from "../../../../lib/gameModes/regular"
+  import { guestUserName, user } from "../../../../stores/stores"
+
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
   const shipSettings = getKeyMap().shipSettings.store
@@ -30,14 +35,15 @@
 
   let canvas: HTMLCanvasElement
   // let cleanup: () => void
-  const localPlayer = createSpaceObject("LocalPlayer")
+  const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
 
   onMount(() => {
     // cleanup = initSettingsControl()
     game = new Game(canvas, localPlayer, getKeyMap(), showDeadMenu)
     game.localPlayer.sessionId = sessionId
     game.localPlayer.joinedGame = currentTimeDate()
-    game.startMultiplayer()
+    // game.startMultiplayer()
+    game.startGame(initRegularGame, renderFrame, nextFrame)
   })
 
   const showDeadMenu = (): void => {

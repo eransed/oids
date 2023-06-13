@@ -3,7 +3,7 @@
   import { fade } from "svelte/transition"
 
   //Stores
-  import { pageHasHeader, user } from "../../stores/stores"
+  import { guestUserName, pageHasHeader, user } from "../../stores/stores"
 
   //Interfaces
   import type { User } from "../../interfaces/user"
@@ -16,15 +16,7 @@
 
   pageHasHeader.set(true)
 
-  let userData: User | undefined
-
-  user.subscribe((value) => {
-    userData = value
-  })
-
-  let userName = userData ? userData?.name : `Player ${rndi(1, 100)}`
-
-  let welcomeMessage = `Welcome to OIDS ${userName}`
+  let welcomeMessage = `Welcome to OIDS ${$user ? $user?.name : $guestUserName}`
 </script>
 
 <style>
