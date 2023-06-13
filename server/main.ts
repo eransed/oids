@@ -199,6 +199,22 @@ export function getPlayersFromSessionId(sessionId: string | null): (SpaceObject 
   return playerList
 }
 
+export function getActivePlayerSessions() {
+  const sessionsSet: Set<Client["sessionId"] | null> = new Set()
+
+  const sessionList: (string | null)[] = []
+
+  for (const client of globalConnectedClients) {
+    sessionsSet.add(client.sessionId)
+  }
+
+  sessionsSet.forEach((v) => {
+    sessionList.push(v)
+  })
+
+  return sessionList
+}
+
 server.on("connection", function connection(clientConnection: WebSocket, req: IncomingMessage) {
   clientConnection.send(JSON.stringify({ serverVersion: name_ver }))
   globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
