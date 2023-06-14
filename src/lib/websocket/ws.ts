@@ -28,7 +28,7 @@ export function getReadyStateText(socket: WebSocket): string {
 
 export function sender(ws: WebSocket, messageObject: object): boolean {
   if (ws.readyState === 1) {
-    console.log ('Sending message...')
+    console.log("Sending message...")
     ws.send(JSON.stringify(messageObject))
     return true
   } else {
@@ -40,31 +40,31 @@ export function sender(ws: WebSocket, messageObject: object): boolean {
 export class OidsSocket {
   private wsurl: URL
   private ws: WebSocket | null = null
-  private prettyStatusString = 'Just created!'
-  
+  private prettyStatusString = "Just created!"
+
   constructor(url: URL) {
-    console.log('New socket created')
+    console.log("New socket created")
     this.wsurl = url
   }
 
-  private socketNotInitErrorMessage(extra = ''): string {
-    const msg = 'WebSocket not initialized ' + extra
+  private socketNotInitErrorMessage(extra = ""): string {
+    const msg = "WebSocket not initialized " + extra
     console.error(msg)
     return msg
   }
-  
+
   private connectPromise(): Promise<WebSocket> {
     return new Promise((resolve, reject) => {
       const wsUrl: URL = this.wsurl
-  
+
       this.ws = new WebSocket(wsUrl)
-      this.ws.onopen = (() => {
+      this.ws.onopen = () => {
         if (this.ws) {
           resolve(this.ws)
         } else {
           this.socketNotInitErrorMessage()
         }
-      })
+      }
       this.ws.onerror = (err) => {
         reject(err)
       }
@@ -78,10 +78,10 @@ export class OidsSocket {
   async connect() {
     try {
       await this.connectPromise()
-        .then(ws => {
+        .then((ws) => {
           console.log(`WebSocket connected with status ${getReadyStateText(ws)}`)
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(`WebSocket failed to connect: ${err}`)
         })
     } catch (error) {
@@ -91,19 +91,19 @@ export class OidsSocket {
 
   send(messageObject: object): void {
     if (!this.ws) {
-      console.log('Connecting websocket...')
+      console.log("Connecting websocket...")
       this.connectPromise()
-        .then(ws => {
+        .then((ws) => {
           sender(ws, messageObject)
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(`Failed to send: ${err}`)
         })
-    } else { 
+    } else {
       sender(this.ws, messageObject)
     }
   }
-    
+
   disconnect(): void {
     if (this.ws) {
       this.ws.close()
@@ -111,7 +111,7 @@ export class OidsSocket {
       this.socketNotInitErrorMessage()
     }
   }
-    
+
   getStateString(): string {
     if (this.ws) {
       return getReadyStateText(this.ws)
@@ -127,8 +127,8 @@ export class OidsSocket {
     if (!this.ws) {
       this.connect()
     }
-    this.ws?.addEventListener('message', (event: any) => {
-      console.log('new incomming message')
+    this.ws?.addEventListener("message", (event: any) => {
+      console.log("new incomming message")
       const data = JSON.parse(event.data)
       // const spaceObjFromSrv: SpaceObject = soFromValueArray(data)
       const spaceObjFromSrv: SpaceObject = data
@@ -142,10 +142,9 @@ export class OidsSocket {
       callback(serverUpdate)
     })
   }
-
 }
 
-export function sendReducedSpaceObjectToBroadcastServer(ows: OidsSocket, so: SpaceObject): void {
+export function sendSpaceObject(ows: OidsSocket, so: SpaceObject): void {
   // Remove array which could contain circular ref
   so.collidingWith = []
   so.isLocal = false
@@ -155,6 +154,6 @@ export function sendReducedSpaceObjectToBroadcastServer(ows: OidsSocket, so: Spa
   // })
   // ows.send(soToValueArray(so))
   ows.send(so)
-  console.log (so.name)
-  console.log (so.lastMessage)
+  console.log(so.name)
+  console.log(so.lastMessage)
 }

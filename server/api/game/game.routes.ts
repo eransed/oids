@@ -28,9 +28,7 @@ game.get("/sessions", async (req: Request, res: Response, next: NextFunction) =>
   try {
     const sessions = getActiveSessions()
 
-    res.json({
-      sessions,
-    })
+    res.json(sessions)
   } catch (err) {
     next(err)
   }

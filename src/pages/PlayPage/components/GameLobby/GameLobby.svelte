@@ -18,15 +18,19 @@
   import ScoreScreen from "../../../GamePage/components/LeaderBoardScreen/ScoreScreen.svelte"
   import TypeWriter from "../../../../components/typeWriter/TypeWriter.svelte"
   import Page from "../../../../components/page/page.svelte"
+  import Card from "../../../../components/card/card.svelte"
 
   //Services
   import { playersInSession, type Session } from "../../../../lib/services/game/playersInSession"
   import { createSpaceObject } from "../../../../lib/factory"
   import type { AxiosResponse } from "axios"
   import { getWsUrl, initMultiplayer } from "../../../../lib/websocket/webSocket"
-  import { OidsSocket, sendReducedSpaceObjectToBroadcastServer } from "../../../../lib/websocket/ws"
+  import { OidsSocket, sendSpaceObject } from "../../../../lib/websocket/ws"
   import { onMount } from "svelte"
-    import { rndi } from "../../../../lib/math"
+  import { rndi } from "../../../../lib/math"
+  import SessionList from "./SessionList/SessionList.svelte"
+  import { createSessionId } from "../../../../helpers/util"
+  import { activeSessions } from "../../../../lib/services/game/activeSessions"
 
   let lobbyStep = 0
   let players: SpaceObject[]
@@ -41,21 +45,28 @@
     return await playersInSession(sessionId)
   }
 
+  const getSessions = async (): Promise<AxiosResponse<Session[]>> => {
+    const sessions = await activeSessions()
+
+    sessions.data.forEach((v) => console.log(v.sessionId))
+
+    return await activeSessions()
+  }
+
   const sock: OidsSocket = new OidsSocket(getWsUrl())
-  onMount(() => {
-    const soTest: SpaceObject = createSpaceObject($guestUserName)
-    soTest.lastMessage = 'hello lobby chat!'
-    sock.addListener((su: ServerUpdate) => {
-      console.log(su)
-      console.log(su.spaceObject.lastMessage)
-      console.log(su.spaceObject.serverVersion)
-      soTest.lastMessage = `msg-${rndi(0, 100000)}`
-      sendReducedSpaceObjectToBroadcastServer(sock, soTest)
-    })
-    setTimeout(() => {
-      sendReducedSpaceObjectToBroadcastServer(sock, soTest)
-    }, 1000)
-  })
+  const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
+
+  localPlayer.sessionId = createSessionId()
+
+  sock.send(localPlayer)
+
+  setTimeout(() => {
+    getSessions()
+  }, 1000)
+  /**
+   * Todos:
+   * Share game lobby link -> use as a param to get into lobby directly.
+   */
 
   const handleSubmit = async (e: Event) => {
     const formData = new FormData(e.target as HTMLFormElement)
@@ -66,8 +77,6 @@
     const gameCodeLength = gameCode.length
 
     if (gameCodeLength >= 4) {
-      const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
-
       // initMultiplayer()
 
       gameSessionId.set(gameCode)
@@ -140,10 +149,16 @@
 </style>
 
 <Page>
+  <div class="sessionList">
+    <SessionList />
+  </div>
+</Page>
+
+<!-- <Page>
   <div class="gameLobby" in:fade={{ duration: 1000, delay: 300 }} out:fade>
     {#if lobbyStep === 0}
       <MenuWrapper>
-        <h5>Enter game code to create or join a game</h5>
+        <h5>Enter game code to create or join a game lobby</h5>
 
         <form on:submit|preventDefault={handleSubmit} on:formdata>
           <input placeholder="Game code" value={$gameSessionId} name="gameCode" type="text" minlength="4" />
@@ -172,4 +187,4 @@
       </MenuWrapper>
     {/if}
   </div>
-</Page>
+</Page> -->

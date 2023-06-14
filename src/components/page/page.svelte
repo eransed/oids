@@ -15,6 +15,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    color: #fff;
   }
 
   @media screen and (max-width: 600px) {

@@ -2,6 +2,7 @@ import axios, { type AxiosResponse } from "axios"
 import type { SpaceObject } from "../../interface"
 
 export interface Session {
+  sessionId: string
   players: SpaceObject[]
 }
 
