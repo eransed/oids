@@ -30,14 +30,14 @@ export function soFromValueArray(value: never[]): SpaceObject {
   const so = createSpaceObject()
   Object.keys(so).forEach((v, i) => {
     if ((v as keyof SpaceObject) === "shotsInFlightValues") {
-      // if ((value[i] as any[]).length > 0) {
+      // if ((value[i] as any[]).length > 0) {  
       //   debugger
       // }
       // console.log ('Test value [i]:')
       // console.log(typeof value[i])
       // console.log(value[i])
       // console.log ('Test end:');
-      ;(value[i] as any[]).forEach((shot) => {
+      (value[i] as any[]).forEach((shot) => {
         so.shotsInFlight.push(photonLaserFromValueArray(shot))
       })
     } else {

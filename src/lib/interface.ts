@@ -119,6 +119,14 @@ export interface Damageable extends Positionable {
   killedByName: string
 }
 
+export interface Chatable {
+  lastMessage: string
+}
+
+export interface LobbyWaiter {
+  readyToPlay: boolean
+}
+
 export interface SpaceObject
   extends Shapable,
     Positionable,
@@ -136,7 +144,9 @@ export interface SpaceObject
     Boostable,
     Colorable,
     Player,
-    Unique {
+    Unique,
+    Chatable,
+    LobbyWaiter {
   isPlaying: boolean
   framesSinceLastServerUpdate: number
   shotsInFlight: PhotonLaser[]

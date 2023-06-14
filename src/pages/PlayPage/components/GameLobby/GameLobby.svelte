@@ -10,7 +10,7 @@
   //Interfaces
   import type { Button90Config } from "../../../../interfaces/menu"
   import type { User } from "../../../../interfaces/user"
-  import type { SpaceObject } from "../../../../lib/interface"
+  import type { ServerUpdate, SpaceObject } from "../../../../lib/interface"
 
   //Components
   import Button90 from "../../../../components/menu/Button90.svelte"
@@ -23,7 +23,10 @@
   import { playersInSession, type Session } from "../../../../lib/services/game/playersInSession"
   import { createSpaceObject } from "../../../../lib/factory"
   import type { AxiosResponse } from "axios"
-  import { initMultiplayer } from "../../../../lib/websocket/webSocket"
+  import { getWsUrl, initMultiplayer } from "../../../../lib/websocket/webSocket"
+  import { OidsSocket, sendReducedSpaceObjectToBroadcastServer } from "../../../../lib/websocket/ws"
+  import { onMount } from "svelte"
+    import { rndi } from "../../../../lib/math"
 
   let lobbyStep = 0
   let players: SpaceObject[]
@@ -38,7 +41,21 @@
     return await playersInSession(sessionId)
   }
 
-  function connectToLobby() {}
+  const sock: OidsSocket = new OidsSocket(getWsUrl())
+  onMount(() => {
+    const soTest: SpaceObject = createSpaceObject($guestUserName)
+    soTest.lastMessage = 'hello lobby chat!'
+    sock.addListener((su: ServerUpdate) => {
+      console.log(su)
+      console.log(su.spaceObject.lastMessage)
+      console.log(su.spaceObject.serverVersion)
+      soTest.lastMessage = `msg-${rndi(0, 100000)}`
+      sendReducedSpaceObjectToBroadcastServer(sock, soTest)
+    })
+    setTimeout(() => {
+      sendReducedSpaceObjectToBroadcastServer(sock, soTest)
+    }, 1000)
+  })
 
   const handleSubmit = async (e: Event) => {
     const formData = new FormData(e.target as HTMLFormElement)
@@ -51,7 +68,7 @@
     if (gameCodeLength >= 4) {
       const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
 
-      initMultiplayer()
+      // initMultiplayer()
 
       gameSessionId.set(gameCode)
       showLobby.set(false)

@@ -1,5 +1,6 @@
 //WS Setup
 import type { IncomingMessage } from "http"
+import { soFromValueArray, soToValueArray } from "../src/lib/websocket/util"
 import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from "ws"
 import { OIDS_WS_PORT } from "./pub_config"
 import { getLocalIp, ipport } from "./net"
@@ -17,7 +18,7 @@ start_host_server()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const pack = require("../package.json")
 // const name_ver: string = pack.name + " " + pack.version
-const name_ver = "oids-0.4.0"
+const name_ver = "oids-0.3.0"
 
 const WS_PORT = OIDS_WS_PORT
 
@@ -85,8 +86,7 @@ export class Client {
       }
 
       try {
-        const so: SpaceObject = JSON.parse(event.data)
-        console.log(`Got message: ${so.lastMessage}`)
+        const so: SpaceObject = soFromValueArray(JSON.parse(event.data))
         this.lastDataObject = so
         if (so.sessionId) this.sessionId = so.sessionId
         if (!this.nameHasBeenUpdated) {
@@ -184,7 +184,7 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
 function broadcastToAllClients(skipSourceClient: Client, connectedClients: Client[], data: SpaceObject): void {
   for (const client of connectedClients) {
     if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
-      client.ws.send(JSON.stringify(data))
+      client.ws.send(JSON.stringify(soToValueArray(data)))
     }
   }
 }
@@ -193,8 +193,7 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        console.log (`Sending ${data.lastMessage} to ${client.name}`)
-        client.ws.send(JSON.stringify(data))
+        client.ws.send(JSON.stringify(soToValueArray(data)))
       }
     }
   }

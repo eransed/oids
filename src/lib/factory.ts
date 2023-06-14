@@ -100,6 +100,8 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     ownerName: "",
     lastDamagedByName: "",
     joinedGame: currentTimeDate(),
+    lastMessage: "",
+    readyToPlay: false
   }
 
   return spaceObject
