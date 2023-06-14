@@ -29,6 +29,7 @@
   let players: SpaceObject[]
 
   let userData: User | undefined
+  let loading: boolean = false
 
   user.subscribe((storedUser) => {
     userData = storedUser
@@ -38,9 +39,8 @@
     return await playersInSession(sessionId)
   }
 
-  function connectToLobby() {}
-
   const handleSubmit = async (e: Event) => {
+    loading = true
     const formData = new FormData(e.target as HTMLFormElement)
     const values = Object.fromEntries(formData.entries())
 
@@ -67,6 +67,7 @@
         // } else lobbyStep = 2
       }
     }
+    loading = false
   }
 
   const joinSession = () => {
@@ -130,7 +131,7 @@
 
         <form on:submit|preventDefault={handleSubmit} on:formdata>
           <input placeholder="Game code" value={$gameSessionId} name="gameCode" type="text" minlength="4" />
-          <Button90 mouseTracking={false} buttonConfig={submitButton} />
+          <Button90 {loading} mouseTracking={false} buttonConfig={submitButton} />
         </form>
       </MenuWrapper>
     {/if}

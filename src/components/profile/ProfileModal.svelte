@@ -20,8 +20,10 @@
 
   let errorText: any = ""
   let wrongPassword: boolean = false
+  let loading: boolean = false
 
   const handleSubmit = async (e: Event): Promise<void> => {
+    loading = true
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
     const response = await login(formData)
@@ -32,6 +34,7 @@
       wrongPassword = true
       errorText = "Wrong email or password, try again!"
     }
+    loading = false
   }
 
   //Color of border color around profile portrait
@@ -93,7 +96,7 @@
 
       <input placeholder="Password" name="password" type="password" autocomplete="current-password" style="border: {wrongPassword && '2px solid red'}" />
       <div class="button">
-        <Button90 buttonConfig={loginButton} mouseTracking={false} />
+        <Button90 {loading} buttonConfig={loginButton} mouseTracking={false} />
       </div>
     </form>
   </div>
