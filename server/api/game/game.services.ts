@@ -1,24 +1,15 @@
-import { SpaceObject } from "../../../src/lib/interface"
-import { getPlayersFromSessionId, getActivePlayerSessions } from "../../main"
+import { Session } from "../../../src/lib/interface"
+import { getActivePlayerSessions, getPlayersFromSessionId } from "../../main"
 
-interface ActiveSession {
-  sessionId: string | null
-  playerList: (SpaceObject | null)[]
-}
-
-export const getPlayerListFromSessionId = (sessionId: string | null): (SpaceObject | null)[] => {
-  return getPlayersFromSessionId(sessionId)
-}
-
-export const getActiveSessions = (): ActiveSession[] => {
-  const activeSessions: ActiveSession[] = []
+export const getActiveSessions = (): Session[] => {
+  const activeSessions: Session[] = []
 
   const sessions = getActivePlayerSessions()
 
   sessions.forEach((sessionId) => {
-    const playerList = getPlayerListFromSessionId(sessionId)
+    const playerList = getPlayersFromSessionId(sessionId)
 
-    activeSessions.push({ sessionId: sessionId, playerList: playerList })
+    activeSessions.push({ sessionHost: "", sessionId: sessionId, playerList: playerList })
   })
 
   return activeSessions

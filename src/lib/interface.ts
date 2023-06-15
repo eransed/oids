@@ -223,3 +223,9 @@ export interface Player {
 export interface Unique {
   id: string
 }
+
+export interface Session {
+  sessionHost: string
+  sessionId: string
+  players: SpaceObject[]
+}

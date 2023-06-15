@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { gameState } from "../../../../../lib/input"
+  import type { SpaceObject } from "../../../../../lib/interface"
   import SessionListRow from "./SessionListRow.svelte"
 
-  export let showLocalPlayer = true
-
-  $: remotePlayers = $gameState.scoreScreenData.remotePlayers
-  $: player = $gameState.scoreScreenData.player
+  export let player: SpaceObject
+  export let remotePlayers: SpaceObject[]
 </script>
 
 <style>
@@ -35,13 +33,12 @@
         <SessionListRow header={true} />
       </tr>
     </thead>
-    {#if showLocalPlayer}
-      <tbody>
-        <tr>
-          <SessionListRow {player} />
-        </tr>
-      </tbody>
-    {/if}
+
+    <tbody>
+      <tr>
+        <SessionListRow {player} />
+      </tr>
+    </tbody>
 
     {#each remotePlayers as remotePlayer}
       <tbody>

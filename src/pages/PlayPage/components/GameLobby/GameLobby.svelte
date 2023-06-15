@@ -1,34 +1,25 @@
 <script lang="ts">
   //Svelte
   import { navigate } from "svelte-routing"
-  import { fade } from "svelte/transition"
 
   //Stores
-  import { gameSessionId, guestUserName, showLobby, user } from "../../../../stores/stores"
-  import { gameState } from "../../../../lib/input"
+  import { gameSessionId, guestUserName, user } from "../../../../stores/stores"
 
   //Interfaces
   import type { Button90Config } from "../../../../interfaces/menu"
   import type { User } from "../../../../interfaces/user"
-  import type { ServerUpdate, SpaceObject } from "../../../../lib/interface"
+  import type { SpaceObject } from "../../../../lib/interface"
 
   //Components
-  import Button90 from "../../../../components/menu/Button90.svelte"
-  import MenuWrapper from "../../../../components/menu/MenuWrapper.svelte"
-  import ScoreScreen from "../../../GamePage/components/LeaderBoardScreen/ScoreScreen.svelte"
-  import TypeWriter from "../../../../components/typeWriter/TypeWriter.svelte"
+
   import Page from "../../../../components/page/page.svelte"
-  import Card from "../../../../components/card/card.svelte"
 
   //Services
-  import { playersInSession, type Session } from "../../../../lib/services/game/playersInSession"
+  import type { Session } from "../../../../lib/interface"
   import { createSpaceObject } from "../../../../lib/factory"
   import type { AxiosResponse } from "axios"
-  import { getWsUrl, initMultiplayer } from "../../../../lib/websocket/webSocket"
-  import { OidsSocket, sendSpaceObject } from "../../../../lib/websocket/ws"
-  import { onMount } from "svelte"
-  import { rndi } from "../../../../lib/math"
-  import SessionList from "./SessionList/SessionList.svelte"
+  import { getWsUrl } from "../../../../lib/websocket/webSocket"
+  import { OidsSocket } from "../../../../lib/websocket/ws"
   import { createSessionId } from "../../../../helpers/util"
   import { activeSessions } from "../../../../lib/services/game/activeSessions"
 
@@ -40,10 +31,6 @@
   user.subscribe((storedUser) => {
     userData = storedUser
   })
-
-  const getPlayerList = async (sessionId: string): Promise<AxiosResponse<Session>> => {
-    return await playersInSession(sessionId)
-  }
 
   const getSessions = async (): Promise<AxiosResponse<Session[]>> => {
     const sessions = await activeSessions()
@@ -60,40 +47,26 @@
 
   sock.send(localPlayer)
 
-  setTimeout(() => {
-    getSessions()
-  }, 1000)
   /**
    * Todos:
    * Share game lobby link -> use as a param to get into lobby directly.
    */
 
-  const handleSubmit = async (e: Event) => {
-    const formData = new FormData(e.target as HTMLFormElement)
-    const values = Object.fromEntries(formData.entries())
+  // const handleSubmit = async (e: Event) => {
+  //   const formData = new FormData(e.target as HTMLFormElement)
+  //   const values = Object.fromEntries(formData.entries())
 
-    const gameCode = values.gameCode.toString()
+  //   const gameCode = values.gameCode.toString()
 
-    const gameCodeLength = gameCode.length
+  //   const gameCodeLength = gameCode.length
 
-    if (gameCodeLength >= 4) {
-      // initMultiplayer()
+  //   if (gameCodeLength >= 4) {
 
-      gameSessionId.set(gameCode)
-      showLobby.set(false)
+  //     gameSessionId.set(gameCode)
+  //     showLobby.set(false)
 
-      const playerList = await getPlayerList(gameCode)
-      if (playerList.status === 200) {
-        players = playerList.data.players
-
-        gameState.set({ scoreScreenData: { player: localPlayer, remotePlayers: players } })
-        lobbyStep = 1
-        // if (players.length > 0) {
-        //   lobbyStep = 1
-        // } else lobbyStep = 2
-      }
-    }
-  }
+  //   }
+  // }
 
   const joinSession = () => {
     navigate(`/play/multiplayer/${$gameSessionId}`)
@@ -101,7 +74,7 @@
 
   const submitButton: Button90Config = {
     buttonText: "Lets go!",
-    clickCallback: () => handleSubmit,
+    clickCallback: () => {},
     selected: false,
   }
 
@@ -150,7 +123,7 @@
 
 <Page>
   <div class="sessionList">
-    <SessionList />
+    <!-- <SessionList /> -->
   </div>
 </Page>
 

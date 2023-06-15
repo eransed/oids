@@ -193,18 +193,18 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        console.log (`Sending ${data.lastMessage} to ${client.name}`)
+        console.log(`Sending ${data.lastMessage} to ${client.name}`)
         client.ws.send(JSON.stringify(data))
       }
     }
   }
 }
 
-export function getPlayersFromSessionId(sessionId: string | null): (SpaceObject | null)[] {
-  const playerList = []
+export function getPlayersFromSessionId(sessionId: string): SpaceObject[] {
+  const playerList: SpaceObject[] = []
 
   for (const client of globalConnectedClients) {
-    if (sessionId === client.sessionId) {
+    if (sessionId === client.sessionId && client.lastDataObject) {
       playerList.push(client.lastDataObject)
     }
   }
@@ -212,17 +212,19 @@ export function getPlayersFromSessionId(sessionId: string | null): (SpaceObject 
   return playerList
 }
 
+//Todo: createSessionId() should make unique sessionId's
+//Then we can be certain sessionId's wont collide = breaking the game.
 export function getActivePlayerSessions() {
-  const sessionsSet: Set<Client["sessionId"] | null> = new Set()
+  const sessionsSet: Set<Client["sessionId"]> = new Set()
 
-  const sessionList: (string | null)[] = []
+  const sessionList: string[] = []
 
   for (const client of globalConnectedClients) {
     sessionsSet.add(client.sessionId)
   }
 
   sessionsSet.forEach((v) => {
-    sessionList.push(v)
+    v && sessionList.push(v)
   })
 
   return sessionList

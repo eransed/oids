@@ -13,8 +13,6 @@ export const userLoading: Writable<boolean> = writable()
 
 export const guestUserName: Writable<string> = writable(`p-${rndi(1, 900000)}`)
 
-export const showLobby: Writable<boolean> = writable(true)
-
 export const pageHasHeader: Writable<boolean> = writable(true)
 
 export const gameSessionId: Writable<string | undefined> = writable("")
