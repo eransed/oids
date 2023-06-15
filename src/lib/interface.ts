@@ -47,7 +47,7 @@ export interface Motivated {
 export interface Remote {
   online: boolean
   serverVersion: string
-  sessionId: string | undefined
+  sessionId: string
   viewport: Vec2d
   joinedGame: string
 }
@@ -225,7 +225,7 @@ export interface Unique {
 }
 
 export interface Session {
-  sessionHost: string
+  sessionHost: SpaceObject
   sessionId: string
   players: SpaceObject[]
 }

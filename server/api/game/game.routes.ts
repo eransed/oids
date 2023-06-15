@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express"
 import express from "express"
 
-import { getActiveSessions } from "./game.services"
-import { getActivePlayerSessions, getPlayersFromSessionId } from "../../main"
+// import { getActiveSessions } from "./game.services"
+import { getPlayersFromSessionId, getSessions } from "../../main"
 
 export const game = express.Router()
 
@@ -27,7 +27,7 @@ game.post("/players", async (req: Request, res: Response, next: NextFunction) =>
 
 game.get("/sessions", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const sessions = getActivePlayerSessions()
+    const sessions = getSessions()
 
     res.json(sessions)
   } catch (err) {

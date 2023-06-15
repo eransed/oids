@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { SpaceObject } from "../../../../../lib/interface"
+  import type { Session, SpaceObject } from "../../../../../lib/interface"
   import SessionListRow from "./SessionListRow.svelte"
 
-  export let player: SpaceObject
-  export let remotePlayers: SpaceObject[]
+  export let sessions: Session[]
+  
 </script>
 
 <style>
@@ -34,16 +34,10 @@
       </tr>
     </thead>
 
-    <tbody>
-      <tr>
-        <SessionListRow {player} />
-      </tr>
-    </tbody>
-
-    {#each remotePlayers as remotePlayer}
+    {#each sessions as session}
       <tbody>
         <tr>
-          <SessionListRow player={remotePlayer} />
+          <SessionListRow player={session.sessionHost} numberOfPlayers={session.players.length} />
         </tr>
       </tbody>
     {/each}

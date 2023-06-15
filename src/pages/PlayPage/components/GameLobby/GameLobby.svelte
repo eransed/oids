@@ -22,6 +22,8 @@
   import { OidsSocket } from "../../../../lib/websocket/ws"
   import { createSessionId } from "../../../../helpers/util"
   import { activeSessions } from "../../../../lib/services/game/activeSessions"
+    import SessionList from "./SessionList/SessionList.svelte"
+    import SessionListRow from "./SessionList/SessionListRow.svelte"
 
   let lobbyStep = 0
   let players: SpaceObject[]
@@ -32,13 +34,6 @@
     userData = storedUser
   })
 
-  const getSessions = async (): Promise<AxiosResponse<Session[]>> => {
-    const sessions = await activeSessions()
-
-    sessions.data.forEach((v) => console.log(v.sessionId))
-
-    return await activeSessions()
-  }
 
   const sock: OidsSocket = new OidsSocket(getWsUrl())
   const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
@@ -46,6 +41,27 @@
   localPlayer.sessionId = createSessionId()
 
   sock.send(localPlayer)
+
+  let sessions: Session[] = []
+
+  setTimeout( () => {
+
+    activeSessions()
+    .then((s) => {
+      if (s.status === 200) {
+        sessions = s.data
+      } else {
+        console.error(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
+      }
+    }).then(() => {
+      console.log (sessions)
+    })
+    .catch( (e) => {
+      console.error(`Failed to fetch sessions: ${e}`)
+    })
+
+  }, 200)
+
 
   /**
    * Todos:
@@ -123,7 +139,7 @@
 
 <Page>
   <div class="sessionList">
-    <!-- <SessionList /> -->
+    <SessionList {sessions} />
   </div>
 </Page>
 

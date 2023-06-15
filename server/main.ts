@@ -6,7 +6,7 @@ import { getLocalIp, ipport } from "./net"
 
 import { apiServer } from "./apiServer"
 import { start_host_server } from "./host_server"
-import { SpaceObject } from "../src/lib/interface"
+import { Session, SpaceObject } from "../src/lib/interface"
 
 // start ApiServer
 apiServer()
@@ -214,20 +214,37 @@ export function getPlayersFromSessionId(sessionId: string): SpaceObject[] {
 
 //Todo: createSessionId() should make unique sessionId's
 //Then we can be certain sessionId's wont collide = breaking the game.
-export function getActivePlayerSessions() {
-  const sessionsSet: Set<Client["sessionId"]> = new Set()
+// export function getActivePlayerSessions() {
+//   const sessionsSet: Set<Client["sessionId"]> = new Set()
 
-  const sessionList: string[] = []
+//   const sessionList: string[] = []
 
-  for (const client of globalConnectedClients) {
-    sessionsSet.add(client.sessionId)
-  }
+//   for (const client of globalConnectedClients) {
+//     sessionsSet.add(client.sessionId)
+//   }
 
-  sessionsSet.forEach((v) => {
-    v && sessionList.push(v)
+//   sessionsSet.forEach((v) => {
+//     v && sessionList.push(v)
+//   })
+
+//   return sessionList
+// }
+
+export function getSessions(): Session[] {
+  const sessions: Session[] = []
+
+  globalConnectedClients.forEach( (client: Client) => {
+    if (client.lastDataObject) {
+      sessions.push({
+        sessionHost: client.lastDataObject,
+        sessionId: client.lastDataObject.sessionId,
+        players: getPlayersFromSessionId(client.lastDataObject.sessionId)
+      })
+    }
   })
 
-  return sessionList
+
+  return sessions
 }
 
 server.on("connection", function connection(clientConnection: WebSocket, req: IncomingMessage) {
