@@ -4,7 +4,10 @@
   export let player: SpaceObject | null = null
   export let header = false
   export let numberOfPlayers: number = 0
-  export let localPlayer = false
+  export let localPlayer: boolean = false
+
+  console.log (localPlayer, player?.name)
+
 </script>
 
 <style>
@@ -17,28 +20,19 @@
     padding-top: 0.6rem;
     font-weight: bold;
     font-size: 14px;
+    color: #ccc;
   }
-
 </style>
 
-{#if localPlayer}
-  <style>
-    td {
-      color: #f00;
-    }
-  </style>
-{:else}
-  <style>
-    td {
-      color: #fff;
-    }
-  </style>
-{/if}
 
 {#if header}
   <th colspan="1">Host</th>
   <th colspan="1">Session</th>
   <th colspan="1">#players</th>
+{:else if player && localPlayer}
+  <td style="color:#f00;">{player.name}</td>
+  <td style="color:#f00;">{player.sessionId}</td>
+  <td style="color:#f00;">{numberOfPlayers}</td>
 {:else if player}
   <td>{player.name}</td>
   <td>{player.sessionId}</td>

@@ -22,8 +22,8 @@
   import { OidsSocket } from "../../../../lib/websocket/ws"
   import { createSessionId } from "../../../../helpers/util"
   import { activeSessions } from "../../../../lib/services/game/activeSessions"
-    import SessionList from "./SessionList/SessionList.svelte"
-    import SessionListRow from "./SessionList/SessionListRow.svelte"
+  import SessionList from "./SessionList/SessionList.svelte"
+  import SessionListRow from "./SessionList/SessionListRow.svelte"
 
   let lobbyStep = 0
   let players: SpaceObject[]
@@ -34,7 +34,6 @@
     userData = storedUser
   })
 
-
   const sock: OidsSocket = new OidsSocket(getWsUrl())
   const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
 
@@ -44,27 +43,22 @@
 
   let sessions: Session[] = []
 
-  setTimeout( () => {
-
+  setTimeout(() => {
     activeSessions()
-    .then((s) => {
-      if (s.status === 200) {
-        sessions = s.data
-        // sessions.filter((sess) => {
-        //   return sess.sessionHost.name !== localPlayer.name
-        // })
-      } else {
-        console.error(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
-      }
-    }).then(() => {
-      console.log (sessions)
-    })
-    .catch( (e) => {
-      console.error(`Failed to fetch sessions: ${e}`)
-    })
-
+      .then((s) => {
+        if (s.status === 200) {
+          sessions = s.data
+        } else {
+          console.error(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
+        }
+      })
+      .then(() => {
+        console.log(sessions)
+      })
+      .catch((e) => {
+        console.error(`Failed to fetch sessions: ${e}`)
+      })
   }, 200)
-
 
   /**
    * Todos:
@@ -138,11 +132,31 @@
     min-height: 300px;
     margin: 1em;
   }
+
+  .lobbyWrapper {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    max-width: 85%;
+    /* place-items: center; */
+  }
+
+  .left,
+  .center,
+  .right {
+    display: grid;
+    border: 1px solid green;
+    padding: 0.5em;
+  }
 </style>
 
 <Page>
-  <div class="sessionList">
-    <SessionList localPlayer={localPlayer} {sessions} />
+  <p>Ugly green border to see what the F im doing</p>
+  <div class="lobbyWrapper">
+    <div class="left">
+      <SessionList localPlayer={localPlayer} {sessions} />
+    </div>
+    <div class="center"><p>Center information like gamemode. Player names. Ready button and go button.</p></div>
+    <div class="right"><p>Chat window - input on bottom and chat messages on top</p></div>
   </div>
 </Page>
 
