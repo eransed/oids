@@ -50,6 +50,9 @@
     .then((s) => {
       if (s.status === 200) {
         sessions = s.data
+        // sessions.filter((sess) => {
+        //   return sess.sessionHost.name !== localPlayer.name
+        // })
       } else {
         console.error(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
       }
@@ -139,7 +142,7 @@
 
 <Page>
   <div class="sessionList">
-    <SessionList {sessions} />
+    <SessionList localPlayer={localPlayer} {sessions} />
   </div>
 </Page>
 

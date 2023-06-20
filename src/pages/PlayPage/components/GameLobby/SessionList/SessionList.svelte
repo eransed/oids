@@ -3,6 +3,7 @@
   import SessionListRow from "./SessionListRow.svelte"
 
   export let sessions: Session[]
+  export let localPlayer: SpaceObject
   
 </script>
 
@@ -37,7 +38,7 @@
     {#each sessions as session}
       <tbody>
         <tr>
-          <SessionListRow player={session.sessionHost} numberOfPlayers={session.players.length} />
+          <SessionListRow localPlayer={localPlayer.name === session.sessionHost.name} player={session.sessionHost} numberOfPlayers={session.players.length} />
         </tr>
       </tbody>
     {/each}
