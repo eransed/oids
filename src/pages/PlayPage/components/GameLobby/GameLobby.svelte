@@ -24,6 +24,7 @@
   import { activeSessions } from "../../../../lib/services/game/activeSessions"
   import SessionList from "./SessionList/SessionList.svelte"
   import SessionListRow from "./SessionList/SessionListRow.svelte"
+  import { onDestroy } from "svelte"
 
   let lobbyStep = 0
   let players: SpaceObject[]
@@ -59,6 +60,10 @@
         console.error(`Failed to fetch sessions: ${e}`)
       })
   }, 200)
+
+  onDestroy(() => {
+    sock.disconnect()
+  })
 
   /**
    * Todos:
@@ -153,7 +158,7 @@
   <p>Ugly green border to see what the F im doing</p>
   <div class="lobbyWrapper">
     <div class="left">
-      <SessionList localPlayer={localPlayer} {sessions} />
+      <SessionList {localPlayer} {sessions} />
     </div>
     <div class="center"><p>Center information like gamemode. Player names. Ready button and go button.</p></div>
     <div class="right"><p>Chat window - input on bottom and chat messages on top</p></div>
