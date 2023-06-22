@@ -88,7 +88,7 @@ export class Client {
       try {
         const so: SpaceObject = JSON.parse(event.data)
 
-        log(`Got message: ${so.name}`)
+        // log(`Got message: ${so.name}`)
         this.lastDataObject = so
         if (so.sessionId) this.sessionId = so.sessionId
         if (!this.nameHasBeenUpdated) {
