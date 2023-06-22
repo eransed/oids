@@ -4,7 +4,6 @@
 
   export let sessions: Session[]
   export let localPlayer: SpaceObject
-  
 </script>
 
 <style>
@@ -38,7 +37,7 @@
     {#each sessions as session}
       <tbody>
         <tr>
-          <SessionListRow localPlayer={localPlayer.name === session.sessionHost.name} player={session.sessionHost} numberOfPlayers={session.players.length} />
+          <SessionListRow localPlayer={localPlayer.name === session.host.name} player={session.host} numberOfPlayers={session.players.length} />
         </tr>
       </tbody>
     {/each}

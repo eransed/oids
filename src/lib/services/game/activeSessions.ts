@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios"
 
-import type { Session } from "./playersInSession"
+import type { Session } from "../../interface"
 
 export const activeSessions = async (): Promise<AxiosResponse<Session[]>> => {
   const response: AxiosResponse<Session[]> = await axios

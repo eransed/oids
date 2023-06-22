@@ -8,7 +8,7 @@
   //Interfaces
   import type { Button90Config } from "../../../../interfaces/menu"
   import type { User } from "../../../../interfaces/user"
-  import type { SpaceObject } from "../../../../lib/interface"
+  import { MessageType, type SpaceObject } from "../../../../lib/interface"
 
   //Components
 
@@ -24,7 +24,8 @@
   import { activeSessions } from "../../../../lib/services/game/activeSessions"
   import SessionList from "./SessionList/SessionList.svelte"
   import SessionListRow from "./SessionList/SessionListRow.svelte"
-  import { onDestroy } from "svelte"
+  import { onDestroy, onMount } from "svelte"
+  import { log } from "../../../../../server/logger"
 
   let lobbyStep = 0
   let players: SpaceObject[]
@@ -35,16 +36,37 @@
     userData = storedUser
   })
 
-  const sock: OidsSocket = new OidsSocket(getWsUrl())
-  const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
-
-  localPlayer.sessionId = createSessionId()
-
-  sock.send(localPlayer)
-
   let sessions: Session[] = []
+  const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
+  const sock: OidsSocket = new OidsSocket(getWsUrl())
 
-  setTimeout(() => {
+  onMount(() => {
+    localPlayer.sessionId = createSessionId()
+    localPlayer.messageType = MessageType.SESSION_UPDATE
+
+    sock.send(localPlayer)
+
+    sock.addListener((su) => {
+      const so = su.spaceObject
+
+      if (!so.name) {
+        return
+      }
+
+      console.log("someMsg ", so)
+
+      if (so.messageType === MessageType.SESSION_UPDATE) {
+        log("Update")
+        updateSessions()
+      }
+    })
+
+    setTimeout(() => {
+      updateSessions()
+    }, 200)
+  })
+
+  function updateSessions() {
     activeSessions()
       .then((s) => {
         if (s.status === 200) {
@@ -54,12 +76,12 @@
         }
       })
       .then(() => {
-        console.log(sessions)
+        console.log("Sessions: ", sessions)
       })
       .catch((e) => {
         console.error(`Failed to fetch sessions: ${e}`)
       })
-  }, 200)
+  }
 
   onDestroy(() => {
     sock.disconnect()

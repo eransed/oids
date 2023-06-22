@@ -127,6 +127,11 @@ export interface LobbyWaiter {
   readyToPlay: boolean
 }
 
+export enum MessageType {
+  GAME_UPDATE,
+  SESSION_UPDATE,
+}
+
 export interface SpaceObject
   extends Shapable,
     Positionable,
@@ -147,6 +152,7 @@ export interface SpaceObject
     Unique,
     Chatable,
     LobbyWaiter {
+  messageType: MessageType
   isPlaying: boolean
   framesSinceLastServerUpdate: number
   shotsInFlight: PhotonLaser[]
@@ -225,7 +231,7 @@ export interface Unique {
 }
 
 export interface Session {
-  sessionHost: SpaceObject
-  sessionId: string
+  host: SpaceObject
+  id: string
   players: SpaceObject[]
 }

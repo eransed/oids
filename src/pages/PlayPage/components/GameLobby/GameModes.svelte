@@ -19,7 +19,6 @@
 
   let gameMode: Game
   let canvas: HTMLCanvasElement
-  let multiplayer: boolean
 
   const localPlayer = createSpaceObject("LocalPlayer")
 
@@ -43,7 +42,6 @@
     removeKeyControllers()
     gameMode.stopGame()
 
-    multiplayer = true
     navigate("/play/multiplayer")
   }
 </script>
@@ -69,26 +67,14 @@
 </style>
 
 <div in:fade={{ delay: 50 }}>
-  {#if !multiplayer}
-    <Page>
-      <Card clickedOnCard={() => chosenMultiplayer()}>
-        <div class="cardTitle">
-          <TypeWriter speed={50} text="Multiplayer" />
-        </div>
-        <canvas bind:this={canvas} />
-      </Card>
-      <Card>
-        <TypeWriter speed={50} delaySpeed={500} text="Co-op" />
-      </Card>
-    </Page>
-  {/if}
+  <Page>
+    <Card clickedOnCard={() => chosenMultiplayer()}>
+      <div class="cardTitle">
+        <TypeWriter speed={50} text="Multiplayer" />
+      </div>
+      <canvas bind:this={canvas} />
+    </Card>
+  </Page>
 </div>
 
 <!-- ToDo: Add list of open sessions and back button if chosen wrong gameMode -->
-
-{#if multiplayer}
-  <Page>
-    <GameLobby />
-    <Card>Online sessions:</Card>
-  </Page>
-{/if}

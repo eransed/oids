@@ -6,7 +6,7 @@ import { getLocalIp, ipport } from "./net"
 
 import { apiServer } from "./apiServer"
 import { start_host_server } from "./host_server"
-import { Session, SpaceObject } from "../src/lib/interface"
+import { MessageType, Session, SpaceObject } from "../src/lib/interface"
 import { error, info, log, warn } from "./logger"
 
 // start ApiServer
@@ -87,7 +87,8 @@ export class Client {
 
       try {
         const so: SpaceObject = JSON.parse(event.data)
-        log(`Got message: ${so.lastMessage}`)
+
+        log(`Got message: ${so.name}`)
         this.lastDataObject = so
         if (so.sessionId) this.sessionId = so.sessionId
         if (!this.nameHasBeenUpdated) {
@@ -102,6 +103,9 @@ export class Client {
           } else {
             log("No clients connected")
           }
+        }
+        if (so.messageType === MessageType.SESSION_UPDATE) {
+          broadcastToAllClients(this, globalConnectedClients, so)
         }
       } catch (e) {
         error(`Failed with: ${e}`)
@@ -234,16 +238,17 @@ export function getPlayersFromSessionId(sessionId: string): SpaceObject[] {
 export function getSessions(): Session[] {
   const sessions: Session[] = []
 
-  globalConnectedClients.forEach( (client: Client) => {
+  globalConnectedClients.forEach((client: Client) => {
     if (client.lastDataObject) {
       sessions.push({
-        sessionHost: client.lastDataObject,
-        sessionId: client.lastDataObject.sessionId,
-        players: getPlayersFromSessionId(client.lastDataObject.sessionId)
+        host: client.lastDataObject,
+        id: client.lastDataObject.sessionId,
+        players: getPlayersFromSessionId(client.lastDataObject.sessionId),
       })
     }
   })
 
+  log(`returned: ${sessions.length} sessions`)
 
   return sessions
 }

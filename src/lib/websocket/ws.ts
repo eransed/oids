@@ -97,7 +97,7 @@ export class OidsSocket {
           sender(ws, messageObject)
         })
         .catch((err) => {
-          console.error(`Failed to send: ${err}`)
+          console.error("Failed to send ", err)
         })
     } else {
       sender(this.ws, messageObject)
@@ -125,10 +125,10 @@ export class OidsSocket {
 
   addListener(callback: (su: ServerUpdate) => void): void {
     if (!this.ws) {
+      console.log("trying to connect")
       this.connect()
     }
     this.ws?.addEventListener("message", (event: any) => {
-      console.log("new incomming message")
       const data = JSON.parse(event.data)
       // const spaceObjFromSrv: SpaceObject = soFromValueArray(data)
       const spaceObjFromSrv: SpaceObject = data
