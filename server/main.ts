@@ -7,6 +7,7 @@ import { getLocalIp, ipport } from "./net"
 import { apiServer } from "./apiServer"
 import { start_host_server } from "./host_server"
 import { Session, SpaceObject } from "../src/lib/interface"
+import { error, info, log, warn } from "./logger"
 
 // start ApiServer
 apiServer()
@@ -53,17 +54,17 @@ export class Client {
       const oldName: string = this.name
       this.name = newName
       this.nameHasBeenUpdated = true
-      console.log(`Updated name: ${oldName} -> ${this.name}`)
+      log(`Updated name: ${oldName} -> ${this.name}`)
     } else {
       console.error(`Multiple name updates for ${this.toString()}: newName="${newName}"`)
     }
   }
 
   addEventListeners(): void {
-    // console.log(`Adding event-listeners for ${this.toString()}`)
+    // log(`Adding event-listeners for ${this.toString()}`)
     this.ws.addEventListener("close", () => {
       // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
-      console.log(`${this.toString()} has been disconnected, sending goodbye message`)
+      log(`${this.toString()} has been disconnected, sending goodbye message`)
       const offlineMessage: SpaceObject | null = this.lastDataObject
       if (offlineMessage) {
         offlineMessage.online = false
@@ -71,22 +72,22 @@ export class Client {
         broadcastToAllClients(this, globalConnectedClients, offlineMessage)
         globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
         if (globalConnectedClients.length === 0) {
-          console.log("No clients connected :(")
+          log("No clients connected :(")
         }
       } else {
-        console.error("Can't send offlineMessage: No data has been recieved")
+        warn("Can't send offlineMessage: No data has been recieved")
       }
     })
 
     this.ws.addEventListener("message", (event: MessageEvent) => {
       if (!event.data) {
-        console.log("No data sent by connected client")
+        warn("No data sent by connected client")
         return
       }
 
       try {
         const so: SpaceObject = JSON.parse(event.data)
-        console.log(`Got message: ${so.lastMessage}`)
+        log(`Got message: ${so.lastMessage}`)
         this.lastDataObject = so
         if (so.sessionId) this.sessionId = so.sessionId
         if (!this.nameHasBeenUpdated) {
@@ -99,11 +100,11 @@ export class Client {
             so.online = true
             broadcastToSessionClients(this, globalConnectedClients, so)
           } else {
-            console.log("No clients connected")
+            log("No clients connected")
           }
         }
       } catch (e) {
-        console.log(`Failed with: ${e}`)
+        error(`Failed with: ${e}`)
       }
     })
   }
@@ -148,9 +149,9 @@ function removeClientIfExisting(clients: Client[], clientConnection: Client): Cl
   })
   const removedCount: number = lengthBefore - clients.length
   if (removedCount === 1) {
-    console.log(`Removed client: ${clientConnection.toString()}`)
+    log(`Removed client: ${clientConnection.toString()}`)
   } else if (removedCount > 1) {
-    console.error(`Removed ${removedCount} equal clients in list`)
+    error(`Removed ${removedCount} equal clients in list`)
   }
   return clients
 }
@@ -166,16 +167,16 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
   })
 
   disconnectedClients.forEach((c) => {
-    console.log(`Disconnected: ${c.toString()}`)
+    log(`Disconnected: ${c.toString()}`)
   })
 
   connectedClients.forEach((c) => {
-    console.log(`Connected: ${c.toString()}`)
+    log(`Connected: ${c.toString()}`)
   })
 
   // const disconClientCount: number = lengthBefore - connectedClients.length
   // if (disconClientCount > 0) {
-  //   console.log(`Removed ${disconClientCount} disconnected clients`)
+  //   log(`Removed ${disconClientCount} disconnected clients`)
   // }
   return connectedClients
 }
@@ -193,7 +194,7 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        console.log(`Sending ${data.lastMessage} to ${client.name}`)
+        log(`Sending ${data.lastMessage} to ${client.name}`)
         client.ws.send(JSON.stringify(data))
       }
     }
@@ -253,14 +254,14 @@ server.on("connection", function connection(clientConnection: WebSocket, req: In
 
   const newClient: Client = new Client(clientConnection, req, `Client-${globalConnectedClients.length}`, new Date())
   if (addNewClientIfNotExisting(globalConnectedClients, newClient)) {
-    console.log(`Storing new client ${newClient.toString()} in broadcast list`)
+    log(`Storing new client ${newClient.toString()} in broadcast list`)
   }
 
-  console.log(`${globalConnectedClients.length} connected clients:`)
+  log(`${globalConnectedClients.length} connected clients:`)
   globalConnectedClients.forEach((c) => {
-    console.log(`   ${c.toString()}`)
+    log(`   ${c.toString()}`)
   })
 })
 
-console.log(`Starting ${name_ver}`)
-console.log(`Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`)
+info(`Starting ${name_ver}`)
+info(`Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`)
