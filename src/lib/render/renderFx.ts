@@ -1,5 +1,5 @@
 import { explosionDuration } from "../constants"
-import { add, rndi, degToRad, type Vec2d } from "../math"
+import { add, rndi, degToRad, type Vec2d } from "mathil"
 import type { SpaceObject } from "../interface"
 
 export function renderHitExplosion(pos: Vec2d, ctx: CanvasRenderingContext2D) {

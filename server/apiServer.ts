@@ -5,7 +5,7 @@ import type { Express } from "express"
 import morgan from "morgan"
 import routes from "./api/routes/routes"
 import cors from "cors"
-import { log } from "./logger"
+import { log } from "mathil"
 
 export const apiServer = () => {
   const router: Express = express()

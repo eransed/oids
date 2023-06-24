@@ -13,7 +13,7 @@
   import type { User } from "../../interfaces/user"
 
   // Utils
-  import { rndi } from "../../lib/math"
+  import { rndi } from "mathil"
 
   pageHasHeader.set(true)
 

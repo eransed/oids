@@ -1,6 +1,6 @@
 import express from 'express'
 import path from 'path'
-import { log } from './logger'
+import { log } from 'mathil'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const pack = require("../package.json");
 // const name_ver = `${pack.name} ${pack.version}`

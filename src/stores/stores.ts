@@ -1,7 +1,7 @@
 import { writable, type Writable } from "svelte/store"
 import type { Button90Config } from "../interfaces/menu"
 import type { User } from "../interfaces/user"
-import { rndi } from "../lib/math"
+import { rndi } from "mathil"
 
 export const menu: Writable<Button90Config[]> = writable()
 

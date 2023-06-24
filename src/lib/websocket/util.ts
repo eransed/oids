@@ -1,5 +1,5 @@
 import type { PhotonLaser, SpaceObject } from "../interface"
-import { round, round2dec } from "../math"
+import { round, round2dec } from "mathil"
 import { createSpaceObject, newPhotonLaser } from "../factory"
 
 //In this util we find functions that convert and iterate through data to save space when sending / recieving data through websocket

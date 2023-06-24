@@ -25,7 +25,7 @@
   import SessionList from "./SessionList/SessionList.svelte"
   import SessionListRow from "./SessionList/SessionListRow.svelte"
   import { onDestroy, onMount } from "svelte"
-  import { log } from "../../../../../server/logger"
+  import { log } from "mathil"
 
   let lobbyStep = 0
   let players: SpaceObject[]

@@ -1,5 +1,5 @@
-import type { Vec2d } from "../math"
-import { linearTransform } from "../math"
+import type { Vec2d } from "mathil"
+import { linearTransform } from "mathil"
 import { getScreenRect } from "../canvas_util"
 import type { Game } from "../game"
 import { LineSegment } from "../shapes"

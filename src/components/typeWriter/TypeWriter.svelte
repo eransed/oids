@@ -2,7 +2,7 @@
   import { fade } from "svelte/transition"
 
   //Util
-  import { rndi } from "../../lib/math"
+  import { rndi } from "mathil"
 
   /**
    * The text that will be written out by the TypeWriter

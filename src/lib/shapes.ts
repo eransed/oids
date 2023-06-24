@@ -1,5 +1,5 @@
-import type { Vec2d } from "./math"
-import { angle, degToRad, direction, dist, norm, smul, sub, newVec2d } from "./math"
+import type { Vec2d } from "mathil"
+import { angle, degToRad, direction, dist, norm, smul, sub, newVec2d } from "mathil"
 import { renderPoint } from "./render/render2d"
 
 export interface ViewSlice {

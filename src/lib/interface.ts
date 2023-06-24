@@ -1,5 +1,5 @@
 import type { Writable } from "svelte/store"
-import type { Vec2d } from "./math"
+import type { Vec2d } from "mathil"
 import type { Steerable } from "./traits/Steerable"
 
 export enum GameType {

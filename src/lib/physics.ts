@@ -1,5 +1,5 @@
 import type { Bounceable, Damager, Physical, Rotatable, SpaceObject } from "./interface"
-import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from "./math"
+import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from "mathil"
 import { getScreenFromCanvas } from "./canvas_util"
 import { renderHitExplosion } from "./render/renderFx"
 import { coolDown, decayDeadShots, handleHittingShot } from "./mechanics"

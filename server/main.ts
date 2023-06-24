@@ -7,7 +7,7 @@ import { getLocalIp, ipport } from "./net"
 import { apiServer } from "./apiServer"
 import { start_host_server } from "./host_server"
 import { MessageType, Session, SpaceObject } from "../src/lib/interface"
-import { error, info, log, warn } from "./logger"
+import { error, info, log, warn } from "mathil"
 
 // start ApiServer
 apiServer()

@@ -1,5 +1,5 @@
 import type { Game } from "./game"
-import { round2dec } from "./math"
+import { round2dec } from "mathil"
 import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from "./websocket/webSocket"
 import { updateShapes, updateSpaceObjects } from "./physics"
 import { clearScreen } from "./render/render2d"

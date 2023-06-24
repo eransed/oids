@@ -1,4 +1,4 @@
-import type { Vec2d } from "../math"
+import type { Vec2d } from "mathil"
 import { angularFriction, linearFriction, timeScale } from "../constants"
 import {
   sub,
@@ -10,7 +10,7 @@ import {
   radToDeg,
   withinBounds,
   limitv,
-} from "../math"
+} from "mathil"
 import type { Testable, TestFunction, TestModule } from "./Testable"
 
 export interface Positionable {

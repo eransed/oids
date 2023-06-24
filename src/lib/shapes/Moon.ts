@@ -1,6 +1,6 @@
 import { randomAnyLightColor } from "../color";
 import type { Damageable } from "../interface";
-import { maxElem, newVec2d, rndfVec2d} from "../math";
+import { maxElem, newVec2d, rndfVec2d} from "mathil";
 import { setScaledFont } from "../render/render2d";
 import type { Shape } from "./Shape";
 
@@ -21,7 +21,9 @@ export function newMoon(): Moon {
     deadFrameCount: 0,
     obliterated: false,
     angleDegree: 0,
-    angularVelocity: 0
+    angularVelocity: 0,
+    lastDamagedByName: "",
+    killedByName: ""
   }
 
   // moon.acceleration = rndfVec2d(0.001, 0.001)

@@ -1,7 +1,7 @@
 import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject } from "./interface"
 import { applyEngineThrust, applySteer, fire } from "./mechanics"
 import { timeScale } from "./constants"
-import type { Vec2d } from "./math"
+import type { Vec2d } from "mathil"
 import { writable, type Writable } from "svelte/store"
 
 export const activeKeyStates: Writable<KeyFunction[]> = writable()

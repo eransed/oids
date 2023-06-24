@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { SpaceObject } from "../../../../../lib/interface"
-  import { round2dec } from "../../../../../lib/math"
+  import { round2dec } from "mathil"
 
   export let player: SpaceObject | null = null
   export let theLocalPlayer = false

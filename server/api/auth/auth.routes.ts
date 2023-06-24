@@ -8,7 +8,7 @@ import hashToken from "../utils/hashToken"
 const jwt = require("jsonwebtoken")
 import type { JwtPayload } from "jsonwebtoken"
 import { JWT_REFRESH_SECRET } from "../../pub_config"
-import { warn } from "../../logger"
+import { warn } from "mathil"
 
 export const auth = express.Router()
 
