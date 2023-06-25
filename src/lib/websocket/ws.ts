@@ -1,6 +1,5 @@
 import { OIDS_WS_PORT } from "../../../server/pub_config"
 import type { ServerUpdate, SpaceObject } from "../interface"
-import { reduceShotSize, reduceSoSize, soFromValueArray, soToValueArray } from "./util"
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
   return new URL(`ws://${new URL(window.location.href).hostname}:${port}`)
@@ -130,7 +129,6 @@ export class OidsSocket {
     }
     this.ws?.addEventListener("message", (event: any) => {
       const data = JSON.parse(event.data)
-      // const spaceObjFromSrv: SpaceObject = soFromValueArray(data)
       const spaceObjFromSrv: SpaceObject = data
       spaceObjFromSrv.isLocal = false
       const serverUpdate: ServerUpdate = {
@@ -148,11 +146,6 @@ export function sendSpaceObject(ows: OidsSocket, so: SpaceObject): void {
   // Remove array which could contain circular ref
   so.collidingWith = []
   so.isLocal = false
-  // so = reduceSoSize(so)
-  // so.shotsInFlight.forEach((v) => {
-  //   v = reduceShotSize(v)
-  // })
-  // ows.send(soToValueArray(so))
   ows.send(so)
   console.log(so.name)
   console.log(so.lastMessage)
