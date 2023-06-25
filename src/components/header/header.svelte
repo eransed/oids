@@ -1,6 +1,7 @@
 <script lang="ts">
   //Routes
-  import { Router, Link } from "svelte-routing"
+  import { routes } from "../../routes"
+  import type { Route } from "../../lib/interface"
 
   //Avatar imgs
   import Avatar from "../../assets/avatar.png"
@@ -21,6 +22,7 @@
   //css
   import "./style.css"
   import Modal from "../modal/Modal.svelte"
+  import { navigate } from "svelte-routing/src/history"
 
   let showLogin: boolean | undefined = false
 
@@ -39,12 +41,20 @@
 <div class="header">
   <nav>
     <div class="menuItem">
-      <div class="navButton">
-        <Button90 mouseTracking={false} buttonConfig={Play} />
-      </div>
-      <div class="navButton profileBtn">
-        <Button90 mouseTracking={false} buttonConfig={Profile} />
-      </div>
+      {#each Object.values(routes) as route}
+        <div class="navButton">
+          <Button90
+            mouseTracking={false}
+            buttonConfig={{
+              buttonText: route.displayText,
+              clickCallback: () => {
+                navigate(route.path)
+              },
+              selected: false,
+            }}
+          />
+        </div>
+      {/each}
     </div>
 
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>

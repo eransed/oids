@@ -30,6 +30,13 @@
   let makeItShine = false
 </script>
 
+{#if makeItShine}
+  <SunRise />
+{/if}
+<div class="postGamePage" in:fade={{ delay: 300 }} out:fade>
+  <TypeWriter text={typeWriterMessage} doneCallback={() => (makeItShine = true)} speed={50} humanRandomeness />
+</div>
+
 <style>
   .postGamePage {
     display: flex;
@@ -41,10 +48,3 @@
     width: 100vw;
   }
 </style>
-
-{#if makeItShine}
-  <SunRise />
-{/if}
-<div class="postGamePage" in:fade={{ delay: 300 }} out:fade>
-  <TypeWriter text={typeWriterMessage} doneCallback={() => (makeItShine = true)} speed={50} humanRandomeness />
-</div>

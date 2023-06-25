@@ -129,8 +129,4 @@ nav {
     width: 100%;
     flex-direction: column;
   }
-
-  .profileBtn {
-    display: none;
-  }
 }

@@ -235,3 +235,8 @@ export interface Session {
   id: string
   players: SpaceObject[]
 }
+
+export interface Route {
+  displayText: string
+  path: string
+}

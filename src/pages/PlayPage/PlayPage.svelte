@@ -3,12 +3,14 @@
   import { pageHasHeader } from "../../stores/stores"
 
   //Components
-  import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
-  import GameLobby from "./components/GameLobby/GameLobby.svelte"
   import GameModes from "./components/GameLobby/GameModes.svelte"
 
   pageHasHeader.set(true)
 </script>
+
+<div class="playPage">
+  <GameModes />
+</div>
 
 <style>
   .playPage {
@@ -17,7 +19,3 @@
     width: 100vw;
   }
 </style>
-
-<div class="playPage">
-  <GameModes />
-</div>

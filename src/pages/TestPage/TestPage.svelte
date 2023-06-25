@@ -2,14 +2,12 @@
   import { log } from "mathil"
   import Page from "../../components/page/page.svelte"
   import BlankCanvas from "./BlankCanvas.svelte"
-  log('TestPage')
+  log("TestPage")
 </script>
 
 <Page>
-  <BlankCanvas></BlankCanvas>
+  <BlankCanvas />
 </Page>
 
-
 <style>
-
 </style>
