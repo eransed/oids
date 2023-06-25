@@ -21,7 +21,7 @@
     let sqLines: Line[] | null = []
     function updatePoints(count = 1) {
       // points = vec2dArray(count, 250, 50)
-      points = points.concat(vec2dArray(1, 280, 80))
+      points = points.concat(vec2dArray(1, 280, 20))
       lines = connectPoints(points)
       sqLines = connectPoints(boundingBox(points), true)
       if (points.length > 5) points.splice(0, 1)
