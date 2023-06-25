@@ -1,5 +1,5 @@
 import { SpaceShape, type Remote, type SpaceObject } from "../interface"
-import { add, degToRad, linearTransform, rndi, round2dec, type Vec2d } from "mathil"
+import { add, degToRad, linearTransform, rndi, round2dec, type Line, type Vec2d } from "mathil"
 import { explosionDuration, screenScale } from "../constants"
 import { getScreenRect } from "../canvas_util"
 import "../../app.css"
@@ -69,6 +69,18 @@ export function renderPoint(ctx: CanvasRenderingContext2D, v: Vec2d, color: stri
   ctx.arc(0, 0, radius, 0, Math.PI * 2, false)
   ctx.closePath()
   ctx.fill()
+  ctx.restore()
+}
+
+export function renderLine(ctx: CanvasRenderingContext2D, l: Line, c = '#000', width = 3) {
+  ctx.save()
+  ctx.beginPath()
+  ctx.strokeStyle = c
+  ctx.lineWidth = width
+  ctx.moveTo(l.p1.x, l.p1.y)
+  ctx.lineTo(l.p2.x, l.p2.y)
+  ctx.closePath()
+  ctx.stroke()
   ctx.restore()
 }
 
