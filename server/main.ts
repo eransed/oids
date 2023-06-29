@@ -87,10 +87,8 @@ export class Client {
 
       try {
         const so: SpaceObject = JSON.parse(event.data)
-
-        // log(`Got message: ${so.name}`)
         this.lastDataObject = so
-        if (so.sessionId) this.sessionId = so.sessionId
+        this.sessionId = so.sessionId
         if (!this.nameHasBeenUpdated) {
           if (globalConnectedClients.length > 0) {
             globalConnectedClients.forEach((client) => {
@@ -106,6 +104,8 @@ export class Client {
         }
         if (so.messageType === MessageType.SESSION_UPDATE) {
           broadcastToAllClients(this, globalConnectedClients, so)
+        } else {
+          broadcastToSessionClients(this, globalConnectedClients, so)
         }
       } catch (e) {
         error(`Failed with: ${e}`)
@@ -248,9 +248,13 @@ export function getSessions(): Session[] {
     }
   })
 
-  log(`returned: ${sessions.length} sessions`)
+  const filteredSessions = sessions.filter((s) => {
+    return s.host.isHost === true
+  })
 
-  return sessions
+  log(`returned: ${filteredSessions.length} sessions`)
+
+  return filteredSessions
 }
 
 server.on("connection", function connection(clientConnection: WebSocket, req: IncomingMessage) {

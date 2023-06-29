@@ -6,9 +6,40 @@
   export let numberOfPlayers: number = 0
   export let localPlayer: boolean = false
 
-  console.log (localPlayer, player?.name)
+  console.log(localPlayer, player?.name)
 
+  export let joinSession: ((so: SpaceObject | null) => void) | null = null
 </script>
+
+{#if header}
+  <th colspan="1">Host</th>
+  <th colspan="1">Session</th>
+  <th colspan="1">#players</th>
+{:else if player && localPlayer}
+  <td style="color:#f00;">{player.name}</td>
+  <td style="color:#f00;">{player.sessionId}</td>
+  <td style="color:#f00;">{numberOfPlayers}</td>
+  <td style="color:#f00;">
+    <button
+      on:click={() => {
+        alert("starting game")
+      }}
+      >Start game!
+    </button>
+  </td>
+{:else if player}
+  <td>{player.name}</td>
+  <td>{player.sessionId}</td>
+  <td>{numberOfPlayers}</td>
+  <td style="color:#f00;">
+    <button
+      on:click={() => {
+        joinSession && joinSession(player)
+      }}
+      >Join game
+    </button>
+  </td>
+{/if}
 
 <style>
   th,
@@ -23,18 +54,3 @@
     color: #ccc;
   }
 </style>
-
-
-{#if header}
-  <th colspan="1">Host</th>
-  <th colspan="1">Session</th>
-  <th colspan="1">#players</th>
-{:else if player && localPlayer}
-  <td style="color:#f00;">{player.name}</td>
-  <td style="color:#f00;">{player.sessionId}</td>
-  <td style="color:#f00;">{numberOfPlayers}</td>
-{:else if player}
-  <td>{player.name}</td>
-  <td>{player.sessionId}</td>
-  <td>{numberOfPlayers}</td>
-{/if}

@@ -127,9 +127,14 @@ export interface LobbyWaiter {
   readyToPlay: boolean
 }
 
+export interface Hoster {
+  isHost: boolean
+}
+
 export enum MessageType {
   GAME_UPDATE,
   SESSION_UPDATE,
+  CHAT_MESSAGE,
 }
 
 export interface SpaceObject
@@ -151,7 +156,8 @@ export interface SpaceObject
     Player,
     Unique,
     Chatable,
-    LobbyWaiter {
+    LobbyWaiter,
+    Hoster {
   messageType: MessageType
   isPlaying: boolean
   framesSinceLastServerUpdate: number

@@ -103,6 +103,7 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     joinedGame: currentTimeDate(),
     lastMessage: "",
     readyToPlay: false,
+    isHost: false,
   }
 
   return spaceObject

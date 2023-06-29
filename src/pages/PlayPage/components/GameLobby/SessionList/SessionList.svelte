@@ -4,7 +4,26 @@
 
   export let sessions: Session[]
   export let localPlayer: SpaceObject
+  export let joinSession: ((so: SpaceObject | null) => void) | null = null
 </script>
+
+<div class="scoreTable">
+  <table>
+    <thead>
+      <tr>
+        <SessionListRow header={true} />
+      </tr>
+    </thead>
+
+    {#each sessions as session}
+      <tbody>
+        <tr>
+          <SessionListRow {joinSession} localPlayer={localPlayer.name === session.host.name} player={session.host} numberOfPlayers={session.players.length} />
+        </tr>
+      </tbody>
+    {/each}
+  </table>
+</div>
 
 <style>
   .scoreTable {
@@ -25,21 +44,3 @@
     font-size: 14px;
   }
 </style>
-
-<div class="scoreTable">
-  <table>
-    <thead>
-      <tr>
-        <SessionListRow header={true} />
-      </tr>
-    </thead>
-
-    {#each sessions as session}
-      <tbody>
-        <tr>
-          <SessionListRow localPlayer={localPlayer.name === session.host.name} player={session.host} numberOfPlayers={session.players.length} />
-        </tr>
-      </tbody>
-    {/each}
-  </table>
-</div>
