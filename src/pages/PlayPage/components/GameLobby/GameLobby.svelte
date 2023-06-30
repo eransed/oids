@@ -89,8 +89,9 @@
 
         console.log("newMsg: ", newMsg)
 
-        chatMessageHistory.push(newMsg)
-        chatMessageHistory = chatMessageHistory
+        // chatMessageHistory.push(newMsg)
+        // chatMessageHistory = chatMessageHistory
+        chatMessageHistory = [...chatMessageHistory, newMsg]
 
         lastMsg = newMsg.message
         console.log(chatMessageHistory)
@@ -197,9 +198,10 @@
       user: localPlayer,
       timeDate: new Date(),
     }
-    chatMessageHistory.push(chatMessage)
-    chatMessageHistory = chatMessageHistory
-    
+    // chatMessageHistory.push(chatMessage)
+    // chatMessageHistory = chatMessageHistory
+    chatMessageHistory = [...chatMessageHistory, chatMessage]
+
     console.log(chatMessage)
     localPlayer.messageType = MessageType.CHAT_MESSAGE
     localPlayer.lastMessage = msgStr
