@@ -1,12 +1,10 @@
 <script lang="ts">
   //Svelte
-  import { navigate } from "svelte-routing"
 
   //Stores
-  import { gameSessionId, guestUserName, user } from "../../../../stores/stores"
+  import { guestUserName, user } from "../../../../stores/stores"
 
   //Interfaces
-  import type { Button90Config } from "../../../../interfaces/menu"
   import type { User } from "../../../../interfaces/user"
   import { MessageType, type SpaceObject } from "../../../../lib/interface"
 
@@ -17,30 +15,21 @@
   //Services
   import type { Session } from "../../../../lib/interface"
   import { createSpaceObject } from "../../../../lib/factory"
-  import type { AxiosResponse } from "axios"
+
   import { getWsUrl } from "../../../../lib/websocket/webSocket"
   import { OidsSocket } from "../../../../lib/websocket/ws"
   import { createSessionId } from "../../../../helpers/util"
   import { activeSessions } from "../../../../lib/services/game/activeSessions"
   import SessionList from "./SessionList/SessionList.svelte"
-  import SessionListRow from "./SessionList/SessionListRow.svelte"
+
   import { onDestroy, onMount } from "svelte"
   import { log, warn } from "mathil"
-
-  let lobbyStep = 0
-  let players: SpaceObject[]
 
   let userData: User | undefined
 
   user.subscribe((storedUser) => {
     userData = storedUser
   })
-
-  const testMsg: ChatMessage = {
-    message: "hej",
-    timeDate: new Date(),
-    user: createSpaceObject(),
-  }
 
   let sessions: Session[] = []
   const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
@@ -59,9 +48,19 @@
     message: string
     timeDate: Date
     user: SpaceObject
+    serviceMsg?: boolean
   }
 
-  let lastMsg = "none"
+  function createJoinMsg(session: string) {
+    const msg: ChatMessage = {
+      message: `Joined ${session}`,
+      timeDate: new Date(),
+      user: localPlayer,
+      serviceMsg: true,
+    }
+
+    return msg
+  }
 
   onMount(() => {
     hostSession()
@@ -87,13 +86,7 @@
           user: incomingUpdate,
         }
 
-        console.log("newMsg: ", newMsg)
-
-        chatMessageHistory.push(newMsg)
-        chatMessageHistory = chatMessageHistory
-
-        lastMsg = newMsg.message
-        console.log(chatMessageHistory)
+        chatMessageHistory = [...chatMessageHistory, newMsg]
       }
     })
 
@@ -144,28 +137,6 @@
    * Share game lobby link -> use as a param to get into lobby directly.
    */
 
-  const joinSession = () => {
-    navigate(`/play/multiplayer/${$gameSessionId}`)
-  }
-
-  const submitButton: Button90Config = {
-    buttonText: "Lets go!",
-    clickCallback: () => {},
-    selected: false,
-  }
-
-  const readyButton: Button90Config = {
-    buttonText: "I'm ready!",
-    clickCallback: () => (lobbyStep = 2),
-    selected: false,
-  }
-
-  const back: Button90Config = {
-    buttonText: "Back",
-    clickCallback: () => (lobbyStep = 0),
-    selected: false,
-  }
-
   function joinSession_(otherPlayerWithSession: SpaceObject | null) {
     if (otherPlayerWithSession) {
       log(`${localPlayer.name}: joining session ${otherPlayerWithSession.sessionId} hosted by ${otherPlayerWithSession.name}`)
@@ -173,6 +144,8 @@
       // send some update that localPlayer joined a/the session
       localPlayer.messageType = MessageType.SESSION_UPDATE
       localPlayer.isHost = false
+      chatMessageHistory = []
+      chatMessageHistory = [...chatMessageHistory, createJoinMsg(otherPlayerWithSession.sessionId)]
       sock.send(localPlayer)
       setTimeout(() => {
         updateSessions()
@@ -189,7 +162,7 @@
     updateSessions()
   }
 
-  let chatMsg: string = "Test"
+  let chatMsg: string = ""
 
   function sendRawChatMessage(msgStr: string) {
     const chatMessage: ChatMessage = {
@@ -199,17 +172,25 @@
     }
     chatMessageHistory.push(chatMessage)
     chatMessageHistory = chatMessageHistory
-    
-    console.log(chatMessage)
+
     localPlayer.messageType = MessageType.CHAT_MESSAGE
     localPlayer.lastMessage = msgStr
     sock.send(localPlayer)
-    console.log(chatMessageHistory)
+    chatMsg = ""
   }
 
   function sendChatMessage() {
     sendRawChatMessage(chatMsg)
     // chatMsg = ""
+  }
+
+  function formatDate(date: Date) {
+    const f = new Intl.DateTimeFormat("en-eu", {
+      timeStyle: "medium",
+      hour12: false,
+    })
+
+    return f.format(date)
   }
 </script>
 
@@ -220,11 +201,13 @@
     </div>
     <div class="center">
       {#if joinedSession}
-        <p>Session host: {joinedSession.host.name}</p>
-        <p>Players:</p>
-        {#each joinedSession.players as player}
-          <p style="color: #34a">{player.name}</p>
-        {/each}
+        <div class="sessionInfo">
+          <p>Session host: {joinedSession.host.name}</p>
+          <p>Players:</p>
+          {#each joinedSession.players as player}
+            <p style="color: #34a">{player.name}</p>
+          {/each}
+        </div>
         <button
           on:click={() => {
             leaveSession()
@@ -235,43 +218,48 @@
       {/if}
     </div>
     <div class="right">
-      <p>Chat</p>
-      <!-- <p>{chatMsg}</p> -->
-      <div class="msgInput">
-        <button
-          on:click={() => {
-            sendChatMessage()
-          }}>Send</button
-        >
-        <!-- <form on:submit|preventDefault={() => sendChatMessage()}>
-          <input bind:value={chatMsg} type="text" />
-          <button
-            on:click={() => {
-              sendChatMessage()
-            }}>Send</button
-          >
-        </form> -->
+      <p>Chat - {joinedSession?.id}</p>
+
+      <div class="messages">
+        {#each chatMessageHistory as msg}
+          {#if msg.serviceMsg}
+            <span style="font-style: italic; opacity: 0.5;">{msg.message}</span>
+          {:else}
+            <p>
+              {formatDate(msg.timeDate)} -
+              {msg.user.name}:
+              {msg.message}
+            </p>
+          {/if}
+        {/each}
       </div>
-      {#each chatMessageHistory as msg}
-        <!-- <p>{msg.timeDate.toLocaleTimeString("sv-SE")} - {msg.user.name}: {msg.message}</p> -->
-        <p>{msg.message}</p>
-        <!-- <p>HEJ TEST</p> -->
-        <!-- <p>{lastMsg}</p> -->
-      {/each}
+      <div class="msgInput">
+        <form on:submit|preventDefault={sendChatMessage}>
+          <input bind:value={chatMsg} placeholder="Got something to say?" type="text" />
+          <button type="submit">Send</button>
+        </form>
+      </div>
     </div>
   </div>
 </Page>
 
 <style>
   .msgInput input {
-    width: 100%;
-    height: 50%;
+    min-height: 2em;
+  }
+
+  .msgInput form {
+    display: grid;
+    grid-auto-columns: 4fr 1fr;
+    grid-auto-flow: column;
   }
 
   .lobbyWrapper {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
     max-width: 85%;
+    min-height: 20em;
+    max-height: 20em;
     /* place-items: center; */
   }
 
@@ -281,5 +269,19 @@
     display: grid;
     border: 1px solid rgb(0, 255, 255, 0.2);
     padding: 0.5em;
+    min-width: 22em;
+    line-break: anywhere;
+  }
+
+  .center,
+  .right {
+    grid-template-rows: 1fr auto;
+  }
+
+  .messages {
+    max-height: 14em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-width: 100%;
   }
 </style>
