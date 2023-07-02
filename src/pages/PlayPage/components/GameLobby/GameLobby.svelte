@@ -25,7 +25,8 @@
   import SessionList from "./SessionList/SessionList.svelte"
   import SessionListRow from "./SessionList/SessionListRow.svelte"
   import { onDestroy, onMount } from "svelte"
-  import { log, warn } from "mathil"
+  import { info, log, warn } from "mathil"
+  import { randomUUID } from "crypto"
 
   let lobbyStep = 0
   let players: SpaceObject[]
@@ -55,6 +56,44 @@
     sock.send(localPlayer)
   }
 
+  interface Ping {
+    sent: Date
+    id: string
+  }
+
+  const pingIdArray: Ping[] = []
+
+  function handlePing(so: SpaceObject, sock: OidsSocket): void {
+    if (so.ping) {
+      info(`ping from: ${so.name}, ttl=${so.ttl}, rtt=${so.rtt}ms, hops=${so.hops}`)
+      so.ping = false
+      so.pingResponse = true
+      so.hops++
+      sock.send(so)
+    } else if (so.pingResponse) {
+
+      pingIdArray.forEach((p) => {
+
+        if (p.id === so.pingId) {
+          const now = new Date()
+          const latency = (now.valueOf() - p.sent.valueOf())
+          info(`ping ${p.id} sent ${p.sent}, latency ${latency}`)
+        }
+      }) 
+    }
+  }
+
+  function ping(so: SpaceObject, sock: OidsSocket): void {
+    info(`ping`)
+    so.ping = true
+    so.pingId = randomUUID()
+    pingIdArray.push({
+      sent: new Date(),
+      id: so.pingId
+    })
+    sock.send(so)
+  }
+
   interface ChatMessage {
     message: string
     timeDate: Date
@@ -79,6 +118,7 @@
         log("Update")
         updateSessions()
       } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
+        handlePing(incomingUpdate, sock)
         const msg = incomingUpdate.lastMessage
         log(`${incomingUpdate.name} says: ${msg}`)
         const newMsg: ChatMessage = {

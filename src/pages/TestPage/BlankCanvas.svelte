@@ -24,7 +24,7 @@
       points = points.concat(vec2dArray(1, 280, 20))
       lines = connectPoints(points)
       sqLines = connectPoints(boundingBox(points), true)
-      if (points.length > 5) points.splice(0, 1)
+      if (points.length > 3) points.splice(0, 1)
     }
 
     updatePoints()
@@ -44,18 +44,18 @@
       clearScreen(ctx, "#fff")
 
       points.forEach((p) => {
-        renderPoint(ctx, p, "#f00", 3)
+        renderPoint(ctx, p, "#000", 3)
       })
 
       if (lines) {
         lines.forEach((l) => {
-          renderLine(ctx, l, "#000", 1)
+          renderLine(ctx, l, "#ccc", 1)
         })
       }
 
       if (sqLines) {
         sqLines.forEach((l) => {
-          renderLine(ctx, l, "#00f", 2)
+          renderLine(ctx, l, "#00f", 1)
         })
       }
 

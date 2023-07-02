@@ -50,6 +50,14 @@ export interface Remote {
   sessionId: string
   viewport: Vec2d
   joinedGame: string
+  dateTimeClient: Date
+  dateTimeServer: Date
+  ping: boolean
+  pingResponse: boolean
+  pingId: string
+  hops: number
+  ttl: number
+  rtt: number
 }
 
 export interface Local {
