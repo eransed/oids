@@ -110,6 +110,11 @@
     leaveSession()
   }
 
+  function dateTimeFormat(d: Date): string {
+    const ms = ('' + d.getMilliseconds()).padStart(3, '0')
+    return `${d.toLocaleString('sv-SE')}.${ms}`
+  }
+
   function updateSessions() {
     activeSessions()
       .then((s) => {
@@ -205,7 +210,7 @@
           <p>Session host: {joinedSession.host.name}</p>
           <p>Players:</p>
           {#each joinedSession.players as player}
-            <p style="color: #34a">{player.name}</p>
+            <p style="color: #c89">{player.name}</p>
           {/each}
         </div>
         <button
@@ -223,11 +228,16 @@
       <div class="messages">
         {#each chatMessageHistory as msg}
           {#if msg.serviceMsg}
-            <span style="font-style: italic; opacity: 0.5;">{msg.message}</span>
+            <span style="font-size: 0.8rem; font-style: italic; opacity: 0.5;">{msg.message}</span>
           {:else}
-            <p>
-              {formatDate(msg.timeDate)} -
-              {msg.user.name}:
+            <p style="margin-bottom: 1rem;">
+              <span style="font-size: 0.65rem; color: #cdcdcd;">  
+                {dateTimeFormat(msg.timeDate)} -
+                <span style="font-size: 0.8rem; color: #c89;">
+                {msg.user.name}:
+                </span>
+              </span>
+              <br>
               {msg.message}
             </p>
           {/if}
