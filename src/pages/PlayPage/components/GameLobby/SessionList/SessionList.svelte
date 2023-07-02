@@ -29,11 +29,9 @@
   .scoreTable {
     display: flex;
     justify-content: center;
-    align-content: center;
     flex-wrap: wrap;
     position: relative;
     inset: 0;
-    margin: auto;
   }
 
   table {
