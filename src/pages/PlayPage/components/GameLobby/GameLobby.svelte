@@ -23,8 +23,8 @@
   import SessionList from "./SessionList/SessionList.svelte"
 
   import { onDestroy, onMount } from "svelte"
-  import { info, log, warn } from "mathil"
-  import { randomUUID } from "crypto"
+  import { info, log, usPretty, warn } from "mathil"
+  import { v4 as uuidv4 } from "uuid"
 
   let userData: User | undefined
 
@@ -35,50 +35,97 @@
   let sessions: Session[] = []
   const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
   const sock: OidsSocket = new OidsSocket(getWsUrl())
-  const hostedSession = createSessionId()
   let chatMessageHistory: ChatMessage[] = []
 
   function hostSession() {
-    localPlayer.sessionId = hostedSession
+    localPlayer.sessionId = createSessionId()
     localPlayer.messageType = MessageType.SESSION_UPDATE
     localPlayer.isHost = true
+    info(`Says hello to online players, new session ${localPlayer.sessionId}`)
     sock.send(localPlayer)
   }
 
   interface Ping {
+    otherClientName: string
     sent: Date
     id: string
+    latencyUs: number
+    responded: boolean
   }
 
-  const pingIdArray: Ping[] = []
+  let pingIdArray: Ping[] = []
+  const pingArrayMaxSize = 10
+
+  function averageLatencyUs() {
+    let sum = 0
+    let size = 0
+    pingIdArray.forEach((p) => {
+      if (p.latencyUs > 0) {
+        sum += p.latencyUs
+        size++
+      }
+    })
+    if (size > 0) {
+      return sum / size
+    } else {
+      return -1
+    }
+  }
 
   function handlePing(so: SpaceObject, sock: OidsSocket): void {
-    if (so.ping) {
+    if (so.messageType !== MessageType.PING) return
+
+    if (so.ping === true) {
       info(`ping from: ${so.name}, ttl=${so.ttl}, rtt=${so.rtt}ms, hops=${so.hops}`)
       so.ping = false
       so.pingResponse = true
       so.hops++
       sock.send(so)
-    } else if (so.pingResponse) {
+    } else if (so.pingResponse === true) {
+      checkJoinedSession()
 
-      pingIdArray.forEach((p) => {
-
+      for (let i = 0; i < pingIdArray.length; i++) {
+        const p = pingIdArray[i]
         if (p.id === so.pingId) {
-          const now = new Date()
-          const latency = (now.valueOf() - p.sent.valueOf())
-          info(`ping ${p.id} sent ${p.sent}, latency ${latency}`)
+          p.latencyUs = (new Date().valueOf() - p.sent.valueOf()) * 1000
+          p.responded = true
+          info(`ping response: ${p.id}, sent: ${p.sent}, latency: ${usPretty(p.latencyUs)}, average=${usPretty(averageLatencyUs())}`)
+          if (pingIdArray.length > pingArrayMaxSize) {
+            const diff = pingIdArray.length - pingArrayMaxSize
+            if (diff > 1) {
+              pingIdArray.splice(0, diff)
+            } else {
+              pingIdArray.splice(0, 1)
+            }
+          }
+          return
         }
-      }) 
+      }
+      warn(`Unhandled ping response:`)
+      console.log(so)
     }
   }
 
   function ping(so: SpaceObject, sock: OidsSocket): void {
-    info(`ping`)
+    info(`PING`)
     so.ping = true
-    so.pingId = randomUUID()
+    so.pingResponse = false
+    so.pingId = uuidv4()
+    so.messageType = MessageType.PING
     pingIdArray.push({
+      otherClientName: so.name,
       sent: new Date(),
-      id: so.pingId
+      id: so.pingId,
+      latencyUs: -1,
+      responded: false,
+    })
+    pingIdArray.forEach((p, idx) => {
+      const currentLatencyUs = (new Date().valueOf() - p.sent.valueOf()) * 1000
+      if (currentLatencyUs > 100) {
+        warn(`high latency: ${usPretty(currentLatencyUs)}`)
+        pingIdArray.splice(idx, 1)
+        checkJoinedSession()
+      }
     })
     sock.send(so)
   }
@@ -101,23 +148,21 @@
     return msg
   }
 
+  let pingTimer: ReturnType<typeof setInterval>
+
   onMount(() => {
-    hostSession()
+    sock.connect().then(() => {
+      info(`Connected to websocket`)
+      hostSession()
+    })
 
     sock.addListener((su) => {
       const incomingUpdate = su.spaceObject
-
-      if (!incomingUpdate.name) {
-        return
-      }
-
-      console.log("someMsg ", incomingUpdate)
 
       if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
         log("Update")
         updateSessions()
       } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
-        handlePing(incomingUpdate, sock)
         const msg = incomingUpdate.lastMessage
         log(`${incomingUpdate.name} says: ${msg}`)
         const newMsg: ChatMessage = {
@@ -127,15 +172,46 @@
         }
 
         chatMessageHistory = [...chatMessageHistory, newMsg]
+      } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
+        warn(`${incomingUpdate.name} left the lobby`)
+        setTimeout(() => {
+          updateSessions()
+        }, 1000)
+      } else if (incomingUpdate.messageType === MessageType.PING) {
+        handlePing(incomingUpdate, sock)
+      } else {
+        warn(`Message (${incomingUpdate.messageType}) from ${incomingUpdate.name} not handled`)
+        console.log(incomingUpdate)
       }
     })
 
     setTimeout(() => {
       updateSessions()
-    }, 200)
+    }, 300)
+
+    pingTimer = setInterval(() => {
+      ping(localPlayer, sock)
+    }, 3000)
   })
 
-  let joinedSession: Session | null = null
+  onDestroy(() => {
+    info(`Leaving session, says goodbye...`)
+    localPlayer.messageType === MessageType.LEFT_SESSION
+    sock.send(localPlayer)
+
+    if (pingTimer) {
+      info(`Clears ping timer ${pingTimer}`)
+      clearInterval(pingTimer)
+    }
+
+    setTimeout(() => {
+      info(`Disconnecting from websocket`)
+      sock.disconnect()
+    }, 2000)
+  })
+
+  let joinedSession: Session | null
+  $: joinedSession = null
 
   function checkJoinedSession(): void {
     for (let i = 0; i < sessions.length; i++) {
@@ -151,8 +227,8 @@
   }
 
   function dateTimeFormat(d: Date): string {
-    const ms = ('' + d.getMilliseconds()).padStart(3, '0')
-    return `${d.toLocaleString('sv-SE')}.${ms}`
+    const ms = ("" + d.getMilliseconds()).padStart(3, "0")
+    return `${d.toLocaleString("sv-SE")}.${ms}`
   }
 
   function updateSessions() {
@@ -173,10 +249,6 @@
       })
   }
 
-  onDestroy(() => {
-    sock.disconnect()
-  })
-
   /**
    * Todos:
    * Share game lobby link -> use as a param to get into lobby directly.
@@ -194,7 +266,7 @@
       sock.send(localPlayer)
       setTimeout(() => {
         updateSessions()
-      }, 200)
+      }, 400)
     } else {
       console.error("Join null session not possible...")
     }
@@ -204,7 +276,10 @@
     log(`Leaving session`)
     joinedSession = null
     hostSession()
-    updateSessions()
+    setTimeout(() => {
+      updateSessions()
+    }, 400)
+    pingIdArray = []
   }
 
   let chatMsg: string = ""
@@ -237,6 +312,24 @@
 
     return f.format(date)
   }
+
+  function getPlayerPing(so: SpaceObject): string {
+    let sumUs = 0
+    let size = 0
+
+    for (let i = 0; i < pingIdArray.length; i++) {
+      const p = pingIdArray[i]
+      if (so.name === p.otherClientName && p.responded === true) {
+        sumUs += p.latencyUs
+        size++
+      }
+    }
+
+    if (size > 0) {
+      return `(ping: ${usPretty(sumUs / size)})`
+    }
+    return ""
+  }
 </script>
 
 <Page>
@@ -250,7 +343,7 @@
           <p>Session host: {joinedSession.host.name}</p>
           <p>Players:</p>
           {#each joinedSession.players as player}
-            <p style="color: #c89">{player.name}</p>
+            <p style="color: #c89">{player.name} {getPlayerPing(player)}</p>
           {/each}
         </div>
         <button
@@ -271,13 +364,13 @@
             <span style="font-size: 0.8rem; font-style: italic; opacity: 0.5;">{msg.message}</span>
           {:else}
             <p style="margin-bottom: 1rem;">
-              <span style="font-size: 0.65rem; color: #cdcdcd;">  
+              <span style="font-size: 0.65rem; color: #cdcdcd;">
                 {dateTimeFormat(msg.timeDate)} -
                 <span style="font-size: 0.8rem; color: #c89;">
-                {msg.user.name}:
+                  {msg.user.name}:
                 </span>
               </span>
-              <br>
+              <br />
               {msg.message}
             </p>
           {/if}

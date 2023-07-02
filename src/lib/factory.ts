@@ -104,6 +104,14 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     lastMessage: "",
     readyToPlay: false,
     isHost: false,
+    // dateTimeClient: undefined,
+    // dateTimeServer: undefined,
+    ping: false,
+    pingResponse: false,
+    pingId: "",
+    hops: 0,
+    ttl: 0,
+    rtt: 0
   }
 
   return spaceObject

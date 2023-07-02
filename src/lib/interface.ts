@@ -50,8 +50,8 @@ export interface Remote {
   sessionId: string
   viewport: Vec2d
   joinedGame: string
-  dateTimeClient: Date
-  dateTimeServer: Date
+  // dateTimeClient: Date
+  // dateTimeServer: Date
   ping: boolean
   pingResponse: boolean
   pingId: string
@@ -142,7 +142,9 @@ export interface Hoster {
 export enum MessageType {
   GAME_UPDATE,
   SESSION_UPDATE,
+  LEFT_SESSION,
   CHAT_MESSAGE,
+  PING
 }
 
 export interface SpaceObject

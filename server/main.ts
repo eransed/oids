@@ -102,7 +102,8 @@ export class Client {
             log("No clients connected")
           }
         }
-        if (so.messageType === MessageType.SESSION_UPDATE) {
+        if (so.messageType === MessageType.SESSION_UPDATE ||
+            so.messageType === MessageType.LEFT_SESSION) {
           broadcastToAllClients(this, globalConnectedClients, so)
         } else {
           broadcastToSessionClients(this, globalConnectedClients, so)
@@ -189,6 +190,9 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
 function broadcastToAllClients(skipSourceClient: Client, connectedClients: Client[], data: SpaceObject): void {
   for (const client of connectedClients) {
     if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
+      if (data.messageType === MessageType.LEFT_SESSION) {
+        info(`${data.name} left the session -> ${client.name}`)
+      }
       client.ws.send(JSON.stringify(data))
     }
   }
@@ -198,8 +202,12 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        log(`Sending ${data.lastMessage} to ${client.name}`)
         client.ws.send(JSON.stringify(data))
+        if (data.messageType === MessageType.PING) {
+          info(`PING<${client.sessionId}>: ${sendingClient.name} -> ${client.name}`)
+        } else {
+          log(`BROADCAST<${client.sessionId}>: '${data.lastMessage}' from ${sendingClient.name} to ${client.name}`)
+        }
       }
     }
   }

@@ -1,3 +1,4 @@
+import { log } from "mathil"
 import { OIDS_WS_PORT } from "../../../server/pub_config"
 import type { ServerUpdate, SpaceObject } from "../interface"
 
@@ -27,7 +28,7 @@ export function getReadyStateText(socket: WebSocket): string {
 
 export function sender(ws: WebSocket, messageObject: object): boolean {
   if (ws.readyState === 1) {
-    console.log("Sending message...")
+    // log("Sending message...")
     ws.send(JSON.stringify(messageObject))
     return true
   } else {
