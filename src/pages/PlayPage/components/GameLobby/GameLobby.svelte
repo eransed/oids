@@ -3,7 +3,7 @@
   import { fade } from "svelte/transition"
 
   //Stores
-  import { guestUserName, user } from "../../../../stores/stores"
+  import { guestUserName, user, localPlayer } from "../../../../stores/stores"
 
   //Interfaces
 
@@ -29,16 +29,16 @@
   import TypeWriter from "../../../../components/typeWriter/TypeWriter.svelte"
 
   let sessions: Session[] = []
-  const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
+
   const sock: OidsSocket = new OidsSocket(getWsUrl())
   let chatMessageHistory: ChatMessage[] = []
 
   function hostSession() {
-    localPlayer.sessionId = createSessionId()
-    localPlayer.messageType = MessageType.SESSION_UPDATE
-    localPlayer.isHost = true
-    info(`Says hello to online players, new session ${localPlayer.sessionId}`)
-    sock.send(localPlayer)
+    $localPlayer.sessionId = createSessionId()
+    $localPlayer.messageType = MessageType.SESSION_UPDATE
+    $localPlayer.isHost = true
+    info(`Says hello to online players, new session ${$localPlayer.sessionId}`)
+    sock.send($localPlayer)
   }
 
   interface Ping {
@@ -137,7 +137,7 @@
     const msg: ChatMessage = {
       message: `Joined ${session}`,
       timeDate: new Date(),
-      user: localPlayer,
+      user: $localPlayer,
       serviceMsg: true,
     }
 
@@ -147,6 +147,8 @@
   let pingTimer: ReturnType<typeof setInterval>
 
   onMount(() => {
+    $localPlayer.name = $user ? $user.name : $guestUserName
+
     sock.connect().then(() => {
       info(`Connected to websocket`)
       hostSession()
@@ -185,15 +187,15 @@
       updateSessions()
     }, 300)
 
-    pingTimer = setInterval(() => {
-      ping(localPlayer, sock)
-    }, 3000)
+    // pingTimer = setInterval(() => {
+    //   ping(localPlayer, sock)
+    // }, 3000)
   })
 
   onDestroy(() => {
     info(`Leaving session, says goodbye...`)
-    localPlayer.messageType === MessageType.LEFT_SESSION
-    sock.send(localPlayer)
+    $localPlayer.messageType === MessageType.LEFT_SESSION
+    sock.send($localPlayer)
 
     if (pingTimer) {
       info(`Clears ping timer ${pingTimer}`)
@@ -212,7 +214,7 @@
   function checkJoinedSession(): void {
     for (let i = 0; i < sessions.length; i++) {
       const s = sessions[i]
-      if (s.id === localPlayer.sessionId) {
+      if (s.id === $localPlayer.sessionId) {
         joinedSession = s
         log(`Joined session ${s.id}`)
         return
@@ -252,14 +254,14 @@
 
   function joinSession_(otherPlayerWithSession: SpaceObject | null) {
     if (otherPlayerWithSession) {
-      log(`${localPlayer.name}: joining session ${otherPlayerWithSession.sessionId} hosted by ${otherPlayerWithSession.name}`)
-      localPlayer.sessionId = otherPlayerWithSession.sessionId
+      log(`${$localPlayer.name}: joining session ${otherPlayerWithSession.sessionId} hosted by ${otherPlayerWithSession.name}`)
+      $localPlayer.sessionId = otherPlayerWithSession.sessionId
       // send some update that localPlayer joined a/the session
-      localPlayer.messageType = MessageType.SESSION_UPDATE
-      localPlayer.isHost = false
+      $localPlayer.messageType = MessageType.SESSION_UPDATE
+      $localPlayer.isHost = false
       chatMessageHistory = []
       chatMessageHistory = [...chatMessageHistory, createJoinMsg(otherPlayerWithSession.sessionId)]
-      sock.send(localPlayer)
+      sock.send($localPlayer)
       setTimeout(() => {
         updateSessions()
       }, 400)
@@ -283,15 +285,15 @@
   function sendRawChatMessage(msgStr: string) {
     const chatMessage: ChatMessage = {
       message: msgStr,
-      user: localPlayer,
+      user: $localPlayer,
       timeDate: new Date(),
     }
     chatMessageHistory.push(chatMessage)
     chatMessageHistory = chatMessageHistory
 
-    localPlayer.messageType = MessageType.CHAT_MESSAGE
-    localPlayer.lastMessage = msgStr
-    sock.send(localPlayer)
+    $localPlayer.messageType = MessageType.CHAT_MESSAGE
+    $localPlayer.lastMessage = msgStr
+    sock.send($localPlayer)
     chatMsg = ""
   }
 
@@ -326,12 +328,19 @@
     }
     return ""
   }
+
+  function readyToPlay() {
+    $localPlayer.readyToPlay = !$localPlayer.readyToPlay
+    $localPlayer.messageType = MessageType.SESSION_UPDATE
+    sock.send($localPlayer)
+    updateSessions()
+  }
 </script>
 
 <Page>
   <div class="lobbyWrapper">
     <div class="left">
-      <SessionList joinSession={joinSession_} {localPlayer} {sessions} />
+      <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
     </div>
     <div class="center">
       {#if joinedSession}
@@ -339,9 +348,15 @@
           <p>Session host: {joinedSession.host.name}</p>
           <p>Players:</p>
           {#each joinedSession.players as player}
-            <p style="color: #c89">{player.name} {getPlayerPing(player)}</p>
+            <p style="color: #c89">
+              {player.name}
+              <!-- {getPlayerPing(player)} - -->
+
+              {player.readyToPlay ? "Ready" : "Not ready"}
+            </p>
           {/each}
         </div>
+        <button on:click={() => readyToPlay()}>{$localPlayer.readyToPlay ? "Ready" : "Not ready"}</button>
         <button
           on:click={() => {
             leaveSession()

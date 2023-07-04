@@ -1,14 +1,12 @@
 <script lang="ts">
   //Svelte
   import { fade } from "svelte/transition"
-  import type { RouteParams } from "svelte-routing/types/Route"
 
   //Components
   import Game from "../GamePage/components/Game/Game.svelte"
 
   //Stores
-  import { gameSessionId, pageHasHeader } from "../../stores/stores"
-  import type { SpaceObject } from "../../lib/interface"
+  import { gameSessionId, pageHasHeader, localPlayer } from "../../stores/stores"
 
   pageHasHeader.set(false)
 
@@ -16,6 +14,10 @@
 
   let sessionId: string = $gameSessionId ? $gameSessionId : gameIdParam
 </script>
+
+<div class="gamePage" in:fade={{ delay: 300 }} out:fade>
+  <Game {sessionId} player={$localPlayer} />
+</div>
 
 <style>
   .gamePage {
@@ -28,7 +30,3 @@
     width: 100vw;
   }
 </style>
-
-<div class="gamePage" in:fade={{ delay: 300 }} out:fade>
-  <Game {sessionId} />
-</div>

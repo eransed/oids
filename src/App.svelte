@@ -3,11 +3,8 @@
   import { Router, Route } from "svelte-routing"
   import { routes } from "./routes"
 
-  //Svelte
-  import { onMount } from "svelte"
-
   //Stores
-  import { pageHasHeader, user, userLoading } from "./stores/stores"
+  import { pageHasHeader } from "./stores/stores"
 
   //Helpers
   import { onAppMount } from "./helpers/onAppMount"

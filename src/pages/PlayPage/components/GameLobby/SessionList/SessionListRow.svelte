@@ -1,12 +1,11 @@
 <script lang="ts">
+  import { navigate } from "svelte-routing/src/history"
   import type { SpaceObject } from "../../../../../lib/interface"
 
   export let player: SpaceObject | null = null
   export let header = false
   export let numberOfPlayers: number = 0
   export let localPlayer: boolean = false
-
-  console.log(localPlayer, player?.name)
 
   export let joinSession: ((so: SpaceObject | null) => void) | null = null
 </script>
@@ -22,7 +21,7 @@
   <td style="color:#f00;">
     <button
       on:click={() => {
-        alert("starting game")
+        navigate(`/play/multiplayer/${player?.sessionId}`)
       }}
       >Start game!
     </button>

@@ -5,7 +5,6 @@
 
   //Svelte
   import { onDestroy, onMount } from "svelte"
-
   import { createSpaceObject, currentTimeDate } from "../../../../lib/factory"
   import { Game } from "../../../../lib/game"
   import { getKeyMap, removeKeyControllers } from "../../../../lib/input"
@@ -17,12 +16,11 @@
   import ShipSettings from "../ShipSettings/ShipSettings.svelte"
 
   //Websocket
-  import { disconnect, initMultiplayer } from "../../../../lib/websocket/webSocket"
+  import { disconnect } from "../../../../lib/websocket/webSocket"
   import ScoreScreen from "../LeaderBoardScreen/ScoreScreen.svelte"
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame } from "../../../../lib/gameModes/regular"
-  import { guestUserName, user } from "../../../../stores/stores"
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -32,17 +30,16 @@
 
   //Props
   export let sessionId: string
+  export let player: SpaceObject
 
   let canvas: HTMLCanvasElement
   // let cleanup: () => void
-  const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
 
   onMount(() => {
     // cleanup = initSettingsControl()
-    game = new Game(canvas, localPlayer, getKeyMap(), showDeadMenu)
+    game = new Game(canvas, player, getKeyMap(), showDeadMenu)
     game.localPlayer.sessionId = sessionId
     game.localPlayer.joinedGame = currentTimeDate()
-    // game.startMultiplayer()
     game.startGame(initRegularGame, renderFrame, nextFrame)
   })
 
@@ -54,8 +51,32 @@
 
   onDestroy(() => {
     disconnect()
+    game.stopGame()
   })
 </script>
+
+<div class="gameInfo">
+  <InGameInfo title={"Leaderboard"} showModal={$showScoreScreen}>
+    <div class="scoreScreen">
+      <ScoreScreen />
+    </div>
+  </InGameInfo>
+
+  <InGameInfo title={"Key Map"} showModal={$showHotKeys}>
+    <div class="hotKeys">
+      <HotKeys activeColor={player.color} />
+    </div>
+  </InGameInfo>
+
+  <InGameInfo title={"Ship Settings"} showModal={$shipSettings}>
+    <div class="hotKeys">
+      <ShipSettings />
+    </div>
+  </InGameInfo>
+</div>
+
+<GameMenu currentGame={game} />
+<canvas class="game_canvas" bind:this={canvas} />
 
 <style>
   :root {
@@ -88,26 +109,3 @@
     grid-template-rows: 50% auto;
   }
 </style>
-
-<div class="gameInfo">
-  <InGameInfo title={"Leaderboard"} showModal={$showScoreScreen}>
-    <div class="scoreScreen">
-      <ScoreScreen />
-    </div>
-  </InGameInfo>
-
-  <InGameInfo title={"Key Map"} showModal={$showHotKeys}>
-    <div class="hotKeys">
-      <HotKeys activeColor={localPlayer.color} />
-    </div>
-  </InGameInfo>
-
-  <InGameInfo title={"Ship Settings"} showModal={$shipSettings}>
-    <div class="hotKeys">
-      <ShipSettings />
-    </div>
-  </InGameInfo>
-</div>
-
-<GameMenu currentGame={game} />
-<canvas class="game_canvas" bind:this={canvas} />
