@@ -26,6 +26,34 @@
   export let params: String
 </script>
 
+<Page>
+  {#if $user}
+    <div class="profileWrapper">
+      <div class="buttons">
+        {#each Object.values(ProfileButtons) as button}
+          <div>
+            <Button90 buttonConfig={button} selected={params === button.routeParam} />
+          </div>
+        {/each}
+      </div>
+      <div class="content" style="padding: 1em">
+        {#if params === "summary"}
+          <ProfileModal />
+        {/if}
+        {#if params === "matchHistory"}
+          <p>Match History</p>
+        {/if}
+        {#if params === "settings"}
+          <p>Settings</p>
+        {/if}
+      </div>
+    </div>
+  {:else}
+    <p style="color: #fff">Please login to see your profile</p>
+    <ProfileModal />
+  {/if}
+</Page>
+
 <style>
   .profileWrapper {
     display: grid;
@@ -69,31 +97,3 @@
     }
   }
 </style>
-
-<Page>
-  {#if $user}
-    <div class="profileWrapper">
-      <div class="buttons">
-        {#each Object.values(ProfileButtons) as button}
-          <div>
-            <Button90 buttonConfig={button} selected={params === button.routeParam} />
-          </div>
-        {/each}
-      </div>
-      <div class="content" style="padding: 1em">
-        {#if params === "summary"}
-          <ProfileModal />
-        {/if}
-        {#if params === "matchHistory"}
-          <p>Match History</p>
-        {/if}
-        {#if params === "settings"}
-          <p>Settings</p>
-        {/if}
-      </div>
-    </div>
-  {:else}
-    <p style="color: #fff">Please login to see your profile</p>
-    <ProfileModal />
-  {/if}
-</Page>

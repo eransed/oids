@@ -1,13 +1,13 @@
 //WS Setup
 import type { IncomingMessage } from "http"
+import { soFromValueArray, soToValueArray } from "../src/lib/websocket/util"
 import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from "ws"
 import { OIDS_WS_PORT } from "./pub_config"
 import { getLocalIp, ipport } from "./net"
 
 import { apiServer } from "./apiServer"
 import { start_host_server } from "./host_server"
-import { MessageType, Session, SpaceObject } from "../src/lib/interface"
-import { error, info, log, warn } from "mathil"
+import { SpaceObject } from "../src/lib/interface"
 
 // start ApiServer
 apiServer()
@@ -18,7 +18,7 @@ start_host_server()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const pack = require("../package.json")
 // const name_ver: string = pack.name + " " + pack.version
-const name_ver = "oids-0.4.0"
+const name_ver = "oids-0.3.0"
 
 const WS_PORT = OIDS_WS_PORT
 
@@ -54,17 +54,17 @@ export class Client {
       const oldName: string = this.name
       this.name = newName
       this.nameHasBeenUpdated = true
-      log(`Updated name: ${oldName} -> ${this.name}`)
+      console.log(`Updated name: ${oldName} -> ${this.name}`)
     } else {
       console.error(`Multiple name updates for ${this.toString()}: newName="${newName}"`)
     }
   }
 
   addEventListeners(): void {
-    // log(`Adding event-listeners for ${this.toString()}`)
+    // console.log(`Adding event-listeners for ${this.toString()}`)
     this.ws.addEventListener("close", () => {
       // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
-      log(`${this.toString()} has been disconnected, sending goodbye message`)
+      console.log(`${this.toString()} has been disconnected, sending goodbye message`)
       const offlineMessage: SpaceObject | null = this.lastDataObject
       if (offlineMessage) {
         offlineMessage.online = false
@@ -72,23 +72,23 @@ export class Client {
         broadcastToAllClients(this, globalConnectedClients, offlineMessage)
         globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
         if (globalConnectedClients.length === 0) {
-          log("No clients connected :(")
+          console.log("No clients connected :(")
         }
       } else {
-        warn("Can't send offlineMessage: No data has been recieved")
+        console.error("Can't send offlineMessage: No data has been recieved")
       }
     })
 
     this.ws.addEventListener("message", (event: MessageEvent) => {
       if (!event.data) {
-        warn("No data sent by connected client")
+        console.log("No data sent by connected client")
         return
       }
 
       try {
-        const so: SpaceObject = JSON.parse(event.data)
+        const so: SpaceObject = soFromValueArray(JSON.parse(event.data))
         this.lastDataObject = so
-        this.sessionId = so.sessionId
+        if (so.sessionId) this.sessionId = so.sessionId
         if (!this.nameHasBeenUpdated) {
           if (globalConnectedClients.length > 0) {
             globalConnectedClients.forEach((client) => {
@@ -99,17 +99,11 @@ export class Client {
             so.online = true
             broadcastToSessionClients(this, globalConnectedClients, so)
           } else {
-            log("No clients connected")
+            console.log("No clients connected")
           }
         }
-        if (so.messageType === MessageType.SESSION_UPDATE ||
-            so.messageType === MessageType.LEFT_SESSION) {
-          broadcastToAllClients(this, globalConnectedClients, so)
-        } else {
-          broadcastToSessionClients(this, globalConnectedClients, so)
-        }
       } catch (e) {
-        error(`Failed with: ${e}`)
+        console.log(`Failed with: ${e}`)
       }
     })
   }
@@ -154,9 +148,9 @@ function removeClientIfExisting(clients: Client[], clientConnection: Client): Cl
   })
   const removedCount: number = lengthBefore - clients.length
   if (removedCount === 1) {
-    log(`Removed client: ${clientConnection.toString()}`)
+    console.log(`Removed client: ${clientConnection.toString()}`)
   } else if (removedCount > 1) {
-    error(`Removed ${removedCount} equal clients in list`)
+    console.error(`Removed ${removedCount} equal clients in list`)
   }
   return clients
 }
@@ -172,16 +166,16 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
   })
 
   disconnectedClients.forEach((c) => {
-    log(`Disconnected: ${c.toString()}`)
+    console.log(`Disconnected: ${c.toString()}`)
   })
 
   connectedClients.forEach((c) => {
-    log(`Connected: ${c.toString()}`)
+    console.log(`Connected: ${c.toString()}`)
   })
 
   // const disconClientCount: number = lengthBefore - connectedClients.length
   // if (disconClientCount > 0) {
-  //   log(`Removed ${disconClientCount} disconnected clients`)
+  //   console.log(`Removed ${disconClientCount} disconnected clients`)
   // }
   return connectedClients
 }
@@ -190,10 +184,7 @@ function removeDisconnectedClients(clients: Client[]): Client[] {
 function broadcastToAllClients(skipSourceClient: Client, connectedClients: Client[], data: SpaceObject): void {
   for (const client of connectedClients) {
     if (skipSourceClient !== client && skipSourceClient.name !== client.name) {
-      if (data.messageType === MessageType.LEFT_SESSION) {
-        info(`${data.name} left the session -> ${client.name}`)
-      }
-      client.ws.send(JSON.stringify(data))
+      client.ws.send(JSON.stringify(soToValueArray(data)))
     }
   }
 }
@@ -202,22 +193,17 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        client.ws.send(JSON.stringify(data))
-        if (data.messageType === MessageType.PING) {
-          info(`PING<${client.sessionId}>: ${sendingClient.name} -> ${client.name}`)
-        } else {
-          log(`BROADCAST<${client.sessionId}>: '${data.lastMessage}' from ${sendingClient.name} to ${client.name}`)
-        }
+        client.ws.send(JSON.stringify(soToValueArray(data)))
       }
     }
   }
 }
 
-export function getPlayersFromSessionId(sessionId: string): SpaceObject[] {
-  const playerList: SpaceObject[] = []
+export function getPlayersFromSessionId(sessionId: string | null): (SpaceObject | null)[] {
+  const playerList = []
 
   for (const client of globalConnectedClients) {
-    if (sessionId === client.sessionId && client.lastDataObject) {
+    if (sessionId === client.sessionId) {
       playerList.push(client.lastDataObject)
     }
   }
@@ -225,44 +211,20 @@ export function getPlayersFromSessionId(sessionId: string): SpaceObject[] {
   return playerList
 }
 
-//Todo: createSessionId() should make unique sessionId's
-//Then we can be certain sessionId's wont collide = breaking the game.
-// export function getActivePlayerSessions() {
-//   const sessionsSet: Set<Client["sessionId"]> = new Set()
+export function getActivePlayerSessions() {
+  const sessionsSet: Set<Client["sessionId"] | null> = new Set()
 
-//   const sessionList: string[] = []
+  const sessionList: (string | null)[] = []
 
-//   for (const client of globalConnectedClients) {
-//     sessionsSet.add(client.sessionId)
-//   }
+  for (const client of globalConnectedClients) {
+    sessionsSet.add(client.sessionId)
+  }
 
-//   sessionsSet.forEach((v) => {
-//     v && sessionList.push(v)
-//   })
-
-//   return sessionList
-// }
-
-export function getSessions(): Session[] {
-  const sessions: Session[] = []
-
-  globalConnectedClients.forEach((client: Client) => {
-    if (client.lastDataObject) {
-      sessions.push({
-        host: client.lastDataObject,
-        id: client.lastDataObject.sessionId,
-        players: getPlayersFromSessionId(client.lastDataObject.sessionId),
-      })
-    }
+  sessionsSet.forEach((v) => {
+    sessionList.push(v)
   })
 
-  const filteredSessions = sessions.filter((s) => {
-    return s.host.isHost === true
-  })
-
-  log(`returned: ${filteredSessions.length} sessions`)
-
-  return filteredSessions
+  return sessionList
 }
 
 server.on("connection", function connection(clientConnection: WebSocket, req: IncomingMessage) {
@@ -271,14 +233,14 @@ server.on("connection", function connection(clientConnection: WebSocket, req: In
 
   const newClient: Client = new Client(clientConnection, req, `Client-${globalConnectedClients.length}`, new Date())
   if (addNewClientIfNotExisting(globalConnectedClients, newClient)) {
-    log(`Storing new client ${newClient.toString()} in broadcast list`)
+    console.log(`Storing new client ${newClient.toString()} in broadcast list`)
   }
 
-  log(`${globalConnectedClients.length} connected clients:`)
+  console.log(`${globalConnectedClients.length} connected clients:`)
   globalConnectedClients.forEach((c) => {
-    log(`   ${c.toString()}`)
+    console.log(`   ${c.toString()}`)
   })
 })
 
-info(`Starting ${name_ver}`)
-info(`Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`)
+console.log(`Starting ${name_ver}`)
+console.log(`Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`)

@@ -1,5 +1,5 @@
 {
-  "svelteSortOrder": "scripts-styles-markup",
+  "svelteSortOrder": "scripts-markup-styles",
   "semi": false,
   "printWidth": 160
 }

@@ -1,5 +1,5 @@
 import type { Rotatable } from "../interface"
-import type { Vec2d } from "../math"
+import type { Vec2d } from "mathil"
 import type { Positionable } from "./Physical"
 
 export interface Steerable extends Positionable, Rotatable {

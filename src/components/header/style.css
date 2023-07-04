@@ -13,6 +13,7 @@
   overflow: hidden;
   justify-content: space-between;
   width: 100%;
+  height: fit-content;
 
   z-index: 2;
   transition: all;
@@ -128,9 +129,5 @@ nav {
     display: grid;
     width: 100%;
     flex-direction: column;
-  }
-
-  .profileBtn {
-    display: none;
   }
 }

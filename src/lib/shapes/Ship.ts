@@ -1,6 +1,6 @@
 import { randomAnyLightColor } from "../color";
 import type { Damageable } from "../interface";
-import { newVec2d } from "../math";
+import { newVec2d } from "mathil";
 import type { Shape } from "./Shape";
 
 export interface Ship extends Shape, Damageable {}
@@ -19,7 +19,9 @@ export function newShip(): Ship {
     deadFrameCount: 0,
     obliterated: false,
     angleDegree: 0,
-    angularVelocity: 0
+    angularVelocity: 0,
+    lastDamagedByName: "",
+    killedByName: ""
   }
 
   return ship

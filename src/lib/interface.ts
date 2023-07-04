@@ -1,5 +1,5 @@
 import type { Writable } from "svelte/store"
-import type { Vec2d } from "./math"
+import type { Vec2d } from "mathil"
 import type { Steerable } from "./traits/Steerable"
 
 export enum GameType {
@@ -47,9 +47,17 @@ export interface Motivated {
 export interface Remote {
   online: boolean
   serverVersion: string
-  sessionId: string | undefined
+  sessionId: string
   viewport: Vec2d
   joinedGame: string
+  // dateTimeClient: Date
+  // dateTimeServer: Date
+  ping: boolean
+  pingResponse: boolean
+  pingId: string
+  hops: number
+  ttl: number
+  rtt: number
 }
 
 export interface Local {
@@ -119,6 +127,26 @@ export interface Damageable extends Positionable {
   killedByName: string
 }
 
+export interface Chatable {
+  lastMessage: string
+}
+
+export interface LobbyWaiter {
+  readyToPlay: boolean
+}
+
+export interface Hoster {
+  isHost: boolean
+}
+
+export enum MessageType {
+  GAME_UPDATE,
+  SESSION_UPDATE,
+  LEFT_SESSION,
+  CHAT_MESSAGE,
+  PING
+}
+
 export interface SpaceObject
   extends Shapable,
     Positionable,
@@ -136,7 +164,11 @@ export interface SpaceObject
     Boostable,
     Colorable,
     Player,
-    Unique {
+    Unique,
+    Chatable,
+    LobbyWaiter,
+    Hoster {
+  messageType: MessageType
   isPlaying: boolean
   framesSinceLastServerUpdate: number
   shotsInFlight: PhotonLaser[]
@@ -212,4 +244,15 @@ export interface Player {
 
 export interface Unique {
   id: string
+}
+
+export interface Session {
+  host: SpaceObject
+  id: string
+  players: SpaceObject[]
+}
+
+export interface Route {
+  displayText: string
+  path: string
 }

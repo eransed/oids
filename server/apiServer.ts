@@ -5,6 +5,7 @@ import type { Express } from "express"
 import morgan from "morgan"
 import routes from "./api/routes/routes"
 import cors from "cors"
+import { log } from "mathil"
 
 export const apiServer = () => {
   const router: Express = express()
@@ -53,6 +54,6 @@ export const apiServer = () => {
   const httpServer = http.createServer(router)
   const PORT: any = process.env.PORT ?? 6060
   httpServer.listen(PORT, () =>
-    console.log(`API server is running on port ${PORT}`)
+    log(`API server is running on port ${PORT}`)
   )
 }

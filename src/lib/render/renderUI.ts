@@ -1,5 +1,5 @@
 import type { Remote, SpaceObject } from "../interface"
-import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string, type Vec2d } from "../math"
+import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string, type Vec2d } from "mathil"
 import { getScreenFromCanvas, getScreenRect } from "../canvas_util"
 import { getNamesAsString, setScaledFont } from "./render2d"
 import { getConnInfo, getReadyStateText } from "../websocket/webSocket"

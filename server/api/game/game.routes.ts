@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express"
 import express from "express"
 
-import { getPlayerListFromSessionId, getActiveSessions } from "./game.services"
+// import { getActiveSessions } from "./game.services"
+import { getPlayersFromSessionId, getSessions } from "../../main"
 
 export const game = express.Router()
 
@@ -14,7 +15,7 @@ game.post("/players", async (req: Request, res: Response, next: NextFunction) =>
       throw new Error("You must provide a sessionId.")
     }
 
-    const players = getPlayerListFromSessionId(sessionId.toString())
+    const players = getPlayersFromSessionId(sessionId.toString())
 
     res.json({
       players,
@@ -26,11 +27,9 @@ game.post("/players", async (req: Request, res: Response, next: NextFunction) =>
 
 game.get("/sessions", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const sessions = getActiveSessions()
+    const sessions = getSessions()
 
-    res.json({
-      sessions,
-    })
+    res.json(sessions)
   } catch (err) {
     next(err)
   }

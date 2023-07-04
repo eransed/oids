@@ -1,5 +1,5 @@
 import type { SpaceObject } from "../interface"
-import { round2dec, type Vec2d } from "../math"
+import { round2dec, type Vec2d } from "mathil"
 import { screenScale } from "../constants"
 import * as ship from "../../assets/ship.svg"
 import { renderShot, setScaledFont } from "./render2d"

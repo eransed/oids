@@ -1,7 +1,7 @@
 import type { Game } from "../game"
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas_util"
 import { gameState, initKeyControllers, spaceObjectKeyController } from "../input"
-import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from "../math"
+import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from "mathil"
 import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
 import { friction, gravity, handleCollisions } from "../physics"
 import { loadingText } from "../render/render2d"

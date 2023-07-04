@@ -1,6 +1,6 @@
 import type { PhotonLaser, SpaceObject } from "./interface"
-import { SpaceShape } from "./interface"
-import { rndf, rndi, type Vec2d } from "./math"
+import { MessageType, SpaceShape } from "./interface"
+import { rndf, rndi, type Vec2d } from "mathil"
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
 
 export function newPhotonLaser(): PhotonLaser {
@@ -41,8 +41,9 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
   }
 
   const spaceObject: SpaceObject = {
+    messageType: MessageType.GAME_UPDATE,
     viewport: { x: 0, y: 0 },
-    sessionId: undefined,
+    sessionId: "",
     acceleration: { x: 0, y: 0 },
     ammo: 1000,
     angleDegree: -90,
@@ -100,6 +101,17 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     ownerName: "",
     lastDamagedByName: "",
     joinedGame: currentTimeDate(),
+    lastMessage: "",
+    readyToPlay: false,
+    isHost: false,
+    // dateTimeClient: undefined,
+    // dateTimeServer: undefined,
+    ping: false,
+    pingResponse: false,
+    pingId: "",
+    hops: 0,
+    ttl: 0,
+    rtt: 0
   }
 
   return spaceObject

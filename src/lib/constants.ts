@@ -1,4 +1,4 @@
-import type { Vec2d } from "./math"
+import type { Vec2d } from "mathil"
 
 export const frontVersion = "0.1.0"
 export const screenScale = 3
