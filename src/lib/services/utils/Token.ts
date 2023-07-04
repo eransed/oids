@@ -4,7 +4,7 @@ import axios, { Axios } from "axios"
 import type { AxiosResponse } from "axios"
 import getProfile from "../user/profile"
 
-import { isLoggedIn, user, userLoading } from "../../../stores/stores"
+import { isLoggedIn, userLoading } from "../../../stores/stores"
 
 import type { Profile } from "../../../interfaces/user"
 
@@ -28,6 +28,7 @@ export const validateToken = async () => {
 
   await axios
     .post(`http://${location.hostname}:6060/api/v1/auth/refreshToken`, body)
+
     .then(async (response: AxiosResponse<any>) => {
       if (response.status === 200) {
         accessToken = response.data.accessToken
@@ -35,10 +36,9 @@ export const validateToken = async () => {
         localStorage.setItem("refreshToken", refreshToken)
         localStorage.setItem("accessToken", accessToken)
 
-        const userProfile: Profile | null = await getProfile()
+        const userProfile: AxiosResponse<Profile> = await getProfile()
 
         if (userProfile) {
-          user.set(userProfile.user)
           isLoggedIn.set(true)
           userLoading.set(false)
         }

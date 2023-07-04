@@ -5,7 +5,7 @@
   import { guestUserName, user } from "../../../../stores/stores"
 
   //Interfaces
-  import type { User } from "../../../../interfaces/user"
+
   import { MessageType, type SpaceObject } from "../../../../lib/interface"
 
   //Components
@@ -25,12 +25,6 @@
   import { onDestroy, onMount } from "svelte"
   import { info, log, usPretty, warn } from "mathil"
   import { v4 as uuidv4 } from "uuid"
-
-  let userData: User | undefined
-
-  user.subscribe((storedUser) => {
-    userData = storedUser
-  })
 
   let sessions: Session[] = []
   const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
@@ -207,7 +201,7 @@
     setTimeout(() => {
       info(`Disconnecting from websocket`)
       sock.disconnect()
-    }, 2000)
+    }, 200)
   })
 
   let joinedSession: Session | null

@@ -46,6 +46,19 @@
   }
 </script>
 
+<div in:fade={{ delay: 50 }}>
+  <Page>
+    <Card clickedOnCard={() => chosenMultiplayer()}>
+      <div class="cardTitle">
+        <TypeWriter speed={50} text="Multiplayer" />
+      </div>
+      <canvas bind:this={canvas} />
+    </Card>
+  </Page>
+</div>
+
+<!-- ToDo: Add list of open sessions and back button if chosen wrong gameMode -->
+
 <style>
   canvas {
     opacity: 0.5;
@@ -65,16 +78,3 @@
     align-self: center;
   }
 </style>
-
-<div in:fade={{ delay: 50 }}>
-  <Page>
-    <Card clickedOnCard={() => chosenMultiplayer()}>
-      <div class="cardTitle">
-        <TypeWriter speed={50} text="Multiplayer" />
-      </div>
-      <canvas bind:this={canvas} />
-    </Card>
-  </Page>
-</div>
-
-<!-- ToDo: Add list of open sessions and back button if chosen wrong gameMode -->

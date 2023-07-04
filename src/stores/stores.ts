@@ -7,7 +7,7 @@ export const menu: Writable<Button90Config[]> = writable()
 
 export const isLoggedIn: Writable<boolean> = writable()
 
-export const user: Writable<User | undefined> = writable()
+export const user: Writable<User> = writable()
 
 export const userLoading: Writable<boolean> = writable()
 
