@@ -1,5 +1,6 @@
 <script lang="ts">
   //Svelte
+  import { fade } from "svelte/transition"
 
   //Stores
   import { guestUserName, user } from "../../../../stores/stores"
@@ -25,6 +26,7 @@
   import { onDestroy, onMount } from "svelte"
   import { info, log, usPretty, warn } from "mathil"
   import { v4 as uuidv4 } from "uuid"
+  import TypeWriter from "../../../../components/typeWriter/TypeWriter.svelte"
 
   let sessions: Session[] = []
   const localPlayer = createSpaceObject($user ? $user.name : $guestUserName)
@@ -357,16 +359,18 @@
           {#if msg.serviceMsg}
             <span style="font-size: 0.8rem; font-style: italic; opacity: 0.5;">{msg.message}</span>
           {:else}
-            <p style="margin-bottom: 1rem;">
-              <span style="font-size: 0.65rem; color: #cdcdcd;">
-                {dateTimeFormat(msg.timeDate)} -
-                <span style="font-size: 0.8rem; color: #c89;">
-                  {msg.user.name}:
+            <div in:fade={{ delay: 100 }}>
+              <p style="margin-bottom: 1rem;">
+                <span style="font-size: 0.65rem; color: #cdcdcd;">
+                  {dateTimeFormat(msg.timeDate)} -
+                  <span style="font-size: 0.8rem; color: #c89;">
+                    {msg.user.name}:
+                  </span>
                 </span>
-              </span>
-              <br />
-              {msg.message}
-            </p>
+                <br />
+                <TypeWriter text={msg.message} delaySpeed={250} speed={35} />
+              </p>
+            </div>
           {/if}
         {/each}
       </div>
