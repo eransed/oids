@@ -3,18 +3,22 @@
  import { fade } from 'svelte/transition'
 
  //Stores
- import { guestUserName, pageHasHeader, user } from '../../stores/stores'
+ import { guestUser, pageHasHeader, user, isLoggedIn } from '../../stores/stores'
 
  //Components
  import TypeWriter from '../../components/typeWriter/TypeWriter.svelte'
 
  pageHasHeader.set(true)
 
- let welcomeMessage = `Welcome to OIDS ${$user ? $user?.name : $guestUserName}`
+ const welcomeMessage = 'Welcome to OIDS '
 </script>
 
 <div out:fade class="landingPage">
- <TypeWriter text={welcomeMessage} />
+ {#if $isLoggedIn}
+  <TypeWriter text={welcomeMessage + $user.name} />
+ {:else}
+  <TypeWriter text={welcomeMessage + $guestUser.name} />
+ {/if}
 </div>
 
 <style>

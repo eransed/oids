@@ -10,7 +10,17 @@ export const user: Writable<User> = writable()
 
 export const userLoading: Writable<boolean> = writable()
 
-export const guestUserName: Writable<string> = writable(`p-${rndi(1, 900000)}`)
+const createdGuestName = `p-${rndi(1, 900000)}`
+export const guestUserName: Writable<string> = writable(createdGuestName)
+
+const gUser: User = {
+ id: createdGuestName,
+ email: '',
+ name: createdGuestName,
+ createdAt: new Date().toDateString(),
+ updatedAt: new Date().toDateString(),
+}
+export const guestUser: Writable<User> = writable(gUser)
 
 export const pageHasHeader: Writable<boolean> = writable(true)
 
