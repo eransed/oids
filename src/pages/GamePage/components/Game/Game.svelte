@@ -35,6 +35,13 @@
   let canvas: HTMLCanvasElement
   // let cleanup: () => void
 
+  const noContext = document.getElementById("noContextMenu")
+
+  noContext?.addEventListener("contextmenu", (e) => {
+    console.log("what")
+    e.preventDefault()
+  })
+
   onMount(() => {
     // cleanup = initSettingsControl()
     game = new Game(canvas, player, getKeyMap(), showDeadMenu)
@@ -76,7 +83,7 @@
 </div>
 
 <GameMenu currentGame={game} />
-<canvas class="game_canvas" bind:this={canvas} />
+<canvas class="game_canvas" id="noContextMenu" bind:this={canvas} />
 
 <style>
   :root {

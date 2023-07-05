@@ -1,7 +1,6 @@
 <script lang="ts">
   //Routes
   import { routes } from "../../routes"
-  import type { Route } from "../../lib/interface"
 
   //Avatar imgs
   import Avatar from "../../assets/avatar.png"
@@ -12,12 +11,6 @@
 
   //Stores
   import { isLoggedIn } from "../../stores/stores"
-
-  //navButtons
-  import { Play, Profile } from "./navButtons"
-
-  //Svelte fx
-  import { slide } from "svelte/transition"
 
   //css
   import "./style.css"
@@ -42,18 +35,20 @@
   <nav>
     <div class="menuItem">
       {#each Object.values(routes) as route}
-        <div class="navButton">
-          <Button90
-            mouseTracking={false}
-            buttonConfig={{
-              buttonText: route.displayText,
-              clickCallback: () => {
-                navigate(route.path)
-              },
-              selected: false,
-            }}
-          />
-        </div>
+        {#if route.inHeader}
+          <div class="navButton">
+            <Button90
+              mouseTracking={false}
+              buttonConfig={{
+                buttonText: route.displayText,
+                clickCallback: () => {
+                  navigate(route.path)
+                },
+                selected: false,
+              }}
+            />
+          </div>
+        {/if}
       {/each}
     </div>
 

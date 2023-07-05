@@ -1,5 +1,5 @@
-import { linearTransform, round2dec, type Vec2d } from "mathil"
-import { setScaledFont } from "./render/render2d"
+import { linearTransform, round2dec, type Vec2d } from 'mathil'
+import { setScaledFont } from './render/render2d'
 
 const defaultSize = 700
 
@@ -46,9 +46,9 @@ export function newDataStats(): DataStats {
     data: [],
     maxSize: defaultSize,
     accumulated: 0,
-    baseUnit: "",
-    accUnit: "",
-    label: "",
+    baseUnit: '',
+    accUnit: '',
+    label: '',
     prettyPrint: siPretty,
   }
   GRAPHS.push(nds)
@@ -67,7 +67,7 @@ export function msPretty(ms: number): string {
   return `${round2dec(ms, 0)} ms`
 }
 
-export function siPretty(value: number, baseUnit = ""): string {
+export function siPretty(value: number, baseUnit = ''): string {
   const Y = 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000
   const Z = 1000 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000
   const E = 1000 * 1000 * 1000 * 1000 * 1000 * 1000
@@ -100,9 +100,9 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
   const max = getMax(ds)
   const a = getAverage(ds)
   const spread = ds.prettyPrint(max - min, ds.baseUnit)
-  ctx.fillStyle = "#fff"
+  ctx.fillStyle = '#fff'
   ctx.lineWidth = thinLine
-  ctx.strokeStyle = "#777"
+  ctx.strokeStyle = '#777'
   setScaledFont(ctx)
   ctx.strokeRect(0, 0, size.x, size.y)
   // ctx.fillText(`Value: ${ds.prettyPrint(value, ds.baseUnit)}`, size.x + 30, 25 + 0)
@@ -121,21 +121,21 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
   ctx.fillText(`${ds.prettyPrint(value, ds.baseUnit)}`, size.x + 40, 10 + yval)
   ctx.fillRect(size.x, yval, 30, thinLine)
 
-  ctx.fillStyle = "#88e"
+  ctx.fillStyle = '#88e'
   const yaver = linearTransform(a, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   ctx.fillText(`a: ${ds.prettyPrint(a, ds.baseUnit)}`, leftPad, 10 + yaver)
   ctx.fillRect(-30, yaver, 30, thinLine)
 
   const ymax = linearTransform(max, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   if (ymax + minRenderDist < yaver) {
-    ctx.fillStyle = "#e00"
+    ctx.fillStyle = '#e00'
     ctx.fillText(`h: ${ds.prettyPrint(max, ds.baseUnit)}`, leftPad, 10 + ymax)
     ctx.fillRect(-30, ymax, 30, thinLine)
   }
 
   const ymin = linearTransform(min, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   if (ymin - minRenderDist > yaver) {
-    ctx.fillStyle = "#0e0"
+    ctx.fillStyle = '#0e0'
     ctx.fillText(`l: ${ds.prettyPrint(min, ds.baseUnit)}`, leftPad, 10 + ymin)
     ctx.fillRect(-30, ymin, 30, thinLine)
   }
@@ -148,8 +148,8 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
     points.push({ x: xmap, y: ymap })
   })
 
-  ctx.fillStyle = "#fff"
-  ctx.strokeStyle = "#fff"
+  ctx.fillStyle = '#fff'
+  ctx.strokeStyle = '#fff'
 
   if (points.length > 1) {
     ctx.lineWidth = thinLine
@@ -165,7 +165,7 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
     })
   }
   // ctx.fillText(`Render t: ${round2dec(performance.now() -st, 0)} ms`, size.x + 30, 25 + 350)
-  ctx.fillStyle = "#0e0"
+  ctx.fillStyle = '#0e0'
   const places = ds.data.length === ds.maxSize ? ` ~${spread}` : ` ${ds.data.length}/${ds.maxSize}`
   ctx.fillText(`${ds.label}${places}`, 0, -Math.floor(edgePad * 1.5))
   ctx.restore()

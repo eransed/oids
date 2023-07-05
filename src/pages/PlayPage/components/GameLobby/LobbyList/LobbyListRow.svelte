@@ -1,23 +1,10 @@
 <script lang="ts">
   import type { SpaceObject } from "../../../../../lib/interface"
-  import { round2dec } from "mathil"
 
   export let player: SpaceObject | null = null
   export let theLocalPlayer = false
   export let header = false
 </script>
-
-<style>
-  th,
-  td {
-    padding-right: 0.6rem;
-  }
-  td {
-    padding-top: 0.6rem;
-    font-weight: bold;
-    font-size: 14px;
-  }
-</style>
 
 {#if header}
   <th colspan="1">Name</th>
@@ -32,3 +19,15 @@
   <td>{player.sessionId}</td>
   <td>{player.readyToPlay}</td>
 {/if}
+
+<style>
+  th,
+  td {
+    padding-right: 0.6rem;
+  }
+  td {
+    padding-top: 0.6rem;
+    font-weight: bold;
+    font-size: 14px;
+  }
+</style>

@@ -1,19 +1,20 @@
 //On mount -> validate refreshtoken and make a new auth token.
 
-import axios, { Axios } from "axios"
-import type { AxiosResponse } from "axios"
-import getProfile from "../user/profile"
+import axios, { Axios } from 'axios'
+import type { AxiosResponse } from 'axios'
+import getProfile from '../user/profile'
 
-import { isLoggedIn, userLoading } from "../../../stores/stores"
+import { isLoggedIn, userLoading } from '../../../stores/stores'
 
-import type { Profile } from "../../../interfaces/user"
+import type { Profile } from '../../../interfaces/user'
+import { log, warn } from 'mathil'
 
 //Check if token is valid and renew
 export const validateToken = async () => {
   let accessToken
   let refreshToken
 
-  const storedRefreshToken = localStorage.getItem("refreshToken")
+  const storedRefreshToken = localStorage.getItem('refreshToken')
 
   //If no refreshToken stored in localstorage -> return undefined and user needs to login
   if (!storedRefreshToken) {
@@ -33,8 +34,8 @@ export const validateToken = async () => {
       if (response.status === 200) {
         accessToken = response.data.accessToken
         refreshToken = response.data.refreshToken
-        localStorage.setItem("refreshToken", refreshToken)
-        localStorage.setItem("accessToken", accessToken)
+        localStorage.setItem('refreshToken', refreshToken)
+        localStorage.setItem('accessToken', accessToken)
 
         const userProfile: AxiosResponse<Profile> = await getProfile()
 
@@ -48,6 +49,6 @@ export const validateToken = async () => {
       }
     })
     .catch((err) => {
-      console.error(err)
+      warn(err)
     })
 }

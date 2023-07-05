@@ -1,16 +1,16 @@
-import type { Vec2d } from "mathil"
-import { linearTransform } from "mathil"
-import { getScreenRect } from "../canvas_util"
-import type { Game } from "../game"
-import { LineSegment } from "../shapes"
+import type { Vec2d } from 'mathil'
+import { linearTransform } from 'mathil'
+import { getScreenRect } from '../canvas_util'
+import type { Game } from '../game'
+import { LineSegment } from '../shapes'
 
 const render3DFrame = (game: Game) => {
   const scr = getScreenRect(game.ctx)
   const padding = 0
   const pad: Vec2d = { x: padding, y: padding }
-  game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, "#f00"))
-  game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, "#00f"))
-  game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, "#0f0"))
+  game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
+  game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
+  game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))
   game.segments.push(new LineSegment({ x: padding, y: scr.y }, { x: padding, y: padding }))
 
   const viewSlices = game.lightSource.shine(game.segments, game.ctx)
@@ -19,7 +19,7 @@ const render3DFrame = (game: Game) => {
   const viewSlizeWidth = Math.floor(viewSize.x / viewSlices.length)
   game.ctx.save()
 
-  game.ctx.fillStyle = "#000"
+  game.ctx.fillStyle = '#000'
   game.ctx.fillRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
   game.ctx.fill()
 
@@ -32,7 +32,7 @@ const render3DFrame = (game: Game) => {
     game.ctx.fillStyle = viewSlices[i].color
     game.ctx.fillRect(viewTopLeft.x + viewSlizeWidth * i, y, viewSlizeWidth, h)
   }
-  game.ctx.strokeStyle = "#f00"
+  game.ctx.strokeStyle = '#f00'
   game.ctx.lineWidth = 10
   game.ctx.strokeRect(viewTopLeft.x, viewTopLeft.y, viewSize.x, viewSize.y)
   game.ctx.stroke()

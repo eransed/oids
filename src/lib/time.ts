@@ -1,12 +1,12 @@
-import type { Game } from "./game"
-import { round2dec } from "mathil"
-import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from "./websocket/webSocket"
-import { updateShapes, updateSpaceObjects } from "./physics"
-import { clearScreen } from "./render/render2d"
-import { addDataPoint, newDataStats } from "./stats"
-import { renderFrameInfo } from "./render/renderUI"
-import { Every } from "./gameModes/regular"
-import { localPlayerStore } from "../pages/GamePage/components/Game/Utils/gameUtils"
+import type { Game } from './game'
+import { round2dec } from 'mathil'
+import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from './websocket/webSocket'
+import { updateShapes, updateSpaceObjects } from './physics'
+import { clearScreen } from './render/render2d'
+import { addDataPoint, newDataStats } from './stats'
+import { renderFrameInfo } from './render/renderUI'
+import { Every } from './gameModes/regular'
+import { localPlayerStore } from '../pages/GamePage/components/Game/Utils/gameUtils'
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -15,14 +15,14 @@ const max_dt = 80
 
 const fpsBuf = newDataStats()
 // fpsBuf.maxSize = 200
-fpsBuf.accUnit = " frames"
-fpsBuf.baseUnit = "fps"
-fpsBuf.label = "FPS"
+fpsBuf.accUnit = ' frames'
+fpsBuf.baseUnit = 'fps'
+fpsBuf.label = 'FPS'
 
 const frameTimes = newDataStats()
-frameTimes.baseUnit = "ms"
+frameTimes.baseUnit = 'ms'
 // frameTimes.maxSize = 500
-frameTimes.label = "Frame time"
+frameTimes.label = 'Frame time'
 
 export function getFrameTimeMs(timestamp: number): number {
   // todo: make sure not to return nan
@@ -59,7 +59,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   let fid: number
 
   function update(timestamp: number): void {
-    every20.tick(() => localPlayerStore.set (game.localPlayer))
+    every20.tick(() => localPlayerStore.set(game.localPlayer))
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx)
     renderFrame(game, dt)

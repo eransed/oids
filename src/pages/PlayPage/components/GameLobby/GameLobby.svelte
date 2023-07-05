@@ -3,7 +3,7 @@
   import { fade } from "svelte/transition"
 
   //Stores
-  import { guestUserName, user, localPlayer } from "../../../../stores/stores"
+  import { guestUserName, user, localPlayer, pageHasHeader } from "../../../../stores/stores"
 
   //Interfaces
 
@@ -27,6 +27,8 @@
   import { info, log, usPretty, warn } from "mathil"
   import { v4 as uuidv4 } from "uuid"
   import TypeWriter from "../../../../components/typeWriter/TypeWriter.svelte"
+
+  pageHasHeader.set(true)
 
   let sessions: Session[] = []
 

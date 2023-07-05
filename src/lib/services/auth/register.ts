@@ -1,1 +1,1 @@
-export const register = "";
+export const register = ''

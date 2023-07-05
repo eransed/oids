@@ -1,17 +1,7 @@
-import type { Vec2d } from "mathil"
-import { angularFriction, linearFriction, timeScale } from "../constants"
-import {
-  sub,
-  magnitude,
-  scalarMultiply,
-  add,
-  smul,
-  degToRad,
-  radToDeg,
-  withinBounds,
-  limitv,
-} from "mathil"
-import type { Testable, TestFunction, TestModule } from "./Testable"
+import type { Vec2d } from 'mathil'
+import { angularFriction, linearFriction, timeScale } from '../constants'
+import { sub, magnitude, scalarMultiply, add, smul, degToRad, radToDeg, withinBounds, limitv } from 'mathil'
+import type { Testable, TestFunction, TestModule } from './Testable'
 
 export interface Positionable {
   position: Vec2d
@@ -89,11 +79,11 @@ export class Physical implements Positionable, Testable {
 
   getTestModule(): TestModule {
     return {
-      name: "Physical",
+      name: 'Physical',
       moduleTestFunctions: [
-        { desc: "Test of the Physical.update method", func: this.testUpdate },
+        { desc: 'Test of the Physical.update method', func: this.testUpdate },
         {
-          desc: "Test of the Physical.onScreen method",
+          desc: 'Test of the Physical.onScreen method',
           func: this.testOnScreen,
         },
       ],

@@ -1,7 +1,11 @@
 <script lang="ts">
   //Svelte-fx
-  import { fade, slide } from "svelte/transition"
+  import { slide } from "svelte/transition"
 </script>
+
+<div class="pageWrapper" in:slide={{ duration: 750 }}>
+  <slot />
+</div>
 
 <style>
   .pageWrapper {
@@ -24,7 +28,3 @@
     }
   }
 </style>
-
-<div class="pageWrapper" in:slide={{ duration: 750 }}>
-  <slot />
-</div>

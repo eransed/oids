@@ -1,13 +1,13 @@
 //WS Setup
-import type { IncomingMessage } from "http"
-import { soFromValueArray, soToValueArray } from "../src/lib/websocket/util"
-import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from "ws"
-import { OIDS_WS_PORT } from "./pub_config"
-import { getLocalIp, ipport } from "./net"
+import type { IncomingMessage } from 'http'
+import { soFromValueArray, soToValueArray } from '../src/lib/websocket/util'
+import { CLOSED, CLOSING, CONNECTING, OPEN, WebSocketServer } from 'ws'
+import { OIDS_WS_PORT } from './pub_config'
+import { getLocalIp, ipport } from './net'
 
-import { apiServer } from "./apiServer"
-import { start_host_server } from "./host_server"
-import { SpaceObject } from "../src/lib/interface"
+import { apiServer } from './apiServer'
+import { start_host_server } from './host_server'
+import { SpaceObject } from '../src/lib/interface'
 
 // start ApiServer
 apiServer()
@@ -18,7 +18,7 @@ start_host_server()
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const pack = require("../package.json")
 // const name_ver: string = pack.name + " " + pack.version
-const name_ver = "oids-0.3.0"
+const name_ver = 'oids-0.3.0'
 
 const WS_PORT = OIDS_WS_PORT
 
@@ -62,7 +62,7 @@ export class Client {
 
   addEventListeners(): void {
     // console.log(`Adding event-listeners for ${this.toString()}`)
-    this.ws.addEventListener("close", () => {
+    this.ws.addEventListener('close', () => {
       // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
       console.log(`${this.toString()} has been disconnected, sending goodbye message`)
       const offlineMessage: SpaceObject | null = this.lastDataObject
@@ -72,16 +72,16 @@ export class Client {
         broadcastToAllClients(this, globalConnectedClients, offlineMessage)
         globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
         if (globalConnectedClients.length === 0) {
-          console.log("No clients connected :(")
+          console.log('No clients connected :(')
         }
       } else {
         console.error("Can't send offlineMessage: No data has been recieved")
       }
     })
 
-    this.ws.addEventListener("message", (event: MessageEvent) => {
+    this.ws.addEventListener('message', (event: MessageEvent) => {
       if (!event.data) {
-        console.log("No data sent by connected client")
+        console.log('No data sent by connected client')
         return
       }
 
@@ -99,7 +99,7 @@ export class Client {
             so.online = true
             broadcastToSessionClients(this, globalConnectedClients, so)
           } else {
-            console.log("No clients connected")
+            console.log('No clients connected')
           }
         }
       } catch (e) {
@@ -117,15 +117,15 @@ function getReadyStateText(ws: WebSocket): string {
   const s: number = ws.readyState
   switch (s) {
     case CONNECTING:
-      return "CONNECTING"
+      return 'CONNECTING'
     case CLOSED:
-      return "CLOSED"
+      return 'CLOSED'
     case OPEN:
-      return "OPEN"
+      return 'OPEN'
     case CLOSING:
-      return "CLOSING"
+      return 'CLOSING'
     default:
-      return "UNKNOWN (" + s + ")"
+      return 'UNKNOWN (' + s + ')'
   }
 }
 
@@ -212,7 +212,7 @@ export function getPlayersFromSessionId(sessionId: string | null): (SpaceObject 
 }
 
 export function getActivePlayerSessions() {
-  const sessionsSet: Set<Client["sessionId"] | null> = new Set()
+  const sessionsSet: Set<Client['sessionId'] | null> = new Set()
 
   const sessionList: (string | null)[] = []
 
@@ -227,7 +227,7 @@ export function getActivePlayerSessions() {
   return sessionList
 }
 
-server.on("connection", function connection(clientConnection: WebSocket, req: IncomingMessage) {
+server.on('connection', function connection(clientConnection: WebSocket, req: IncomingMessage) {
   clientConnection.send(JSON.stringify({ serverVersion: name_ver }))
   globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
 

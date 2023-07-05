@@ -1,11 +1,15 @@
+import { writable, type Writable } from "svelte/store"
 import type { Button90Config } from "../../interfaces/menu"
+import ProfileModal from "../../components/profile/ProfileModal.svelte"
+import type { ComponentConstructorOptions } from "svelte"
 
-import { navigate } from "svelte-routing"
+//Stores
+export const profileComponent: Writable<string> = writable("summary")
 
 const summary: Button90Config = {
   buttonText: "Summary",
   clickCallback: () => {
-    navigate("/profile/summary")
+    profileComponent.set("summary")
   },
   routeParam: "summary",
   selected: false,
@@ -14,7 +18,7 @@ const summary: Button90Config = {
 const matchHistory: Button90Config = {
   buttonText: "Match history",
   clickCallback: () => {
-    navigate("/profile/matchHistory")
+    profileComponent.set("matchHistory")
   },
   routeParam: "matchHistory",
   selected: false,
@@ -23,7 +27,7 @@ const matchHistory: Button90Config = {
 const settings: Button90Config = {
   buttonText: "Settings",
   clickCallback: () => {
-    navigate("/profile/settings")
+    profileComponent.set("settings")
   },
   routeParam: "settings",
   selected: false,

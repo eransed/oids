@@ -1,11 +1,11 @@
-import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical, Positionable, SpaceObject, Thrustable } from "./interface"
-import type { Steerable } from "./traits/Steerable"
+import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical, Positionable, SpaceObject, Thrustable } from './interface'
+import type { Steerable } from './traits/Steerable'
 
-import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2d } from "mathil"
-import { maxHeat, shotHitReversFactor } from "./constants"
-import { renderHitExplosion } from "./render/renderFx"
-import { newPhotonLaser } from "./factory"
-import { getHeading } from "./physics"
+import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2d } from 'mathil'
+import { maxHeat, shotHitReversFactor } from './constants'
+import { renderHitExplosion } from './render/renderFx'
+import { newPhotonLaser } from './factory'
+import { getHeading } from './physics'
 
 export function applyEngine(so: Thrustable & Boostable, boost = false): number {
   const consumption: number = so.enginePower * (boost ? so.booster : 1)

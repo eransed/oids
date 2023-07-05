@@ -1,6 +1,6 @@
-import type { Writable } from "svelte/store"
-import type { Vec2d } from "mathil"
-import type { Steerable } from "./traits/Steerable"
+import type { Writable } from 'svelte/store'
+import type { Vec2d } from 'mathil'
+import type { Steerable } from './traits/Steerable'
 
 export enum GameType {
   SinglePlayer,
@@ -144,7 +144,7 @@ export enum MessageType {
   SESSION_UPDATE,
   LEFT_SESSION,
   CHAT_MESSAGE,
-  PING
+  PING,
 }
 
 export interface SpaceObject
@@ -255,4 +255,5 @@ export interface Session {
 export interface Route {
   displayText: string
   path: string
+  inHeader: boolean
 }

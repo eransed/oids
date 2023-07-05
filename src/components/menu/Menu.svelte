@@ -78,6 +78,19 @@
   }
 </script>
 
+{#if menuOpen}
+  <MenuWrapper>
+    <ul class="buttonList">
+      <h3 class="menuHeader">{menuHeader}</h3>
+      {#each buttons as button}
+        <li class="button">
+          <Button90 buttonConfig={button} />
+        </li>
+      {/each}
+    </ul>
+  </MenuWrapper>
+{/if}
+
 <style>
   :root {
     --color: rgb(99, 136, 179, 1);
@@ -141,16 +154,3 @@
     transition-duration: 0.5s;
   }
 </style>
-
-{#if menuOpen}
-  <MenuWrapper>
-    <ul class="buttonList">
-      <h3 class="menuHeader">{menuHeader}</h3>
-      {#each buttons as button}
-        <li class="button">
-          <Button90 buttonConfig={button} />
-        </li>
-      {/each}
-    </ul>
-  </MenuWrapper>
-{/if}

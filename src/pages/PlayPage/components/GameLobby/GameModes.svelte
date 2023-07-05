@@ -7,7 +7,6 @@
   import Page from "../../../../components/page/page.svelte"
   import Card from "../../../../components/card/card.svelte"
   import TypeWriter from "../../../../components/typeWriter/TypeWriter.svelte"
-  import GameLobby from "./GameLobby.svelte"
 
   //Game
   import { Game } from "../../../../lib/game"

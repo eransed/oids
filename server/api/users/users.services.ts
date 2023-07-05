@@ -1,7 +1,7 @@
-import bcrypt from "bcrypt"
-import db from "../utils/db"
+import bcrypt from 'bcrypt'
+import db from '../utils/db'
 
-import { User } from "../types/user"
+import { User } from '../types/user'
 
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({

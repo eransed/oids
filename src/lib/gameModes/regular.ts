@@ -1,23 +1,23 @@
-import type { Game } from "../game"
-import { setCanvasSize, getScreenRect, getScreenCenterPosition } from "../canvas_util"
-import { gameState, initKeyControllers, spaceObjectKeyController } from "../input"
-import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from "mathil"
-import { bounceSpaceObject, handleDeathExplosion } from "../mechanics"
-import { friction, gravity, handleCollisions } from "../physics"
-import { loadingText } from "../render/render2d"
-import { fpsCounter } from "../time"
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from "../interface"
-import { getSerVer, initMultiplayer, registerServerUpdate } from "../websocket/webSocket"
-import { randomAnyColor } from "../color"
-import { test } from "../test"
-import { explosionDuration } from "../constants"
-import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from "../stats"
-import { createSpaceObject, newPhotonLaser } from "../factory"
-import { reduceShotSize, reduceSoSize } from "../websocket/util"
-import { renderMoon } from "../render/renderDebris"
-import { renderShip } from "../render/renderShip"
-import { renderViewport } from "../render/renderUI"
-import { renderExplosionFrame } from "../render/renderFx"
+import type { Game } from '../game'
+import { setCanvasSize, getScreenRect, getScreenCenterPosition } from '../canvas_util'
+import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
+import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from 'mathil'
+import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
+import { friction, gravity, handleCollisions } from '../physics'
+import { loadingText } from '../render/render2d'
+import { fpsCounter } from '../time'
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from '../interface'
+import { getSerVer, initMultiplayer, registerServerUpdate } from '../websocket/webSocket'
+import { randomAnyColor } from '../color'
+import { test } from '../test'
+import { explosionDuration } from '../constants'
+import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from '../stats'
+import { createSpaceObject, newPhotonLaser } from '../factory'
+import { reduceShotSize, reduceSoSize } from '../websocket/util'
+import { renderMoon } from '../render/renderDebris'
+import { renderShip } from '../render/renderShip'
+import { renderViewport } from '../render/renderUI'
+import { renderExplosionFrame } from '../render/renderFx'
 
 //Stores
 
@@ -47,52 +47,52 @@ const shotSize = newDataStats()
 const soSize = newDataStats()
 const dataTest = newDataStats()
 
-dataTest.baseUnit = "B"
-dataTest.label = "Reduced So Size"
+dataTest.baseUnit = 'B'
+dataTest.label = 'Reduced So Size'
 
-soSize.baseUnit = "B"
-soSize.label = "SpaceObject Size"
+soSize.baseUnit = 'B'
+soSize.label = 'SpaceObject Size'
 
-shotSize.baseUnit = "B"
-shotSize.label = "Shot size"
+shotSize.baseUnit = 'B'
+shotSize.label = 'Shot size'
 
-speedbuf.baseUnit = "m/s"
-speedbuf.accUnit = "m"
-speedbuf.label = "Speed"
+speedbuf.baseUnit = 'm/s'
+speedbuf.accUnit = 'm'
+speedbuf.label = 'Speed'
 // speedbuf.maxSize = 500
 
-hpbuf.baseUnit = "hp"
-hpbuf.label = "Hp"
+hpbuf.baseUnit = 'hp'
+hpbuf.label = 'Hp'
 // hpbuf.maxSize = 1000
 
 // symbuf.maxSize = 500
-packetSizeBuf.baseUnit = "B"
-packetSizeBuf.label = "Packet"
+packetSizeBuf.baseUnit = 'B'
+packetSizeBuf.label = 'Packet'
 
-rxByteDataBuf.baseUnit = "B"
-rxByteDataBuf.label = "Data downloaded"
+rxByteDataBuf.baseUnit = 'B'
+rxByteDataBuf.label = 'Data downloaded'
 // rxByteDataBuf.maxSize = 1000
 
-ppsbuf.baseUnit = "pps"
-ppsbuf.label = "Packets/sec"
+ppsbuf.baseUnit = 'pps'
+ppsbuf.label = 'Packets/sec'
 // ppsbuf.maxSize = 1000
 
 // renderObjBuf.maxSize = 2000
-renderObjBuf.baseUnit = "obj"
-renderObjBuf.label = "Obj/frame"
+renderObjBuf.baseUnit = 'obj'
+renderObjBuf.label = 'Obj/frame'
 
-timebuf.baseUnit = "s"
+timebuf.baseUnit = 's'
 timebuf.prettyPrint = msPretty
 timebuf.maxSize = 60
-timebuf.label = "Time"
+timebuf.label = 'Time'
 
-downloadBuf.label = "Download"
-downloadBuf.baseUnit = "bit/s"
-downloadBuf.accUnit = "bit"
+downloadBuf.label = 'Download'
+downloadBuf.baseUnit = 'bit/s'
+downloadBuf.accUnit = 'bit'
 downloadBuf.maxSize = 60
 
-batbuf.label = "Battery"
-batbuf.baseUnit = "%"
+batbuf.label = 'Battery'
+batbuf.baseUnit = '%'
 
 // const packetSize = newDataStats()
 // packetSize.maxSize = 1000
@@ -111,7 +111,7 @@ export function initRegularGame(game: Game): void {
     return
   }
 
-  loadingText("Loading...", game.ctx)
+  loadingText('Loading...', game.ctx)
   initKeyControllers()
 
   const offset = 500
@@ -131,12 +131,12 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.steeringPower = 1.6
   game.localPlayer.enginePower = 0.25
   game.localPlayer.color = randomAnyColor()
-  game.localPlayer.photonColor = "#f0f"
+  game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
   game.localPlayer.hitRadius = 120
-  game.localPlayer.color = "#db8"
+  game.localPlayer.color = '#db8'
 
-  console.log("Your ship name is: " + game.localPlayer.name + "\nAnd your color is: " + game.localPlayer.color)
+  console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
   initMultiplayer()
 
@@ -150,7 +150,7 @@ export function initRegularGame(game: Game): void {
 
     asteroid.position = rndfVec2d(0, 1200)
     asteroid.health = 1
-    asteroid.name = "asteroid-" + i
+    asteroid.name = 'asteroid-' + i
 
     game.bodies.push(asteroid)
   }

@@ -1,7 +1,7 @@
-import crypto from "crypto";
+import crypto from "crypto"
 
 const hashToken = (token: string) => {
-  return crypto.createHash("sha512").update(token).digest("hex");
-};
+  return crypto.createHash("sha512").update(token).digest("hex")
+}
 
-export default hashToken;
+export default hashToken

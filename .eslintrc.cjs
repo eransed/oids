@@ -4,11 +4,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:storybook/recommended",
-  ],
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:storybook/recommended"],
   overrides: [],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -17,4 +13,4 @@ module.exports = {
   },
   plugins: ["@typescript-eslint"],
   rules: {},
-};
+}

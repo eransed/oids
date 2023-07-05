@@ -1,14 +1,14 @@
-import type { Remote, SpaceObject } from "../interface"
-import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string, type Vec2d } from "mathil"
-import { getScreenFromCanvas, getScreenRect } from "../canvas_util"
-import { getNamesAsString, setScaledFont } from "./render2d"
-import { getConnInfo, getReadyStateText } from "../websocket/webSocket"
-import { screenScale, timeScale } from "../constants"
+import type { Remote, SpaceObject } from '../interface'
+import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string, type Vec2d } from 'mathil'
+import { getScreenFromCanvas, getScreenRect } from '../canvas_util'
+import { getNamesAsString, setScaledFont } from './render2d'
+import { getConnInfo, getReadyStateText } from '../websocket/webSocket'
+import { screenScale, timeScale } from '../constants'
 
 //Rendering the viewport of other players
 export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remote): void {
   const viewport = remotePlayer.viewport
-  ctx.strokeStyle = "#fff"
+  ctx.strokeStyle = '#fff'
   ctx.lineWidth = 5
   ctx.strokeRect(0, 0, viewport.x, viewport.y)
 }
@@ -25,8 +25,8 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const scale = setScaledFont(ctx)
 
   const renderSpeedometer = (screen: Vec2d, so: SpaceObject, ctx: CanvasRenderingContext2D) => {
-    renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 150, "y m/s")
-    renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 150, "x m/s")
+    renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 150, 'y m/s')
+    renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 150, 'x m/s')
   }
 
   ctx.save()
@@ -34,25 +34,25 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   //Speedometer
   // renderSpeedometer(screen, so, ctx)
 
-  ctx.fillStyle = "#fff"
+  ctx.fillStyle = '#fff'
   ctx.fillText(`Local: ${so.name}`, xpos, yrow1)
   // ctx.fillText(`---------------------`, xpos, yrow3)
   ctx.fillText(getNamesAsString(serverObjects, `Online (${serverObjects.length}): `), xpos, yrow2)
-  ctx.fillText("SIF: " + so.shotsInFlight.length, xpos + 360, yrow1)
+  ctx.fillText('SIF: ' + so.shotsInFlight.length, xpos + 360, yrow1)
   // ctx.fillText(so.health + 'hp', xpos + offset * 0.5, yrow1)
   // ctx.fillText('Ammo: ' + so.ammo, xpos + offset * 0.9, yrow1)
   // ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', xpos + offset * 1.5, ypos)
-  ctx.fillText("P" + to_string(so.position, 0), xpos + 600, yrow1)
-  ctx.fillText("V" + to_string(so.velocity, 1), xpos + 1000, yrow1)
-  ctx.fillText("A" + to_string(scalarMultiply(so.acceleration, 1000), 1), xpos + 1400, yrow1)
+  ctx.fillText('P' + to_string(so.position, 0), xpos + 600, yrow1)
+  ctx.fillText('V' + to_string(so.velocity, 1), xpos + 1000, yrow1)
+  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), xpos + 1400, yrow1)
   const firstBar = 170
   const barDiff = 80
-  renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, "hp", so.health, 250, ctx, 75)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, "Bat", so.batteryLevel, 500, ctx, 250)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, "Amm", so.ammo, 1000, ctx, 200)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, "Speed", magnitude(so.velocity), 20, ctx, -15)
-  const cstate: string = so.canonOverHeat ? "Overheat" : "Heat"
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 4) }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, "#d44")
+  renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, 'hp', so.health, 250, ctx, 75)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, 'Bat', so.batteryLevel, 500, ctx, 250)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, 'Amm', so.ammo, 1000, ctx, 200)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
+  const cstate: string = so.canonOverHeat ? 'Overheat' : 'Heat'
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 4) }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, '#d44')
   // renderProgressBar({ x: xpos, y: yrow1 - 500 }, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
   // renderProgressBar({ x: xpos, y: yrow1 - 700 }, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
   ctx.restore()
@@ -65,14 +65,14 @@ export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, v
   const screen: Vec2d = getScreenRect(ctx)
   const ratio: number = round2dec(screen.x / screen.y, 2)
   setScaledFont(ctx)
-  ctx.fillStyle = "#fff"
+  ctx.fillStyle = '#fff'
   const info = `WS: ${getReadyStateText()} ${getConnInfo()}   RES: ${screen.x}x${screen.y} (x${screenScale}, ${ratio})   DTS: ${round2dec(
     frameTimeMs * timeScale,
     dec
   )}`
   ctx.fillText(info, xpos, 50)
-  ctx.fillStyle = "#444"
-  ctx.fillText("" + ver, screen.x - ver.length * 27, 50)
+  ctx.fillStyle = '#444'
+  ctx.fillText('' + ver, screen.x - ver.length * 27, 50)
 }
 
 export function renderProgressBar(
@@ -83,7 +83,7 @@ export function renderProgressBar(
   ctx: CanvasRenderingContext2D,
   redLevel = 60,
   warn = false,
-  textWarnColor = "#7b7b7b"
+  textWarnColor = '#7b7b7b'
 ): void {
   ctx.save()
   ctx.translate(pos.x, pos.y)
@@ -92,12 +92,12 @@ export function renderProgressBar(
   const h = 50
 
   ctx.lineWidth = linew
-  ctx.strokeStyle = "#fff"
-  ctx.fillStyle = "#fff"
+  ctx.strokeStyle = '#fff'
+  ctx.fillStyle = '#fff'
 
   if (amount < redLevel || (redLevel < 0 && amount > Math.abs(redLevel))) {
     // ctx.fillStyle = '#ffa500'
-    ctx.fillStyle = "#ff0"
+    ctx.fillStyle = '#ff0'
   } else if (redLevel < 0 && amount < Math.abs(redLevel)) {
     // ctx.fillStyle = '#090'
   }
@@ -112,7 +112,7 @@ export function renderProgressBar(
   let p: number = (w * amount) / max - linew
   if (p < 0) p = 0
   if (p > w) {
-    ctx.fillStyle = "#600"
+    ctx.fillStyle = '#600'
     p = w - linew
   }
 
@@ -123,7 +123,7 @@ export function renderProgressBar(
   ctx.strokeRect(Math.floor(linew / 2), Math.floor(linew / 2) + 1, 1, h - Math.floor(linew / 2) - 1)
 
   setScaledFont(ctx)
-  ctx.fillStyle = "#7b7b7b"
+  ctx.fillStyle = '#7b7b7b'
   if (percent_n > 56) {
     // ctx.fillStyle = '#000'
   }
@@ -141,8 +141,8 @@ export function renderNumber(num: number, pos: Vec2d, ctx: CanvasRenderingContex
   ctx.translate(pos.x, pos.y)
   ctx.rotate(degToRad(angleAdjDeg))
   ctx.font = `bold 22px courier`
-  ctx.textAlign = "center"
-  ctx.textBaseline = "middle"
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
   ctx.fillText(`${num}`, 0, 0)
   ctx.restore()
 }
@@ -160,13 +160,13 @@ export function renderRoundIndicator(
   ctx.save()
   ctx.translate(centerPos.x, centerPos.y)
   ctx.beginPath()
-  ctx.strokeStyle = "#fff"
-  ctx.fillStyle = "#fff"
+  ctx.strokeStyle = '#fff'
+  ctx.fillStyle = '#fff'
   ctx.lineWidth = 8
 
   const ang1 = -240
   const meterAngleTest = round2dec(linearTransform(value, min, max, 0, -ang1), 0)
-  const meterAngleTestStr = meterAngleTest + ""
+  const meterAngleTestStr = meterAngleTest + ''
   const roundVal = `${round2dec(value, 0)}`
   ctx.fillText(`${meterAngleTest}`, -8 * meterAngleTestStr.length, radius / 2)
   // ctx.fillText(`${roundVal}`, -8 * roundVal.length , radius/2)
@@ -216,7 +216,7 @@ export function renderRoundIndicator(
   ctx.lineTo(radius - 25, 0)
   ctx.moveTo(-needleWith / 2, 0)
   ctx.lineWidth = needleWith
-  ctx.strokeStyle = "#c00"
+  ctx.strokeStyle = '#c00'
   ctx.closePath()
   ctx.stroke()
   ctx.restore()

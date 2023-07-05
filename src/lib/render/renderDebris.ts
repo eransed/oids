@@ -1,5 +1,5 @@
-import type { SpaceObject } from "../interface"
-import { setScaledFont } from "./render2d"
+import type { SpaceObject } from '../interface'
+import { setScaledFont } from './render2d'
 
 export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
   ctx.save()
@@ -10,7 +10,7 @@ export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void 
   ctx.closePath()
   ctx.fill()
   setScaledFont(ctx)
-  ctx.fillStyle = "#ccc"
+  ctx.fillStyle = '#ccc'
   //ctx.fillText(`${s.health}hp`, 0, 0)
   ctx.restore()
 }
@@ -24,7 +24,7 @@ export function renderComet(s: SpaceObject, ctx: CanvasRenderingContext2D): void
   ctx.closePath()
   ctx.fill()
   setScaledFont(ctx)
-  ctx.fillStyle = "#ccc"
+  ctx.fillStyle = '#ccc'
   //ctx.fillText(`${s.health}hp`, 0, 0)
   ctx.restore()
 }

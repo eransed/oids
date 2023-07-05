@@ -1,9 +1,9 @@
 <script lang="ts">
   //Stores
-  import { pageHasHeader } from "../../stores/stores"
+  import { pageHasHeader } from '../../stores/stores'
 
   //Components
-  import GameModes from "./components/GameLobby/GameModes.svelte"
+  import GameModes from './components/GameLobby/GameModes.svelte'
 
   pageHasHeader.set(true)
 </script>

@@ -1,12 +1,12 @@
-import { GameType, type SpaceObject, type KeyFunctionMap } from "./interface"
+import { GameType, type SpaceObject, type KeyFunctionMap } from './interface'
 
-import { getContext } from "./canvas_util"
+import { getContext } from './canvas_util'
 
-import { LightSource, LineSegment } from "./shapes"
-import { renderLoop } from "./time"
-import * as WelcomeScreen from "./gameModes/welcomeScreen"
-import type { Shape } from "./shapes/Shape"
-import { initRegularGame, nextFrame, renderFrame } from "./gameModes/regular"
+import { LightSource, LineSegment } from './shapes'
+import { renderLoop } from './time'
+import * as WelcomeScreen from './gameModes/welcomeScreen'
+import type { Shape } from './shapes/Shape'
+import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 
 export class Game {
   testShapes: Shape[] = []
@@ -50,12 +50,12 @@ export class Game {
     if (this.stopper) {
       await this.stopper()
     } else {
-      console.error("stopper not init")
+      console.error('stopper not init')
     }
   }
 
   startSingleplayer(): void {
-    console.log("starts single")
+    console.log('starts single')
   }
 
   startWelcomeScreen(): void {

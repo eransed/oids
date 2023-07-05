@@ -1,33 +1,33 @@
-import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject } from "./interface"
-import { applyEngineThrust, applySteer, fire } from "./mechanics"
-import { timeScale } from "./constants"
-import type { Vec2d } from "mathil"
-import { writable, type Writable } from "svelte/store"
+import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject } from './interface'
+import { applyEngineThrust, applySteer, fire } from './mechanics'
+import { timeScale } from './constants'
+import type { Vec2d } from 'mathil'
+import { writable, type Writable } from 'svelte/store'
 
 export const activeKeyStates: Writable<KeyFunction[]> = writable()
 export const gameState: Writable<GameState> = writable()
 
 const DefaultKeyMap: KeyFunctionMap = {
-  thrust: { activators: ["w", "ArrowUp"], keyStatus: false },
-  reverseThrust: { activators: ["s", "ArrowDown"], keyStatus: false },
-  boost: { activators: ["b"], keyStatus: false },
-  halt: { activators: ["h"], keyStatus: false, toggle: true },
-  turnLeft: { activators: ["a", "ArrowLeft"], keyStatus: false },
-  turnRight: { activators: ["d", "ArrowRight"], keyStatus: false },
-  strafeLeft: { activators: ["q", "PageUp"], keyStatus: false },
-  strafeRight: { activators: ["e", "PageDown"], keyStatus: false },
-  fire: { activators: [" "], keyStatus: false },
-  reload: { activators: ["r"], keyStatus: false },
-  selfDestroy: { activators: ["k"], keyStatus: false },
-  systemGraphs: { activators: ["g"], keyStatus: false, toggle: true },
-  leaderBoard: { activators: ["p"], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  hotKeys: { activators: ["o"], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  shipSettings: { activators: ["i"], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  thrust: { activators: ['w', 'ArrowUp'], keyStatus: false },
+  reverseThrust: { activators: ['s', 'ArrowDown'], keyStatus: false },
+  boost: { activators: ['b'], keyStatus: false },
+  halt: { activators: ['h'], keyStatus: false, toggle: true },
+  turnLeft: { activators: ['a', 'ArrowLeft'], keyStatus: false },
+  turnRight: { activators: ['d', 'ArrowRight'], keyStatus: false },
+  strafeLeft: { activators: ['q', 'PageUp'], keyStatus: false },
+  strafeRight: { activators: ['e', 'PageDown'], keyStatus: false },
+  fire: { activators: [' '], keyStatus: false },
+  reload: { activators: ['r'], keyStatus: false },
+  selfDestroy: { activators: ['k'], keyStatus: false },
+  systemGraphs: { activators: ['g'], keyStatus: false, toggle: true },
+  leaderBoard: { activators: ['p'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  hotKeys: { activators: ['o'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  shipSettings: { activators: ['i'], keyStatus: false, store: writable<boolean>(false), toggle: true },
 }
 
 // Input helper functions
 export function keyDisplayName(key: string) {
-  if (key === " ") return "Spacebar"
+  if (key === ' ') return 'Spacebar'
   return key
 }
 
@@ -166,14 +166,14 @@ function keyupArrowControl(event: KeyboardEvent) {
 }
 
 export function initKeyControllers(): void {
-  document.addEventListener("keydown", keydownArrowControl)
-  document.addEventListener("keyup", keyupArrowControl)
+  document.addEventListener('keydown', keydownArrowControl)
+  document.addEventListener('keyup', keyupArrowControl)
 }
 
 export function removeKeyControllers(): void {
   resetState()
-  document.removeEventListener("keydown", keydownArrowControl)
-  document.removeEventListener("keyup", keyupArrowControl)
+  document.removeEventListener('keydown', keydownArrowControl)
+  document.removeEventListener('keyup', keyupArrowControl)
 }
 
 export function getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEvent): Vec2d {

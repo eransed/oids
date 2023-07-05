@@ -1,7 +1,7 @@
-import axios, { type AxiosResponse } from "axios"
+import axios, { type AxiosResponse } from 'axios'
 import { Tester } from 'mathil'
 
-import type { Session } from "../../interface"
+import type { Session } from '../../interface'
 
 export const activeSessions = async (): Promise<AxiosResponse<Session[]>> => {
   const response: AxiosResponse<Session[]> = await axios
@@ -15,7 +15,6 @@ export const activeSessions = async (): Promise<AxiosResponse<Session[]>> => {
 
   return response
 }
-
 
 // const testActiveSessions = new Tester(
 //   (a: AxiosResponse<Session[], any>, b: AxiosResponse<Session[], any>) => {
@@ -32,5 +31,3 @@ export const activeSessions = async (): Promise<AxiosResponse<Session[]>> => {
 //     testActiveSessions.test(expected, () => { return q })
 //   })
 // })
-
-

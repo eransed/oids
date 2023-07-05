@@ -1,3 +1,7 @@
+<div class="menuWrapper">
+  <slot />
+</div>
+
 <style>
   :root {
     --color: rgb(99, 136, 179, 1);
@@ -29,7 +33,3 @@
     color: #fff;
   }
 </style>
-
-<div class="menuWrapper">
-  <slot />
-</div>

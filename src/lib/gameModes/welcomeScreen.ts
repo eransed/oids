@@ -1,15 +1,15 @@
-import { setCanvasSize, getScreenCenterPosition, getScreenRect, getScreenCenterPositionFromClient } from "../canvas_util"
-import { randomBlue, randomAnyColor } from "../color"
-import { initKeyControllers, spaceObjectKeyController } from "../input"
-import { createSpaceObject } from "../factory"
-import type { Game } from "../game"
-import { add, rndfVec2d, rndi } from "mathil"
-import { bounceSpaceObject } from "../mechanics"
-import { gravity } from "../physics"
-import { loadingText } from "../render/render2d"
-import { GameType, SpaceShape } from "../interface"
-import { renderComet, renderMoon } from "../render/renderDebris"
-import { renderShip } from "../render/renderShip"
+import { setCanvasSize, getScreenCenterPosition, getScreenRect, getScreenCenterPositionFromClient } from '../canvas_util'
+import { randomBlue, randomAnyColor } from '../color'
+import { spaceObjectKeyController } from '../input'
+import { createSpaceObject } from '../factory'
+import type { Game } from '../game'
+import { add, rndfVec2d, rndi } from 'mathil'
+import { bounceSpaceObject } from '../mechanics'
+import { gravity } from '../physics'
+import { loadingText } from '../render/render2d'
+import { GameType, SpaceShape } from '../interface'
+import { renderMoon } from '../render/renderDebris'
+import { renderShip } from '../render/renderShip'
 
 export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
@@ -35,10 +35,10 @@ export function renderFrame(game: Game, dt: number): void {
   }
   setCanvasSize(game.ctx)
   game.ctx.save()
-  game.ctx.fillStyle = "#000"
+  game.ctx.fillStyle = '#000'
   game.ctx.fill()
   game.ctx.beginPath()
-  game.ctx.strokeStyle = "#f00"
+  game.ctx.strokeStyle = '#f00'
   game.ctx.lineWidth = 10
   game.ctx.stroke()
   game.ctx.fill()
@@ -64,7 +64,7 @@ export function initWelcomeScreen(game: Game): void {
 
   game.type = GameType.WelcomeScreen
 
-  loadingText("Loading...", game.ctx)
+  loadingText('Loading...', game.ctx)
 
   // initKeyControllers()
 
@@ -84,7 +84,7 @@ export function initWelcomeScreen(game: Game): void {
   game.localPlayer.canonOverHeat = true
   game.localPlayer.name = `P-${rndi(0, 900000)}`
   game.localPlayer.color = randomAnyColor()
-  game.localPlayer.photonColor = "#f0f"
+  game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
   game.localPlayer.hitRadius = 50
   game.localPlayer.position.x = screenCenter.x

@@ -1,9 +1,7 @@
 <script lang="ts">
-  //Svelte-fx
-  import { fade } from "svelte/transition"
-
   //Stores
   import { pageHasHeader, user } from "../../stores/stores"
+  import { profileComponent } from "./ProfileButtons"
 
   //Interfaces
   import type { User } from "../../interfaces/user"
@@ -13,7 +11,6 @@
   import Page from "../../components/page/page.svelte"
   import Button90 from "../../components/menu/Button90.svelte"
   import { ProfileButtons } from "./ProfileButtons"
-  import Card from "../../components/card/card.svelte"
 
   pageHasHeader.set(true)
 
@@ -22,8 +19,6 @@
   user.subscribe((v) => {
     userData = v
   })
-
-  export let params: String
 </script>
 
 <Page>
@@ -32,19 +27,22 @@
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
           <div>
-            <Button90 buttonConfig={button} selected={params === button.routeParam} />
+            <Button90 buttonConfig={button} selected={$profileComponent === button.routeParam} />
           </div>
         {/each}
       </div>
       <div class="content" style="padding: 1em">
-        {#if params === "summary"}
+        {#if $profileComponent === "summary"}
           <ProfileModal />
         {/if}
-        {#if params === "matchHistory"}
+        {#if $profileComponent === "matchHistory"}
           <p>Match History</p>
         {/if}
-        {#if params === "settings"}
+        {#if $profileComponent === "settings"}
           <p>Settings</p>
+        {/if}
+        {#if $profileComponent === "test"}
+          <p>Test</p>
         {/if}
       </div>
     </div>

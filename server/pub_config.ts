@@ -1,3 +1,3 @@
-export const OIDS_WS_PORT = 5678;
-export const JWT_ACCESS_SECRET = "SECRET123";
-export const JWT_REFRESH_SECRET = "ANOTHER_SECRET123";
+export const OIDS_WS_PORT = 5678
+export const JWT_ACCESS_SECRET = 'SECRET123'
+export const JWT_REFRESH_SECRET = 'ANOTHER_SECRET123'

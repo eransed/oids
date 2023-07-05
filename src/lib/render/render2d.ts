@@ -1,12 +1,12 @@
-import { SpaceShape, type Remote, type SpaceObject } from "../interface"
-import { add, degToRad, linearTransform, rndi, round2dec, type Line, type Vec2d } from "mathil"
-import { explosionDuration, screenScale } from "../constants"
-import { getScreenRect } from "../canvas_util"
-import "../../app.css"
-import { renderMoon } from "./renderDebris"
-import { renderShip } from "./renderShip"
+import { SpaceShape, type Remote, type SpaceObject } from '../interface'
+import { round2dec, type Line, type Vec2d } from 'mathil'
+import { screenScale } from '../constants'
+import { getScreenRect } from '../canvas_util'
+import '../../app.css'
+import { renderMoon } from './renderDebris'
+import { renderShip } from './renderShip'
 
-export function clearScreen(ctx: CanvasRenderingContext2D, color = "#000") {
+export function clearScreen(ctx: CanvasRenderingContext2D, color = '#000') {
   ctx.fillStyle = color
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
@@ -27,26 +27,26 @@ export function render(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
 export function renderInfoText(text: string, ypos: number, ctx: CanvasRenderingContext2D): void {
   const xpos = 26
   setScaledFont(ctx)
-  ctx.fillStyle = "#fff"
+  ctx.fillStyle = '#fff'
   ctx.fillText(`${text}`, xpos, ypos)
 }
 
 export function loadingText(text: string, ctx: CanvasRenderingContext2D) {
-  ctx.font = "bold 80px courier"
-  ctx.fillStyle = "#fff"
+  ctx.font = 'bold 80px courier'
+  ctx.fillStyle = '#fff'
   const ppt = 15
   ctx.fillText(text, getScreenRect(ctx).x / 2 - text.length * ppt, getScreenRect(ctx).y / 2)
 }
 
-export function getNamesAsString(sos: SpaceObject[], label = ""): string {
+export function getNamesAsString(sos: SpaceObject[], label = ''): string {
   const arr: string[] = []
   sos.forEach((e) => {
     arr.push(`(${e.name}, ${e.health}hp)`)
   })
-  return label + arr.join(", ")
+  return label + arr.join(', ')
 }
 
-export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContext2D, scale = 10000, color = "#fff", offset: Vec2d = { x: 0, y: 0 }) {
+export function renderVector(v: Vec2d, origin: Vec2d, ctx: CanvasRenderingContext2D, scale = 10000, color = '#fff', offset: Vec2d = { x: 0, y: 0 }) {
   ctx.save()
   ctx.translate(origin.x + offset.x, origin.y + offset.y)
   ctx.beginPath()
@@ -88,7 +88,7 @@ export function renderHitBox(so: SpaceObject, ctx: CanvasRenderingContext2D): vo
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
-  ctx.strokeStyle = "#fff"
+  ctx.strokeStyle = '#fff'
   ctx.strokeRect(0, 0, so.size.x, so.size.y)
   ctx.restore()
 }
@@ -96,7 +96,7 @@ export function renderHitBox(so: SpaceObject, ctx: CanvasRenderingContext2D): vo
 export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   ctx.save()
   ctx.translate(so.position.x, so.position.y)
-  ctx.strokeStyle = "#447"
+  ctx.strokeStyle = '#447'
   ctx.lineWidth = 3
   ctx.beginPath()
   ctx.arc(0, 0, so.hitRadius, 0, Math.PI * 2)
@@ -110,13 +110,13 @@ export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D) {
   for (const shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
-      ctx.fillStyle = shot.armedDelay < 0 ? "#fff" : "#fff"
+      ctx.fillStyle = shot.armedDelay < 0 ? '#fff' : '#fff'
     } else if (Math.random() > 0.9) {
-      ctx.fillStyle = shot.armedDelay < 0 ? "#f0f" : "#fff"
+      ctx.fillStyle = shot.armedDelay < 0 ? '#f0f' : '#fff'
     } else if (Math.random() > 0.8) {
-      ctx.fillStyle = shot.armedDelay < 0 ? "#0f0" : "#fff"
+      ctx.fillStyle = shot.armedDelay < 0 ? '#0f0' : '#fff'
     } else {
-      ctx.fillStyle = shot.armedDelay < 0 ? shot.color : "#fff"
+      ctx.fillStyle = shot.armedDelay < 0 ? shot.color : '#fff'
     }
     ctx.save()
     ctx.translate(shot.position.x, shot.position.y)

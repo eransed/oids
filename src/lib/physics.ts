@@ -1,10 +1,10 @@
-import type { Bounceable, Damager, Physical, Rotatable, SpaceObject } from "./interface"
-import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from "mathil"
-import { getScreenFromCanvas } from "./canvas_util"
-import { renderHitExplosion } from "./render/renderFx"
-import { coolDown, decayDeadShots, handleHittingShot } from "./mechanics"
-import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from "./constants"
-import type { Shape } from "./shapes/Shape"
+import type { Bounceable, Damager, Physical, Rotatable, SpaceObject } from './interface'
+import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from 'mathil'
+import { getScreenFromCanvas } from './canvas_util'
+import { renderHitExplosion } from './render/renderFx'
+import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
+import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from './constants'
+import type { Shape } from './shapes/Shape'
 
 export function updateShape(shape: Shape, dt: number): void {
   if (isNaN(dt)) return
@@ -219,7 +219,7 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
             so1.lastDamagedByName = shot.ownerName
             shot.didHit = true
             if (so1.health < 1) {
-              console.log("You killed: " + so1.name)
+              console.log('You killed: ' + so1.name)
               so0.kills.add(so1.name)
               so0.killCount = so0.kills.size
               so1.killedByName = so1.lastDamagedByName

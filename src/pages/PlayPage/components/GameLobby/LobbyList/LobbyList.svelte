@@ -9,26 +9,6 @@
   $: player = $gameState.scoreScreenData.player
 </script>
 
-<style>
-  .scoreTable {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-wrap: wrap;
-    position: relative;
-    inset: 0;
-    margin: auto;
-  }
-
-  table {
-    max-height: 70%;
-    display: block;
-    padding: 8px;
-    font-weight: bold;
-    font-size: 14px;
-  }
-</style>
-
 <div class="scoreTable">
   <table>
     <thead>
@@ -53,3 +33,23 @@
     {/each}
   </table>
 </div>
+
+<style>
+  .scoreTable {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    inset: 0;
+    margin: auto;
+  }
+
+  table {
+    max-height: 70%;
+    display: block;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+</style>

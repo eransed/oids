@@ -1,10 +1,10 @@
-import axios, { type AxiosResponse } from "axios"
-import { user } from "../../../stores/stores"
+import axios, { type AxiosResponse } from 'axios'
+import { user } from '../../../stores/stores'
 
-import type { Profile } from "../../../interfaces/user"
+import type { Profile } from '../../../interfaces/user'
 
 const getProfile = async (): Promise<AxiosResponse<Profile>> => {
-  const token = localStorage.getItem("accessToken")
+  const token = localStorage.getItem('accessToken')
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },

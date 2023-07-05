@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-
   type positionType = "fixed" | "absolute" | "relative"
 
   export let title: string = "Title"
@@ -58,6 +56,27 @@
   //   $: shipTouchModal = modal.offsetTop === shipLocation.y && modal.offsetLeft === shipLocation.x
   // }
 </script>
+
+{#if showModal}
+  <div
+    class="modal"
+    id={title}
+    style="--width: {width}; --height: {height}; position: {position}; opacity: {shipInsideModal ? '0.2' : ''}"
+    contenteditable={isEditable}
+    in:fade={{ delay: 50 }}
+    out:fade
+  >
+    <div id="modalContent" style="--left: {m.x}; --top: {m.y}; ">
+      <div id="header">
+        <div id="headerTitle"><h3>{title}</h3></div>
+
+        {#if closeBtn}<div on:click={() => handleClick()} on:keydown={() => {}} id="closeBtn" />{/if}
+      </div>
+
+      <slot><p>{modalExplain}</p></slot>
+    </div>
+  </div>
+{/if}
 
 <style>
   :root {
@@ -197,24 +216,3 @@
     border-color: rgb(47, 167, 252, 1);
   }
 </style>
-
-{#if showModal}
-  <div
-    class="modal"
-    id={title}
-    style="--width: {width}; --height: {height}; position: {position}; opacity: {shipInsideModal ? '0.2' : ''}"
-    contenteditable={isEditable}
-    in:fade={{ delay: 50 }}
-    out:fade
-  >
-    <div id="modalContent" style="--left: {m.x}; --top: {m.y}; ">
-      <div id="header">
-        <div id="headerTitle"><h3>{title}</h3></div>
-
-        {#if closeBtn}<div on:click={() => handleClick()} on:keydown={() => {}} id="closeBtn" />{/if}
-      </div>
-
-      <slot><p>{modalExplain}</p></slot>
-    </div>
-  </div>
-{/if}

@@ -1,6 +1,6 @@
-import type { Vec2d } from "mathil"
-import { angle, degToRad, direction, dist, norm, smul, sub, newVec2d } from "mathil"
-import { renderPoint } from "./render/render2d"
+import type { Vec2d } from 'mathil'
+import { angle, degToRad, direction, dist, norm, smul, sub, newVec2d } from 'mathil'
+import { renderPoint } from './render/render2d'
 
 export interface ViewSlice {
   distance: number
@@ -34,7 +34,7 @@ export class LightSource {
     for (const ray of this.rays) {
       let min = Infinity
       let nearestIntersect: Vec2d | null = null
-      let color = "#000"
+      let color = '#000'
       for (const segment of segments) {
         const p = ray.cast(segment)
         if (p) {
@@ -49,8 +49,8 @@ export class LightSource {
         }
       }
       if (nearestIntersect) {
-        new LineSegment(this.position, nearestIntersect, "#50503a").render(ctx)
-        renderPoint(ctx, nearestIntersect, "#ff0", 20)
+        new LineSegment(this.position, nearestIntersect, '#50503a').render(ctx)
+        renderPoint(ctx, nearestIntersect, '#ff0', 20)
         slices.push({ distance: min, color: color })
       }
     }
@@ -115,7 +115,7 @@ export class Ray {
     const dirScaled = smul(this.direction, scale)
     ctx.save()
     ctx.lineWidth = 6
-    ctx.strokeStyle = "#555"
+    ctx.strokeStyle = '#555'
     ctx.translate(this.position.x, this.position.y)
     ctx.beginPath()
     ctx.moveTo(0, 0)
@@ -131,7 +131,7 @@ export class LineSegment {
   p1: Vec2d
   color: string
 
-  constructor(_p0: Vec2d, _p1: Vec2d, _color = "#fff") {
+  constructor(_p0: Vec2d, _p1: Vec2d, _color = '#fff') {
     this.p0 = _p0
     this.p1 = _p1
     this.color = _color

@@ -1,6 +1,8 @@
 <script lang="ts">
 </script>
 
+<div class="circle" />
+
 <style>
   .circle {
     width: 25px;
@@ -23,5 +25,3 @@
     }
   }
 </style>
-
-<div class="circle" />

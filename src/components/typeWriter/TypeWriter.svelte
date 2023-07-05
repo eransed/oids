@@ -105,20 +105,13 @@
   }, delaySpeed)
 </script>
 
+<div in:fade={{ delay: 150 }} out:fade class="wrapper"><p>{typeWriterText}</p></div>
+
 <style>
   .wrapper {
-    /* position: absolute;
-    margin: auto;
-    inset: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-content: center; */
     max-width: 450px;
     flex-wrap: wrap;
     line-break: strict;
     line-height: 1.5;
   }
 </style>
-
-<div in:fade={{ delay: 150 }} out:fade class="wrapper"><p>{typeWriterText}</p></div>

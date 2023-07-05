@@ -5,12 +5,6 @@
   //Stores
   import { guestUserName, pageHasHeader, user } from "../../stores/stores"
 
-  //Interfaces
-  import type { User } from "../../interfaces/user"
-
-  //Utils
-  import { rndi } from "mathil"
-
   //Components
   import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
 
@@ -18,6 +12,10 @@
 
   let welcomeMessage = `Welcome to OIDS ${$user ? $user?.name : $guestUserName}`
 </script>
+
+<div out:fade class="landingPage">
+  <TypeWriter text={welcomeMessage} />
+</div>
 
 <style>
   .landingPage {
@@ -30,7 +28,3 @@
     width: 100vw;
   }
 </style>
-
-<div out:fade class="landingPage">
-  <TypeWriter text={welcomeMessage} />
-</div>

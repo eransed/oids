@@ -1,13 +1,13 @@
-import jwt from "jsonwebtoken"
+import jwt from 'jsonwebtoken'
 
-import type { User } from "../types/user"
+import type { User } from '../types/user'
 
-import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from "../../pub_config"
+import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from '../../pub_config'
 
 //Token valid time
 export const generateAccessToken = (user: User) => {
   return jwt.sign({ userId: user.id }, JWT_ACCESS_SECRET, {
-    expiresIn: "5m",
+    expiresIn: '5m',
   })
 }
 
@@ -20,7 +20,7 @@ export const generateRefreshToken = (user: User, jti: string) => {
     },
     JWT_REFRESH_SECRET,
     {
-      expiresIn: "8h", //Set to 8 hour to gimmick a working day!
+      expiresIn: '8h', //Set to 8 hour to gimmick a working day!
     }
   )
 }

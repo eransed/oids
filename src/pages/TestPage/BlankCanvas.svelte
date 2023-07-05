@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte"
-  import { error, info, vec2dArray, to_string, log, warn, EveryInterval, type Vec2d, type Line, connectPoints, boundingBox } from "mathil"
-  import { clearScreen, renderLine, renderPoint } from "../../lib/render/render2d"
+  import { onDestroy, onMount } from 'svelte'
+  import { error, info, vec2dArray, to_string, log, warn, EveryInterval, type Vec2d, type Line, connectPoints, boundingBox } from 'mathil'
+  import { clearScreen, renderLine, renderPoint } from '../../lib/render/render2d'
 
   let canvas: HTMLCanvasElement
 
   onMount(() => {
-    const ctx = <CanvasRenderingContext2D>canvas.getContext("2d")
+    const ctx = <CanvasRenderingContext2D>canvas.getContext('2d')
     ctx.canvas.width = 300
     ctx.canvas.height = 300
-    info("mount")
+    info('mount')
 
     if (!ctx) {
-      error("Failed to get canvas context")
+      error('Failed to get canvas context')
       return
     }
 
@@ -41,21 +41,21 @@
     function loop(t: number) {
       frame = requestAnimationFrame(loop)
 
-      clearScreen(ctx, "#fff")
+      clearScreen(ctx, '#fff')
 
       points.forEach((p) => {
-        renderPoint(ctx, p, "#000", 3)
+        renderPoint(ctx, p, '#000', 3)
       })
 
       if (lines) {
         lines.forEach((l) => {
-          renderLine(ctx, l, "#ccc", 1)
+          renderLine(ctx, l, '#ccc', 1)
         })
       }
 
       if (sqLines) {
         sqLines.forEach((l) => {
-          renderLine(ctx, l, "#00f", 1)
+          renderLine(ctx, l, '#00f', 1)
         })
       }
 
@@ -68,7 +68,7 @@
       })
     }
 
-    info("mount done")
+    info('mount done')
 
     return () => {
       cancelAnimationFrame(frame)
@@ -76,7 +76,7 @@
   })
 
   onDestroy(() => {
-    warn("destroy")
+    warn('destroy')
   })
 </script>
 

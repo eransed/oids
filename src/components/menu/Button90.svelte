@@ -32,6 +32,21 @@
   }
 </script>
 
+<div on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
+  <button
+    {disabled}
+    style="--left: {m.x}; --top: {m.y}"
+    class={buttonConfig.selected || selected ? "selected" : "notSelected"}
+    on:click={buttonConfig.clickCallback}
+  >
+    {#if loading}
+      <CircularSpinner />
+    {:else}
+      {buttonConfig.buttonText}
+    {/if}
+  </button>
+</div>
+
 <style>
   :root {
     --left: 100px;
@@ -92,18 +107,3 @@
     background: transparent;
   }
 </style>
-
-<div on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
-  <button
-    {disabled}
-    style="--left: {m.x}; --top: {m.y}"
-    class={buttonConfig.selected || selected ? "selected" : "notSelected"}
-    on:click={buttonConfig.clickCallback}
-  >
-    {#if loading}
-      <CircularSpinner />
-    {:else}
-      {buttonConfig.buttonText}
-    {/if}
-  </button>
-</div>

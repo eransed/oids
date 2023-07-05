@@ -1,10 +1,10 @@
-import type { ServerUpdate, SpaceObject } from "../interface"
-import { OIDS_WS_PORT } from "../../../server/pub_config"
-import { reduceShotSize, reduceSoSize, soFromValueArray, soToValueArray } from "./util"
+import type { ServerUpdate, SpaceObject } from '../interface'
+import { OIDS_WS_PORT } from '../../../server/pub_config'
+import { reduceShotSize, reduceSoSize, soFromValueArray, soToValueArray } from './util'
 
 export let socket: WebSocket
-let serverVersion = "offline"
-let connectionInfo = ""
+let serverVersion = 'offline'
+let connectionInfo = ''
 
 export function getSerVer(): string {
   return serverVersion
@@ -56,13 +56,13 @@ export function getReadyStateText(): string {
   const s: number = getReadyState()
   switch (s) {
     case WebSocket.CONNECTING:
-      return "CONNECTING..."
+      return 'CONNECTING...'
     case WebSocket.CLOSED:
-      return "CLOSED"
+      return 'CLOSED'
     case WebSocket.OPEN:
-      return "OPEN"
+      return 'OPEN'
     case WebSocket.CLOSING:
-      return "CLOSING..."
+      return 'CLOSING...'
     default:
       return `UNKNOWN (${s})`
   }
@@ -70,13 +70,13 @@ export function getReadyStateText(): string {
 
 export const sendToServer = (messageObject: object): void => {
   if (!socket) {
-    console.error("Socket is undefined")
+    console.error('Socket is undefined')
     return
   }
   if (socket.readyState === 1) {
     socket.send(JSON.stringify(messageObject))
   } else {
-    console.error("Socket not open, readyState=" + socket.readyState)
+    console.error('Socket not open, readyState=' + socket.readyState)
   }
 }
 
@@ -94,7 +94,7 @@ export function sendSpaceObjectToBroadcastServer(so: SpaceObject): void {
 }
 
 export const registerServerUpdate = (callback: (su: ServerUpdate) => void): void => {
-  socket.addEventListener("message", (event) => {
+  socket.addEventListener('message', (event) => {
     const data = JSON.parse(event.data)
     if (data.serverVersion) {
       serverVersion = data.serverVersion

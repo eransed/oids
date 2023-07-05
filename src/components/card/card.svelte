@@ -4,19 +4,23 @@
    *
    * default, help, wait, crosshair, not-allowed, zoom-in, grab, pointer
    */
-  export let cursor = "pointer"
+  export let cursor = 'pointer'
   export let clickedOnCard: () => void = () => {}
   export let hoverEffect: boolean = true
 
   function shouldEffectHover() {
     if (hoverEffect) {
-      return "hoverEffect"
+      return 'hoverEffect'
     }
     if (!hoverEffect) {
-      return ""
+      return ''
     }
   }
 </script>
+
+<div id="cardWrapper" class={shouldEffectHover()} style="cursor: {cursor}" on:click={clickedOnCard} on:keydown={() => {}}>
+  <slot />
+</div>
 
 <style>
   :root {
@@ -47,7 +51,3 @@
     --cardShadow: 1;
   }
 </style>
-
-<div id="cardWrapper" class={shouldEffectHover()} style="cursor: {cursor}" on:click={clickedOnCard} on:keydown={() => {}}>
-  <slot />
-</div>

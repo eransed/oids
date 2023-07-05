@@ -1,7 +1,7 @@
-import type { PhotonLaser, SpaceObject } from "./interface"
-import { MessageType, SpaceShape } from "./interface"
-import { rndf, rndi, type Vec2d } from "mathil"
-import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
+import type { PhotonLaser, SpaceObject } from './interface'
+import { MessageType, SpaceShape } from './interface'
+import { rndf, rndi, type Vec2d } from 'mathil'
+import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 
 export function newPhotonLaser(): PhotonLaser {
   const shot: PhotonLaser = {
@@ -9,7 +9,7 @@ export function newPhotonLaser(): PhotonLaser {
     angleDegree: -90,
     angularVelocity: 0,
     armedDelay: 50,
-    color: "#90d",
+    color: '#90d',
     damage: 5,
     deadFrameCount: 0,
     didHit: false,
@@ -21,19 +21,19 @@ export function newPhotonLaser(): PhotonLaser {
     shotBlowFrame: 16,
     size: { x: 100, y: 100 },
     velocity: { x: 0, y: 0 },
-    ownerName: "",
-    lastDamagedByName: "",
-    killedByName: "",
+    ownerName: '',
+    lastDamagedByName: '',
+    killedByName: '',
   }
 
   return shot
 }
 
 export function currentTimeDate(): string {
-  return new Date().toLocaleString("sv-SE")
+  return new Date().toLocaleString('sv-SE')
 }
 
-export function createSpaceObject(name = "SpaceObject"): SpaceObject {
+export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2d = {
     x: rndi(0, 100),
@@ -43,7 +43,7 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
   const spaceObject: SpaceObject = {
     messageType: MessageType.GAME_UPDATE,
     viewport: { x: 0, y: 0 },
-    sessionId: "",
+    sessionId: '',
     acceleration: { x: 0, y: 0 },
     ammo: 1000,
     angleDegree: -90,
@@ -58,7 +58,7 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     canonOverHeat: false,
     colliding: false,
     collidingWith: [],
-    color: "#90d",
+    color: '#90d',
     damage: 5,
     deadFrameCount: 0,
     didHit: false,
@@ -71,7 +71,7 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     isDead: false,
     isLocal: false,
     isPlaying: false,
-    killedByName: "",
+    killedByName: '',
     kills: new Set<string>(),
     killCount: 0,
     mass: 1,
@@ -83,9 +83,9 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     id: rndi(1, 500).toString(),
     obliterated: false,
     online: false,
-    photonColor: "#0f0",
+    photonColor: '#0f0',
     position: initPos,
-    serverVersion: "",
+    serverVersion: '',
     shape: SpaceShape.SmallShip,
     shotBlowFrame: 16,
     shotsInFlight: [],
@@ -94,24 +94,24 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     shotsPerFrame: 1,
     size: { x: 100, y: 100 },
     steer: function (direction: number, deltaTime: number): void {
-      throw new Error("Steer not implemented.")
+      throw new Error('Steer not implemented.')
     },
     steeringPower: 1.2,
     velocity: initVel,
-    ownerName: "",
-    lastDamagedByName: "",
+    ownerName: '',
+    lastDamagedByName: '',
     joinedGame: currentTimeDate(),
-    lastMessage: "",
+    lastMessage: '',
     readyToPlay: false,
     isHost: false,
     // dateTimeClient: undefined,
     // dateTimeServer: undefined,
     ping: false,
     pingResponse: false,
-    pingId: "",
+    pingId: '',
     hops: 0,
     ttl: 0,
-    rtt: 0
+    rtt: 0,
   }
 
   return spaceObject

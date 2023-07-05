@@ -1,4 +1,4 @@
-import type { GameHistory } from "./game"
+import type { GameHistory } from './game'
 
 export interface User {
   id: string
