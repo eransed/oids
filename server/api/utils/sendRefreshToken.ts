@@ -1,1 +1,1 @@
-export const sendRefreshToken = console.log("nothing")
+export const sendRefreshToken = console.log('nothing')

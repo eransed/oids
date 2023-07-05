@@ -1,30 +1,30 @@
 <script lang="ts">
-  //Svelte
-  import { fade } from "svelte/transition"
+ //Svelte
+ import { fade } from 'svelte/transition'
 
-  //Stores
-  import { guestUserName, pageHasHeader, user } from "../../stores/stores"
+ //Stores
+ import { guestUserName, pageHasHeader, user } from '../../stores/stores'
 
-  //Components
-  import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
+ //Components
+ import TypeWriter from '../../components/typeWriter/TypeWriter.svelte'
 
-  pageHasHeader.set(true)
+ pageHasHeader.set(true)
 
-  let welcomeMessage = `Welcome to OIDS ${$user ? $user?.name : $guestUserName}`
+ let welcomeMessage = `Welcome to OIDS ${$user ? $user?.name : $guestUserName}`
 </script>
 
 <div out:fade class="landingPage">
-  <TypeWriter text={welcomeMessage} />
+ <TypeWriter text={welcomeMessage} />
 </div>
 
 <style>
-  .landingPage {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-wrap: wrap;
-    color: #fff;
-    height: 100vh;
-    width: 100vw;
-  }
+ .landingPage {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  color: #fff;
+  height: 100vh;
+  width: 100vw;
+ }
 </style>

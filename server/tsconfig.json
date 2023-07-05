@@ -1,12 +1,12 @@
 {
-  "compilerOptions": {
-    "isolatedModules": true,
-    "removeComments": true,
-    "allowJs": false,
-    "checkJs": false,
-    "strict": true,
-    "outDir": "build",
-    "esModuleInterop": true
-  },
-  "include": ["./**/*.ts"]
+ "compilerOptions": {
+  "isolatedModules": true,
+  "removeComments": true,
+  "allowJs": false,
+  "checkJs": false,
+  "strict": true,
+  "outDir": "build",
+  "esModuleInterop": true
+ },
+ "include": ["./**/*.ts", "main.ts"]
 }

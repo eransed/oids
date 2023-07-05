@@ -5,11 +5,11 @@
  * @returns cleanupFunction
  */
 export function addKeyDownListener(callback: (event: KeyboardEvent) => void): () => void {
-  document.addEventListener('keydown', callback)
+ document.addEventListener('keydown', callback)
 
-  function cleanup() {
-    document.removeEventListener('keydown', callback)
-  }
+ function cleanup() {
+  document.removeEventListener('keydown', callback)
+ }
 
-  return cleanup
+ return cleanup
 }
