@@ -337,8 +337,23 @@
  }
 
  function sendChatMessage() {
-  sendRawChatMessage(chatMsg)
-  // chatMsg = ""
+  const msgSet: Set<string> = new Set()
+
+  let uniqueMsg: string[] = []
+
+  chatMsg.split('').forEach((msg) => {
+   msgSet.add(msg)
+  })
+
+  msgSet.forEach((msg) => {
+   uniqueMsg.push(msg)
+  })
+
+  if (chatMsg.length > 0) {
+   if (uniqueMsg.length === 1 && uniqueMsg[0] === ' ') {
+    return
+   } else sendRawChatMessage(chatMsg)
+  }
  }
 
  function formatDate(date: Date) {
