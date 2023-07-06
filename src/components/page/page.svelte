@@ -13,7 +13,7 @@
   width: 100vw;
   top: 88px;
   display: flex;
-  margin: 2em;
+  margin-top: 2em;
   position: relative;
   align-content: flex-start;
   flex-direction: row;

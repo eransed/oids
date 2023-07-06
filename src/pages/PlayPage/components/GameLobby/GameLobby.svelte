@@ -46,6 +46,8 @@
 
  $: if ($user) console.log($user)
 
+ $: allReady = false
+
  pageHasHeader.set(true)
 
  let sessions: Session[] = []
@@ -59,6 +61,22 @@
   $localPlayer.isHost = true
   info(`Says hello to online players, new session ${$localPlayer.sessionId}`)
   sock.send($localPlayer)
+ }
+
+ function checkReady(): void {
+  let readyPlayers = []
+
+  if (joinedSession?.players) {
+   joinedSession?.players.forEach((player) => {
+    if (player.readyToPlay) {
+     readyPlayers.push(player)
+    }
+   })
+  }
+
+  if (readyPlayers.length === joinedSession?.players.length) {
+   allReady = true
+  } else allReady = false
  }
 
  interface Ping {
@@ -236,6 +254,7 @@
    const s = sessions[i]
    if (s.id === $localPlayer.sessionId) {
     joinedSession = s
+    checkReady()
     log(`Joined session ${s.id}`)
     return
    }
@@ -365,17 +384,27 @@
   <div class="center">
    {#if joinedSession}
     <div class="sessionInfo">
-     <p>Session host: {joinedSession.host.name}</p>
-     <p>Players:</p>
+     <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: #fff'}>
+      Host: {joinedSession.host.name}
+      {joinedSession.host.readyToPlay ? '✅' : ''}
+     </p>
+     {#if joinedSession.players.length > 1}
+      <p>Players</p>
+     {/if}
      {#each joinedSession.players as player}
-      <p style="color: #c89">
-       {player.name}
-       <!-- {getPlayerPing(player)} - -->
+      {#if !player.isHost}
+       <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: #fff'}>
+        {player.name}
+        <!-- {getPlayerPing(player)} - -->
 
-       {player.readyToPlay ? 'Ready' : 'Not ready'}
-      </p>
+        {player.readyToPlay ? '✅' : ''}
+       </p>
+      {/if}
      {/each}
     </div>
+    {#if allReady}
+     <p>All players ready!</p>
+    {/if}
     <button on:click={() => readyToPlay()}>{$localPlayer.readyToPlay ? 'Ready' : 'Not ready'}</button>
     <button
      on:click={() => {
@@ -468,7 +497,7 @@
   max-width: 100%;
  }
 
- @media screen and (max-width: 900px) {
+ @media screen and (max-width: 1000px) {
   .left,
   .center,
   .right {
@@ -480,15 +509,20 @@
   }
   .left {
    grid-column-start: 1;
-   grid-column-end: 4;
+   grid-column-end: 2;
   }
   .center {
    grid-column-start: 1;
    grid-column-end: 2;
+   grid-row-start: 2;
+   grid-row-end: 4;
   }
   .right {
+   grid-row-start: 1;
+   grid-row-end: 4;
    grid-column-start: 2;
    grid-column-end: 4;
+   max-height: 22em;
   }
  }
 
