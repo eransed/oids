@@ -334,6 +334,7 @@
   $localPlayer.lastMessage = msgStr
   sock.send($localPlayer)
   chatMsg = ''
+  scrollToBottom()
  }
 
  function sendChatMessage() {
@@ -389,6 +390,16 @@
   sock.send($localPlayer)
   updateSessions()
  }
+
+ function scrollToBottom(): void {
+  const messageDiv = document.getElementById('messagesDiv')
+  if (messageDiv) {
+   setTimeout(() => {
+    messageDiv.scrollTop = messageDiv.scrollHeight
+    log('scrolled')
+   }, 300)
+  }
+ }
 </script>
 
 <Page>
@@ -433,7 +444,7 @@
   <div class="right">
    <p>Chat - {joinedSession?.id}</p>
 
-   <div class="messages">
+   <div class="messages" id="messagesDiv">
     {#each chatMessageHistory as msg}
      {#if msg.serviceMsg}
       <span style="font-size: 0.8rem; font-style: italic; opacity: 0.5;">{msg.message}</span>
@@ -447,7 +458,7 @@
          </span>
         </span>
         <br />
-        <TypeWriter text={msg.message} delaySpeed={250} speed={35} />
+        <TypeWriter text={msg.message} delaySpeed={250} speed={35} startCallback={() => scrollToBottom()} />
        </p>
       </div>
      {/if}
