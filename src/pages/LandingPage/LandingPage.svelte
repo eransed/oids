@@ -14,7 +14,7 @@
 </script>
 
 <div out:fade class="landingPage">
- {#if $isLoggedIn}
+ {#if $isLoggedIn && $user}
   <TypeWriter text={welcomeMessage + $user.name} />
  {:else}
   <TypeWriter text={welcomeMessage + $guestUser.name} />
