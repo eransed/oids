@@ -54,7 +54,8 @@
  const showDeadMenu = (): void => {
   removeKeyControllers()
   game.stopGame()
-  navigate('/play')
+  game.websocket.resetListeners()
+  navigate('/play/multiplayer')
  }
 
  onDestroy(() => {

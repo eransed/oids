@@ -188,6 +188,8 @@
    hostSession()
   })
 
+  log('Adding lobby websocket listener...')
+
   $socket.addListener((su) => {
    const incomingUpdate = su.spaceObject
 
