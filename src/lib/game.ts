@@ -7,8 +7,10 @@ import { renderLoop } from './time'
 import * as WelcomeScreen from './gameModes/welcomeScreen'
 import type { Shape } from './shapes/Shape'
 import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
+import type { OidsSocket } from './websocket/ws'
 
 export class Game {
+ websocket: OidsSocket
  testShapes: Shape[] = []
  private running = false
  type: GameType = GameType.SinglePlayer
@@ -27,9 +29,16 @@ export class Game {
  OnDeadLocalPlayerCallBack: () => void
  stopper: (() => Promise<number>) | null = null
 
- constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, keyFuncMap: KeyFunctionMap, _OnDeadLocalPlayerCallBack: () => void) {
+ constructor(
+  _canvas: HTMLCanvasElement,
+  _localPlayer: SpaceObject,
+  _websocket: OidsSocket,
+  keyFuncMap: KeyFunctionMap,
+  _OnDeadLocalPlayerCallBack: () => void
+ ) {
   this.canvas = _canvas
   this.localPlayer = _localPlayer
+  this.websocket = _websocket
   this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
   this.ctx = getContext(this.canvas)
   this.keyFuncMap = keyFuncMap

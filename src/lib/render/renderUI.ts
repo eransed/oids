@@ -2,8 +2,9 @@ import type { Remote, SpaceObject } from '../interface'
 import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string, type Vec2d } from 'mathil'
 import { getScreenFromCanvas, getScreenRect } from '../canvas_util'
 import { getNamesAsString, setScaledFont } from './render2d'
-import { getConnInfo, getReadyStateText } from '../websocket/webSocket'
+// import { getConnInfo, getReadyStateText } from '../websocket/webSocket'
 import { screenScale, timeScale } from '../constants'
+import type { Game } from '../game'
 
 //Rendering the viewport of other players
 export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remote): void {
@@ -59,19 +60,19 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
 }
 
 //Frame-info
-export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
+export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, game: Game, ctx: CanvasRenderingContext2D): void {
  const xpos = 26
  const dec = 1
  const screen: Vec2d = getScreenRect(ctx)
  const ratio: number = round2dec(screen.x / screen.y, 2)
  setScaledFont(ctx)
  ctx.fillStyle = '#fff'
- const info = `WS: ${getReadyStateText()} ${getConnInfo()}   RES: ${screen.x}x${screen.y} (x${screenScale}, ${ratio})   DTS: ${round2dec(
-  frameTimeMs * timeScale,
-  dec
- )}`
+ const info = `WS: ${game.websocket.getStateString()} ${game.websocket.getStatusString()}   RES: ${screen.x}x${
+  screen.y
+ } (x${screenScale}, ${ratio})   DTS: ${round2dec(frameTimeMs * timeScale, dec)}`
  ctx.fillText(info, xpos, 50)
  ctx.fillStyle = '#444'
+ const ver = 'Version: fix me!'
  ctx.fillText('' + ver, screen.x - ver.length * 27, 50)
 }
 

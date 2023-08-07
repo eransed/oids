@@ -106,6 +106,7 @@ export class Client {
      broadcastToAllClients(this, globalConnectedClients, so)
     } else {
      broadcastToSessionClients(this, globalConnectedClients, so)
+     //  log(`${this.name} with ${this.sessionId} broadcasts game info to possible ${globalConnectedClients.length}`)
     }
    } catch (e) {
     error(`Failed with: ${e}`)
@@ -205,7 +206,7 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
     if (data.messageType === MessageType.PING) {
      info(`PING<${client.sessionId}>: ${sendingClient.name} -> ${client.name}`)
     } else {
-     log(`BROADCAST<${client.sessionId}>: '${data.lastMessage}' from ${sendingClient.name} to ${client.name}`)
+     //  log(`BROADCAST<${client.sessionId}>: '${data.lastMessage}' from ${sendingClient.name} to ${client.name}`)
     }
    }
   }

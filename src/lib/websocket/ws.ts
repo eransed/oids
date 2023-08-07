@@ -1,4 +1,4 @@
-import { log } from 'mathil'
+import { info, log, warn } from 'mathil'
 import { OIDS_WS_PORT } from '../../../server/pub_config'
 import type { ServerUpdate, SpaceObject } from '../interface'
 
@@ -41,6 +41,7 @@ export class OidsSocket {
  private wsurl: URL
  private ws: WebSocket | null = null
  private prettyStatusString = 'Just created!'
+ private sl: SocketListener | null = null
 
  constructor(url: URL) {
   console.log('New socket created')
@@ -128,19 +129,39 @@ export class OidsSocket {
    console.log('trying to connect')
    this.connect()
   }
-  this.ws?.addEventListener('message', (event: any) => {
-   const data = JSON.parse(event.data)
-   const spaceObjFromSrv: SpaceObject = data
-   spaceObjFromSrv.isLocal = false
-   const serverUpdate: ServerUpdate = {
-    spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(spaceObjFromSrv)).length,
-    unparsedDataLength: event.data.length,
-    numberOfSpaceObjectKeys: Object.keys(spaceObjFromSrv).length,
-    spaceObject: spaceObjFromSrv,
-   }
-   callback(serverUpdate)
-  })
+
+  this.sl = {
+   event: 'message',
+   fn: (event: any) => {
+    const data = JSON.parse(event.data)
+    const spaceObjFromSrv: SpaceObject = data
+    spaceObjFromSrv.isLocal = false
+    const serverUpdate: ServerUpdate = {
+     spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(spaceObjFromSrv)).length,
+     unparsedDataLength: event.data.length,
+     numberOfSpaceObjectKeys: Object.keys(spaceObjFromSrv).length,
+     spaceObject: spaceObjFromSrv,
+    }
+    callback(serverUpdate)
+   },
+  }
+
+  this.ws?.addEventListener(this.sl.event, this.sl.fn)
  }
+
+ resetListeners(): void {
+  if (this.sl) {
+   info('Reseting socket listeners...')
+   this.ws?.removeEventListener(this.sl.event, this.sl.fn)
+  } else {
+   warn('Did not remove any listenerss')
+  }
+ }
+}
+
+export interface SocketListener {
+ event: string
+ fn: (e: any) => void
 }
 
 export function sendSpaceObject(ows: OidsSocket, so: SpaceObject): void {

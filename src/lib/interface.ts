@@ -140,11 +140,12 @@ export interface Hoster {
 }
 
 export enum MessageType {
- GAME_UPDATE,
+ GAME_UPDATE = 0,
  SESSION_UPDATE,
  LEFT_SESSION,
  CHAT_MESSAGE,
  PING,
+ START_GAME,
 }
 
 export interface SpaceObject

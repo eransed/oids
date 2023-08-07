@@ -1,12 +1,13 @@
 import type { Game } from './game'
 import { round2dec } from 'mathil'
-import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from './websocket/webSocket'
+// import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from './websocket/webSocket'
 import { updateShapes, updateSpaceObjects } from './physics'
 import { clearScreen } from './render/render2d'
 import { addDataPoint, newDataStats } from './stats'
 import { renderFrameInfo } from './render/renderUI'
 import { Every } from './gameModes/regular'
 import { localPlayerStore } from '../pages/GamePage/components/Game/Utils/gameUtils'
+import { MessageType } from './interface'
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -36,7 +37,7 @@ export function getFrameTimeMs(timestamp: number): number {
  }
 }
 
-export function fpsCounter(ops: number, frameTimeMs: number, ver: string, ctx: CanvasRenderingContext2D): void {
+export function fpsCounter(ops: number, frameTimeMs: number, game: Game, ctx: CanvasRenderingContext2D): void {
  const fps = round2dec(1000 / frameTimeMs, 0)
  addDataPoint(fpsBuf, fps)
  addDataPoint(frameTimes, frameTimeMs)
@@ -46,10 +47,10 @@ export function fpsCounter(ops: number, frameTimeMs: number, ver: string, ctx: C
  fps_list.push(fps)
  if (fps_list.length >= fps_list_max_entries) {
   const afps: number = round2dec(fps_list.reduce((prev, cur) => prev + cur, 0) / fps_list_max_entries, 0)
-  renderFrameInfo(ops, afps, dt, ver, ctx)
+  renderFrameInfo(ops, afps, dt, game, ctx)
   fps_list.shift()
  } else {
-  renderFrameInfo(ops, fps, dt, ver, ctx)
+  renderFrameInfo(ops, fps, dt, game, ctx)
  }
 }
 
@@ -67,8 +68,16 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   updateSpaceObjects(game.remotePlayers, dt, game.ctx)
   updateSpaceObjects(game.all, dt, game.ctx)
   updateShapes(game.testShapes, dt)
-  if (isConnectedToWsServer() && game.shouldSendToServer) {
-   sendSpaceObjectToBroadcastServer(game.localPlayer)
+  //   if (isConnectedToWsServer() && game.shouldSendToServer) {
+  //    sendSpaceObjectToBroadcastServer(game.localPlayer)
+  //   }
+  if (game.websocket.isConnected() && game.shouldSendToServer) {
+   game.localPlayer.messageType = MessageType.GAME_UPDATE
+   // remove circ refs and make play non local
+   game.localPlayer.collidingWith = []
+   game.localPlayer.isLocal = false
+   game.localPlayer.online = true
+   game.websocket.send(game.localPlayer)
   }
   game.localPlayer.shotsFiredThisFrame = false
   fid = requestAnimationFrame(update)
@@ -79,10 +88,12 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
 
  function stopper(): Promise<number> {
   return new Promise<number>((resolve) => {
-   if (isConnectedToWsServer()) {
+   if (game.websocket.isConnected()) {
     game.localPlayer.isPlaying = false
-
-    sendSpaceObjectToBroadcastServer(game.localPlayer)
+    // Game updates goes only to session peers
+    game.localPlayer.messageType = MessageType.GAME_UPDATE
+    game.websocket.send(game.localPlayer)
+    // sendSpaceObjectToBroadcastServer(game.localPlayer)
    }
    cancelAnimationFrame(fid)
    resolve(fid)

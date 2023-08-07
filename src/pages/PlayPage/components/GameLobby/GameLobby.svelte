@@ -3,21 +3,17 @@
  import { fade } from 'svelte/transition'
 
  //Stores
- import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser } from '../../../../stores/stores'
+ import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket } from '../../../../stores/stores'
 
  //Interfaces
-
  import { MessageType, type SpaceObject } from '../../../../lib/interface'
+ import type { OidsSocket } from '../../../../lib/websocket/ws'
 
  //Components
-
  import Page from '../../../../components/page/page.svelte'
 
  //Services
  import type { Session } from '../../../../lib/interface'
-
- import { getWsUrl } from '../../../../lib/websocket/webSocket'
- import { OidsSocket } from '../../../../lib/websocket/ws'
  import { createSessionId } from '../../../../helpers/util'
  import { activeSessions } from '../../../../lib/services/game/activeSessions'
  import SessionList from './SessionList/SessionList.svelte'
@@ -26,6 +22,7 @@
  import { info, log, usPretty, warn } from 'mathil'
  import { v4 as uuidv4 } from 'uuid'
  import TypeWriter from '../../../../components/typeWriter/TypeWriter.svelte'
+ import { navigate } from 'svelte-routing'
 
  /**
   * Reactive on changes to $user store.
@@ -33,14 +30,14 @@
  $: if ($user && $user.name !== $localPlayer.name) {
   info('Updating guestname name in session to username after login completed.')
   $localPlayer.name = $user.name
-  sock.send($localPlayer)
+  $socket.send($localPlayer)
   updateSessions()
  }
 
  $: if ($isLoggedIn === false) {
   info('User logged out - renaming to guestname')
   $localPlayer.name = $guestUser.name
-  sock.send($localPlayer)
+  $socket.send($localPlayer)
   updateSessions()
  }
 
@@ -52,7 +49,6 @@
 
  let sessions: Session[] = []
 
- const sock: OidsSocket = new OidsSocket(getWsUrl())
  let chatMessageHistory: ChatMessage[] = []
 
  function hostSession() {
@@ -60,7 +56,7 @@
   $localPlayer.messageType = MessageType.SESSION_UPDATE
   $localPlayer.isHost = true
   info(`Says hello to online players, new session ${$localPlayer.sessionId}`)
-  sock.send($localPlayer)
+  $socket.send($localPlayer)
  }
 
  function checkReady(): void {
@@ -106,7 +102,7 @@
   }
  }
 
- function handlePing(so: SpaceObject, sock: OidsSocket): void {
+ function handlePing(so: SpaceObject, socket: OidsSocket): void {
   if (so.messageType !== MessageType.PING) return
 
   if (so.ping === true) {
@@ -114,7 +110,7 @@
    so.ping = false
    so.pingResponse = true
    so.hops++
-   sock.send(so)
+   $socket.send(so)
   } else if (so.pingResponse === true) {
    checkJoinedSession()
 
@@ -140,7 +136,7 @@
   }
  }
 
- function ping(so: SpaceObject, sock: OidsSocket): void {
+ function ping(so: SpaceObject, $socket: OidsSocket): void {
   info(`PING`)
   so.ping = true
   so.pingResponse = false
@@ -161,7 +157,7 @@
     checkJoinedSession()
    }
   })
-  sock.send(so)
+  $socket.send(so)
  }
 
  interface ChatMessage {
@@ -187,12 +183,12 @@
  onMount(() => {
   $localPlayer.name = $user ? $user.name : $guestUserName
 
-  sock.connect().then(() => {
+  $socket.connect().then(() => {
    info(`Connected to websocket`)
    hostSession()
   })
 
-  sock.addListener((su) => {
+  $socket.addListener((su) => {
    const incomingUpdate = su.spaceObject
 
    if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
@@ -206,7 +202,6 @@
      timeDate: new Date(),
      user: incomingUpdate,
     }
-
     chatMessageHistory = [...chatMessageHistory, newMsg]
    } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
     warn(`${incomingUpdate.name} left the lobby`)
@@ -214,10 +209,15 @@
      updateSessions()
     }, 1000)
    } else if (incomingUpdate.messageType === MessageType.PING) {
-    handlePing(incomingUpdate, sock)
+    handlePing(incomingUpdate, $socket)
+   } else if (incomingUpdate.messageType === MessageType.START_GAME) {
+    const sess = incomingUpdate.sessionId
+    log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
+    $socket.resetListeners()
+    navigate(`/play/multiplayer/${sess}`)
    } else {
     warn(`Message (${incomingUpdate.messageType}) from ${incomingUpdate.name} not handled`)
-    console.log(incomingUpdate)
+    // console.log(incomingUpdate)
    }
   })
 
@@ -226,14 +226,15 @@
   }, 300)
 
   // pingTimer = setInterval(() => {
-  //   ping(localPlayer, sock)
+  //   ping(localPlayer, $socket)
   // }, 3000)
  })
 
  onDestroy(() => {
-  info(`Leaving session, says goodbye...`)
-  $localPlayer.messageType === MessageType.LEFT_SESSION
-  sock.send($localPlayer)
+  // info(`Leaving session, says goodbye...`)
+  // $localPlayer.messageType === MessageType.LEFT_SESSION
+  // $socket.send($localPlayer)
+  $socket.resetListeners()
 
   if (pingTimer) {
    info(`Clears ping timer ${pingTimer}`)
@@ -241,8 +242,8 @@
   }
 
   setTimeout(() => {
-   info(`Disconnecting from websocket`)
-   sock.disconnect()
+   //  info(`Disconnecting from websocket`)
+   //  $socket.disconnect()
   }, 200)
  })
 
@@ -300,7 +301,7 @@
    $localPlayer.isHost = false
    chatMessageHistory = []
    chatMessageHistory = [...chatMessageHistory, createJoinMsg(otherPlayerWithSession.sessionId)]
-   sock.send($localPlayer)
+   $socket.send($localPlayer)
    setTimeout(() => {
     updateSessions()
    }, 400)
@@ -332,7 +333,7 @@
 
   $localPlayer.messageType = MessageType.CHAT_MESSAGE
   $localPlayer.lastMessage = msgStr
-  sock.send($localPlayer)
+  $socket.send($localPlayer)
   chatMsg = ''
   scrollToBottom()
  }
@@ -355,6 +356,12 @@
     return
    } else sendRawChatMessage(chatMsg)
   }
+ }
+
+ function startGame() {
+  $localPlayer.messageType = MessageType.START_GAME
+  $socket.send($localPlayer)
+  navigate(`/play/multiplayer/${$localPlayer.sessionId}`)
  }
 
  function formatDate(date: Date) {
@@ -387,7 +394,7 @@
  function readyToPlay() {
   $localPlayer.readyToPlay = !$localPlayer.readyToPlay
   $localPlayer.messageType = MessageType.SESSION_UPDATE
-  sock.send($localPlayer)
+  $socket.send($localPlayer)
   updateSessions()
  }
 
@@ -396,7 +403,6 @@
   if (messageDiv) {
    setTimeout(() => {
     messageDiv.scrollTop = messageDiv.scrollHeight
-    log('scrolled')
    }, 300)
   }
  }
@@ -437,6 +443,13 @@
       leaveSession()
      }}>Leave session</button
     >
+    <button
+     on:click={() => {
+      // navigate(`/play/multiplayer/${$localPlayer.sessionId}`)
+      startGame()
+     }}
+     >Start game!
+    </button>
    {:else}
     <p>No session joined</p>
    {/if}

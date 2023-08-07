@@ -1,13 +1,12 @@
 import type { Game } from '../game'
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from '../canvas_util'
 import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
-import { add, direction, magnitude, rndfVec2d, rndi, round2dec } from 'mathil'
+import { add, direction, log, magnitude, rndfVec2d, rndi, round2dec } from 'mathil'
 import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, gravity, handleCollisions } from '../physics'
 import { loadingText } from '../render/render2d'
 import { fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from '../interface'
-import { getSerVer, initMultiplayer, registerServerUpdate } from '../websocket/webSocket'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
 import { explosionDuration } from '../constants'
@@ -138,22 +137,20 @@ export function initRegularGame(game: Game): void {
 
  console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
- initMultiplayer()
-
  //Shootable non-player objects
  const asterois: SpaceObject[] = []
 
  const asteroids = 10
 
- for (let i = 0; i < asteroids; i++) {
-  const asteroid = createSpaceObject()
+ //  for (let i = 0; i < asteroids; i++) {
+ //   const asteroid = createSpaceObject()
 
-  asteroid.position = rndfVec2d(0, 1200)
-  asteroid.health = 1
-  asteroid.name = 'asteroid-' + i
+ //   asteroid.position = rndfVec2d(0, 1200)
+ //   asteroid.health = 1
+ //   asteroid.name = 'asteroid-' + i
 
-  game.bodies.push(asteroid)
- }
+ //   game.bodies.push(asteroid)
+ //  }
 
  // game.remotePlayers = []
  game.all = game.all.concat(game.bodies)
@@ -161,7 +158,9 @@ export function initRegularGame(game: Game): void {
 
  let startTime = 0
 
- registerServerUpdate((su: ServerUpdate) => {
+ log('Setting game socket listener...')
+ game.websocket.addListener((su: ServerUpdate) => {
+  // console.log(su)
   const so: SpaceObject = su.spaceObject
   dataLen = su.unparsedDataLength
   bytesRecievedLastSecond += dataLen
@@ -294,7 +293,7 @@ export function renderFrame(game: Game, dt: number): void {
  // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
 
  if (game.keyFuncMap.systemGraphs.keyStatus) {
-  fpsCounter(ops, dt, getSerVer(), ctx)
+  fpsCounter(ops, dt, game, ctx)
  }
 
  // renderInfoText(`packets/sec: ${ops}`, 450, ctx)
