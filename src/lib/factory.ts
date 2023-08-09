@@ -72,7 +72,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   isLocal: false,
   isPlaying: false,
   killedByName: '',
-  kills: new Set<string>(),
+  kills: [],
   killCount: 0,
   mass: 1,
   missileDamage: 2,

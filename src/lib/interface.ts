@@ -91,7 +91,7 @@ export interface Thrustable extends Positionable, Physical {
 }
 
 export interface Fireable extends Positionable, Physical {
- kills: Set<string>
+ kills: string[]
  killCount: number
  ammo: number
  missileSpeed: number

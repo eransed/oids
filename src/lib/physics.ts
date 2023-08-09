@@ -1,5 +1,5 @@
 import type { Bounceable, Damager, Physical, Rotatable, SpaceObject } from './interface'
-import { add, degToRad, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from 'mathil'
+import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from 'mathil'
 import { getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
@@ -219,12 +219,13 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
       so1.lastDamagedByName = shot.ownerName
       shot.didHit = true
       if (so1.health < 1) {
-       console.log('You killed: ' + so1.name)
-       so0.kills.add(so1.name)
-       so0.killCount = so0.kills.size
-       so1.killedByName = so1.lastDamagedByName
-       so1.isDead = true
-       so1.health = 0
+        if (addIfNotExists(so1.name, so0.kills) === true) {
+          info('You killed: ' + so1.name)
+          so0.killCount = so0.kills.length
+          so1.killedByName = so1.lastDamagedByName
+          so1.isDead = true
+          so1.health = 0
+       }
       }
      }
     }
@@ -233,6 +234,16 @@ export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderi
    }
   }
  }
+}
+
+export function addIfNotExists(str: string, arr: string[]): boolean {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === str) {
+      return false
+    }
+  }
+  arr.push(str)
+  return true
 }
 
 export function resetCollisions(spaceObjects: SpaceObject[]) {

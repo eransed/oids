@@ -28,14 +28,13 @@
   * Reactive on changes to $user store.
   */
  $: if ($user && $user.name !== $localPlayer.name) {
-  info('Updating guestname name in session to username after login completed.')
   $localPlayer.name = $user.name
   $socket.send($localPlayer)
   updateSessions()
  }
 
  $: if ($isLoggedIn === false) {
-  info('User logged out - renaming to guestname')
+  info('User logged out - renaming to guest name')
   $localPlayer.name = $guestUser.name
   $socket.send($localPlayer)
   updateSessions()
@@ -51,12 +50,16 @@
 
  let chatMessageHistory: ChatMessage[] = []
 
- function hostSession() {
-  $localPlayer.sessionId = createSessionId()
-  $localPlayer.messageType = MessageType.SESSION_UPDATE
-  $localPlayer.isHost = true
-  info(`Says hello to online players, new session ${$localPlayer.sessionId}`)
-  $socket.send($localPlayer)
+ function hostSession(forceNewSessionId = false) {
+  if ($localPlayer.sessionId.length === 0 || forceNewSessionId === true) {
+    $localPlayer.sessionId = createSessionId()
+    $localPlayer.messageType = MessageType.SESSION_UPDATE
+    $localPlayer.isHost = true
+    info(`Says hello to online players, new session ${$localPlayer.sessionId}`)
+    $socket.send($localPlayer)
+  } else {
+    info(`Reusing old session ${$localPlayer.sessionId}`)
+  }
  }
 
  function checkReady(): void {
@@ -194,7 +197,7 @@
    const incomingUpdate = su.spaceObject
 
    if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
-    log('Update')
+    log(`Got an session update message from ${incomingUpdate.name}` )
     updateSessions()
    } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
     const msg = incomingUpdate.lastMessage
@@ -233,9 +236,7 @@
  })
 
  onDestroy(() => {
-  // info(`Leaving session, says goodbye...`)
-  // $localPlayer.messageType === MessageType.LEFT_SESSION
-  // $socket.send($localPlayer)
+  setReadyToPlay(false)
   $socket.resetListeners()
 
   if (pingTimer) {
@@ -243,10 +244,6 @@
    clearInterval(pingTimer)
   }
 
-  setTimeout(() => {
-   //  info(`Disconnecting from websocket`)
-   //  $socket.disconnect()
-  }, 200)
  })
 
  let joinedSession: Session | null
@@ -258,11 +255,11 @@
    if (s.id === $localPlayer.sessionId) {
     joinedSession = s
     checkReady()
-    log(`Joined session ${s.id}`)
+    // log(`Joined session ${s.id}`)
     return
    }
   }
-  warn('No joined session')
+  warn('No joined session/host closed the session')
   leaveSession()
  }
 
@@ -282,7 +279,7 @@
     }
    })
    .then(() => {
-    console.log('Sessions: ', sessions)
+    // console.log('Sessions: ', sessions)
    })
    .catch((e) => {
     console.error(`Failed to fetch sessions: ${e}`)
@@ -313,9 +310,10 @@
  }
 
  function leaveSession() {
+  chatMessageHistory = []
   log(`Leaving session`)
   joinedSession = null
-  hostSession()
+  hostSession(true)
   setTimeout(() => {
    updateSessions()
   }, 400)
@@ -393,12 +391,18 @@
   return ''
  }
 
- function readyToPlay() {
-  $localPlayer.readyToPlay = !$localPlayer.readyToPlay
+ function toggleReadyToPlay() {
+  setReadyToPlay(!$localPlayer.readyToPlay)
+ }
+
+ function setReadyToPlay(ready: boolean) {
+  info(`Sending ${ready ? 'ready': 'not ready'} to play to session peers`)
+  $localPlayer.readyToPlay = ready
   $localPlayer.messageType = MessageType.SESSION_UPDATE
   $socket.send($localPlayer)
   updateSessions()
  }
+
 
  function scrollToBottom(): void {
   const messageDiv = document.getElementById('messagesDiv')
@@ -439,13 +443,13 @@
     {#if allReady}
      <p>All players ready!</p>
     {/if}
-    <button on:click={() => readyToPlay()}>{$localPlayer.readyToPlay ? 'Ready' : 'Not ready'}</button>
+    <button on:click={() => toggleReadyToPlay()}>{$localPlayer.readyToPlay ? 'Ready ✅' : 'Ready up!'}</button>
     <button
      on:click={() => {
       leaveSession()
      }}>Leave session</button
     >
-    <button
+    <button disabled={!allReady}
      on:click={() => {
       // navigate(`/play/multiplayer/${$localPlayer.sessionId}`)
       startGame()

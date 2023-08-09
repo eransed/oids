@@ -77,16 +77,20 @@ export class OidsSocket {
  }
 
  async connect() {
-  try {
-   await this.connectPromise()
-    .then((ws) => {
-     console.log(`WebSocket connected with status ${getReadyStateText(ws)}`)
-    })
-    .catch((err) => {
-     console.error(`WebSocket failed to connect: ${err}`)
-    })
-  } catch (error) {
-   this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed`
+  if (this.isConnected() === false) {
+    try {
+      await this.connectPromise()
+      .then((ws) => {
+        console.log(`WebSocket connected with status ${getReadyStateText(ws)}`)
+      })
+      .catch((err) => {
+        console.error(`WebSocket failed to connect: ${err}`)
+      })
+    } catch (error) {
+      this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed`
+    }
+  } else {
+    warn('Already connected to websocket')
   }
  }
 

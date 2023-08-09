@@ -59,8 +59,6 @@
  }
 
  onDestroy(() => {
-  $socket.disconnect()
-  // disconnect()
   game.stopGame()
  })
 </script>
