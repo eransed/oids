@@ -258,3 +258,10 @@ export interface Route {
  path: string
  inHeader: boolean
 }
+
+export interface ChatMessage {
+  message: string
+  timeDate: Date
+  user: SpaceObject
+  serviceMsg?: boolean
+ }

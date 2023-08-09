@@ -1,7 +1,7 @@
 import { writable, type Writable } from 'svelte/store'
 import type { User } from '../interfaces/user'
 import { rndi } from 'mathil'
-import type { SpaceObject } from '../lib/interface'
+import type { ChatMessage, SpaceObject } from '../lib/interface'
 import { createSpaceObject } from '../lib/factory'
 import { OidsSocket } from '../lib/websocket/ws'
 import { getWsUrl } from '../lib/websocket/ws'
@@ -31,3 +31,5 @@ export const gameSessionId: Writable<string | undefined> = writable('')
 export const localPlayer: Writable<SpaceObject> = writable(createSpaceObject())
 
 export const socket: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
+
+export const  chatMessageHistory: Writable<ChatMessage[]> = writable([])

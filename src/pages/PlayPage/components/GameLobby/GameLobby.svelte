@@ -3,7 +3,7 @@
  import { fade } from 'svelte/transition'
 
  //Stores
- import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket } from '../../../../stores/stores'
+ import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket, chatMessageHistory } from '../../../../stores/stores'
 
  //Interfaces
  import { MessageType, type SpaceObject } from '../../../../lib/interface'
@@ -13,7 +13,7 @@
  import Page from '../../../../components/page/page.svelte'
 
  //Services
- import type { Session } from '../../../../lib/interface'
+ import type { ChatMessage, Session } from '../../../../lib/interface'
  import { createSessionId } from '../../../../helpers/util'
  import { activeSessions } from '../../../../lib/services/game/activeSessions'
  import SessionList from './SessionList/SessionList.svelte'
@@ -48,7 +48,7 @@
 
  let sessions: Session[] = []
 
- let chatMessageHistory: ChatMessage[] = []
+
 
  function hostSession(forceNewSessionId = false) {
   if ($localPlayer.sessionId.length === 0 || forceNewSessionId === true) {
@@ -63,19 +63,25 @@
  }
 
  function checkReady(): void {
+  info('Checking which player are ready...')
   let readyPlayers = []
 
   if (joinedSession?.players) {
-   joinedSession?.players.forEach((player) => {
-    if (player.readyToPlay) {
-     readyPlayers.push(player)
-    }
-   })
+    joinedSession?.players.forEach((player) => {
+      info(`${player.name}: ${player.readyToPlay ? 'ready': 'not ready'}`)
+      if (player.readyToPlay) {
+        readyPlayers.push(player)
+      }
+    })
   }
 
   if (readyPlayers.length === joinedSession?.players.length) {
-   allReady = true
-  } else allReady = false
+    info('All players are ready!')
+    allReady = true
+  } else {
+    allReady = false
+  }
+
  }
 
  interface Ping {
@@ -163,12 +169,7 @@
   $socket.send(so)
  }
 
- interface ChatMessage {
-  message: string
-  timeDate: Date
-  user: SpaceObject
-  serviceMsg?: boolean
- }
+
 
  function createJoinMsg(session: string) {
   const msg: ChatMessage = {
@@ -207,7 +208,7 @@
      timeDate: new Date(),
      user: incomingUpdate,
     }
-    chatMessageHistory = [...chatMessageHistory, newMsg]
+    $chatMessageHistory = [...$chatMessageHistory, newMsg]
    } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
     warn(`${incomingUpdate.name} left the lobby`)
     setTimeout(() => {
@@ -221,8 +222,9 @@
     $socket.resetListeners()
     navigate(`/play/multiplayer/${sess}`)
    } else {
-    warn(`Message (${incomingUpdate.messageType}) from ${incomingUpdate.name} not handled`)
-    // console.log(incomingUpdate)
+    if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
+      warn(`Message (${incomingUpdate.messageType}) from ${incomingUpdate.name} not handled`)
+    }
    }
   })
 
@@ -236,7 +238,7 @@
  })
 
  onDestroy(() => {
-  setReadyToPlay(false)
+  // setReadyToPlay(false)
   $socket.resetListeners()
 
   if (pingTimer) {
@@ -298,8 +300,8 @@
    // send some update that localPlayer joined a/the session
    $localPlayer.messageType = MessageType.SESSION_UPDATE
    $localPlayer.isHost = false
-   chatMessageHistory = []
-   chatMessageHistory = [...chatMessageHistory, createJoinMsg(otherPlayerWithSession.sessionId)]
+   $chatMessageHistory = []
+   $chatMessageHistory = [...$chatMessageHistory, createJoinMsg(otherPlayerWithSession.sessionId)]
    $socket.send($localPlayer)
    setTimeout(() => {
     updateSessions()
@@ -310,7 +312,7 @@
  }
 
  function leaveSession() {
-  chatMessageHistory = []
+  $chatMessageHistory = []
   log(`Leaving session`)
   joinedSession = null
   hostSession(true)
@@ -328,8 +330,8 @@
    user: $localPlayer,
    timeDate: new Date(),
   }
-  chatMessageHistory.push(chatMessage)
-  chatMessageHistory = chatMessageHistory
+  $chatMessageHistory.push(chatMessage)
+  $chatMessageHistory = $chatMessageHistory
 
   $localPlayer.messageType = MessageType.CHAT_MESSAGE
   $localPlayer.lastMessage = msgStr
@@ -426,6 +428,7 @@
       Host: {joinedSession.host.name}
       {joinedSession.host.readyToPlay ? '✅' : ''}
      </p>
+     <br/>
      {#if joinedSession.players.length > 1}
       <p>Players</p>
      {/if}
@@ -464,7 +467,7 @@
    <p>Chat - {joinedSession?.id}</p>
 
    <div class="messages" id="messagesDiv">
-    {#each chatMessageHistory as msg}
+    {#each $chatMessageHistory as msg}
      {#if msg.serviceMsg}
       <span style="font-size: 0.8rem; font-style: italic; opacity: 0.5;">{msg.message}</span>
      {:else}
