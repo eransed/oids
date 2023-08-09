@@ -1,7 +1,7 @@
 import type { Game } from '../game'
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from '../canvas_util'
 import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
-import { add, direction, log, magnitude, rndfVec2d, rndi, round2dec } from 'mathil'
+import { add, direction, info, log, magnitude, rndfVec2d, rndi, round2dec } from 'mathil'
 import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, gravity, handleCollisions } from '../physics'
 import { loadingText } from '../render/render2d'
@@ -138,9 +138,9 @@ export function initRegularGame(game: Game): void {
  console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
  //Shootable non-player objects
- const asterois: SpaceObject[] = []
+//  const asterois: SpaceObject[] = []
 
- const asteroids = 10
+//  const asteroids = 10
 
  //  for (let i = 0; i < asteroids; i++) {
  //   const asteroid = createSpaceObject()
@@ -162,6 +162,7 @@ export function initRegularGame(game: Game): void {
  game.websocket.addListener((su: ServerUpdate) => {
   // console.log(su)
   const so: SpaceObject = su.spaceObject
+  info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
   dataLen = su.unparsedDataLength
   bytesRecievedLastSecond += dataLen
   dataKeys = su.numberOfSpaceObjectKeys
@@ -198,6 +199,7 @@ export function initRegularGame(game: Game): void {
 
     // Makes sure to return the previously shots fired on the copy of remote player
     game.remotePlayers[i].shotsInFlight = game.remotePlayers[i].shotsInFlight.concat(cachePhotonLasers)
+    console.log (`Remote player: ${i}: ` +  game.remotePlayers[i].shotsInFlight.length)
 
     return
    }

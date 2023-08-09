@@ -48,6 +48,12 @@ export function soFromValueArray(value: never[]): SpaceObject {
  return so
 }
 
+export function moveShotsToShotsFiredThisFrame(so: SpaceObject) {
+  if (!so.shotsFiredThisFrame) {
+    so.shotsInFlight = []
+  }
+} 
+
 //Creates one shot from valuearray
 export function photonLaserFromValueArray(values: []): PhotonLaser {
  const pl = newPhotonLaser()

@@ -7,7 +7,8 @@ import { addDataPoint, newDataStats } from './stats'
 import { renderFrameInfo } from './render/renderUI'
 import { Every } from './gameModes/regular'
 import { localPlayerStore } from '../pages/GamePage/components/Game/Utils/gameUtils'
-import { MessageType } from './interface'
+import { MessageType, type SpaceObject } from './interface'
+import { reduceShotSize, reduceSoSize } from './websocket/util'
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -72,12 +73,19 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   //    sendSpaceObjectToBroadcastServer(game.localPlayer)
   //   }
   if (game.websocket.isConnected() && game.shouldSendToServer) {
-   game.localPlayer.messageType = MessageType.GAME_UPDATE
-   // remove circ refs and make play non local
-   game.localPlayer.collidingWith = []
-   game.localPlayer.isLocal = false
-   game.localPlayer.online = true
-   game.websocket.send(game.localPlayer)
+    // const so = reduceSoSize(game.localPlayer)
+    game.localPlayer.collidingWith = []
+    const so: SpaceObject = JSON.parse(JSON.stringify(game.localPlayer))
+    so.messageType = MessageType.GAME_UPDATE
+    // remove circ refs and make play non local
+    so.collidingWith = []
+    so.isLocal = false
+    so.online = true
+    // so.shotsInFlight.forEach(v => v = reduceShotSize(v))
+    if (!so.shotsFiredThisFrame) {
+      so.shotsInFlight = []
+    }
+    game.websocket.send(so)
   }
   game.localPlayer.shotsFiredThisFrame = false
   fid = requestAnimationFrame(update)

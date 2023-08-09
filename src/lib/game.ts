@@ -104,7 +104,7 @@ export class Game {
   this.stopper = renderLoop(this, renderFrame, nextFrame)
  }
 
- startGame(initFn: any, renderFn: any, nextFn: any): void {
+ startGame(initFn: (g: Game)=>void, renderFn: (game: Game, dt: number) => void, nextFn: (game: Game, dt: number) => void): void {
   this.shouldSendToServer = true
   this.localPlayer.isPlaying = true
   initFn(this)

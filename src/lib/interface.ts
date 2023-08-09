@@ -173,7 +173,7 @@ export interface SpaceObject
  isPlaying: boolean
  framesSinceLastServerUpdate: number
  shotsInFlight: PhotonLaser[]
- shotsInFlightValues: any[]
+ shotsInFlightValues: PhotonLaser[]
  shotsFiredThisFrame: boolean
  collidingWith: SpaceObject[]
 }
