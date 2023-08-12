@@ -7,7 +7,7 @@ export interface Steerable extends Positionable, Rotatable {
  angleDegree: number
  angularVelocity: number
  steeringPower: number
- steer(direction: number, deltaTime: number): void
+//  steer(direction: number, deltaTime: number): void
 }
 
 export function steerImpl(s: Steerable, direction: number, deltaTime: number) {

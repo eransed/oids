@@ -104,6 +104,7 @@
     border: 2px solid rgb(99, 136, 179, 1);
     border-radius: 4px;
     outline: 2px solid rgb(36, 22, 159);
+
   }
 
   #modalContent {

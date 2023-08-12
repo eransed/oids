@@ -1,27 +1,30 @@
 import type { PhotonLaser, SpaceObject } from '../interface'
 import { round, round2dec } from 'mathil'
 import { createSpaceObject, newPhotonLaser } from '../factory'
+import { copyObject } from '../time'
 
 //In this util we find functions that convert and iterate through data to save space when sending / recieving data through websocket
 
-export function reduceSoSize(so: SpaceObject): SpaceObject {
- const dec = 2
-
- so.canonCoolDown = round2dec(so.canonCoolDown, dec)
- so.acceleration = round(so.acceleration, dec)
- so.velocity = round(so.velocity, dec)
- so.position = round(so.position, dec)
-
- return so
+export function reduceSoSize(so: SpaceObject, dec=0): SpaceObject {
+  const so_copy = <SpaceObject>copyObject(so)
+  so_copy.canonCoolDown = round2dec(so_copy.canonCoolDown, dec)
+  so_copy.acceleration = round(so_copy.acceleration, dec)
+  so_copy.velocity = round(so_copy.velocity, dec)
+  so_copy.position = round(so_copy.position, dec)
+  so_copy.angleDegree = round2dec(so_copy.angleDegree, dec)
+  so_copy.shotsInFlight.forEach((shot) => {
+  shot = reduceShotSize(shot, dec)
+ })
+ so_copy.shotsInFlightNew.forEach((shot) => {
+  shot = reduceShotSize(shot, dec)
+ })
+ return so_copy
 }
 
-export function reduceShotSize(photonLaser: PhotonLaser): PhotonLaser {
- const dec = 2
-
+export function reduceShotSize(photonLaser: PhotonLaser, dec=1): PhotonLaser {
  photonLaser.acceleration = round(photonLaser.acceleration, dec)
  photonLaser.velocity = round(photonLaser.velocity, dec)
  photonLaser.position = round(photonLaser.position, dec)
-
  return photonLaser
 }
 

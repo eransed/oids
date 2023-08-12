@@ -1,4 +1,4 @@
-import { info, log, warn } from 'mathil'
+import { info, warn } from 'mathil'
 import { OIDS_WS_PORT } from '../../../server/pub_config'
 import type { ServerUpdate, SpaceObject } from '../interface'
 
@@ -41,7 +41,7 @@ export class OidsSocket {
  private wsurl: URL
  private ws: WebSocket | null = null
  private prettyStatusString = 'Just created!'
- private sl: SocketListener | null = null
+ private sockMsgListener: SocketListener<'message'> | null = null
 
  constructor(url: URL) {
   console.log('New socket created')
@@ -82,12 +82,14 @@ export class OidsSocket {
       await this.connectPromise()
       .then((ws) => {
         console.log(`WebSocket connected with status ${getReadyStateText(ws)}`)
+        this.prettyStatusString = ''
       })
       .catch((err) => {
         console.error(`WebSocket failed to connect: ${err}`)
+        this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed 1`
       })
     } catch (error) {
-      this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed`
+      this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed 2`
     }
   } else {
     warn('Already connected to websocket')
@@ -134,9 +136,9 @@ export class OidsSocket {
    this.connect()
   }
 
-  this.sl = {
+  this.sockMsgListener = {
    event: 'message',
-   fn: (event: any) => {
+   fn: (event: MessageEvent) => {
     const data = JSON.parse(event.data)
     const spaceObjFromSrv: SpaceObject = data
     spaceObjFromSrv.isLocal = false
@@ -150,22 +152,29 @@ export class OidsSocket {
    },
   }
 
-  this.ws?.addEventListener(this.sl.event, this.sl.fn)
+  this.ws?.addEventListener(this.sockMsgListener.event, this.sockMsgListener.fn)
  }
 
  resetListeners(): void {
-  if (this.sl) {
-   info('Reseting socket listeners...')
-   this.ws?.removeEventListener(this.sl.event, this.sl.fn)
+  if (this.sockMsgListener) {
+   info('Resetting socket listeners...')
+   this.ws?.removeEventListener(this.sockMsgListener.event, this.sockMsgListener.fn)
   } else {
-   warn('Did not remove any listenerss')
+   warn('Did not remove any listeners')
   }
  }
 }
 
-export interface SocketListener {
- event: string
- fn: (e: any) => void
+interface WebSocketEventMap_copy {
+  "close": CloseEvent;
+  "error": Event;
+  "message": MessageEvent;
+  "open": Event;
+}
+
+export interface SocketListener<K extends keyof WebSocketEventMap> {
+ event: K
+ fn: (e: WebSocketEventMap[K]) => void
 }
 
 export function sendSpaceObject(ows: OidsSocket, so: SpaceObject): void {
