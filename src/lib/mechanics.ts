@@ -114,7 +114,7 @@ export function fire(so: SpaceObject): void {
 
  const shotLeftToFire = so.ammo - so.shotsPerFrame < 0 ? so.shotsPerFrame - so.ammo : so.shotsPerFrame
  for (let i = 0; i < shotLeftToFire; i++) {
-  so.shotsInFlight.push(generateMissileFrom(so))
+  so.shotsInFlightNew.push(generateMissileFrom(so))
  }
 
  so.ammo -= shotLeftToFire

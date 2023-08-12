@@ -44,7 +44,7 @@ export function soFromValueArray(value: never[]): SpaceObject {
    so[v as keyof SpaceObject] = value[i]
   }
  })
- so.shotsInFlightValues = []
+ so.shotsInFlightNew = []
  return so
 }
 

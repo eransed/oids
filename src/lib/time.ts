@@ -1,6 +1,5 @@
 import type { Game } from './game'
 import { round2dec } from 'mathil'
-// import { isConnectedToWsServer, sendSpaceObjectToBroadcastServer } from './websocket/webSocket'
 import { updateShapes, updateSpaceObjects } from './physics'
 import { clearScreen } from './render/render2d'
 import { addDataPoint, newDataStats } from './stats'
@@ -8,7 +7,6 @@ import { renderFrameInfo } from './render/renderUI'
 import { Every } from './gameModes/regular'
 import { localPlayerStore } from '../pages/GamePage/components/Game/Utils/gameUtils'
 import { MessageType, type SpaceObject } from './interface'
-import { reduceShotSize, reduceSoSize } from './websocket/util'
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -55,6 +53,34 @@ export function fpsCounter(ops: number, frameTimeMs: number, game: Game, ctx: Ca
  }
 }
 
+function moveNewShotsToLocalBuffer(so: SpaceObject): void {
+  so.shotsInFlight = [...so.shotsInFlight, ...so.shotsInFlightNew]
+  so.shotsInFlightNew = []
+}
+
+function shotHandler(so: SpaceObject): SpaceObject {
+  so.shotsFiredThisFrame = false
+  so.shotsInFlight = []
+  if (so.shotsInFlightNew.length > 0) {
+    so.shotsInFlight = so.shotsInFlightNew
+  }
+  so.shotsInFlightNew = []
+  return so
+}
+
+function copyObject(obj: unknown): unknown {
+  return JSON.parse(JSON.stringify(obj))
+}
+
+function getSendableSpaceObject(so: SpaceObject): SpaceObject {
+  so.collidingWith = []
+  const so_copy: SpaceObject = <SpaceObject>copyObject(so)
+  so_copy.messageType = MessageType.GAME_UPDATE
+  so_copy.isLocal = false
+  so_copy.online = true
+  return shotHandler(so_copy)
+}
+
 const every20: Every = new Every(20)
 
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
@@ -65,29 +91,13 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   const dt: number = getFrameTimeMs(timestamp)
   clearScreen(game.ctx)
   renderFrame(game, dt)
-  // updateSpaceObject(game.localPlayer, dt, game.ctx)
   updateSpaceObjects(game.remotePlayers, dt, game.ctx)
   updateSpaceObjects(game.all, dt, game.ctx)
   updateShapes(game.testShapes, dt)
-  //   if (isConnectedToWsServer() && game.shouldSendToServer) {
-  //    sendSpaceObjectToBroadcastServer(game.localPlayer)
-  //   }
   if (game.websocket.isConnected() && game.shouldSendToServer) {
-    // const so = reduceSoSize(game.localPlayer)
-    game.localPlayer.collidingWith = []
-    const so: SpaceObject = JSON.parse(JSON.stringify(game.localPlayer))
-    so.messageType = MessageType.GAME_UPDATE
-    // remove circ refs and make play non local
-    so.collidingWith = []
-    so.isLocal = false
-    so.online = true
-    // so.shotsInFlight.forEach(v => v = reduceShotSize(v))
-    if (!so.shotsFiredThisFrame) {
-      so.shotsInFlight = []
-    }
-    game.websocket.send(so)
+    game.websocket.send(getSendableSpaceObject(game.localPlayer))
   }
-  game.localPlayer.shotsFiredThisFrame = false
+  moveNewShotsToLocalBuffer(game.localPlayer)
   fid = requestAnimationFrame(update)
   nextFrame(game, dt)
  }

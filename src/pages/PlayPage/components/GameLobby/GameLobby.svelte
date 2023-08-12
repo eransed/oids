@@ -7,7 +7,6 @@
 
  //Interfaces
  import { MessageType, type SpaceObject } from '../../../../lib/interface'
- import type { OidsSocket } from '../../../../lib/websocket/ws'
 
  //Components
  import Page from '../../../../components/page/page.svelte'
@@ -19,8 +18,7 @@
  import SessionList from './SessionList/SessionList.svelte'
 
  import { onDestroy, onMount } from 'svelte'
- import { info, log, usPretty, warn } from 'mathil'
- import { v4 as uuidv4 } from 'uuid'
+ import { info, log, warn } from 'mathil'
  import TypeWriter from '../../../../components/typeWriter/TypeWriter.svelte'
  import { navigate } from 'svelte-routing'
 
@@ -48,17 +46,15 @@
 
  let sessions: Session[] = []
 
-
-
  function hostSession(forceNewSessionId = false) {
   if ($localPlayer.sessionId.length === 0 || forceNewSessionId === true) {
-    $localPlayer.sessionId = createSessionId()
-    $localPlayer.messageType = MessageType.SESSION_UPDATE
-    $localPlayer.isHost = true
-    info(`Says hello to online players, new session ${$localPlayer.sessionId}`)
-    $socket.send($localPlayer)
+   $localPlayer.sessionId = createSessionId()
+   $localPlayer.messageType = MessageType.SESSION_UPDATE
+   $localPlayer.isHost = true
+   info(`Says hello to online players, new session ${$localPlayer.sessionId}`)
+   $socket.send($localPlayer)
   } else {
-    info(`Reusing old session ${$localPlayer.sessionId}`)
+   info(`Reusing old session ${$localPlayer.sessionId}`)
   }
  }
 
@@ -67,109 +63,21 @@
   let readyPlayers = []
 
   if (joinedSession?.players) {
-    joinedSession?.players.forEach((player) => {
-      info(`${player.name}: ${player.readyToPlay ? 'ready': 'not ready'}`)
-      if (player.readyToPlay) {
-        readyPlayers.push(player)
-      }
-    })
+   joinedSession?.players.forEach((player) => {
+    info(`${player.name}: ${player.readyToPlay ? 'ready' : 'not ready'}`)
+    if (player.readyToPlay) {
+     readyPlayers.push(player)
+    }
+   })
   }
 
   if (readyPlayers.length === joinedSession?.players.length) {
-    info('All players are ready!')
-    allReady = true
+   info('All players are ready!')
+   allReady = true
   } else {
-    allReady = false
-  }
-
- }
-
- interface Ping {
-  otherClientName: string
-  sent: Date
-  id: string
-  latencyUs: number
-  responded: boolean
- }
-
- let pingIdArray: Ping[] = []
- const pingArrayMaxSize = 10
-
- function averageLatencyUs() {
-  let sum = 0
-  let size = 0
-  pingIdArray.forEach((p) => {
-   if (p.latencyUs > 0) {
-    sum += p.latencyUs
-    size++
-   }
-  })
-  if (size > 0) {
-   return sum / size
-  } else {
-   return -1
+   allReady = false
   }
  }
-
- function handlePing(so: SpaceObject, socket: OidsSocket): void {
-  if (so.messageType !== MessageType.PING) return
-
-  if (so.ping === true) {
-   info(`ping from: ${so.name}, ttl=${so.ttl}, rtt=${so.rtt}ms, hops=${so.hops}`)
-   so.ping = false
-   so.pingResponse = true
-   so.hops++
-   $socket.send(so)
-  } else if (so.pingResponse === true) {
-   checkJoinedSession()
-
-   for (let i = 0; i < pingIdArray.length; i++) {
-    const p = pingIdArray[i]
-    if (p.id === so.pingId) {
-     p.latencyUs = (new Date().valueOf() - p.sent.valueOf()) * 1000
-     p.responded = true
-     info(`ping response: ${p.id}, sent: ${p.sent}, latency: ${usPretty(p.latencyUs)}, average=${usPretty(averageLatencyUs())}`)
-     if (pingIdArray.length > pingArrayMaxSize) {
-      const diff = pingIdArray.length - pingArrayMaxSize
-      if (diff > 1) {
-       pingIdArray.splice(0, diff)
-      } else {
-       pingIdArray.splice(0, 1)
-      }
-     }
-     return
-    }
-   }
-   warn(`Unhandled ping response:`)
-   console.log(so)
-  }
- }
-
- function ping(so: SpaceObject, $socket: OidsSocket): void {
-  info(`PING`)
-  so.ping = true
-  so.pingResponse = false
-  so.pingId = uuidv4()
-  so.messageType = MessageType.PING
-  pingIdArray.push({
-   otherClientName: so.name,
-   sent: new Date(),
-   id: so.pingId,
-   latencyUs: -1,
-   responded: false,
-  })
-  pingIdArray.forEach((p, idx) => {
-   const currentLatencyUs = (new Date().valueOf() - p.sent.valueOf()) * 1000
-   if (currentLatencyUs > 100) {
-    warn(`high latency: ${usPretty(currentLatencyUs)}`)
-    pingIdArray.splice(idx, 1)
-    checkJoinedSession()
-   }
-  })
-  $socket.send(so)
- }
-
-
 
  function createJoinMsg(session: string) {
   const msg: ChatMessage = {
@@ -198,7 +106,7 @@
    const incomingUpdate = su.spaceObject
 
    if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
-    log(`Got an session update message from ${incomingUpdate.name}` )
+    log(`Got an session update message from ${incomingUpdate.name}`)
     updateSessions()
    } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
     const msg = incomingUpdate.lastMessage
@@ -215,7 +123,7 @@
      updateSessions()
     }, 1000)
    } else if (incomingUpdate.messageType === MessageType.PING) {
-    handlePing(incomingUpdate, $socket)
+    // handlePing(incomingUpdate, $socket)
    } else if (incomingUpdate.messageType === MessageType.START_GAME) {
     const sess = incomingUpdate.sessionId
     log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
@@ -223,7 +131,7 @@
     navigate(`/play/multiplayer/${sess}`)
    } else {
     if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
-      warn(`Message (${incomingUpdate.messageType}) from ${incomingUpdate.name} not handled`)
+     warn(`Message (${incomingUpdate.messageType}) from ${incomingUpdate.name} not handled`)
     }
    }
   })
@@ -231,10 +139,6 @@
   setTimeout(() => {
    updateSessions()
   }, 300)
-
-  // pingTimer = setInterval(() => {
-  //   ping(localPlayer, $socket)
-  // }, 3000)
  })
 
  onDestroy(() => {
@@ -245,7 +149,6 @@
    info(`Clears ping timer ${pingTimer}`)
    clearInterval(pingTimer)
   }
-
  })
 
  let joinedSession: Session | null
@@ -319,7 +222,7 @@
   setTimeout(() => {
    updateSessions()
   }, 400)
-  pingIdArray = []
+  // pingIdArray = []
  }
 
  let chatMsg: string = ''
@@ -375,36 +278,17 @@
   return f.format(date)
  }
 
- function getPlayerPing(so: SpaceObject): string {
-  let sumUs = 0
-  let size = 0
-
-  for (let i = 0; i < pingIdArray.length; i++) {
-   const p = pingIdArray[i]
-   if (so.name === p.otherClientName && p.responded === true) {
-    sumUs += p.latencyUs
-    size++
-   }
-  }
-
-  if (size > 0) {
-   return `(ping: ${usPretty(sumUs / size)})`
-  }
-  return ''
- }
-
  function toggleReadyToPlay() {
   setReadyToPlay(!$localPlayer.readyToPlay)
  }
 
  function setReadyToPlay(ready: boolean) {
-  info(`Sending ${ready ? 'ready': 'not ready'} to play to session peers`)
+  info(`Sending ${ready ? 'ready' : 'not ready'} to play to session peers`)
   $localPlayer.readyToPlay = ready
   $localPlayer.messageType = MessageType.SESSION_UPDATE
   $socket.send($localPlayer)
   updateSessions()
  }
-
 
  function scrollToBottom(): void {
   const messageDiv = document.getElementById('messagesDiv')
@@ -428,7 +312,7 @@
       Host: {joinedSession.host.name}
       {joinedSession.host.readyToPlay ? '✅' : ''}
      </p>
-     <br/>
+     <br />
      {#if joinedSession.players.length > 1}
       <p>Players</p>
      {/if}
@@ -452,7 +336,8 @@
       leaveSession()
      }}>Leave session</button
     >
-    <button disabled={!allReady}
+    <button
+     disabled={!allReady}
      on:click={() => {
       // navigate(`/play/multiplayer/${$localPlayer.sessionId}`)
       startGame()

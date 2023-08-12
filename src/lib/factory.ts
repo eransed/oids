@@ -89,7 +89,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   shape: SpaceShape.SmallShip,
   shotBlowFrame: 16,
   shotsInFlight: [],
-  shotsInFlightValues: [],
+  shotsInFlightNew: [],
   shotsFiredThisFrame: false,
   shotsPerFrame: 1,
   size: { x: 100, y: 100 },
