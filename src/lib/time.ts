@@ -26,34 +26,34 @@ frameTimes.baseUnit = 'ms'
 frameTimes.label = 'Frame time'
 
 export function getFrameTimeMs(timestamp: number): number {
- // todo: make sure not to return nan
- const frameTime = timestamp - prevTimestamp
- prevTimestamp = timestamp
+  // todo: make sure not to return nan
+  const frameTime = timestamp - prevTimestamp
+  prevTimestamp = timestamp
 
- if (frameTime < max_dt) {
-  return frameTime
- } else {
-  return max_dt
- }
+  if (frameTime < max_dt) {
+    return frameTime
+  } else {
+    return max_dt
+  }
 }
 
 let frameCount = 0
 
 export function fpsCounter(ops: number, frameTimeMs: number, game: Game, ctx: CanvasRenderingContext2D): void {
- const fps = round2dec(1000 / frameTimeMs, 0)
- addDataPoint(fpsBuf, fps)
- addDataPoint(frameTimes, frameTimeMs)
- // renderGraph(fpsBuf, {x: 350, y: 100}, {x: 300, y: 70}, ctx)
- // renderGraph(frameTimes, {x: 350, y: 200}, {x: 300, y: 70}, ctx)
- const dt = round2dec(frameTimeMs, 0)
- fps_list.push(fps)
- if (fps_list.length >= fps_list_max_entries) {
-  const afps: number = round2dec(fps_list.reduce((prev, cur) => prev + cur, 0) / fps_list_max_entries, 0)
-  renderFrameInfo(ops, afps, dt, frameCount, game, ctx)
-  fps_list.shift()
- } else {
-  renderFrameInfo(ops, fps, dt, frameCount, game, ctx)
- }
+  const fps = round2dec(1000 / frameTimeMs, 0)
+  addDataPoint(fpsBuf, fps)
+  addDataPoint(frameTimes, frameTimeMs)
+  // renderGraph(fpsBuf, {x: 350, y: 100}, {x: 300, y: 70}, ctx)
+  // renderGraph(frameTimes, {x: 350, y: 200}, {x: 300, y: 70}, ctx)
+  const dt = round2dec(frameTimeMs, 0)
+  fps_list.push(fps)
+  if (fps_list.length >= fps_list_max_entries) {
+    const afps: number = round2dec(fps_list.reduce((prev, cur) => prev + cur, 0) / fps_list_max_entries, 0)
+    renderFrameInfo(ops, afps, dt, frameCount, game, ctx)
+    fps_list.shift()
+  } else {
+    renderFrameInfo(ops, fps, dt, frameCount, game, ctx)
+  }
 }
 
 function moveNewShotsToLocalBuffer(so: SpaceObject): void {
@@ -75,7 +75,7 @@ export function copyObject(obj: any): unknown {
   if (obj.collidingWith) {
     const so = <SpaceObject>obj
     so.collidingWith = []
-    return JSON.parse(JSON.stringify(so))  
+    return JSON.parse(JSON.stringify(so))
   }
   return JSON.parse(JSON.stringify(obj))
 }
@@ -92,45 +92,45 @@ function getSendableSpaceObject(so: SpaceObject): SpaceObject {
 const every20: Every = new Every(20)
 
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
- let fid: number
+  let fid: number
 
- function update(timestamp: number): void {
-  frameCount++
-  every20.tick(() => localPlayerStore.set(game.localPlayer))
-  const dt: number = getFrameTimeMs(timestamp)
-  clearScreen(game.ctx)
-  renderFrame(game, dt)
-  updateSpaceObjects(game.remotePlayers, dt, game.ctx)
-  updateSpaceObjects(game.all, dt, game.ctx)
-  updateShapes(game.testShapes, dt)
-  if (game.websocket.isConnected() && game.shouldSendToServer) {
-    game.websocket.send(getSendableSpaceObject(game.localPlayer))
+  function update(timestamp: number): void {
+    frameCount++
+    every20.tick(() => localPlayerStore.set(game.localPlayer))
+    const dt: number = getFrameTimeMs(timestamp)
+    clearScreen(game.ctx)
+    renderFrame(game, dt)
+    updateSpaceObjects(game.remotePlayers, dt, game.ctx)
+    updateSpaceObjects(game.all, dt, game.ctx)
+    updateShapes(game.testShapes, dt)
+    if (game.websocket.isConnected() && game.shouldSendToServer) {
+      game.websocket.send(getSendableSpaceObject(game.localPlayer))
+    }
+    moveNewShotsToLocalBuffer(game.localPlayer)
+    fid = requestAnimationFrame(update)
+    nextFrame(game, dt)
   }
-  moveNewShotsToLocalBuffer(game.localPlayer)
-  fid = requestAnimationFrame(update)
-  nextFrame(game, dt)
- }
 
- update(0)
+  update(0)
 
- function stopper(): Promise<number> {
-  return new Promise<number>((resolve) => {
-   if (game.websocket.isConnected()) {
-    game.localPlayer.isPlaying = false
-    // Game updates goes only to session peers
-    game.localPlayer.messageType = MessageType.GAME_UPDATE
-    game.websocket.send(game.localPlayer)
-    // sendSpaceObjectToBroadcastServer(game.localPlayer)
-   }
-   cancelAnimationFrame(fid)
-   resolve(fid)
+  function stopper(): Promise<number> {
+    return new Promise<number>((resolve) => {
+      if (game.websocket.isConnected()) {
+        game.localPlayer.isPlaying = false
+        // Game updates goes only to session peers
+        game.localPlayer.messageType = MessageType.GAME_UPDATE
+        game.websocket.send(game.localPlayer)
+        // sendSpaceObjectToBroadcastServer(game.localPlayer)
+      }
+      cancelAnimationFrame(fid)
+      resolve(fid)
 
-   // setTimeout(() => {
-   //   cancelAnimationFrame(fid)
-   //   resolve(fid)
-   // }, 1000)
-  })
- }
+      // setTimeout(() => {
+      //   cancelAnimationFrame(fid)
+      //   resolve(fid)
+      // }, 1000)
+    })
+  }
 
- return stopper
+  return stopper
 }

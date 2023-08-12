@@ -1,7 +1,5 @@
 import { GameType, type SpaceObject, type KeyFunctionMap } from './interface'
-
 import { getContext } from './canvas_util'
-
 import { LightSource, LineSegment } from './shapes'
 import { renderLoop } from './time'
 import * as WelcomeScreen from './gameModes/welcomeScreen'
@@ -10,108 +8,108 @@ import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
 
 export class Game {
- websocket: OidsSocket
- testShapes: Shape[] = []
- private running = false
- type: GameType = GameType.SinglePlayer
- ctx: CanvasRenderingContext2D
- canvas: HTMLCanvasElement
- localPlayer: SpaceObject
- remotePlayers: SpaceObject[] = []
- lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
- segments: LineSegment[] = []
- gameOver = false
- bodies: SpaceObject[] = []
- all: SpaceObject[] = []
- shouldSendToServer = false
- hasCalledCallback = false
- keyFuncMap: KeyFunctionMap
- OnDeadLocalPlayerCallBack: () => void
- stopper: (() => Promise<number>) | null = null
+  websocket: OidsSocket
+  testShapes: Shape[] = []
+  private running = false
+  type: GameType = GameType.SinglePlayer
+  ctx: CanvasRenderingContext2D
+  canvas: HTMLCanvasElement
+  localPlayer: SpaceObject
+  remotePlayers: SpaceObject[] = []
+  lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
+  segments: LineSegment[] = []
+  gameOver = false
+  bodies: SpaceObject[] = []
+  all: SpaceObject[] = []
+  shouldSendToServer = false
+  hasCalledCallback = false
+  keyFuncMap: KeyFunctionMap
+  OnDeadLocalPlayerCallBack: () => void
+  stopper: (() => Promise<number>) | null = null
 
- constructor(
-  _canvas: HTMLCanvasElement,
-  _localPlayer: SpaceObject,
-  _websocket: OidsSocket,
-  keyFuncMap: KeyFunctionMap,
-  _OnDeadLocalPlayerCallBack: () => void
- ) {
-  this.canvas = _canvas
-  this.localPlayer = _localPlayer
-  this.websocket = _websocket
-  this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
-  this.ctx = getContext(this.canvas)
-  this.keyFuncMap = keyFuncMap
- }
-
- isRunning(): boolean {
-  return this.running
- }
-
- shouldQuit(): boolean {
-  return !this.running
- }
-
- stopGame = async (): Promise<void> => {
-  this.running = false
-  this.shouldSendToServer = false
-  this.localPlayer.isPlaying = false
-  if (this.stopper) {
-   await this.stopper()
-  } else {
-   console.error('stopper not init')
+  constructor(
+    _canvas: HTMLCanvasElement,
+    _localPlayer: SpaceObject,
+    _websocket: OidsSocket,
+    keyFuncMap: KeyFunctionMap,
+    _OnDeadLocalPlayerCallBack: () => void
+  ) {
+    this.canvas = _canvas
+    this.localPlayer = _localPlayer
+    this.websocket = _websocket
+    this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
+    this.ctx = getContext(this.canvas)
+    this.keyFuncMap = keyFuncMap
   }
- }
 
- startSingleplayer(): void {
-  console.log('starts single')
- }
-
- startWelcomeScreen(): void {
-  WelcomeScreen.initWelcomeScreen(this)
-  this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
- }
-
- clearBodies(): void {
-  this.bodies = []
-  this.all = []
- }
-
- callBackWrapper(): void {
-  if (!this.hasCalledCallback) {
-   this.hasCalledCallback = true
-   this.OnDeadLocalPlayerCallBack()
+  isRunning(): boolean {
+    return this.running
   }
- }
 
- reset(): void {
-  this.hasCalledCallback = false
-  this.localPlayer.isDead = false
-  this.localPlayer.obliterated = false
-  this.localPlayer.deadFrameCount = 0
-  this.clearBodies()
- }
+  shouldQuit(): boolean {
+    return !this.running
+  }
 
- startMultiplayer(): void {
-  // init a regular game
-  this.shouldSendToServer = true
-  this.localPlayer.isPlaying = true
-  initRegularGame(this)
+  stopGame = async (): Promise<void> => {
+    this.running = false
+    this.shouldSendToServer = false
+    this.localPlayer.isPlaying = false
+    if (this.stopper) {
+      await this.stopper()
+    } else {
+      console.error('stopper not init')
+    }
+  }
 
-  this.running = true
+  startSingleplayer(): void {
+    console.log('starts single')
+  }
 
-  // start the animation loop
-  this.stopper = renderLoop(this, renderFrame, nextFrame)
- }
+  startWelcomeScreen(): void {
+    WelcomeScreen.initWelcomeScreen(this)
+    this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
+  }
 
- startGame(initFn: (g: Game)=>void, renderFn: (game: Game, dt: number) => void, nextFn: (game: Game, dt: number) => void): void {
-  this.shouldSendToServer = true
-  this.localPlayer.isPlaying = true
-  initFn(this)
+  clearBodies(): void {
+    this.bodies = []
+    this.all = []
+  }
 
-  this.running = true
+  callBackWrapper(): void {
+    if (!this.hasCalledCallback) {
+      this.hasCalledCallback = true
+      this.OnDeadLocalPlayerCallBack()
+    }
+  }
 
-  // start the animation loop
-  this.stopper = renderLoop(this, renderFn, nextFn)
- }
+  reset(): void {
+    this.hasCalledCallback = false
+    this.localPlayer.isDead = false
+    this.localPlayer.obliterated = false
+    this.localPlayer.deadFrameCount = 0
+    this.clearBodies()
+  }
+
+  startMultiplayer(): void {
+    // init a regular game
+    this.shouldSendToServer = true
+    this.localPlayer.isPlaying = true
+    initRegularGame(this)
+
+    this.running = true
+
+    // start the animation loop
+    this.stopper = renderLoop(this, renderFrame, nextFrame)
+  }
+
+  startGame(initFn: (g: Game) => void, renderFn: (game: Game, dt: number) => void, nextFn: (game: Game, dt: number) => void): void {
+    this.shouldSendToServer = true
+    this.localPlayer.isPlaying = true
+    initFn(this)
+
+    this.running = true
+
+    // start the animation loop
+    this.stopper = renderLoop(this, renderFn, nextFn)
+  }
 }
