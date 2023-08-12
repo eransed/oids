@@ -61,6 +61,7 @@ export function coolDown(so: SpaceObject) {
 export function generateMissileFrom(so: SpaceObject): PhotonLaser {
  // what is the type of the shot?
  const shot: PhotonLaser = newPhotonLaser()
+ shot.armedDelay = so.armedDelay
  shot.mass = 10
  // shot.angularVelocity = rndi(-70, 70)
  shot.damage = so.missileDamage

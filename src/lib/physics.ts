@@ -3,7 +3,7 @@ import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul,
 import { getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
-import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, timeScale } from './constants'
+import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, screenPaddingFactor, timeScale } from './constants'
 import type { Shape } from './shapes/Shape'
 
 export function updateShape(shape: Shape, dt: number): void {
@@ -47,7 +47,8 @@ export function updateSpaceObjects(sos: SpaceObject[], frameTimeMs: number, ctx:
 export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingContext2D): void {
  if (isNaN(dts)) return
 
- decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), 1.2)
+//  decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), screenPaddingFactor)
+ decayOffScreenShots(so, getScreenFromCanvas(ctx))
  decayDeadShots(so)
 
  coolDown(so)

@@ -121,9 +121,12 @@ export function initRegularGame(game: Game): void {
 
  //Local player init
  game.reset()
- game.localPlayer.mass = 0.1
+ game.localPlayer.mass = 40
  game.localPlayer.missileDamage = 1
- game.localPlayer.missileSpeed = 2
+ game.localPlayer.missileSpeed = 19
+ game.localPlayer.armedDelay = 5
+ game.localPlayer.shotsPerFrame = 1
+ game.localPlayer.ammo = 1000000
  game.localPlayer.angleDegree = -120
  game.localPlayer.health = 100
  game.localPlayer.batteryLevel = 500
@@ -330,7 +333,13 @@ export function renderFrame(game: Game, dt: number): void {
 
  if (game.keyFuncMap.systemGraphs.keyStatus) {
   GRAPHS.forEach((g, i) => {
-   renderGraph(g, { x: 310, y: 110 + i * 142 }, { x: 200, y: 84 }, ctx)
+    const half = Math.floor(GRAPHS.length/2)
+    const h = 130
+    const w = 250
+    const space = 200
+    const startx = 110
+    if (i < half) renderGraph(g, { x: 400, y: startx + i * space }, { x: w, y: h }, ctx)
+    else renderGraph(g, { x: 1200, y: startx + (i-half) * space }, { x: w, y: h }, ctx)
   })
  }
 
