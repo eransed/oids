@@ -26,6 +26,7 @@ export class Game {
   keyFuncMap: KeyFunctionMap
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
+  serverVersion = '_unknown_server_version_'
 
   constructor(
     _canvas: HTMLCanvasElement,

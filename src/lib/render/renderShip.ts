@@ -1,7 +1,7 @@
 import type { SpaceObject } from '../interface'
 import { round2dec, type Vec2d } from 'mathil'
 import { screenScale } from '../constants'
-import * as ship from '../../assets/ship.svg'
+// import * as ship from '../../assets/ship.svg'
 import { renderShot, setScaledFont } from './render2d'
 
 export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false): void {
@@ -11,7 +11,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
 
  const shipSvg = new Image()
 
- shipSvg.src = ship.default
+//  shipSvg.src = ship.default
 
  // Render hit box of ship after contex restore
  //renderHitRadius(so, ctx)

@@ -70,7 +70,7 @@ export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, f
   const info = `WS: ${game.websocket.getStateString()} ${game.websocket.getStatusString()}   RES: ${screen.x}x${screen.y} (x${screenScale}, ${ratio})   DTS: ${(round2dec(frameTimeMs * timeScale, dec)+'').padStart(5, ' ')}   FrameCount: ${fc}`
   ctx.fillText(info, xpos, 50)
   ctx.fillStyle = '#444'
-  const ver = 'Version: fix me!'
+  const ver = game.serverVersion
   ctx.fillText('' + ver, screen.x - ver.length * 27, 50)
 }
 

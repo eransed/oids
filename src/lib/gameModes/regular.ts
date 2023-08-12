@@ -1,12 +1,12 @@
 import type { Game } from '../game'
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from '../canvas_util'
 import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
-import { add, direction, log, magnitude, rndfVec2d, round2dec } from 'mathil'
+import { add, direction, info, log, magnitude, rndfVec2d, round2dec } from 'mathil'
 import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions } from '../physics'
 import { loadingText } from '../render/render2d'
 import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject } from '../interface'
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject, MessageType } from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
 import { explosionDuration } from '../constants'
@@ -158,6 +158,7 @@ export function initRegularGame(game: Game): void {
   // game.remotePlayers = []
   game.all = game.all.concat(game.bodies)
   game.all.push(game.localPlayer)
+  game.serverVersion = game.localPlayer.serverVersion
 
   let startTime = 0
 
@@ -166,6 +167,11 @@ export function initRegularGame(game: Game): void {
     // console.log(su)
     const so: SpaceObject = su.spaceObject
     //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
+    if (so.messageType === MessageType.SERVICE) {
+      game.serverVersion = so.serverVersion
+      info(`Service message: server version: ${so.serverVersion}`)
+      return
+    }
     dataLen = su.unparsedDataLength
     bytesRecievedLastSecond += dataLen
     dataKeys = su.numberOfSpaceObjectKeys

@@ -147,6 +147,7 @@ export enum MessageType {
  PING,
  PING_RESPONSE,
  START_GAME,
+ SERVICE,
 }
 
 export interface SpaceObject

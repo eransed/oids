@@ -21,6 +21,7 @@
  import { info, log, warn } from 'mathil'
  import TypeWriter from '../../../../components/typeWriter/TypeWriter.svelte'
  import { navigate } from 'svelte-routing'
+ import Game from '../../../GamePage/components/Game/Game.svelte'
 
  /**
   * Reactive on changes to $user store.
@@ -129,9 +130,12 @@
     log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
     $socket.resetListeners()
     navigate(`/play/multiplayer/${sess}`)
+   } else if (incomingUpdate.messageType === MessageType.SERVICE) {
+      info(`Service message: server version: ${incomingUpdate.serverVersion}`)
+      $localPlayer.serverVersion = incomingUpdate.serverVersion
    } else {
     if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
-     warn(`Message (${incomingUpdate.messageType}) from ${incomingUpdate.name} not handled`)
+     warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
     }
    }
   })
