@@ -1,6 +1,7 @@
 body {
  background-color: #000;
- overflow: hidden;
+ overflow-x: hidden;
+ overflow-y: hidden;
  font-family: 'Courier New', Courier, monospace;
 }
 

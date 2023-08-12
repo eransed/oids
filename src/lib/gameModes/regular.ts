@@ -327,9 +327,11 @@ export function renderFrame(game: Game, dt: number): void {
  addDataPoint(hpbuf, game.localPlayer.health)
  addDataPoint(packetSizeBuf, dataLen)
  addDataPoint(batbuf, game.localPlayer.batteryLevel)
- addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)
- addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(createSpaceObject())).length)
- addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(createSpaceObject()))).length)
+ try {
+   addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)
+   addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(game.localPlayer)).length)
+   addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(game.localPlayer))).length)
+  } catch (e) { /* empty */ }
 
  if (game.keyFuncMap.systemGraphs.keyStatus) {
   GRAPHS.forEach((g, i) => {

@@ -93,9 +93,9 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   shotsFiredThisFrame: false,
   shotsPerFrame: 1,
   size: { x: 100, y: 100 },
-  steer: function (direction: number, deltaTime: number): void {
-   throw new Error('Steer not implemented.')
-  },
+  // steer: function (direction: number, deltaTime: number): void {
+  //  throw new Error('Steer not implemented.')
+  // },
   steeringPower: 1.2,
   velocity: initVel,
   ownerName: '',

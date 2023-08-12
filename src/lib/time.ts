@@ -7,6 +7,7 @@ import { renderFrameInfo } from './render/renderUI'
 import { Every } from './gameModes/regular'
 import { localPlayerStore } from '../pages/GamePage/components/Game/Utils/gameUtils'
 import { MessageType, type SpaceObject } from './interface'
+import { reduceSoSize } from './websocket/util'
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -36,6 +37,8 @@ export function getFrameTimeMs(timestamp: number): number {
  }
 }
 
+let frameCount = 0
+
 export function fpsCounter(ops: number, frameTimeMs: number, game: Game, ctx: CanvasRenderingContext2D): void {
  const fps = round2dec(1000 / frameTimeMs, 0)
  addDataPoint(fpsBuf, fps)
@@ -46,10 +49,10 @@ export function fpsCounter(ops: number, frameTimeMs: number, game: Game, ctx: Ca
  fps_list.push(fps)
  if (fps_list.length >= fps_list_max_entries) {
   const afps: number = round2dec(fps_list.reduce((prev, cur) => prev + cur, 0) / fps_list_max_entries, 0)
-  renderFrameInfo(ops, afps, dt, game, ctx)
+  renderFrameInfo(ops, afps, dt, frameCount, game, ctx)
   fps_list.shift()
  } else {
-  renderFrameInfo(ops, fps, dt, game, ctx)
+  renderFrameInfo(ops, fps, dt, frameCount, game, ctx)
  }
 }
 
@@ -68,7 +71,12 @@ function shotHandler(so: SpaceObject): SpaceObject {
   return so
 }
 
-function copyObject(obj: unknown): unknown {
+export function copyObject(obj: any): unknown {
+  if (obj.collidingWith) {
+    const so = <SpaceObject>obj
+    so.collidingWith = []
+    return JSON.parse(JSON.stringify(so))  
+  }
   return JSON.parse(JSON.stringify(obj))
 }
 
@@ -78,7 +86,7 @@ function getSendableSpaceObject(so: SpaceObject): SpaceObject {
   so_copy.messageType = MessageType.GAME_UPDATE
   so_copy.isLocal = false
   so_copy.online = true
-  return shotHandler(so_copy)
+  return reduceSoSize(shotHandler(so_copy))
 }
 
 const every20: Every = new Every(20)
@@ -87,6 +95,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
  let fid: number
 
  function update(timestamp: number): void {
+  frameCount++
   every20.tick(() => localPlayerStore.set(game.localPlayer))
   const dt: number = getFrameTimeMs(timestamp)
   clearScreen(game.ctx)

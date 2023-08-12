@@ -12,6 +12,9 @@
 </script>
 
 <style>
+  div {
+    overflow: auto;
+  }
 </style>
 
 <Modal position="relative" {title} {showModal} {closedCallback} backDrop={false} closeBtn={false}>
