@@ -115,7 +115,7 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
   // ctx.fillText(`${ds.label}`, Math.floor(size.x/2) - (ds.label.length*10), -30)
   // ctx.fillText(`[t]`, Math.floor(size.x/2) - 10, size.y + 30)
 
-  const leftPad = -320
+  const leftPad = -350
 
   const yval = linearTransform(value, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
   const yaver = linearTransform(a, min - edgePad, max + edgePad, size.y - edgePad, edgePad)
