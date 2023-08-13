@@ -44,7 +44,7 @@
     font-size: 0.6rem;
     max-width: 35rem;
     min-width: 35rem;
-    overflow-y: auto;
+    /* overflow-y: auto; */
   }
 
   .left {
@@ -61,7 +61,7 @@
 <div>
 
   {#each Object.entries($localPlayerStore) as kv, index}
-  <div class="left"><span style="color: {$localPlayerStore.color}">[{index + 1}].{kv[0]}</span>{getObjectPropCountIfAny(kv[1])} = {prettySpaceObjectValue(kv[1], kv[0])}</div>
+  <div><span style="color: {$localPlayerStore.color}">[{index + 1}].{kv[0]}</span>{getObjectPropCountIfAny(kv[1])} = {prettySpaceObjectValue(kv[1], kv[0])}</div>
   {/each}
 
 </div>
