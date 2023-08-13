@@ -1,7 +1,7 @@
 import type { Game } from '../game'
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from '../canvas_util'
 import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
-import { add, direction, info, log, magnitude, rndfVec2d, round2dec } from 'mathil'
+import { add, direction, info, log, magnitude, newVec2d, rndfVec2d, round2dec } from 'mathil'
 import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions } from '../physics'
 import { loadingText } from '../render/render2d'
@@ -127,7 +127,7 @@ export function initRegularGame(game: Game): void {
 
   //Local player init
   game.reset()
-  game.localPlayer.mass = 40
+  game.localPlayer.mass = 1
   game.localPlayer.missileDamage = 1
   game.localPlayer.missileSpeed = 19
   game.localPlayer.armedDelay = 5
@@ -147,19 +147,17 @@ export function initRegularGame(game: Game): void {
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
   //Shootable non-player objects
-  //  const asterois: SpaceObject[] = []
-
-  //  const asteroids = 10
-
-  //  for (let i = 0; i < asteroids; i++) {
-  //   const asteroid = createSpaceObject()
-
-  //   asteroid.position = rndfVec2d(0, 1200)
-  //   asteroid.health = 1
-  //   asteroid.name = 'asteroid-' + i
-
-  //   game.bodies.push(asteroid)
-  //  }
+  const asteroidCount = 1
+  for (let i = 0; i < asteroidCount; i++) {
+    const asteroid = createSpaceObject()
+    asteroid.position = rndfVec2d(0, 1200)
+    asteroid.health = 1000
+    asteroid.name = 'asteroid-' + i
+    asteroid.hitRadius = 220
+    asteroid.size = newVec2d(200, 200)
+    asteroid.mass = 10
+    game.bodies.push(asteroid)
+  }
 
   // game.remotePlayers = []
   game.all = game.all.concat(game.bodies)
@@ -339,7 +337,7 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(hpbuf, game.localPlayer.health)
   addDataPoint(packetSizeBuf, dataLen)
   addDataPoint(batbuf, game.localPlayer.batteryLevel)
-  addDataPoint(angularVelocityGraph, game.localPlayer.angularVelocity*1000)
+  addDataPoint(angularVelocityGraph, game.localPlayer.angularVelocity * 1000)
   addDataPoint(ammoGraph, game.localPlayer.ammo)
   try {
     addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)

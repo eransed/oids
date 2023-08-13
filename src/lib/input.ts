@@ -101,6 +101,7 @@ function reloadSpaceObject(so: SpaceObject) {
   so.batteryLevel = 1000
   so.booster = 5
   so.missileDamage = 10
+  so.missileSpeed = 25
   so.inverseFireRate = 6
   so.shotsPerFrame = 2
 }
