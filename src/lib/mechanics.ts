@@ -2,7 +2,7 @@ import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical,
 import type { Steerable } from './traits/Steerable'
 
 import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2d } from 'mathil'
-import { maxHeat, shotHitReversFactor } from './constants'
+import { maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
 import { getHeading } from './physics'
@@ -18,8 +18,11 @@ export function applyEngine(so: Thrustable & Boostable, boost = false): number {
 }
 
 export function applySteer(so: Steerable, dir: number, deltaTimeScaled: number): void {
-  so.angleDegree += dir * so.steeringPower * deltaTimeScaled
-  // so.angularVelocity += dir * so.steeringPower
+  if (thrustSteer) {
+    so.angularVelocity += dir * so.steeringPower * thrustSteerPowerFactor
+  } else {
+    so.angleDegree += dir * so.steeringPower * deltaTimeScaled
+  }
 }
 
 export function getThrustVector(so: Thrustable & Steerable & Boostable, dirAng: number, boost = false): Vec2d {

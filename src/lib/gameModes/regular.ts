@@ -45,6 +45,12 @@ const hpbuf = newDataStats()
 const shotSize = newDataStats()
 const soSize = newDataStats()
 const dataTest = newDataStats()
+const angularVelocityGraph = newDataStats()
+angularVelocityGraph.baseUnit = 'mdeg/f'
+angularVelocityGraph.label = 'Angular Vel.'
+const ammoGraph = newDataStats()
+ammoGraph.label = 'Ammo'
+ammoGraph.baseUnit = ''
 
 dataTest.baseUnit = 'B'
 dataTest.label = 'Reduced So Size'
@@ -333,6 +339,8 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(hpbuf, game.localPlayer.health)
   addDataPoint(packetSizeBuf, dataLen)
   addDataPoint(batbuf, game.localPlayer.batteryLevel)
+  addDataPoint(angularVelocityGraph, game.localPlayer.angularVelocity*1000)
+  addDataPoint(ammoGraph, game.localPlayer.ammo)
   try {
     addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)
     addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(game.localPlayer)).length)

@@ -33,8 +33,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRender
  so.position = add(so.position, v)
  so.acceleration = { x: 0, y: 0 }
  so.velocity = limitv(so.velocity, { x: 250, y: 250 })
-
- // so.angleDegree += so.angularVelocity * deltaTime
+ so.angleDegree += so.angularVelocity * deltaTime
  updateShots(so, deltaTime, ctx)
 }
 
