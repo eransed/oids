@@ -130,7 +130,7 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.mass = 1
   game.localPlayer.missileDamage = 1
   game.localPlayer.missileSpeed = 19
-  game.localPlayer.armedDelay = 5
+  game.localPlayer.armedDelay = 10
   game.localPlayer.shotsPerFrame = 1
   game.localPlayer.ammo = 1000000
   game.localPlayer.angleDegree = -120
@@ -343,7 +343,9 @@ export function renderFrame(game: Game, dt: number): void {
     addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)
     addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(game.localPlayer)).length)
     addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(game.localPlayer))).length)
-  } catch (e) { /* empty */ }
+  } catch (e) {
+    /* empty */
+  }
 
   if (game.keyFuncMap.systemGraphs.keyStatus) {
     GRAPHS.forEach((g, i) => {

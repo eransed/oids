@@ -9,6 +9,7 @@ import { start_host_server } from './host_server'
 import { MessageType, Session, SpaceObject } from '../src/lib/interface'
 import { error, info, log, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
+import { GameHandler } from './game_handler'
 
 // start ApiServer
 apiServer()
@@ -28,6 +29,10 @@ const server: WebSocketServer = new WebSocketServer({
 })
 
 let globalConnectedClients: Client[] = []
+
+const gameHandler = new GameHandler((data: any, sessionId: string | null) => {
+  serverBroadcast(data, globalConnectedClients, sessionId)
+})
 
 export class Client {
   ws: WebSocket
@@ -104,6 +109,9 @@ export class Client {
             info('No clients connected')
           }
         }
+
+        gameHandler.checkMessage(so)
+
         if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
           broadcastToAllClients(this, globalConnectedClients, so)
         } else {
@@ -210,6 +218,20 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
         } else {
           //  info(`BROADCAST<${client.sessionId}>: '${data.lastMessage}' from ${sendingClient.name} to ${client.name}`)
         }
+      }
+    }
+  }
+}
+
+function serverBroadcast(data: SpaceObject, connectedClients: Client[], sessionId: string | null = null): void {
+  if (sessionId === null) {
+    for (const client of connectedClients) {
+      client.ws.send(JSON.stringify(data))
+    }
+  } else {
+    for (const client of connectedClients) {
+      if (client.sessionId === sessionId) {
+        client.ws.send(JSON.stringify(data))
       }
     }
   }
