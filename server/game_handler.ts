@@ -1,28 +1,34 @@
-import { info, warn, usNow, usPretty } from 'mathil'
+import { info, warn, usNow } from 'mathil'
 import { MessageType, NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
-import { Client } from './main'
-import { createNpc, createSpaceObject } from '../src/lib/factory'
-import { updateSpaceObjects } from '../src/lib/physics'
+import { createNpc } from '../src/lib/factory'
+import { updateNonPlayerCharacter } from '../src/lib/physics'
 
 export class GameHandler {
   game_started = false
   asteroids: NonPlayerCharacter[] = []
   game_interval: NodeJS.Timer | null = null
   start_time_us: number = usNow()
-  broadcaster: (data: unknown, sessionId: string | null) => void
+  private lastTime = performance.now()
+  private dt = performance.now()
+  private minTickTimeMs = 1000
+  broadcaster: (data: NonPlayerCharacter, sessionId: string | null) => void
 
-  constructor(bc: (data: unknown, sessionId: string | null) => void) {
+  constructor(bc: (data: NonPlayerCharacter, sessionId: string | null) => void) {
     this.broadcaster = bc
   }
 
+
   game_session_start(sessionId: string) {
+    this.spawnAsteroids()
     this.game_interval = setInterval(() => {
-      //update game state
+      // info(`Game tick`)
       this.asteroids.forEach((a) => {
+        this.dt = performance.now() - this.lastTime
+        updateNonPlayerCharacter(a, this.dt)
         this.broadcaster(a, sessionId)
+        this.lastTime = performance.now()
       })
-      //   updateSpaceObjects(this.asteroids, 10, null)
-    }, 10)
+    }, this.minTickTimeMs)
   }
 
   checkMessage(obj: SpaceObject) {

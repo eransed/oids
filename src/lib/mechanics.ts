@@ -1,4 +1,4 @@
-import type { Boostable, Bounceable, Damageable, Damager, PhotonLaser, Physical, Positionable, SpaceObject, Thrustable } from './interface'
+import type { Boostable, Bounceable, Damageable, Damager, NonPlayerCharacter, PhotonLaser, Physical, Positionable, SpaceObject, Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
 import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2d } from 'mathil'
@@ -45,11 +45,11 @@ export function wrapSpaceObject(so: Positionable, screen: Vec2d): void {
   // mirrorWrap(so.position, screen)
 }
 
-export function decayDeadShots(so: SpaceObject) {
+export function decayDeadShots(so: SpaceObject | NonPlayerCharacter) {
   so.shotsInFlight = <PhotonLaser[]>decayDeadSpaceObjects(so.shotsInFlight)
 }
 
-export function coolDown(so: SpaceObject) {
+export function coolDown(so: SpaceObject | NonPlayerCharacter) {
   if (so.canonCoolDown >= maxHeat) {
     so.canonOverHeat = true
   }
@@ -150,7 +150,7 @@ export function decayDeadSpaceObjects(so: Damageable[]): Damageable[] {
   return out
 }
 
-export function handleDeathExplosion(so: SpaceObject, maximumIncrement: number): void {
+export function handleDeathExplosion(so: NonPlayerCharacter, maximumIncrement: number): void {
   //Increment deadframecount to use in render of explosion
   if (so.obliterated) {
     return
@@ -163,7 +163,7 @@ export function handleDeathExplosion(so: SpaceObject, maximumIncrement: number):
   so.deadFrameCount++
 }
 
-export function bounceSpaceObject(so: Physical & Damager & Bounceable, screen: Vec2d, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
+export function bounceSpaceObject(so: NonPlayerCharacter, screen: Vec2d, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
   if (so.position.x < gap) {
     so.velocity.x = -so.velocity.x * energyFactor
     so.position.x = gap

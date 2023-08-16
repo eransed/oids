@@ -1,6 +1,6 @@
 import { info, warn } from 'mathil'
 import { OIDS_WS_PORT } from '../../../server/pub_config'
-import type { ServerUpdate, SpaceObject } from '../interface'
+import { MessageType, type NonPlayerCharacter, type ServerUpdate, type SpaceObject } from '../interface'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
  return new URL(`ws://${new URL(window.location.href).hostname}:${port}`)
@@ -130,7 +130,7 @@ export class OidsSocket {
   return this.prettyStatusString
  }
 
- addListener(callback: (su: ServerUpdate) => void): void {
+ addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<NonPlayerCharacter>) => void): void {
   if (!this.ws) {
    console.log('trying to connect')
    this.connect()
@@ -140,16 +140,33 @@ export class OidsSocket {
    event: 'message',
    fn: (event: MessageEvent) => {
     const data = JSON.parse(event.data)
-    const spaceObjFromSrv: SpaceObject = data
-    spaceObjFromSrv.isLocal = false
-    const serverUpdate: ServerUpdate = {
-     spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(spaceObjFromSrv)).length,
-     unparsedDataLength: event.data.length,
-     numberOfSpaceObjectKeys: Object.keys(spaceObjFromSrv).length,
-     spaceObject: spaceObjFromSrv,
+
+    // if (!data.messageType) {
+    //   console.error(data)
+    //   throw new Error('Unvalid json')
+    // }
+
+    function serverUpdateObject<T extends SpaceObject | NonPlayerCharacter> (data: T): ServerUpdate<T> {
+      const serverUpdate: ServerUpdate<T> = {
+        spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(data)).length,
+        unparsedDataLength: event.data.length,
+        numberOfSpaceObjectKeys: Object.keys(data).length,
+        dataObject: data
+      }
+
+      return serverUpdate
     }
-    callback(serverUpdate)
-   },
+
+    if (data.messageType === MessageType.SERVER_GAME_UPDATE) {
+      const su = serverUpdateObject<NonPlayerCharacter>(data)
+      callbackNpc(su)
+    } else {
+      const su = serverUpdateObject<SpaceObject>(data)
+      su.dataObject = data
+      su.dataObject.isLocal = false
+      callbackSo(su)
+    }
+   }
   }
 
   this.ws?.addEventListener(this.sockMsgListener.event, this.sockMsgListener.fn)

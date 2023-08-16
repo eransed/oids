@@ -104,7 +104,7 @@
   log('Adding lobby websocket listener...')
 
   $socket.addListener((su) => {
-   const incomingUpdate = su.spaceObject
+   const incomingUpdate = su.dataObject
 
    if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
     log(`Got an session update message from ${incomingUpdate.name}`)
@@ -138,7 +138,7 @@
      warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
     }
    }
-  })
+  }, () => {})
 
   setTimeout(() => {
    updateSessions()

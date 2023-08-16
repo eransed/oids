@@ -1,8 +1,8 @@
-import { GameType, type SpaceObject, type KeyFunctionMap } from './interface'
+import { GameType, type SpaceObject, type KeyFunctionMap, type NonPlayerCharacter } from './interface'
 import { getContext } from './canvas_util'
 import { LightSource, LineSegment } from './shapes'
 import { renderLoop } from './time'
-import * as WelcomeScreen from './gameModes/welcomeScreen'
+// import * as WelcomeScreen from './gameModes/welcomeScreen'
 import type { Shape } from './shapes/Shape'
 import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
@@ -19,8 +19,8 @@ export class Game {
   lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
   segments: LineSegment[] = []
   gameOver = false
-  bodies: SpaceObject[] = []
-  all: SpaceObject[] = []
+  bodies: (SpaceObject | NonPlayerCharacter) [] = []
+  all: (SpaceObject | NonPlayerCharacter)[] = []
   shouldSendToServer = false
   hasCalledCallback = false
   keyFuncMap: KeyFunctionMap
@@ -67,8 +67,8 @@ export class Game {
   }
 
   startWelcomeScreen(): void {
-    WelcomeScreen.initWelcomeScreen(this)
-    this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
+    // WelcomeScreen.initWelcomeScreen(this)
+    // this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
   }
 
   clearBodies(): void {

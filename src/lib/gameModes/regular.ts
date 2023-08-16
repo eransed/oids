@@ -6,7 +6,7 @@ import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions } from '../physics'
 import { loadingText } from '../render/render2d'
 import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject, MessageType } from '../interface'
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject, MessageType, type NonPlayerCharacter } from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
 import { explosionDuration } from '../constants'
@@ -136,8 +136,8 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.angleDegree = -120
   game.localPlayer.health = 100
   game.localPlayer.batteryLevel = 500
-  game.localPlayer.steeringPower = 1.6
-  game.localPlayer.enginePower = 0.25
+  game.localPlayer.steeringPower = 1.4
+  game.localPlayer.enginePower = 0.20
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
@@ -147,17 +147,17 @@ export function initRegularGame(game: Game): void {
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
   //Shootable non-player objects
-  const asteroidCount = 1
-  for (let i = 0; i < asteroidCount; i++) {
-    const asteroid = createSpaceObject()
-    asteroid.position = rndfVec2d(0, 1200)
-    asteroid.health = 1000
-    asteroid.name = 'asteroid-' + i
-    asteroid.hitRadius = 220
-    asteroid.size = newVec2d(200, 200)
-    asteroid.mass = 10
-    game.bodies.push(asteroid)
-  }
+  // const asteroidCount = 1
+  // for (let i = 0; i < asteroidCount; i++) {
+  //   const asteroid = createSpaceObject()
+  //   asteroid.position = rndfVec2d(0, 1200)
+  //   asteroid.health = 1000
+  //   asteroid.name = 'asteroid-' + i
+  //   asteroid.hitRadius = 220
+  //   asteroid.size = newVec2d(200, 200)
+  //   asteroid.mass = 10
+  //   game.bodies.push(asteroid)
+  // }
 
   // game.remotePlayers = []
   game.all = game.all.concat(game.bodies)
@@ -167,67 +167,86 @@ export function initRegularGame(game: Game): void {
   let startTime = 0
 
   log('Setting game socket listener...')
-  game.websocket.addListener((su: ServerUpdate) => {
+
+  game.websocket.addListener((su) => {
     // console.log(su)
-    const so: SpaceObject = su.spaceObject
     //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
-    if (so.messageType === MessageType.SERVICE) {
-      game.serverVersion = so.serverVersion
-      info(`Service message: server version: ${so.serverVersion}`)
+    if (su.dataObject.messageType === MessageType.SERVICE) {
+      game.serverVersion = su.dataObject.serverVersion
+      info(`Service message: server version: ${su.dataObject.serverVersion}`)
       return
-    }
-    dataLen = su.unparsedDataLength
-    bytesRecievedLastSecond += dataLen
-    dataKeys = su.numberOfSpaceObjectKeys
-    rxDataBytes += dataLen * symbolByteSize
-    // addDataPoint(packetSize, su.spaceObjectByteSize)
-    if (performance.now() - startTime >= 1000) {
-      addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
-      ops = numberOfServerObjects
-      startTime = performance.now()
-      if (numberOfServerObjects > 0) {
-        symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
-        byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
-        bitSpeed = round2dec(byteSpeed * byteSize, 1)
-        addDataPoint(downloadBuf, bitSpeed)
-      }
-      numberOfServerObjects = 0
-      bytesRecievedLastSecond = 0
-    } else {
-      numberOfServerObjects++
-    }
-    for (let i = 0; i < game.remotePlayers.length; i++) {
-      if (so.name === game.remotePlayers[i].name) {
-        if (!so.online) {
-          console.log(`${so.name} went offline`)
-          game.remotePlayers.splice(i)
-          continue
+    } else if (su.dataObject){
+
+      const so: SpaceObject = su.dataObject
+      dataLen = su.unparsedDataLength
+      bytesRecievedLastSecond += dataLen
+      dataKeys = su.numberOfSpaceObjectKeys
+      rxDataBytes += dataLen * symbolByteSize
+      // addDataPoint(packetSize, su.spaceObjectByteSize)
+      if (performance.now() - startTime >= 1000) {
+        addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
+        ops = numberOfServerObjects
+        startTime = performance.now()
+        if (numberOfServerObjects > 0) {
+          symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
+          byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
+          bitSpeed = round2dec(byteSpeed * byteSize, 1)
+          addDataPoint(downloadBuf, bitSpeed)
         }
-
-        // Store every previously shots fired
-        const cachePhotonLasers = game.remotePlayers[i].shotsInFlight
-
-        const newShotsThisUpdate = so.shotsInFlight
-
-        // update the remote player data object
-        game.remotePlayers[i] = so
-
-        // if (so.shotsFiredThisFrame) {
-        game.remotePlayers[i].shotsInFlight = [...cachePhotonLasers, ...newShotsThisUpdate]
-        // }
-
-        // Makes sure to return the previously shots fired on the copy of remote player
-        // game.remotePlayers[i].shotsInFlight = game.remotePlayers[i].shotsInFlight.concat(cachePhotonLasers)
-        // console.log (`Remote player: ${i}: ` +  game.remotePlayers[i].shotsInFlight.length)
-
-        return
+        numberOfServerObjects = 0
+        bytesRecievedLastSecond = 0
+      } else {
+        numberOfServerObjects++
       }
-    }
-    if (so.name !== game.localPlayer.name) {
-      game.remotePlayers.push(so)
-      console.log(`New ship online: ${so.name}`)
+      for (let i = 0; i < game.remotePlayers.length; i++) {
+        if (so.name === game.remotePlayers[i].name) {
+          if (!so.online) {
+            console.log(`${so.name} went offline`)
+            game.remotePlayers.splice(i)
+            continue
+          }
+          
+          // Store every previously shots fired
+          const cachePhotonLasers = game.remotePlayers[i].shotsInFlight
+          
+          const newShotsThisUpdate = so.shotsInFlight
+          
+          // update the remote player data object
+          game.remotePlayers[i] = so
+          
+          // if (so.shotsFiredThisFrame) {
+            game.remotePlayers[i].shotsInFlight = [...cachePhotonLasers, ...newShotsThisUpdate]
+            // }
+            
+            // Makes sure to return the previously shots fired on the copy of remote player
+            // game.remotePlayers[i].shotsInFlight = game.remotePlayers[i].shotsInFlight.concat(cachePhotonLasers)
+            // console.log (`Remote player: ${i}: ` +  game.remotePlayers[i].shotsInFlight.length)
+            
+            return
+          }
+        }
+        if (so.name !== game.localPlayer.name) {
+          game.remotePlayers.push(so)
+          console.log(`New ship online: ${so.name}`)
+        }
+      }
+  }, (su) => {
+    // console.log (su.dataObject)
+    info(`Number of server obj: ${game.bodies.length}`)
+    console.log (game.bodies)
+    if (!exists(su.dataObject, game.bodies)) {
+      game.bodies.push(su.dataObject)
     }
   })
+}
+
+function exists(entity: NonPlayerCharacter, entities: NonPlayerCharacter[]): boolean {
+  entities.forEach( (b) => {
+    if (b.name === entity.name) {
+      return true
+    }
+  })
+  return false
 }
 
 function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext2D): SpaceObject[] {

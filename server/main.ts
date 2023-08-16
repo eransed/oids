@@ -6,7 +6,7 @@ import { getLocalIp, ipport } from './net'
 
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
-import { MessageType, Session, SpaceObject } from '../src/lib/interface'
+import { MessageType, NonPlayerCharacter, Session, SpaceObject } from '../src/lib/interface'
 import { error, info, log, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
@@ -30,8 +30,9 @@ const server: WebSocketServer = new WebSocketServer({
 
 let globalConnectedClients: Client[] = []
 
-const gameHandler = new GameHandler((data: any, sessionId: string | null) => {
-  serverBroadcast(data, globalConnectedClients, sessionId)
+const gameHandler = new GameHandler((data: NonPlayerCharacter, sessionId: string | null) => {
+  // info(`Sending to session: ${sessionId}`)
+  serverBroadcast<NonPlayerCharacter>(data, globalConnectedClients, sessionId)
 })
 
 export class Client {
@@ -223,7 +224,7 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   }
 }
 
-function serverBroadcast(data: SpaceObject, connectedClients: Client[], sessionId: string | null = null): void {
+function serverBroadcast<T extends SpaceObject | NonPlayerCharacter>(data: T, connectedClients: Client[], sessionId: string | null = null): void {
   if (sessionId === null) {
     for (const client of connectedClients) {
       client.ws.send(JSON.stringify(data))
@@ -231,6 +232,7 @@ function serverBroadcast(data: SpaceObject, connectedClients: Client[], sessionI
   } else {
     for (const client of connectedClients) {
       if (client.sessionId === sessionId) {
+        // info(`Sending to ${client.name} with session ${sessionId}`)
         client.ws.send(JSON.stringify(data))
       }
     }

@@ -1,7 +1,7 @@
-import type { SpaceObject } from '../interface'
+import type { NonPlayerCharacter, SpaceObject } from '../interface'
 import { setScaledFont } from './render2d'
 
-export function renderMoon(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
+export function renderMoon(s: NonPlayerCharacter, ctx: CanvasRenderingContext2D): void {
  ctx.save()
  ctx.translate(s.position.x, s.position.y)
  ctx.beginPath()

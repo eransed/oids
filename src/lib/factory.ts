@@ -1,6 +1,6 @@
 import type { NonPlayerCharacter, PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceShape } from './interface'
-import { newVec2d, rndf, rndi, type Vec2d } from 'mathil'
+import { newVec2d, rndf, rndfVec2d, rndi, type Vec2d } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 
 export function newPhotonLaser(): PhotonLaser {
@@ -119,21 +119,47 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
 
 export function createNpc(): NonPlayerCharacter {
   const npc: NonPlayerCharacter = {
-    health: 0,
+    health: 100,
     isDead: false,
     deadFrameCount: 0,
     obliterated: false,
     lastDamagedByName: '',
     killedByName: '',
-    position: newVec2d(),
-    color: '',
+    position: rndfVec2d(100, 2000),
+    color: '#fff',
     colliding: false,
-    hitRadius: 0,
-    mass: 0,
-    size: newVec2d(),
-    velocity: newVec2d(),
+    hitRadius: 100,
+    mass: 1,
+    size: rndfVec2d(50, 100),
+    velocity: rndfVec2d(0.5, 1),
     acceleration: newVec2d(),
     messageType: MessageType.SERVER_GAME_UPDATE,
+    angleDegree: 0,
+    angularVelocity: 1,
+    collidingWith: [],
+    bounceCount: 0,
+    damage: 0,
+    armedDelay: 0,
+    didHit: false,
+    shotBlowFrame: 0,
+    ownerName: '',
+    name: `A-${rndi(100000, 100000000)}`,
+    kills: [],
+    killCount: 0,
+    ammo: 0,
+    missileSpeed: 0,
+    missileDamage: 0,
+    canonCoolDown: 0,
+    canonOverHeat: false,
+    canonHeatAddedPerShot: 0,
+    canonCoolDownSpeed: 0,
+    inverseFireRate: 0,
+    framesSinceLastShot: 0,
+    shotsPerFrame: 0,
+    photonColor: '',
+    shotsInFlight: [],
+    shotsInFlightNew: [],
+    shotsFiredThisFrame: false
   }
   return npc
 }

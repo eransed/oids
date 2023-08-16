@@ -45,7 +45,9 @@ export interface Motivated {
 }
 
 export interface Remote {
+  framesSinceLastServerUpdate: number
   online: boolean
+  isPlaying: boolean
   serverVersion: string
   sessionId: string
   viewport: Vec2d
@@ -83,6 +85,7 @@ export interface Rotatable extends Positionable {
 export interface Collidable extends Positionable {
   colliding: boolean
   hitRadius: number
+  collidingWith: Collidable[]
 }
 
 export interface Thrustable extends Positionable, Physical {
@@ -104,6 +107,9 @@ export interface Fireable extends Positionable, Physical {
   framesSinceLastShot: number
   shotsPerFrame: number
   photonColor: string
+  shotsInFlight: PhotonLaser[]
+  shotsInFlightNew: PhotonLaser[]
+  shotsFiredThisFrame: boolean
 }
 
 export interface Bounceable extends Positionable, Physical {
@@ -140,6 +146,7 @@ export interface Hoster {
 }
 
 export interface Typable {
+  // readonly messageType: MessageType
   messageType: MessageType
 }
 
@@ -171,25 +178,20 @@ export interface SpaceObject
     Bounceable,
     Boostable,
     Colorable,
-    Player,
+    Nameable,
     Unique,
     Chatable,
     LobbyWaiter,
     Hoster,
     Typable {
-  isPlaying: boolean
-  framesSinceLastServerUpdate: number
-  shotsInFlight: PhotonLaser[]
-  shotsInFlightNew: PhotonLaser[]
-  shotsFiredThisFrame: boolean
-  collidingWith: SpaceObject[]
+  
 }
 
-export interface ServerUpdate {
+export interface ServerUpdate<T> {
   spaceObjectByteSize: number
   unparsedDataLength: number
   numberOfSpaceObjectKeys: number
-  spaceObject: SpaceObject
+  dataObject: T
 }
 
 export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable {}
@@ -246,7 +248,7 @@ export interface ScoreScreenData {
   remotePlayers: SpaceObject[]
 }
 
-export interface Player {
+export interface Nameable {
   name: string
 }
 
@@ -273,4 +275,4 @@ export interface ChatMessage {
   serviceMsg?: boolean
 }
 
-export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable {}
+export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable {}

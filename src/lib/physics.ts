@@ -1,4 +1,4 @@
-import type { Bounceable, Damager, Physical, Rotatable, SpaceObject } from './interface'
+import type { Bounceable, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
 import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from 'mathil'
 import { getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
@@ -23,41 +23,57 @@ export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
   })
 }
 
-export function updateSpaceObject(so: SpaceObject, dt: number, ctx: CanvasRenderingContext2D): void {
-  // If assigning nan to so.velocity, position or acceleration it will stay nan for ever
+export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: number, ctx: CanvasRenderingContext2D): void {
+  // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) return
   const deltaTime: number = dt * timeScale
-  const v: Vec2d = scalarMultiply(so.velocity, deltaTime)
-  const a: Vec2d = scalarMultiply(so.acceleration, deltaTime)
-  so.velocity = add(so.velocity, a)
-  so.position = add(so.position, v)
-  so.acceleration = { x: 0, y: 0 }
-  so.velocity = limitv(so.velocity, { x: 250, y: 250 })
-  so.angleDegree += so.angularVelocity * deltaTime
-  if (so.angleDegree < 0) so.angleDegree = 360
-  if (so.angleDegree > 360) so.angleDegree = 0
-  updateShots(so, deltaTime, ctx)
+  const v: Vec2d = scalarMultiply(npc.velocity, deltaTime)
+  const a: Vec2d = scalarMultiply(npc.acceleration, deltaTime)
+  npc.velocity = add(npc.velocity, a)
+  npc.position = add(npc.position, v)
+  npc.acceleration = { x: 0, y: 0 }
+  npc.velocity = limitv(npc.velocity, { x: 250, y: 250 })
+  npc.angleDegree += npc.angularVelocity * deltaTime
+  if (npc.angleDegree < 0) npc.angleDegree = 360
+  if (npc.angleDegree > 360) npc.angleDegree = 0
+  updateShots(npc, deltaTime, ctx)
 }
 
-export function updateSpaceObjects(sos: SpaceObject[], frameTimeMs: number, ctx: CanvasRenderingContext2D): void {
-  sos.forEach((so) => {
-    updateSpaceObject(so, frameTimeMs, ctx)
+export function updateNonPlayerCharacter(npc: NonPlayerCharacter, dt: number): void {
+  // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
+  if (isNaN(dt)) return
+  const deltaTime: number = dt * timeScale
+  const v: Vec2d = scalarMultiply(npc.velocity, deltaTime)
+  const a: Vec2d = scalarMultiply(npc.acceleration, deltaTime)
+  npc.velocity = add(npc.velocity, a)
+  npc.position = add(npc.position, v)
+  npc.acceleration = { x: 0, y: 0 }
+  npc.velocity = limitv(npc.velocity, { x: 250, y: 250 })
+  npc.angleDegree += npc.angularVelocity * deltaTime
+  if (npc.angleDegree < 0) npc.angleDegree = 360
+  if (npc.angleDegree > 360) npc.angleDegree = 0
+}
+
+
+export function updateSpaceObjects(npcs: (SpaceObject | NonPlayerCharacter)[], frameTimeMs: number, ctx: CanvasRenderingContext2D): void {
+  npcs.forEach((npc) => {
+    updateSpaceObject(npc, frameTimeMs, ctx)
   })
 }
 
-export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingContext2D): void {
+export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number, ctx: CanvasRenderingContext2D): void {
   if (isNaN(dts)) return
 
-  //  decayOffScreenShotsPadded(so, getScreenFromCanvas(ctx), screenPaddingFactor)
-  decayOffScreenShots(so, getScreenFromCanvas(ctx))
-  decayDeadShots(so)
+  //  decayOffScreenShotsPadded(npc, getScreenFromCanvas(ctx), screenPaddingFactor)
+  decayOffScreenShots(npc, getScreenFromCanvas(ctx))
+  decayDeadShots(npc)
 
-  coolDown(so)
-  if (so.framesSinceLastShot > 0) {
-    so.framesSinceLastShot--
+  coolDown(npc)
+  if (npc.framesSinceLastShot > 0) {
+    npc.framesSinceLastShot--
   }
 
-  for (const shot of so.shotsInFlight) {
+  for (const shot of npc.shotsInFlight) {
     const v: Vec2d = scalarMultiply(shot.velocity, dts)
     const a: Vec2d = scalarMultiply(shot.acceleration, dts)
     shot.velocity = add(shot.velocity, a)
@@ -72,17 +88,17 @@ export function updateShots(so: SpaceObject, dts: number, ctx: CanvasRenderingCo
     // bounceSpaceObject(shot, screen, 1, 0, 0.7)
     //handleHittingShot(shot, ctx)
   }
-  // removeShotsAfterBounces(so, 2)
+  // removeShotsAfterBounces(npc, 2)
 }
 
-export function decayOffScreenShots(so: SpaceObject, screen: Vec2d) {
-  so.shotsInFlight = so.shotsInFlight.filter(function (e) {
+export function decayOffScreenShots(npc: SpaceObject | NonPlayerCharacter, screen: Vec2d) {
+  npc.shotsInFlight = npc.shotsInFlight.filter(function (e) {
     return !offScreen(e.position, screen)
   })
 }
 
-export function decayOffScreenShotsPadded(so: SpaceObject, screen: Vec2d, padFac = 1) {
-  so.shotsInFlight = so.shotsInFlight.filter(function (e) {
+export function decayOffScreenShotsPadded(npc: SpaceObject | NonPlayerCharacter, screen: Vec2d, padFac = 1) {
+  npc.shotsInFlight = npc.shotsInFlight.filter(function (e) {
     return !offScreen_mm(e.position, scalarMultiply(screen, -padFac), scalarMultiply(screen, padFac))
   })
 }
@@ -122,8 +138,8 @@ export function friction(p: Physical & Rotatable) {
   p.angularVelocity = p.angularVelocity * angularFriction
 }
 
-export function applyFriction(so: Physical, friction: number) {
-  so.velocity = scalarMultiply(so.velocity, friction)
+export function applyFriction(npc: Physical, friction: number) {
+  npc.velocity = scalarMultiply(npc.velocity, friction)
 }
 
 export function getHeading(p: Physical & Rotatable): Vec2d {
@@ -195,43 +211,43 @@ export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen
   }
 }
 
-export function handleCollisions(spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D): void {
+export function handleCollisions(spaceObjects: NonPlayerCharacter[], ctx: CanvasRenderingContext2D): void {
   resetCollisions(spaceObjects)
-  for (const so0 of spaceObjects) {
-    if (so0.isDead) continue
+  for (const npc0 of spaceObjects) {
+    if (npc0.isDead) continue
 
-    for (const so1 of spaceObjects) {
-      if (so1.isDead) continue
-      //  if (isColliding(so0, so1) && so0.name !== so1.name) {
-      if (isWithinRadius(so0, so1, so1.hitRadius) && so0.name !== so1.name) {
-        so0.colliding = true
-        so1.colliding = true
-        so0.collidingWith.push(so1)
-        so1.collidingWith.push(so0)
-        so0.health -= collisionFrameDamage
-        so1.health -= collisionFrameDamage
-        renderHitExplosion(so0.position, ctx)
-        renderHitExplosion(so1.position, ctx)
+    for (const npc1 of spaceObjects) {
+      if (npc1.isDead) continue
+      //  if (isColliding(npc0, npc1) && npc0.name !== npc1.name) {
+      if (isWithinRadius(npc0, npc1, npc1.hitRadius) && npc0.name !== npc1.name) {
+        npc0.colliding = true
+        npc1.colliding = true
+        npc0.collidingWith.push(npc1)
+        npc1.collidingWith.push(npc0)
+        npc0.health -= collisionFrameDamage
+        npc1.health -= collisionFrameDamage
+        renderHitExplosion(npc0.position, ctx)
+        renderHitExplosion(npc1.position, ctx)
 
         const f = -0.005
-        so0.velocity = smul(so0.velocity, f * so1.mass)
-        so1.velocity = smul(so0.velocity, -f * so0.mass)
+        npc0.velocity = smul(npc0.velocity, f * npc1.mass)
+        npc1.velocity = smul(npc0.velocity, -f * npc0.mass)
       }
-      for (const shot of so0.shotsInFlight) {
+      for (const shot of npc0.shotsInFlight) {
         if (shot.armedDelay < 0) {
           const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
-          if (isWithinRadius(shot, so1, so1.hitRadius) && shot.didHit === false) {
-            so1.health -= shot.damage
-            so1.velocity = add(so1.velocity, heading)
-            so1.lastDamagedByName = shot.ownerName
+          if (isWithinRadius(shot, npc1, npc1.hitRadius) && shot.didHit === false) {
+            npc1.health -= shot.damage
+            npc1.velocity = add(npc1.velocity, heading)
+            npc1.lastDamagedByName = shot.ownerName
             shot.didHit = true
-            if (so1.health < 1) {
-              if (addIfNotExists(so1.name, so0.kills) === true) {
-                info('You killed: ' + so1.name)
-                so0.killCount = so0.kills.length
-                so1.killedByName = so1.lastDamagedByName
-                so1.isDead = true
-                so1.health = 0
+            if (npc1.health < 1) {
+              if (addIfNotExists(npc1.name, npc0.kills) === true) {
+                info('You killed: ' + npc1.name)
+                npc0.killCount = npc0.kills.length
+                npc1.killedByName = npc1.lastDamagedByName
+                npc1.isDead = true
+                npc1.health = 0
               }
             }
           }
@@ -253,9 +269,9 @@ export function addIfNotExists(str: string, arr: string[]): boolean {
   return true
 }
 
-export function resetCollisions(spaceObjects: SpaceObject[]) {
-  for (const so of spaceObjects) {
-    so.colliding = false
-    so.collidingWith = []
+export function resetCollisions(spaceObjects: Collidable[]) {
+  for (const npc of spaceObjects) {
+    npc.colliding = false
+    npc.collidingWith = []
   }
 }
