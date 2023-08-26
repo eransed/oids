@@ -28,11 +28,11 @@ const server: WebSocketServer = new WebSocketServer({
   port: WS_PORT,
 })
 
-let globalConnectedClients: Client[] = []
+export let globalConnectedClients: Client[] = []
 
-const gameHandler = new GameHandler((data: NonPlayerCharacter, sessionId: string | null) => {
+const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
   // info(`Sending to session: ${sessionId}`)
-  serverBroadcast<NonPlayerCharacter>(data, globalConnectedClients, sessionId)
+  serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
 })
 
 export class Client {

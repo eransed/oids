@@ -1,5 +1,5 @@
 import type { Bounceable, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
-import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, type Vec2d } from 'mathil'
+import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, warn, type Vec2d } from 'mathil'
 import { getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
@@ -39,9 +39,12 @@ export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: num
   updateShots(npc, deltaTime, ctx)
 }
 
-export function updateNonPlayerCharacter(npc: NonPlayerCharacter, dt: number): void {
+export function updateNonPlayerCharacter(npc: NonPlayerCharacter, dt: number): NonPlayerCharacter {
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
-  if (isNaN(dt)) return
+  if (isNaN(dt)) {
+    warn(`nan!`)
+    return npc
+  }
   const deltaTime: number = dt * timeScale
   const v: Vec2d = scalarMultiply(npc.velocity, deltaTime)
   const a: Vec2d = scalarMultiply(npc.acceleration, deltaTime)
@@ -52,8 +55,8 @@ export function updateNonPlayerCharacter(npc: NonPlayerCharacter, dt: number): v
   npc.angleDegree += npc.angularVelocity * deltaTime
   if (npc.angleDegree < 0) npc.angleDegree = 360
   if (npc.angleDegree > 360) npc.angleDegree = 0
+  return npc
 }
-
 
 export function updateSpaceObjects(npcs: (SpaceObject | NonPlayerCharacter)[], frameTimeMs: number, ctx: CanvasRenderingContext2D): void {
   npcs.forEach((npc) => {

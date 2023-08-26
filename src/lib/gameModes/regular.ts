@@ -137,7 +137,7 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.health = 100
   game.localPlayer.batteryLevel = 500
   game.localPlayer.steeringPower = 1.4
-  game.localPlayer.enginePower = 0.20
+  game.localPlayer.enginePower = 0.2
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
@@ -168,60 +168,60 @@ export function initRegularGame(game: Game): void {
 
   log('Setting game socket listener...')
 
-  game.websocket.addListener((su) => {
-    // console.log(su)
-    //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
-    if (su.dataObject.messageType === MessageType.SERVICE) {
-      game.serverVersion = su.dataObject.serverVersion
-      info(`Service message: server version: ${su.dataObject.serverVersion}`)
-      return
-    } else if (su.dataObject){
-
-      const so: SpaceObject = su.dataObject
-      dataLen = su.unparsedDataLength
-      bytesRecievedLastSecond += dataLen
-      dataKeys = su.numberOfSpaceObjectKeys
-      rxDataBytes += dataLen * symbolByteSize
-      // addDataPoint(packetSize, su.spaceObjectByteSize)
-      if (performance.now() - startTime >= 1000) {
-        addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
-        ops = numberOfServerObjects
-        startTime = performance.now()
-        if (numberOfServerObjects > 0) {
-          symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
-          byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
-          bitSpeed = round2dec(byteSpeed * byteSize, 1)
-          addDataPoint(downloadBuf, bitSpeed)
-        }
-        numberOfServerObjects = 0
-        bytesRecievedLastSecond = 0
-      } else {
-        numberOfServerObjects++
-      }
-      for (let i = 0; i < game.remotePlayers.length; i++) {
-        if (so.name === game.remotePlayers[i].name) {
-          if (!so.online) {
-            console.log(`${so.name} went offline`)
-            game.remotePlayers.splice(i)
-            continue
+  game.websocket.addListener(
+    (su) => {
+      // console.log(su)
+      //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
+      if (su.dataObject.messageType === MessageType.SERVICE) {
+        game.serverVersion = su.dataObject.serverVersion
+        info(`Service message: server version: ${su.dataObject.serverVersion}`)
+        return
+      } else if (su.dataObject) {
+        const so: SpaceObject = su.dataObject
+        dataLen = su.unparsedDataLength
+        bytesRecievedLastSecond += dataLen
+        dataKeys = su.numberOfSpaceObjectKeys
+        rxDataBytes += dataLen * symbolByteSize
+        // addDataPoint(packetSize, su.spaceObjectByteSize)
+        if (performance.now() - startTime >= 1000) {
+          addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
+          ops = numberOfServerObjects
+          startTime = performance.now()
+          if (numberOfServerObjects > 0) {
+            symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
+            byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
+            bitSpeed = round2dec(byteSpeed * byteSize, 1)
+            addDataPoint(downloadBuf, bitSpeed)
           }
-          
-          // Store every previously shots fired
-          const cachePhotonLasers = game.remotePlayers[i].shotsInFlight
-          
-          const newShotsThisUpdate = so.shotsInFlight
-          
-          // update the remote player data object
-          game.remotePlayers[i] = so
-          
-          // if (so.shotsFiredThisFrame) {
+          numberOfServerObjects = 0
+          bytesRecievedLastSecond = 0
+        } else {
+          numberOfServerObjects++
+        }
+        for (let i = 0; i < game.remotePlayers.length; i++) {
+          if (so.name === game.remotePlayers[i].name) {
+            if (!so.online) {
+              console.log(`${so.name} went offline`)
+              game.remotePlayers.splice(i)
+              continue
+            }
+
+            // Store every previously shots fired
+            const cachePhotonLasers = game.remotePlayers[i].shotsInFlight
+
+            const newShotsThisUpdate = so.shotsInFlight
+
+            // update the remote player data object
+            game.remotePlayers[i] = so
+
+            // if (so.shotsFiredThisFrame) {
             game.remotePlayers[i].shotsInFlight = [...cachePhotonLasers, ...newShotsThisUpdate]
             // }
-            
+
             // Makes sure to return the previously shots fired on the copy of remote player
             // game.remotePlayers[i].shotsInFlight = game.remotePlayers[i].shotsInFlight.concat(cachePhotonLasers)
             // console.log (`Remote player: ${i}: ` +  game.remotePlayers[i].shotsInFlight.length)
-            
+
             return
           }
         }
@@ -230,22 +230,33 @@ export function initRegularGame(game: Game): void {
           console.log(`New ship online: ${so.name}`)
         }
       }
-  }, (su) => {
-    // console.log (su.dataObject)
-    info(`Number of server obj: ${game.bodies.length}`)
-    console.log (game.bodies)
-    if (!exists(su.dataObject, game.bodies)) {
-      game.bodies.push(su.dataObject)
+    },
+    (su) => {
+      // console.log (su.dataObject)
+      // info(`Number of server obj: ${game.bodies.length}`)
+      // console.log(su.dataObject)
+      if (!exists(su.dataObject, game.bodies)) {
+        // info(`Adding ${su.dataObject.name}`)
+        game.bodies.push(su.dataObject)
+      } else {
+        game.bodies.forEach((b, i) => {
+          if (b.name === su.dataObject.name) {
+            game.bodies[i] = su.dataObject
+          }
+        })
+      }
     }
-  })
+  )
 }
 
 function exists(entity: NonPlayerCharacter, entities: NonPlayerCharacter[]): boolean {
-  entities.forEach( (b) => {
+  for (let i = 0; i < entities.length; i++) {
+    const b = entities[i]
+    // info(`bname: ${b.name}, ename ${entity.name} equal: ${b.name === entity.name}`)
     if (b.name === entity.name) {
       return true
     }
-  })
+  }
   return false
 }
 

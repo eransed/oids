@@ -1,7 +1,9 @@
-import { info, warn, usNow } from 'mathil'
+import { info, warn, usNow, EveryInterval, newVec2d } from 'mathil'
 import { MessageType, NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
 import { createNpc } from '../src/lib/factory'
 import { updateNonPlayerCharacter } from '../src/lib/physics'
+import { Client, globalConnectedClients } from './main'
+import { bounceSpaceObject } from '../src/lib/mechanics'
 
 export class GameHandler {
   game_started = false
@@ -10,24 +12,29 @@ export class GameHandler {
   start_time_us: number = usNow()
   private lastTime = performance.now()
   private dt = performance.now()
-  private minTickTimeMs = 1000
-  broadcaster: (data: NonPlayerCharacter, sessionId: string | null) => void
+  private minTickTimeMs = 1 / 60
+  private every = new EveryInterval(2)
+  private screenSize = newVec2d(1200, 720)
+  broadcaster: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void
 
-  constructor(bc: (data: NonPlayerCharacter, sessionId: string | null) => void) {
+  constructor(bc: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void) {
     this.broadcaster = bc
   }
 
-
   game_session_start(sessionId: string) {
+    info(`Starting game and creating asteroids...`)
     this.spawnAsteroids()
     this.game_interval = setInterval(() => {
-      // info(`Game tick`)
-      this.asteroids.forEach((a) => {
-        this.dt = performance.now() - this.lastTime
-        updateNonPlayerCharacter(a, this.dt)
-        this.broadcaster(a, sessionId)
-        this.lastTime = performance.now()
-      })
+      // info(`Game tick ${this.dt}`)
+      this.dt = performance.now() - this.lastTime
+      for (let i = 0; i < this.asteroids.length; i++) {
+        this.asteroids[i] = updateNonPlayerCharacter(this.asteroids[i], this.dt)
+        bounceSpaceObject(this.asteroids[i], this.asteroids[i].viewport, 0.8, 10, 0)
+        this.every.tick(() => {
+          this.broadcaster(globalConnectedClients, this.asteroids[i], sessionId)
+        })
+      }
+      this.lastTime = performance.now()
     }, this.minTickTimeMs)
   }
 
@@ -38,13 +45,13 @@ export class GameHandler {
       } else {
         info(`Starting new game`)
         this.game_session_start(obj.sessionId)
+        this.game_started = false
       }
-      this.game_started = true
     }
   }
 
   spawnAsteroids(): NonPlayerCharacter[] {
-    const num = 10
+    const num = 2
     for (let i = 0; i < num; i++) {
       const npc = createNpc()
 

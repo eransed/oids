@@ -43,6 +43,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   const spaceObject: SpaceObject = {
     messageType: MessageType.GAME_UPDATE,
     viewport: { x: 0, y: 0 },
+    viewportScale: 1,
     sessionId: '',
     acceleration: { x: 0, y: 0 },
     ammo: 1000,
@@ -133,6 +134,8 @@ export function createNpc(): NonPlayerCharacter {
     size: rndfVec2d(50, 100),
     velocity: rndfVec2d(0.5, 1),
     acceleration: newVec2d(),
+    viewport: newVec2d(1200, 720),
+    viewportScale: 1,
     messageType: MessageType.SERVER_GAME_UPDATE,
     angleDegree: 0,
     angularVelocity: 1,
@@ -143,7 +146,8 @@ export function createNpc(): NonPlayerCharacter {
     didHit: false,
     shotBlowFrame: 0,
     ownerName: '',
-    name: `A-${rndi(100000, 100000000)}`,
+    name: `A-12345`,
+    // name: `A-${rndi(100000, 100000000)}`,
     kills: [],
     killCount: 0,
     ammo: 0,
@@ -159,7 +163,7 @@ export function createNpc(): NonPlayerCharacter {
     photonColor: '',
     shotsInFlight: [],
     shotsInFlightNew: [],
-    shotsFiredThisFrame: false
+    shotsFiredThisFrame: false,
   }
   return npc
 }

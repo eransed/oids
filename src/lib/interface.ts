@@ -44,13 +44,17 @@ export interface Motivated {
   motivationLevel: number
 }
 
+export interface Bounded {
+  viewport: Vec2d
+  viewportScale: number
+}
+
 export interface Remote {
   framesSinceLastServerUpdate: number
   online: boolean
   isPlaying: boolean
   serverVersion: string
   sessionId: string
-  viewport: Vec2d
   joinedGame: string
   // dateTimeClient: Date
   // dateTimeServer: Date
@@ -183,9 +187,8 @@ export interface SpaceObject
     Chatable,
     LobbyWaiter,
     Hoster,
-    Typable {
-  
-}
+    Typable,
+    Bounded {}
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number
@@ -275,4 +278,4 @@ export interface ChatMessage {
   serviceMsg?: boolean
 }
 
-export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable {}
+export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable, Bounded {}
