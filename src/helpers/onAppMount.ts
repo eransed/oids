@@ -6,5 +6,5 @@ import { validateToken } from '../lib/services/utils/Token'
  * Use this function to add functionality that needs to run before app starts.
  */
 export const onAppMount = async (): Promise<void> => {
- await validateToken()
+  await validateToken()
 }
