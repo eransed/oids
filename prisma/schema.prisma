@@ -32,8 +32,8 @@ model RefreshToken {
 }
 
 model Game {
-  id        String   @id @unique @default(uuid())
-  sessionId String  
+  id        Int      @id @unique @default(autoincrement())
+  sessionId String
   win       Boolean
   played    DateTime @default(now())
   players   Player[]
@@ -42,9 +42,9 @@ model Game {
 }
 
 model Player {
-  id     String  @id @unique @default(uuid())
-  name   String
-  Game   Game?   @relation(fields: [gameId], references: [id])
-  gameId String?
- 
+  id            Int    @id @unique @default(autoincrement())
+  name          String
+  Game          Game?  @relation(fields: [gameId], references: [id])
+  gameId        Int?
+  gameSessionId String
 }
