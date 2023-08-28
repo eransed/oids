@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { pageHasHeader, user } from '../../stores/stores'
+  import { pageHasHeader, user, isLoggedIn } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -11,14 +11,20 @@
 
   //Util
   import { formatDate } from '../../helpers/util'
+  import getProfile from '../../lib/services/user/profile'
+  import { onMount } from 'svelte'
 
-  console.log($user)
+  onMount(() => {
+    if ($isLoggedIn) {
+      getProfile()
+    }
+  })
 
   pageHasHeader.set(true)
 </script>
 
 <Page>
-  {#if $user}
+  {#if $isLoggedIn}
     <div class="profileWrapper">
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
@@ -33,25 +39,20 @@
             <h3>{$user.name}</h3>
             <p>Created: <i>{formatDate($user.createdAt)}</i></p>
           </div>
-          <br />
-          <hr />
-          <br />
-          <div>
-            <h3>Games</h3>
-            {#if $user.gameHistory}
-              {#each Object.values($user.gameHistory) as game}
-                <br />
-                <p>Game Name: {game.id}</p>
-                <p><i>{formatDate(game.played)}</i></p>
-                <p>{game.win ? 'Won' : 'Lost'}</p>
-                <br />
-              {/each}
-            {/if}
-          </div>
+
           <!-- <ProfileModal /> -->
         {/if}
         {#if $profileComponent === 'matchHistory'}
-          <p>Match History</p>
+          <h3>Match History</h3>
+          {#if $user.gameHistory}
+            {#each Object.values($user.gameHistory) as game}
+              <br />
+              <p>Game Name: {game.sessionId}</p>
+              <p><i>{formatDate(game.played)}</i></p>
+              <p>{game.win ? 'Won' : 'Lost'}</p>
+              <br />
+            {/each}
+          {/if}
         {/if}
         {#if $profileComponent === 'settings'}
           <p>Settings</p>

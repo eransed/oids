@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt'
 import db from '../utils/db'
 
-import { User } from '../types/user'
+import { User, Player } from '../types/user'
+import { getPlayersFromSessionId } from '../../main'
 
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({
@@ -37,12 +38,13 @@ export const getGameHistory = (id: string) => {
   })
 }
 
-export const saveGame = (id: string, win: boolean, played: Date) => {
-  return db.game.create({
+export const saveGame = async (id: string, win: boolean, played: Date, sessionId: string) => {
+  await db.game.create({
     data: {
       userId: id,
       win: win,
       played: played,
+      sessionId: sessionId,
     },
   })
 }

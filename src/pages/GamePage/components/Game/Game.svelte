@@ -22,6 +22,8 @@
   // Game variants
   import { initRegularGame, nextFrame, renderFrame } from '../../../../lib/gameModes/regular'
   import { socket } from '../../../../stores/stores'
+  import { saveGame } from '../../../../lib/services/game/saveGame'
+  import type { GameHistory } from '../../../../interfaces/game'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store

@@ -5,7 +5,7 @@ import { findUserById, getGameHistory, saveGame } from './users.services'
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 
-import { Game, User, UserProfile } from '../types/user'
+import { Game, Player, User, UserProfile } from '../types/user'
 
 export const users = express.Router()
 
@@ -43,7 +43,6 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
   }
 })
 
-//Save game - can only take win boolean for now
 users.post('/savegame', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { authorization } = req.headers
@@ -64,9 +63,9 @@ users.post('/savegame', isAuthenticated, async (req: Request, res: Response, nex
 
     const game: Game = req.body
 
-    await saveGame(user.id, game.win, game.played)
+    await saveGame(user.id, game.win, game.played, game.sessionId)
 
-    res.json({ message: 'Game saved successfully!', game: game })
+    res.json(game)
   } catch (err) {
     next(err)
   }

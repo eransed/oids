@@ -275,15 +275,6 @@
     navigate(`/play/${$localPlayer.sessionId}`)
   }
 
-  function formatDate(date: Date) {
-    const f = new Intl.DateTimeFormat('en-eu', {
-      timeStyle: 'medium',
-      hour12: false,
-    })
-
-    return f.format(date)
-  }
-
   function toggleReadyToPlay() {
     setReadyToPlay(!$localPlayer.readyToPlay)
   }

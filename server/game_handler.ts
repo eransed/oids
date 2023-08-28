@@ -4,6 +4,7 @@ import { createNpc } from '../src/lib/factory'
 import { updateNonPlayerCharacter } from '../src/lib/physics'
 import { Client, globalConnectedClients } from './main'
 import { bounceSpaceObject } from '../src/lib/mechanics'
+import { saveGame } from './api/users/users.services'
 
 export class GameHandler {
   game_started = false
@@ -36,6 +37,7 @@ export class GameHandler {
       }
       this.lastTime = performance.now()
     }, this.minTickTimeMs)
+    saveGame('', false, new Date(), sessionId)
   }
 
   checkMessage(obj: SpaceObject) {
