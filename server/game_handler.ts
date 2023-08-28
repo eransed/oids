@@ -2,15 +2,16 @@ import { info, warn, usNow, EveryInterval, newVec2d } from 'mathil'
 import { MessageType, NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
 import { createNpc } from '../src/lib/factory'
 import { updateNonPlayerCharacter } from '../src/lib/physics'
-import { Client, globalConnectedClients } from './main'
+import { Client, getActivePlayersFromSession, getPlayersFromSessionId, globalConnectedClients } from './main'
 import { bounceSpaceObject } from '../src/lib/mechanics'
 import { saveGame } from './api/users/users.services'
 
 export class GameHandler {
   game_started = false
   asteroids: NonPlayerCharacter[] = []
-  game_interval: NodeJS.Timer | null = null
+  game_interval: NodeJS.Timer | undefined = undefined
   start_time_us: number = usNow()
+
   private lastTime = performance.now()
   private dt = performance.now()
   private minTickTimeMs = 1 / 60
@@ -25,6 +26,7 @@ export class GameHandler {
   game_session_start(sessionId: string) {
     info(`Starting game and creating asteroids...`)
     this.spawnAsteroids()
+
     this.game_interval = setInterval(() => {
       // info(`Game tick ${this.dt}`)
       this.dt = performance.now() - this.lastTime
@@ -36,8 +38,12 @@ export class GameHandler {
         })
       }
       this.lastTime = performance.now()
+      if (getActivePlayersFromSession(sessionId).length === 0) {
+        //do something when no players left in session
+        // clearInterval(this.game_interval)
+      }
     }, this.minTickTimeMs)
-    saveGame('', false, new Date(), sessionId)
+    // saveGame('', false, new Date(), sessionId)
   }
 
   checkMessage(obj: SpaceObject) {

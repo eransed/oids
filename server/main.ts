@@ -251,6 +251,20 @@ export function getPlayersFromSessionId(sessionId: string): SpaceObject[] {
   return playerList
 }
 
+export function getActivePlayersFromSession(sessionId: string): SpaceObject[] {
+  const playerList: SpaceObject[] = []
+
+  for (const client of globalConnectedClients) {
+    if (sessionId === client.sessionId && client.lastDataObject) {
+      if (client.lastDataObject.isPlaying) {
+        playerList.push(client.lastDataObject)
+      }
+    }
+  }
+
+  return playerList
+}
+
 //Todo: createSessionId() should make unique sessionId's
 //Then we can be certain sessionId's wont collide = breaking the game.
 // export function getActivePlayerSessions() {
