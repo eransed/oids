@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { SvelteComponentDev, SvelteComponentTyped } from 'svelte/internal'
   //Routes
   import { Router, Route } from 'svelte-routing'
 

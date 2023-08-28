@@ -16,11 +16,12 @@ const createdGuestName = `p-${rndi(1, 900000)}`
 export const guestUserName: Writable<string> = writable(createdGuestName)
 
 const gUser: User = {
- id: createdGuestName,
- email: '',
- name: createdGuestName,
- createdAt: new Date().toDateString(),
- updatedAt: new Date().toDateString(),
+  id: createdGuestName,
+  email: '',
+  name: createdGuestName,
+  createdAt: new Date().toDateString(),
+  updatedAt: new Date().toDateString(),
+  gameHistory: [],
 }
 export const guestUser: Writable<User> = writable(gUser)
 
@@ -32,4 +33,4 @@ export const localPlayer: Writable<SpaceObject> = writable(createSpaceObject())
 
 export const socket: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
 
-export const  chatMessageHistory: Writable<ChatMessage[]> = writable([])
+export const chatMessageHistory: Writable<ChatMessage[]> = writable([])
