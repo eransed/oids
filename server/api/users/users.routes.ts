@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction, response } from 'express'
 import express from 'express'
 import { isAuthenticated } from '../middleware'
-import { findUserById, getGameHistory, saveGame } from './users.services'
+import { findUserByEmail, findUserById, getGameHistory, saveGame, updateUserRole } from './users.services'
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 
@@ -34,10 +34,38 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         gameHistory: gameHistory,
+        role: user.role,
       }
 
       res.json(userProfile)
     }
+  } catch (err) {
+    next(err)
+  }
+})
+
+users.post('/update', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, role } = req.body
+
+    if (!email) {
+      res.status(400)
+      throw new Error('You must provide an email.')
+    }
+
+    const existingUser = await findUserByEmail(email)
+
+    if (!existingUser) {
+      res.status(404)
+      throw new Error(`No user found with email: ${email}`)
+    }
+
+    existingUser.role = role
+    await updateUserRole(existingUser)
+
+    const updatedUser = await findUserByEmail(email)
+
+    res.json(updatedUser)
   } catch (err) {
     next(err)
   }

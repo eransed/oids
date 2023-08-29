@@ -22,6 +22,7 @@
   //Components
   import Page from './components/page/page.svelte'
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
+  import AdminPage from './pages/AdminPage/AdminPage.svelte'
 </script>
 
 {#if $pageHasHeader}
@@ -45,6 +46,7 @@
         <GameLobby />
       </Route>
       <Route path={routes.test.path}><TestPage /></Route>
+      <Route path={routes.admin.path}><AdminPage /></Route>
     {/await}
   </Router>
 </body>

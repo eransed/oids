@@ -7,4 +7,5 @@ export interface User {
   createdAt: string
   updatedAt: string
   gameHistory: GameHistory[]
+  role: string
 }

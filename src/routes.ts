@@ -7,4 +7,5 @@ export const routes = {
   play: <Route>{ path: '/play', displayText: 'Play', inHeader: true },
   end: <Route>{ path: '/play/end', displayText: 'Score Screen', inHeader: false },
   test: <Route>{ path: '/test', displayText: 'Test', inHeader: true },
+  admin: <Route>{ path: '/admin', displayText: 'Admin', inHeader: true },
 }

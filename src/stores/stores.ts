@@ -22,6 +22,7 @@ const gUser: User = {
   createdAt: new Date().toDateString(),
   updatedAt: new Date().toDateString(),
   gameHistory: [],
+  role: 'guest',
 }
 export const guestUser: Writable<User> = writable(gUser)
 

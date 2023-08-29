@@ -19,6 +19,7 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   gameHistory   Game[]
+  role          String         @default("player")
 }
 
 model RefreshToken {
