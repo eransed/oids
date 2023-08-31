@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, response } from 'express'
 import express from 'express'
 import { isAuthenticated } from '../middleware'
-import { findUserByEmail, findUserById, getGameHistory, saveGame, updateUserRole } from './users.services'
+import { findUserByEmail, findUserById, getGameHistory, getUsers, saveGame, updateUserRole } from './users.services'
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 
@@ -97,4 +97,35 @@ users.post('/savegame', isAuthenticated, async (req: Request, res: Response, nex
   } catch (err) {
     next(err)
   }
+})
+
+users.get('/list', isAuthenticated,async (req:Request, res: Response, next: NextFunction) => {
+  try {
+    const { authorization } = req.headers
+
+    if (!authorization) {
+      res.status(401)
+      throw new Error('No authorization')
+    }
+
+    const token = authorization.split(' ')[1]
+    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
+    const user: User | null = await findUserById(payload.userId)
+
+    if (!user || user.role !== "admin") {
+      res.status(403)
+      throw new Error('Forbidden, you are not admin.')
+    }
+
+
+    let users: User[] = await getUsers()
+
+    if (users) {
+      res.json(users)
+    } 
+  } catch (err) {
+    next(err)
+  }
+  
+
 })

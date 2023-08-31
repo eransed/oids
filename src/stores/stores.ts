@@ -15,7 +15,7 @@ export const userLoading: Writable<boolean> = writable()
 const createdGuestName = `p-${rndi(1, 900000)}`
 export const guestUserName: Writable<string> = writable(createdGuestName)
 
-const gUser: User = {
+export const gUser: User = {
   id: createdGuestName,
   email: '',
   name: createdGuestName,
@@ -24,6 +24,7 @@ const gUser: User = {
   gameHistory: [],
   role: 'guest',
 }
+
 export const guestUser: Writable<User> = writable(gUser)
 
 export const pageHasHeader: Writable<boolean> = writable(true)

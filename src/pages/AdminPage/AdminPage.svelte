@@ -4,12 +4,33 @@
 
   //Components
   import Page from '../../components/page/page.svelte'
-
-  console.log($user)
 </script>
 
-{#if $user.role === 'player'}
-  <Page>
-    <h1>Admin Page</h1>
-  </Page>
+{#if $user}
+  {#if $user.role === 'admin'}
+    <Page>
+      <h1>Admin Page</h1>
+
+      <div class="dataTable">
+        <table>
+          <tr>
+            <th>User</th>
+            <th>User</th>
+          </tr>
+        </table>
+      </div>
+    </Page>
+  {/if}
 {/if}
+
+<style>
+  .dataTable {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+  }
+
+  .dataTable table {
+    width: 80%;
+  }
+</style>
