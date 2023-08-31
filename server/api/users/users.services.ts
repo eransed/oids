@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import db from '../utils/db'
 
-import { User} from '../types/user'
+import { User } from '../types/user'
 
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({
@@ -48,16 +48,15 @@ export const saveGame = async (id: string, win: boolean, played: Date, sessionId
   })
 }
 
-export const updateUserRole = async (user: User) => {
-
-  
-
+export const updateUser = async (user: User) => {
   await db.user.update({
     where: {
       email: user.email,
     },
     data: {
       role: user.role,
+      name: user.name,
+      email: user.email,
     },
   })
 }
@@ -65,4 +64,24 @@ export const updateUserRole = async (user: User) => {
 export const getUsers = async () => {
   const users = await db.user.findMany({})
   return users
+}
+
+/**
+ * WARNING: User will be deleted forever!
+ */
+export const deleteUser = async (user: User): Promise<string> => {
+  const response = await db.user
+    .delete({
+      where: {
+        id: user.id,
+      },
+    })
+    .then(() => {
+      return `User ${user.email} is now deleted.`
+    })
+    .catch((err) => {
+      return err
+    })
+
+  return response
 }
