@@ -4,12 +4,14 @@
 
   //Components
   import Page from '../../components/page/page.svelte'
-  import Card from '../../components/card/card.svelte'
 
+  //Services
+  import updateUser from '../../lib/services/user/updateUser'
   import userList from '../../lib/services/user/userList'
 
   //Interfaces
   import type { User } from '../../interfaces/user'
+  import getProfile from '../../lib/services/user/profile'
 
   async function getUsers(): Promise<User[]> {
     return await userList()
@@ -22,6 +24,26 @@
   }
 
   let editUser: User | undefined = undefined
+
+  let name = ''
+  let email = ''
+  let role = 'guest'
+  let roleOptions = ['admin', 'player', 'guest']
+
+  async function sendUpdateUser(u: User) {
+    await updateUser(u)
+      .then((res) => {
+        if (res.status === 200) {
+          editUser = undefined
+          if ($user.id === u.id) {
+            getProfile()
+          }
+        }
+      })
+      .catch((err) => {
+        throw new Error(err)
+      })
+  }
 </script>
 
 {#if $user}
@@ -38,18 +60,44 @@
             {#each Object.values(user) as u}
               {#if editUser && u.id === editUser.id}
                 <tr>
-                  <td><input value={u.name} /></td>
-                  <td><input value={u.email} /></td>
-                  <td><input value={u.role} /></td>
+                  <td><input bind:value={name} /></td>
+                  <td><input bind:value={email} /></td>
+                  <td>
+                    <select bind:value={role}>
+                      {#each roleOptions as value}
+                        <option {value}>{value}</option>
+                      {/each}
+                    </select>
+                  </td>
                   <td><button on:click={() => (editUser = undefined)}>Cancel</button></td>
-                  <td><button on:click={() => console.log('save')}>Save</button></td>
+                  <td>
+                    <button
+                      on:click={() => {
+                        if (editUser) {
+                          editUser.name = name
+                          editUser.email = email
+                          editUser.role = role
+                          sendUpdateUser(editUser)
+                        }
+                      }}>Save</button
+                    ></td
+                  >
                 </tr>
               {:else}
                 <tr>
                   <td>{u.name}</td>
                   <td>{u.email}</td>
                   <td>{u.role}</td>
-                  <td><button on:click={() => (editUser = u)}>Edit</button></td>
+                  <td
+                    ><button
+                      on:click={() => {
+                        editUser = u
+                        name = u.name
+                        email = u.email
+                        role = u.role
+                      }}>Edit</button
+                    ></td
+                  >
                 </tr>
               {/if}
             {/each}
@@ -70,5 +118,9 @@
   .dataTable table {
     width: 50%;
     text-align: left;
+  }
+
+  .dataTable input {
+    width: fit-content;
   }
 </style>

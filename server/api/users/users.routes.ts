@@ -46,28 +46,43 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
 
 users.post('/update', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, role, name } = req.body
+    const user: User  = req.body
 
-    if (!email) {
-      res.status(400)
-      throw new Error('You must provide an email.')
+    const { authorization } = req.headers
+
+    if (!authorization) {
+      res.status(401)
+      throw new Error('No authorization')
     }
 
-    const existingUser = await findUserByEmail(email)
+    const token = authorization.split(' ')[1]
+    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
+    const caller: User | null = await findUserById(payload.userId)
+
+    if (!caller || caller.role !== 'admin') {
+      res.status(403)
+      throw new Error('Forbidden, you are not admin.')
+    }
+
+    if (!user.id) {
+      res.status(400)
+      throw new Error('You must provide a user id.')
+    }
+
+    const existingUser = await findUserById(user.id)
 
     if (!existingUser) {
       res.status(404)
-      throw new Error(`No user found with email: ${email}`)
+      throw new Error(`No user found with id: ${user.id}`)
     }
 
-    existingUser.role = role
-    existingUser.name = name
-    existingUser.email = email
-    await updateUser(existingUser)
+    await updateUser(user).then(() => {
+      res.status(200).json(user)
+    }).catch((err) => {
+      throw new Error(err)
+    })
 
-    const updatedUser = await findUserByEmail(email)
 
-    res.json(updatedUser)
   } catch (err) {
     next(err)
   }
@@ -120,6 +135,8 @@ users.get('/list', isAuthenticated, async (req: Request, res: Response, next: Ne
     }
 
     let users: User[] = await getUsers()
+
+    users.forEach((user) => user.password = ":)")
 
     if (users) {
       res.json(users)

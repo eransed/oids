@@ -51,7 +51,7 @@ export const saveGame = async (id: string, win: boolean, played: Date, sessionId
 export const updateUser = async (user: User) => {
   await db.user.update({
     where: {
-      email: user.email,
+      id: user.id,
     },
     data: {
       role: user.role,

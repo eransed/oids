@@ -36,7 +36,7 @@
     <div class="menuItem">
       {#each Object.values(routes) as route}
         {#if route.inHeader}
-          {#if route.path === '/admin' && loggedIn}
+          {#if route.path === '/admin' && $user && $user.role === 'admin'}
             <div class="navButton">
               <Button90
                 mouseTracking={false}
