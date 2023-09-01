@@ -12,6 +12,8 @@
   //Interfaces
   import type { User } from '../../interfaces/user'
   import getProfile from '../../lib/services/user/profile'
+  import Alert from '../../components/alert/Alert.svelte'
+  import type { AlertType } from '../../components/alert/AlertType'
 
   async function getUsers(): Promise<User[]> {
     return await userList()
@@ -29,8 +31,10 @@
   let email = ''
   let role = 'guest'
   let roleOptions = ['admin', 'player', 'guest']
+  let error: AlertType | undefined = undefined
 
   async function sendUpdateUser(u: User) {
+    console.log('updateUser')
     await updateUser(u)
       .then((res) => {
         if (res.status === 200) {
@@ -38,6 +42,15 @@
           if ($user.id === u.id) {
             getProfile()
           }
+        } else {
+          console.log(res.statusText)
+          error = {
+            severity: 'error',
+            text: 'Could not save!',
+          }
+          setTimeout(() => {
+            error = undefined
+          }, 2000)
         }
       })
       .catch((err) => {
@@ -45,6 +58,10 @@
       })
   }
 </script>
+
+{#if error}
+  <Alert severity={error.severity}>{error.text}</Alert>
+{/if}
 
 {#if $user}
   {#if $user.role === 'admin'}

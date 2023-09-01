@@ -7,7 +7,7 @@ import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from '../../pub_config'
 //Token valid time
 export const generateAccessToken = (user: User) => {
  return jwt.sign({ userId: user.id }, JWT_ACCESS_SECRET, {
-  expiresIn: '5m',
+  expiresIn: '8h',
  })
 }
 
