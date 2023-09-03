@@ -14,6 +14,8 @@
   import getProfile from '../../lib/services/user/profile'
   import Alert from '../../components/alert/Alert.svelte'
   import type { AlertType } from '../../components/alert/AlertType'
+  import Button90 from '../../components/menu/Button90.svelte'
+  import { add } from 'mathil'
 
   async function getUsers(): Promise<User[]> {
     return await userList()
@@ -32,6 +34,13 @@
   let role = 'guest'
   let roleOptions = ['admin', 'player', 'guest']
   let error: AlertType | undefined = undefined
+  let addNewUser = false
+
+  let newUser = {
+    name: '',
+    email: '',
+    password: '',
+  }
 
   async function sendUpdateUser(u: User) {
     console.log('updateUser')
@@ -57,6 +66,8 @@
         throw new Error(err)
       })
   }
+
+  async function addUser() {}
 </script>
 
 {#if error}
@@ -66,6 +77,19 @@
 {#if $user}
   {#if $user.role === 'admin'}
     <Page>
+      <div class="actions">
+        <button on:click={() => (addNewUser = true)}>Add user</button>
+      </div>
+      {#if addNewUser}
+        <div class="addUser">
+          <input bind:value={newUser.name} placeholder="Name" />
+          <input bind:value={newUser.email} placeholder="Email" />
+          <input bind:value={newUser.password} placeholder="Password" />
+          <button on:click={() => (addNewUser = false)}>Cancel</button>
+          <button>Save</button>
+        </div>
+      {/if}
+
       <div class="dataTable">
         <table>
           <tr>
@@ -126,10 +150,38 @@
 {/if}
 
 <style>
+  .actions {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1em;
+  }
+
+  .addUser {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .addUser input {
+    margin: 0.2em;
+    padding: 0.2em;
+  }
+
+  button {
+    margin: 0.2em;
+    padding: 0.2em;
+  }
+
+  input {
+    margin: 0.2em;
+    padding: 0.2em;
+  }
   .dataTable {
     width: 100%;
     justify-content: center;
     display: flex;
+    margin: 1em;
   }
 
   .dataTable table {
