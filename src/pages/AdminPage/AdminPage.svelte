@@ -4,31 +4,40 @@
 
   //Components
   import Page from '../../components/page/page.svelte'
+  import Alert from '../../components/alert/Alert.svelte'
 
   //Services
   import updateUser from '../../lib/services/user/updateUser'
   import userList from '../../lib/services/user/userList'
   import register from '../../lib/services/auth/register'
+  import getProfile from '../../lib/services/user/profile'
+  import axios from 'axios'
+  import type { AxiosError } from 'axios'
+
+  //Svelte
+  import { onMount } from 'svelte'
 
   //Interfaces
   import type { User } from '../../interfaces/user'
-  import getProfile from '../../lib/services/user/profile'
-  import Alert from '../../components/alert/Alert.svelte'
   import type { AlertType } from '../../components/alert/AlertType'
-  import type { AxiosError } from 'axios'
-  import axios from 'axios'
+  import { fade } from 'svelte/transition'
 
   async function getUsers(): Promise<User[]> {
     return await userList()
       .then((v) => {
-        return v.data
+        return (users = v.data)
       })
       .catch((err) => {
         return err
       })
   }
 
-  let editUser: User | undefined = undefined
+  onMount(() => {
+    getUsers()
+  })
+
+  let editingUser: User | undefined = undefined
+  let edit: boolean = false
 
   let name = ''
   let email = ''
@@ -36,6 +45,8 @@
   let roleOptions = ['admin', 'player', 'guest']
   let alert: AlertType | undefined = undefined
   let addNewUser = false
+  let users: User[]
+  let oldList: User[]
 
   let newUser = {
     name: '',
@@ -43,28 +54,41 @@
     password: '',
   }
 
-  async function sendUpdateUser(editedUser: User) {
-    await updateUser(editedUser)
-      .then((res) => {
-        if (res.status === 200) {
-          alert = {
-            severity: 'success',
-            text: `User updated successfully to ${editedUser.name}, ${editedUser.email}, ${editedUser.role} `,
+  async function sendUpdateUser() {
+    const editedUser = editingUser
+
+    if (editedUser) {
+      editedUser.name = name
+      editedUser.email = email
+      editedUser.role = role
+      await updateUser(editedUser)
+        .then((res) => {
+          if (res.status === 200) {
+            alert = {
+              severity: 'success',
+              text: `User updated successfully to ${editedUser.name}, ${editedUser.email}, ${editedUser.role} `,
+            }
+            editingUser = undefined
+            edit = false
+            if ($user.id === editedUser.id) {
+              getProfile()
+            }
+          } else {
+            const error = res
+            console.log(error)
+            if (axios.isAxiosError(error)) {
+              getUsers()
+              alert = {
+                severity: 'error',
+                text: `${error.response?.data}`,
+              }
+            }
           }
-          editUser = undefined
-          if ($user.id === editedUser.id) {
-            getProfile()
-          }
-        } else {
-          alert = {
-            severity: 'error',
-            text: 'Could not save!',
-          }
-        }
-      })
-      .catch((err) => {
-        throw new Error(err)
-      })
+        })
+        .catch((err) => {
+          throw new Error(err)
+        })
+    }
   }
 
   async function addUser() {
@@ -94,6 +118,12 @@
         }
       })
   }
+
+  function onKeyPress(e: KeyboardEvent) {
+    if (e.code === 'Enter') {
+      sendUpdateUser()
+    }
+  }
 </script>
 
 {#if alert}
@@ -107,7 +137,7 @@
         <button on:click={() => (addNewUser = true)}>Add user</button>
       </div>
       {#if addNewUser}
-        <div class="addUser">
+        <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
           <input bind:value={newUser.name} placeholder="Name" />
           <input bind:value={newUser.email} placeholder="Email" />
           <input bind:value={newUser.password} placeholder="Password" />
@@ -123,12 +153,12 @@
             <th>Email</th>
             <th>Role</th>
           </tr>
-          {#await getUsers() then userList}
-            {#each Object.values(userList) as u}
-              {#if editUser && u.id === editUser.id}
+          {#if users}
+            {#each Object.values(users) as u}
+              {#if edit && u.id === editingUser?.id}
                 <tr>
-                  <td><input bind:value={name} /></td>
-                  <td><input bind:value={email} /></td>
+                  <td><input on:keypress={onKeyPress} bind:value={name} /></td>
+                  <td><input on:keypress={onKeyPress} bind:value={email} /></td>
                   <td>
                     <select bind:value={role}>
                       {#each roleOptions as value}
@@ -136,15 +166,19 @@
                       {/each}
                     </select>
                   </td>
-                  <td><button on:click={() => (editUser = undefined)}>Cancel</button></td>
+                  <td
+                    ><button
+                      on:click={() => {
+                        editingUser = undefined
+                        edit = false
+                      }}>Cancel</button
+                    ></td
+                  >
                   <td>
                     <button
                       on:click={() => {
-                        if (editUser) {
-                          editUser.name = name
-                          editUser.email = email
-                          editUser.role = role
-                          sendUpdateUser(editUser)
+                        if (editingUser) {
+                          sendUpdateUser()
                         }
                       }}>Save</button
                     ></td
@@ -158,17 +192,18 @@
                   <td
                     ><button
                       on:click={() => {
-                        editUser = u
-                        name = u.name
-                        email = u.email
-                        role = u.role
+                        edit = true
+                        editingUser = u
+                        name = editingUser.name
+                        email = editingUser.email
+                        role = editingUser.role
                       }}>Edit</button
                     ></td
                   >
                 </tr>
               {/if}
             {/each}
-          {/await}
+          {/if}
         </table>
       </div>
     </Page>
@@ -178,15 +213,17 @@
 <style>
   .actions {
     display: flex;
-    width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
     margin: 1em;
+    flex-flow: row;
+    padding: 1em;
   }
 
   .addUser {
     display: flex;
     width: 100%;
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .addUser input {

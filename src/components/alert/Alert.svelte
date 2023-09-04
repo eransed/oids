@@ -9,6 +9,7 @@
   export let text: string = ''
 
   $: if (text) {
+    color = colors[severity]
     setTimeout(() => {
       text = ''
     }, 3500)
@@ -20,8 +21,7 @@
     info: '#e5f6fd',
     success: '#bbffbb',
   }
-
-  const color = colors[severity]
+  let color = colors[severity]
 </script>
 
 {#if text}

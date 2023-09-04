@@ -1,4 +1,4 @@
-import axios, { AxiosError, type AxiosResponse } from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 
 import type { User } from '../../../interfaces/user'
 
@@ -16,7 +16,6 @@ const register = async (email: string, name: string, password: string): Promise<
       return data
     })
     .catch((err: AxiosResponse<Error>) => {
-      
       return err
     })
 

@@ -51,7 +51,7 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
     const { authorization } = req.headers
 
     if (!authorization) {
-      res.status(401)
+      res.status(401).send("You are not logged in.")
       throw new Error('No authorization')
     }
 
@@ -60,7 +60,7 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
     const caller: User | null = await findUserById(payload.userId)
 
     if (!caller || caller.role !== 'admin') {
-      res.status(403)
+      res.status(403).send("Forbidden, you are not admin")
       throw new Error('Forbidden, you are not admin.')
     }
 
@@ -72,16 +72,17 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
     const existingUser = await findUserById(user.id)
 
     if (!existingUser) {
-      res.status(404)
+      res.status(404).send("No user found to update with that id.")
       throw new Error(`No user found with id: ${user.id}`)
     }
 
-    await updateUser(user).then(() => {
+    await updateUser(user).then((d) => {
+      
       res.status(200).json(user)
-    }).catch((err) => {
-      throw new Error(err)
+    }).catch((err: Error) => {
+      res.status(500).send("Prisma DB did not approve this update.")
+      throw new Error(err.message)
     })
-
 
   } catch (err) {
     next(err)
