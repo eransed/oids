@@ -19,14 +19,14 @@ auth.post('/register', async (req, res, next) => {
   try {
     const { email, password, name } = req.body
     if (!email || !password || !name) {
-      res.status(400)
-      throw new Error('You must provide an name, email and a password.')
+      res.status(400).send("You must provide a name, email and a password.")
+      throw new Error('You must provide a name, email and a password.')
     }
 
     const existingUser = await findUserByEmail(email)
 
     if (existingUser) {
-      res.status(400)
+      res.status(400).send("Email already in use!")
       throw new Error('Email already in use.')
     }
 

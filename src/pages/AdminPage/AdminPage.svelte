@@ -8,14 +8,15 @@
   //Services
   import updateUser from '../../lib/services/user/updateUser'
   import userList from '../../lib/services/user/userList'
+  import register from '../../lib/services/auth/register'
 
   //Interfaces
   import type { User } from '../../interfaces/user'
   import getProfile from '../../lib/services/user/profile'
   import Alert from '../../components/alert/Alert.svelte'
   import type { AlertType } from '../../components/alert/AlertType'
-  import Button90 from '../../components/menu/Button90.svelte'
-  import { add } from 'mathil'
+  import type { AxiosError } from 'axios'
+  import axios from 'axios'
 
   async function getUsers(): Promise<User[]> {
     return await userList()
@@ -33,7 +34,7 @@
   let email = ''
   let role = 'guest'
   let roleOptions = ['admin', 'player', 'guest']
-  let error: AlertType | undefined = undefined
+  let alert: AlertType | undefined = undefined
   let addNewUser = false
 
   let newUser = {
@@ -42,24 +43,23 @@
     password: '',
   }
 
-  async function sendUpdateUser(u: User) {
-    console.log('updateUser')
-    await updateUser(u)
+  async function sendUpdateUser(editedUser: User) {
+    await updateUser(editedUser)
       .then((res) => {
         if (res.status === 200) {
+          alert = {
+            severity: 'success',
+            text: `User updated successfully to ${editedUser.name}, ${editedUser.email}, ${editedUser.role} `,
+          }
           editUser = undefined
-          if ($user.id === u.id) {
+          if ($user.id === editedUser.id) {
             getProfile()
           }
         } else {
-          console.log(res.statusText)
-          error = {
+          alert = {
             severity: 'error',
             text: 'Could not save!',
           }
-          setTimeout(() => {
-            error = undefined
-          }, 2000)
         }
       })
       .catch((err) => {
@@ -67,11 +67,37 @@
       })
   }
 
-  async function addUser() {}
+  async function addUser() {
+    await register(newUser.email, newUser.name, newUser.password)
+      .then((res) => {
+        if (res.status === 200) {
+          alert = {
+            severity: 'success',
+            text: `New user ${newUser.name} added!`,
+          }
+          addNewUser = false
+          getUsers()
+        } else {
+          const error = res
+          if (axios.isAxiosError(error)) {
+            alert = {
+              severity: 'warning',
+              text: `Could not save: ${error.response?.data}`,
+            }
+          }
+        }
+      })
+      .catch((error: AxiosError) => {
+        alert = {
+          severity: 'warning',
+          text: `Could not save: ${error.response?.data}`,
+        }
+      })
+  }
 </script>
 
-{#if error}
-  <Alert severity={error.severity}>{error.text}</Alert>
+{#if alert}
+  <Alert severity={alert.severity} text={alert.text} />
 {/if}
 
 {#if $user}
@@ -86,7 +112,7 @@
           <input bind:value={newUser.email} placeholder="Email" />
           <input bind:value={newUser.password} placeholder="Password" />
           <button on:click={() => (addNewUser = false)}>Cancel</button>
-          <button>Save</button>
+          <button on:click={() => addUser()}>Save</button>
         </div>
       {/if}
 
@@ -97,8 +123,8 @@
             <th>Email</th>
             <th>Role</th>
           </tr>
-          {#await getUsers() then user}
-            {#each Object.values(user) as u}
+          {#await getUsers() then userList}
+            {#each Object.values(userList) as u}
               {#if editUser && u.id === editUser.id}
                 <tr>
                   <td><input bind:value={name} /></td>
