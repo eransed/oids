@@ -2,6 +2,7 @@
  import { onDestroy, onMount } from 'svelte'
  import { error, info, vec2dArray, to_string, log, warn, EveryInterval, type Vec2d, type Line, connectPoints, boundingBox } from 'mathil'
  import { clearScreen, renderLine, renderPoint } from '../../lib/render/render2d'
+  import type { UIStyle } from '../../lib/interface'
 
  let canvas: HTMLCanvasElement
 
@@ -41,7 +42,13 @@
   function loop(t: number) {
    frame = requestAnimationFrame(loop)
 
-   clearScreen(ctx, '#fff')
+   const s: UIStyle = {
+     armedShotColor: '',
+     unarmedShotColor: '',
+     shipColor: '',
+     spaceColor: '#fff'
+   }
+   clearScreen(ctx, s)
 
    points.forEach((p) => {
     renderPoint(ctx, p, '#000', 3)

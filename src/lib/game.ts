@@ -1,4 +1,4 @@
-import { GameType, type SpaceObject, type KeyFunctionMap, type NonPlayerCharacter } from './interface'
+import { GameType, type SpaceObject, type KeyFunctionMap, type NonPlayerCharacter, type UIStyle } from './interface'
 import { getContext } from './canvas_util'
 import { LightSource, LineSegment } from './shapes'
 import { renderLoop } from './time'
@@ -6,6 +6,7 @@ import { renderLoop } from './time'
 import type { Shape } from './shapes/Shape'
 import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
+import { getDefaultTheme } from '../pages/GamePage/components/Game/Utils/getTheme'
 
 export class Game {
   websocket: OidsSocket
@@ -27,6 +28,7 @@ export class Game {
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
   serverVersion = '_unknown_server_version_'
+  style: UIStyle = getDefaultTheme()
 
   constructor(
     _canvas: HTMLCanvasElement,

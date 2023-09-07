@@ -1,28 +1,26 @@
-import { SpaceShape, type Remote, type SpaceObject } from '../interface'
 import { round2dec, type Line, type Vec2d } from 'mathil'
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
-import '../../app.css'
-import { renderMoon } from './renderDebris'
-import { renderShip } from './renderShip'
+import type { SpaceObject, UIStyle } from '../interface'
 
-export function clearScreen(ctx: CanvasRenderingContext2D, color = '#000') {
-  ctx.fillStyle = document.documentElement.style.getPropertyValue('--main-bg-color')
+export function clearScreen(ctx: CanvasRenderingContext2D, style: UIStyle) {
+  // ctx.fillStyle = document.documentElement.style.getPropertyValue('--main-bg-color')
+  ctx.fillStyle = style.spaceColor
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
 
-export function render(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
-  switch (s.shape) {
-    case SpaceShape.Moon:
-      renderMoon(s, ctx)
-      break
-    case SpaceShape.SmallShip:
-      renderShip(s, ctx)
-      break
-    default:
-      console.error(`Unknown shape: ${s.shape}`)
-  }
-}
+// export function render(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
+//   switch (s.shape) {
+//     case SpaceShape.Moon:
+//       renderMoon(s, ctx)
+//       break
+//     case SpaceShape.SmallShip:
+//       renderShip(s, ctx, st)
+//       break
+//     default:
+//       console.error(`Unknown shape: ${s.shape}`)
+//   }
+// }
 
 export function renderInfoText(text: string, ypos: number, ctx: CanvasRenderingContext2D): void {
   const xpos = 26
@@ -105,18 +103,19 @@ export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D):
   ctx.restore()
 }
 
-export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D) {
+
+export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D, style: UIStyle) {
   ctx.save()
   for (const shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#fff' : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? style.unarmedShotColor : style.unarmedShotColor
     } else if (Math.random() > 0.9) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#f0f' : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? style.armedShotColor : style.unarmedShotColor
     } else if (Math.random() > 0.8) {
-      ctx.fillStyle = shot.armedDelay < 0 ? '#0f0' : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? style.armedShotColor : style.unarmedShotColor
     } else {
-      ctx.fillStyle = shot.armedDelay < 0 ? shot.color : '#fff'
+      ctx.fillStyle = shot.armedDelay < 0 ? shot.color : style.unarmedShotColor
     }
     ctx.save()
     ctx.translate(shot.position.x, shot.position.y)

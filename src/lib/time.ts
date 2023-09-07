@@ -98,7 +98,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     frameCount++
     every20.tick(() => localPlayerStore.set(game.localPlayer))
     const dt: number = getFrameTimeMs(timestamp)
-    clearScreen(game.ctx)
+    clearScreen(game.ctx, game.style)
     renderFrame(game, dt)
     updateSpaceObjects(game.remotePlayers, dt, game.ctx)
     updateSpaceObjects(game.all, dt, game.ctx)

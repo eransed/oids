@@ -18,7 +18,7 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
 
       const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
 
-      let user: User | null = await findUserById(payload.userId)
+      const user: User | null = await findUserById(payload.userId)
 
       if (user) {
         user.password = ''
@@ -127,7 +127,7 @@ users.get('/list', isAuthenticated, async (req: Request, res: Response, next: Ne
       throw new Error('Forbidden, you are not admin.')
     }
 
-    let users: User[] = await getUsers()
+    const users: User[] = await getUsers()
 
     users.forEach((user) => (user.password = ':)'))
 

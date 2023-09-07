@@ -282,4 +282,13 @@ export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, P
 
 export interface Settings {
   darkMode: boolean
+  uiStyle: UIStyle
 }
+
+export interface UIStyle {
+  unarmedShotColor: string
+  armedShotColor: string
+  shipColor: string
+  spaceColor: string
+}
+

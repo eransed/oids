@@ -1,7 +1,7 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import type { SpaceObject } from '../../../../lib/interface'
+  import type { Settings, SpaceObject } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
@@ -24,6 +24,7 @@
   import { socket } from '../../../../stores/stores'
   import { saveGame } from '../../../../lib/services/game/saveGame'
   import type { GameHistory } from '../../../../interfaces/game'
+  import { gameRef } from './Utils/mainGame'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -48,6 +49,7 @@
   onMount(() => {
     // cleanup = initSettingsControl()
     game = new Game(canvas, player, $socket, getKeyMap(), showDeadMenu)
+    gameRef(game)
     game.localPlayer.sessionId = sessionId
     game.localPlayer.joinedGame = currentTimeDate()
     game.startGame(initRegularGame, renderFrame, nextFrame)

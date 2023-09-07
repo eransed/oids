@@ -23,16 +23,44 @@
   import Page from './components/page/page.svelte'
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
+  import type { Settings, UIStyle } from './lib/interface'
+  import { setGameSettings } from './pages/GamePage/components/Game/Utils/mainGame'
 
   $: if ($settings) {
-    handleSettings()
+    setCssFromSettings()
   }
 
-  function handleSettings() {
-    document.documentElement.style.setProperty('--main-bg-color', `${$settings.darkMode ? '#000' : '#fff'}`)
-    document.documentElement.style.setProperty('--main-text-color', `${$settings.darkMode ? '#fff' : '#000'}`)
-    document.documentElement.style.setProperty('--main-card-color', `${$settings.darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`)
+  function setCssFromSettings(): void {
+
+    const darkMode = $settings.darkMode
+
+    document.documentElement.style.setProperty('--main-bg-color', `${darkMode ? '#000' : '#fff'}`)
+    document.documentElement.style.setProperty('--main-text-color', `${darkMode ? '#fff' : '#000'}`)
+    document.documentElement.style.setProperty('--main-card-color', `${darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`)
+
+    const themeTextColor = document.documentElement.style.getPropertyValue('--main-text-color')
+    const spaceColor = document.documentElement.style.getPropertyValue('--main-bg-color')
+    const cardColor = document.documentElement.style.getPropertyValue('--main-card-color')
+
+    const uiStyle: UIStyle = {
+      unarmedShotColor: themeTextColor,
+      armedShotColor: '#0f0',
+      shipColor: '',
+      spaceColor: spaceColor
+    }
+
+    const sets: Settings = {
+      darkMode: darkMode,
+      uiStyle: uiStyle
+    }
+
+    setGameSettings(sets)
+
   }
+
+  
+
+
 </script>
 
 {#if $pageHasHeader}

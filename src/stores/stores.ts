@@ -5,6 +5,7 @@ import type { ChatMessage, Settings, SpaceObject } from '../lib/interface'
 import { createSpaceObject } from '../lib/factory'
 import { OidsSocket } from '../lib/websocket/ws'
 import { getWsUrl } from '../lib/websocket/ws'
+import { getDefaultTheme } from '../pages/GamePage/components/Game/Utils/getTheme'
 
 export const isLoggedIn: Writable<boolean> = writable()
 
@@ -38,4 +39,4 @@ export const socket: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
 
 export const chatMessageHistory: Writable<ChatMessage[]> = writable([])
 
-export const settings: Writable<Settings> = writable({ darkMode: true })
+export const settings: Writable<Settings> = writable({ darkMode: true, uiStyle: getDefaultTheme()})

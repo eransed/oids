@@ -6,7 +6,7 @@ import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions } from '../physics'
 import { loadingText } from '../render/render2d'
 import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject, MessageType, type NonPlayerCharacter } from '../interface'
+import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject, MessageType, type NonPlayerCharacter, type UIStyle } from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
 import { explosionDuration } from '../constants'
@@ -260,7 +260,7 @@ function exists(entity: NonPlayerCharacter, entities: NonPlayerCharacter[]): boo
   return false
 }
 
-function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext2D): SpaceObject[] {
+function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext2D, style: UIStyle): SpaceObject[] {
   remotes.forEach((so) => {
     so.framesSinceLastServerUpdate++
   })
@@ -291,7 +291,7 @@ function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext
         return
       } else {
         renderViewport(ctx, so)
-        renderShip(so, ctx, false)
+        renderShip(so, ctx, false, style)
       }
     }
   })
@@ -339,7 +339,7 @@ export function renderFrame(game: Game, dt: number): void {
     s.render(ctx)
   })
 
-  game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx)
+  game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx, game.style)
 
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
 
@@ -422,7 +422,7 @@ export function renderFrame(game: Game, dt: number): void {
 
     return
   } else {
-    renderShip(game.localPlayer, ctx, true)
+    renderShip(game.localPlayer, ctx, true, game.style)
   }
 }
 
