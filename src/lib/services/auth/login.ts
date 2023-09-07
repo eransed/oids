@@ -17,6 +17,7 @@ const login = async (req: FormData) => {
     localStorage.setItem('accessToken', response.data.accessToken)
     localStorage.setItem('refreshToken', response.data.refreshToken)
     isLoggedIn.set(true)
+    
    }
   })
   .catch((err) => {

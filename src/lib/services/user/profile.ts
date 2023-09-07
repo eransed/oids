@@ -1,26 +1,32 @@
 import axios, { type AxiosResponse } from 'axios'
-import { user } from '../../../stores/stores'
 
-import type { Profile } from '../../../interfaces/user'
+//Svelte store
+import { settings, user } from '../../../stores/stores'
 
-const getProfile = async (): Promise<AxiosResponse<Profile>> => {
- const token = localStorage.getItem('accessToken')
+//Interface
+import type { User } from '../../../interfaces/user'
 
- const config = {
-  headers: { Authorization: `Bearer ${token}` },
- }
+const getProfile = async (): Promise<User> => {
+  const token = localStorage.getItem('accessToken')
 
- const response: AxiosResponse<Profile> = await axios
-  .get(`http://${location.hostname}:6060/api/v1/users/profile`, config)
-  .then((response: AxiosResponse<Profile>) => {
-   user.set(response.data.user)
-   return response.data
-  })
-  .catch((err) => {
-   return err
-  })
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  }
 
- return response
+  const response: User = await axios
+    .get(`http://${location.hostname}:6060/api/v1/users/profile`, config)
+    .then((response: AxiosResponse<User>) => {
+      user.set(response.data)
+      console.log('Welcome: ', response.data.name, response.data)
+      settings.set({ darkMode: response.data.darkMode })
+
+      return response.data
+    })
+    .catch((err) => {
+      return err
+    })
+
+  return response
 }
 
 export default getProfile

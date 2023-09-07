@@ -1,128 +1,128 @@
 :root {
- --borderColor: rgb(255, 165, 0);
- --borderSize: 3px;
- --borderStyle: solid;
+  --borderColor: rgb(255, 165, 0);
+  --borderSize: 3px;
+  --borderStyle: solid;
 }
 
 .header {
- top: 0;
- position: fixed;
- display: flex;
- flex-wrap: wrap;
- color: #fff;
- overflow: hidden;
- justify-content: space-between;
- width: 100%;
- height: fit-content;
+  top: 0;
+  position: fixed;
+  display: flex;
+  flex-wrap: wrap;
+  color: var(--main-text-color);
+  overflow: hidden;
+  justify-content: space-between;
+  width: 100%;
+  height: fit-content;
 
- z-index: 2;
- transition: all;
- transition-duration: 0s;
- transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
- /* background: linear-gradient(rgba(50, 82, 225, 0.1), rgba(0, 0, 0, 0.4)); */
+  z-index: 2;
+  transition: all;
+  transition-duration: 0s;
+  transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
+  /* background: linear-gradient(rgba(50, 82, 225, 0.1), rgba(0, 0, 0, 0.4)); */
 }
 
 .header > * {
- transition: all;
- transition-duration: 0s;
- margin: 1em;
+  transition: all;
+  transition-duration: 0s;
+  margin: 1em;
 }
 
 .header:hover > * {
- transition: all;
- transition-duration: 0.5s;
- margin-right: 1em;
+  transition: all;
+  transition-duration: 0.5s;
+  margin-right: 1em;
 }
 
 .menuItem,
 .modalProfile {
- height: 50px;
- display: flex;
- text-align: center;
- flex-wrap: wrap;
- justify-content: center;
- flex-direction: row;
- align-content: center;
- cursor: pointer;
- border-color: var(--borderColor);
- transition: var(--borderColor);
- transition-duration: 1s;
- transition-delay: 0.2s;
- transition-property: all;
- transition-timing-function: cubic-bezier(1, -0.53, 0.26, 1.1);
+  height: 50px;
+  display: flex;
+  text-align: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-direction: row;
+  align-content: center;
+  cursor: pointer;
+  border-color: var(--borderColor);
+  transition: var(--borderColor);
+  transition-duration: 1s;
+  transition-delay: 0.2s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(1, -0.53, 0.26, 1.1);
 }
 
 .menuItem {
- width: fit-content;
- height: fit-content;
+  width: fit-content;
+  height: fit-content;
 }
 
 .navButton {
- cursor: default;
- opacity: 1;
- padding: 1em;
- font-weight: bolder;
- color: rgba(255, 255, 255, 0.6);
- transition-property: all;
- transition: 0.6s;
- border-color: rgb(161, 211, 247, 0.5);
+  cursor: default;
+  opacity: 1;
+  padding: 1em;
+  font-weight: bolder;
+  color: var(--main-text-color);
+  transition-property: all;
+  transition: 0.6s;
+  border-color: rgb(161, 211, 247, 0.5);
 }
 
 .navButton:hover {
- opacity: 1;
- transition-property: all;
- color: rgb(255, 255, 255);
- transition: 0.6s;
- /* border-bottom: 1px solid #fff; */
+  opacity: 1;
+  transition-property: all;
+  color: rgb(255, 255, 255);
+  transition: 0.6s;
+  /* border-bottom: 1px solid #fff; */
 }
 
 .modalProfile {
- width: 50px;
- top: 0.5em;
- left: 6em;
- cursor: auto;
- filter: saturate(2);
- border-radius: 100%;
- border-style: solid;
- border-width: 3px;
- border-color: var(--borderColor);
- transition: var(--borderColor);
- transition: all;
- transition-duration: 1s;
+  width: 50px;
+  top: 0.5em;
+  left: 6em;
+  cursor: auto;
+  filter: saturate(2);
+  border-radius: 100%;
+  border-style: solid;
+  border-width: 3px;
+  border-color: var(--borderColor);
+  transition: var(--borderColor);
+  transition: all;
+  transition-duration: 1s;
 }
 
 .modalProfile:hover {
- filter: saturate(5);
- opacity: 1;
+  filter: saturate(5);
+  opacity: 1;
 
- transition-property: all;
- transition: 1s;
- cursor: pointer;
- width: fit-content;
+  transition-property: all;
+  transition: 1s;
+  cursor: pointer;
+  width: fit-content;
 }
 
 .avatar {
- height: 100%;
+  height: 100%;
 }
 
 .form {
- display: grid;
- flex-direction: column;
- justify-content: center;
- flex-wrap: wrap;
- align-content: center;
+  display: grid;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-content: center;
 }
 
 .form input {
- width: 80%;
- padding: 8px;
- margin: 8px;
+  width: 80%;
+  padding: 8px;
+  margin: 8px;
 }
 
 nav {
- display: grid;
- width: 100%;
-
- grid-template-columns: 1fr auto;
- min-width: 450px;
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 0.06fr auto;
+  min-width: 450px;
+  align-items: center;
 }

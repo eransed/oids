@@ -19,6 +19,8 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   gameHistory   Game[]
+  role          String         @default("player")
+  darkMode      Boolean        @default(true)
 }
 
 model RefreshToken {
@@ -32,8 +34,19 @@ model RefreshToken {
 }
 
 model Game {
-  id     String  @id @unique @default(uuid())
-  win    Boolean
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
+  id        Int      @id @unique @default(autoincrement())
+  sessionId String
+  win       Boolean
+  played    DateTime @default(now())
+  players   Player[]
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model Player {
+  id            Int    @id @unique @default(autoincrement())
+  name          String
+  Game          Game?  @relation(fields: [gameId], references: [id])
+  gameId        Int?
+  gameSessionId String
 }

@@ -6,9 +6,10 @@ import { getLocalIp, ipport } from './net'
 
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
-import { MessageType, Session, SpaceObject } from '../src/lib/interface'
+import { MessageType, NonPlayerCharacter, Session, SpaceObject } from '../src/lib/interface'
 import { error, info, log, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
+import { GameHandler } from './game_handler'
 
 // start ApiServer
 apiServer()
@@ -27,7 +28,12 @@ const server: WebSocketServer = new WebSocketServer({
   port: WS_PORT,
 })
 
-let globalConnectedClients: Client[] = []
+export let globalConnectedClients: Client[] = []
+
+const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
+  // info(`Sending to session: ${sessionId}`)
+  serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
+})
 
 export class Client {
   ws: WebSocket
@@ -104,6 +110,9 @@ export class Client {
             info('No clients connected')
           }
         }
+
+        gameHandler.checkMessage(so)
+
         if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
           broadcastToAllClients(this, globalConnectedClients, so)
         } else {
@@ -215,12 +224,41 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   }
 }
 
+function serverBroadcast<T extends SpaceObject | NonPlayerCharacter>(data: T, connectedClients: Client[], sessionId: string | null = null): void {
+  if (sessionId === null) {
+    for (const client of connectedClients) {
+      client.ws.send(JSON.stringify(data))
+    }
+  } else {
+    for (const client of connectedClients) {
+      if (client.sessionId === sessionId) {
+        // info(`Sending to ${client.name} with session ${sessionId}`)
+        client.ws.send(JSON.stringify(data))
+      }
+    }
+  }
+}
+
 export function getPlayersFromSessionId(sessionId: string): SpaceObject[] {
   const playerList: SpaceObject[] = []
 
   for (const client of globalConnectedClients) {
     if (sessionId === client.sessionId && client.lastDataObject) {
       playerList.push(client.lastDataObject)
+    }
+  }
+
+  return playerList
+}
+
+export function getActivePlayersFromSession(sessionId: string): SpaceObject[] {
+  const playerList: SpaceObject[] = []
+
+  for (const client of globalConnectedClients) {
+    if (sessionId === client.sessionId && client.lastDataObject) {
+      if (client.lastDataObject.isPlaying) {
+        playerList.push(client.lastDataObject)
+      }
     }
   }
 

@@ -1,18 +1,18 @@
 <script lang="ts">
   //Imports
-  import Button90 from "./Button90.svelte"
-  import type { Button90Config } from "../../interfaces/menu"
-  import MenuWrapper from "./MenuWrapper.svelte"
-  import { onDestroy } from "svelte"
-  import { addKeyDownListener } from "../../stores/eventListenerStore"
+  import Button90 from './Button90.svelte'
+  import type { Button90Config } from '../../interfaces/menu'
+  import MenuWrapper from './MenuWrapper.svelte'
+  import { onDestroy } from 'svelte'
+  import { addKeyDownListener } from '../../stores/eventListenerStore'
 
   // used to disable game controllers while menu is open
-  import { initKeyControllers, removeKeyControllers } from "../../lib/input"
+  import { initKeyControllers, removeKeyControllers } from '../../lib/input'
 
   //Exports
   export let menuOpen: boolean = false
   export let buttons: Button90Config[]
-  export let menuHeader: string = "Menu"
+  export let menuHeader: string = 'Menu'
 
   const toggleMenu = (): void => {
     menuOpen = !menuOpen
@@ -24,7 +24,7 @@
   }
 
   const handleKeyDown = (event: KeyboardEvent): void => {
-    if (event.key === "Escape") {
+    if (event.key === 'Escape') {
       toggleMenu()
     }
   }
@@ -35,7 +35,7 @@
   onDestroy(() => {
     //Call the cleanup function
     cleanup()
-    document.removeEventListener("keydown", handleMenuSelection)
+    document.removeEventListener('keydown', handleMenuSelection)
   })
 
   const rotate = (index: number, size: number): number => {
@@ -59,11 +59,11 @@
       b.selected = false
     })
 
-    if (event.code === "ArrowUp") {
+    if (event.code === 'ArrowUp') {
       selectedIndex--
-    } else if (event.code === "ArrowDown") {
+    } else if (event.code === 'ArrowDown') {
       selectedIndex++
-    } else if (event.code === "Enter") {
+    } else if (event.code === 'Enter') {
       buttons[selectedIndex].clickCallback()
     }
     selectedIndex = rotate(selectedIndex, buttons.length)
@@ -72,9 +72,9 @@
   }
 
   $: if (menuOpen) {
-    document.addEventListener("keydown", handleMenuSelection)
+    document.addEventListener('keydown', handleMenuSelection)
   } else {
-    document.removeEventListener("keydown", handleMenuSelection)
+    document.removeEventListener('keydown', handleMenuSelection)
   }
 </script>
 
@@ -135,6 +135,7 @@
   .menuHeader {
     text-transform: uppercase;
     font-size: 12px;
+    color: var(--main-text-color);
   }
 
   .buttonList:hover > .button {

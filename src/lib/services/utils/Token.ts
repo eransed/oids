@@ -6,49 +6,53 @@ import getProfile from '../user/profile'
 
 import { isLoggedIn, userLoading } from '../../../stores/stores'
 
-import type { Profile } from '../../../interfaces/user'
+import type { User } from '../../../interfaces/user'
 import { log, warn } from 'mathil'
 
 //Check if token is valid and renew
-export const validateToken = async () => {
- let accessToken
- let refreshToken
+export const validateToken = async (): Promise<User | undefined> => {
+  let accessToken
+  let refreshToken
+  let userProfile: User | undefined
 
- const storedRefreshToken = localStorage.getItem('refreshToken')
+  const storedRefreshToken = localStorage.getItem('refreshToken')
 
- //If no refreshToken stored in localstorage -> return undefined and user needs to login
- if (!storedRefreshToken) {
-  return
- }
+  //If no refreshToken stored in localstorage -> return undefined and user needs to login
+  if (!storedRefreshToken) {
+    return undefined
+  }
 
- const body = {
-  refreshToken: storedRefreshToken,
- }
+  const body = {
+    refreshToken: storedRefreshToken,
+  }
 
- userLoading.set(true)
+  userLoading.set(true)
 
- await axios
-  .post(`http://${location.hostname}:6060/api/v1/auth/refreshToken`, body)
+  await axios
+    .post(`http://${location.hostname}:6060/api/v1/auth/refreshToken`, body)
 
-  .then(async (response: AxiosResponse<any>) => {
-   if (response.status === 200) {
-    accessToken = response.data.accessToken
-    refreshToken = response.data.refreshToken
-    localStorage.setItem('refreshToken', refreshToken)
-    localStorage.setItem('accessToken', accessToken)
+    .then(async (response: AxiosResponse<any>) => {
+      if (response.status === 200) {
+        accessToken = response.data.accessToken
+        refreshToken = response.data.refreshToken
+        localStorage.setItem('refreshToken', refreshToken)
+        localStorage.setItem('accessToken', accessToken)
 
-    const userProfile: AxiosResponse<Profile> = await getProfile()
+        userProfile = await getProfile().then((user) => user)
 
-    if (userProfile) {
-     isLoggedIn.set(true)
-     userLoading.set(false)
-    }
-   } else {
-    userLoading.set(false)
-    return
-   }
-  })
-  .catch((err) => {
-   warn(err)
-  })
+        if (userProfile) {
+          isLoggedIn.set(true)
+          userLoading.set(false)
+        }
+        return userProfile
+      } else {
+        userLoading.set(false)
+        return undefined
+      }
+    })
+    .catch((err) => {
+      warn(err)
+    })
+
+  return userProfile ? userProfile : undefined
 }
