@@ -15,7 +15,7 @@
   import { onMount } from 'svelte'
 
   onMount(() => {
-    if ($isLoggedIn) {
+    if ($isLoggedIn && !$user) {
       getProfile()
     }
   })
@@ -24,7 +24,7 @@
 </script>
 
 <Page>
-  {#if $isLoggedIn}
+  {#if $isLoggedIn && $user}
     <div class="profileWrapper">
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}

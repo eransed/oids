@@ -7,17 +7,13 @@ import { stopGame } from '../Game/Utils/gameUtils'
 export const GameMenuButtons = (Game: Game): Button90Config[] => {
   const settings: Button90Config = {
     buttonText: 'Settings',
-    clickCallback() {
-      console.log('settings please')
-    },
+    clickCallback() {},
     selected: false,
   }
 
   const continueGame: Button90Config = {
     buttonText: 'Continue',
-    clickCallback() {
-      console.log('continue game aka close menu')
-    },
+    clickCallback() {},
     selected: false,
   }
 

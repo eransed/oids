@@ -18,7 +18,11 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
 
       const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
 
-      const user: User | null = await findUserById(payload.userId)
+      let user: User | null = await findUserById(payload.userId)
+
+      if (user) {
+        user.password = ''
+      }
 
       if (!user) {
         res.status(404)

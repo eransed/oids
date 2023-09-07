@@ -1,7 +1,7 @@
 import axios, { type AxiosResponse } from 'axios'
 
 //Svelte store
-import { user } from '../../../stores/stores'
+import { settings, user } from '../../../stores/stores'
 
 //Interface
 import type { User } from '../../../interfaces/user'
@@ -18,6 +18,7 @@ const getProfile = async (): Promise<User> => {
     .then((response: AxiosResponse<User>) => {
       user.set(response.data)
       console.log('Welcome: ', response.data.name, response.data)
+      settings.set({ darkMode: response.data.darkMode })
 
       return response.data
     })

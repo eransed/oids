@@ -39,7 +39,6 @@ export const validateToken = async (): Promise<User | undefined> => {
         localStorage.setItem('accessToken', accessToken)
 
         userProfile = await getProfile().then((user) => user)
-        console.log(userProfile)
 
         if (userProfile) {
           isLoggedIn.set(true)

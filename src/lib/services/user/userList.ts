@@ -11,7 +11,6 @@ const userList = async (): Promise<AxiosResponse<User[]>> => {
   const response: AxiosResponse<User[]> = await axios
     .get(`http://${location.hostname}:6060/api/v1/users/list`, config)
     .then((response: AxiosResponse<User[]>) => {
-      console.log(response.data)
       return response
     })
     .catch((err) => {

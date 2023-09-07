@@ -1,5 +1,5 @@
 import { validateToken } from '../lib/services/utils/Token'
-import { user } from '../stores/stores'
+import { user, settings } from '../stores/stores'
 
 /**
  * Asynchronus function that runs at startup.
@@ -7,5 +7,9 @@ import { user } from '../stores/stores'
  * Use this function to add functionality that needs to run before app starts.
  */
 export const onAppMount = async (): Promise<void> => {
-  await validateToken().then((d) => console.log(d?.email))
+  await validateToken().then((d) => {
+    if (d?.darkMode) {
+      settings.set({ darkMode: d?.darkMode })
+    }
+  })
 }

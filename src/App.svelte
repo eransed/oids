@@ -23,7 +23,6 @@
   import Page from './components/page/page.svelte'
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
-  import type { Settings } from './lib/interface'
 
   $: if ($settings) {
     handleSettings()
