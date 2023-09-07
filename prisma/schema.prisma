@@ -20,6 +20,7 @@ model User {
   updatedAt     DateTime       @updatedAt
   gameHistory   Game[]
   role          String         @default("player")
+  darkMode      Boolean        @default(true)
 }
 
 model RefreshToken {

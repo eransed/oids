@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { pageHasHeader, user, isLoggedIn } from '../../stores/stores'
+  import { pageHasHeader, user, isLoggedIn, settings } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -55,17 +55,45 @@
           {/if}
         {/if}
         {#if $profileComponent === 'settings'}
-          <p>Settings</p>
+          <table>
+            <tr>
+              <th>
+                <p>Settings</p>
+              </th>
+            </tr>
+            <tr>
+              <td>Darkmode</td>
+              <td
+                ><button
+                  on:click={() => {
+                    $user.darkMode = !$user.darkMode
+                    $settings.darkMode = $user.darkMode
+                  }}>{$user.darkMode}</button
+                ></td
+              >
+            </tr>
+          </table>
         {/if}
       </div>
     </div>
   {:else}
-    <p style="color: #fff">Please login to see your profile</p>
+    <p style="color: var(--main-text-color)">Please login to see your profile</p>
     <ProfileModal />
   {/if}
 </Page>
 
 <style>
+  table {
+    border-collapse: collapse;
+    width: 50%;
+  }
+
+  td,
+  th {
+    text-align: left;
+    padding: 8px;
+  }
+
   .profileWrapper {
     display: grid;
     justify-self: center;
@@ -76,6 +104,7 @@
   }
 
   .content {
+    color: var(--main-text-color);
     padding: 1em;
     min-width: 400px;
     overflow-y: auto;

@@ -100,6 +100,7 @@
     height: 100vh;
     top: 0;
     position: fixed;
+    background-color: var(--main-bg-color);
     /* cursor: none; */
   }
   .gameInfo {

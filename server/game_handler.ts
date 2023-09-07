@@ -43,7 +43,10 @@ export class GameHandler {
         // clearInterval(this.game_interval)
       }
     }, this.minTickTimeMs)
-    // saveGame('', false, new Date(), sessionId)
+    /**
+     * ToDo: Save the game when finished to all clients.
+     */
+    // saveGame('011ef253-eae8-4da5-9eb1-6a0a3816c7e5', false, new Date(), sessionId)
   }
 
   checkMessage(obj: SpaceObject) {

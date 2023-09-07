@@ -26,13 +26,8 @@ export const findUserById = (id: string) => {
     where: {
       id,
     },
-  })
-}
-
-export const getGameHistory = (id: string) => {
-  return db.game.findMany({
-    where: {
-      userId: id,
+    include: {
+      gameHistory: true,
     },
   })
 }

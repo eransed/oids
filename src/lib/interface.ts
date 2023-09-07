@@ -279,3 +279,7 @@ export interface ChatMessage {
 }
 
 export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable, Bounded {}
+
+export interface Settings {
+  darkMode: boolean
+}

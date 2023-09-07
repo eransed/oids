@@ -8,4 +8,5 @@ export interface User {
   updatedAt: string
   gameHistory: GameHistory[]
   role: string
+  darkMode: boolean
 }

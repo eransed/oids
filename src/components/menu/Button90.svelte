@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { Button90Config } from "../../interfaces/menu"
-  import CircularSpinner from "../loaders/circularSpinner.svelte"
+  import type { Button90Config } from '../../interfaces/menu'
+  import CircularSpinner from '../loaders/circularSpinner.svelte'
 
   export let mouseTracking: boolean = false
   export let selected: boolean = false
@@ -8,26 +8,26 @@
   export let disabled: boolean = loading
 
   export let buttonConfig: Button90Config = {
-    buttonText: "",
+    buttonText: '',
     clickCallback: () => {
-      console.error("Callback not implemented")
+      console.error('Callback not implemented')
     },
     selected: false,
   }
 
-  $: m = { x: "", y: "" }
+  $: m = { x: '', y: '' }
 
   function handleMousemove(event: MouseEvent) {
     if (mouseTracking) {
-      m.x = event.offsetX + "px"
-      m.y = event.offsetY + "px"
+      m.x = event.offsetX + 'px'
+      m.y = event.offsetY + 'px'
     }
   }
 
   const handleMouseLeave = (event: MouseEvent) => {
     if (mouseTracking) {
-      m.x = "0px"
-      m.y = "0px"
+      m.x = '0px'
+      m.y = '0px'
     }
   }
 </script>
@@ -36,7 +36,7 @@
   <button
     {disabled}
     style="--left: {m.x}; --top: {m.y}"
-    class={buttonConfig.selected || selected ? "selected" : "notSelected"}
+    class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
     {#if loading}
@@ -55,11 +55,12 @@
 
   button {
     min-width: 10em;
-    color: #fff;
+    background: var(--main-card-color);
+    color: var(--main-text-color);
     padding: 10px;
     width: fit-content;
     height: 4em;
-    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-weight: bold;
     font-size: 15px;
     letter-spacing: calc(var(--top) * 1.05 - var(--top));
@@ -78,18 +79,20 @@
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.7375565610859729) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%);
     transition: all;
     transition-duration: 0s;
+    color: #fff;
   }
 
   .notSelected {
-    background-color: transparent;
     opacity: 1;
+    color: var(--main-text-color);
     /* transition-property: all; */
     /* transition-duration: 0.5s; */
-    background: radial-gradient(800px circle at var(--left) var(--top), rgba(255, 255, 255, 0.06), transparent 100%);
+    background: radial-gradient(800px circle at var(--left) var(--top), var(--main-card-color), transparent 100%);
   }
   .selected {
-    background-color: transparent;
+    background-color: var(--main-bg-color);
     border-color: rgb(161, 211, 247, 1);
+    color: #fff;
     opacity: 1;
     /* transition-property: all; */
     /* transition-duration: 0.5s; */

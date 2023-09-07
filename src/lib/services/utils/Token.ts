@@ -10,15 +10,16 @@ import type { User } from '../../../interfaces/user'
 import { log, warn } from 'mathil'
 
 //Check if token is valid and renew
-export const validateToken = async () => {
+export const validateToken = async (): Promise<User | undefined> => {
   let accessToken
   let refreshToken
+  let userProfile: User | undefined
 
   const storedRefreshToken = localStorage.getItem('refreshToken')
 
   //If no refreshToken stored in localstorage -> return undefined and user needs to login
   if (!storedRefreshToken) {
-    return
+    return undefined
   }
 
   const body = {
@@ -37,18 +38,22 @@ export const validateToken = async () => {
         localStorage.setItem('refreshToken', refreshToken)
         localStorage.setItem('accessToken', accessToken)
 
-        const userProfile: AxiosResponse<User> = await getProfile()
+        userProfile = await getProfile().then((user) => user)
+        console.log(userProfile)
 
         if (userProfile) {
           isLoggedIn.set(true)
           userLoading.set(false)
         }
+        return userProfile
       } else {
         userLoading.set(false)
-        return
+        return undefined
       }
     })
     .catch((err) => {
       warn(err)
     })
+
+  return userProfile ? userProfile : undefined
 }

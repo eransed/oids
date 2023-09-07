@@ -2,6 +2,7 @@ import type { NonPlayerCharacter, PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceShape } from './interface'
 import { newVec2d, rndf, rndfVec2d, rndi, type Vec2d } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
+import { randomAnyColor, randomAnyLightColor, randomBlue } from './color'
 
 export function newPhotonLaser(): PhotonLaser {
   const shot: PhotonLaser = {
@@ -127,7 +128,7 @@ export function createNpc(): NonPlayerCharacter {
     lastDamagedByName: '',
     killedByName: '',
     position: rndfVec2d(100, 2000),
-    color: '#fff',
+    color: randomBlue(),
     colliding: false,
     hitRadius: 100,
     mass: 1,

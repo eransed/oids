@@ -6,6 +6,7 @@ export interface User {
   createdAt: Date
   updatedAt: Date
   role: string
+  darkMode: boolean
 }
 
 export type Game = {
@@ -22,5 +23,3 @@ export interface GameHistory {
 export interface Player {
   name: string
 }
-
-export interface UserProfile extends User, GameHistory {}

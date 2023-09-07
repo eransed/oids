@@ -5,7 +5,7 @@
   import { routes } from './routes'
 
   //Stores
-  import { pageHasHeader } from './stores/stores'
+  import { pageHasHeader, settings } from './stores/stores'
 
   //Helpers
   import { onAppMount } from './helpers/onAppMount'
@@ -23,6 +23,17 @@
   import Page from './components/page/page.svelte'
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
+  import type { Settings } from './lib/interface'
+
+  $: if ($settings) {
+    handleSettings()
+  }
+
+  function handleSettings() {
+    document.documentElement.style.setProperty('--main-bg-color', `${$settings.darkMode ? '#000' : '#fff'}`)
+    document.documentElement.style.setProperty('--main-text-color', `${$settings.darkMode ? '#fff' : '#000'}`)
+    document.documentElement.style.setProperty('--main-card-color', `${$settings.darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`)
+  }
 </script>
 
 {#if $pageHasHeader}

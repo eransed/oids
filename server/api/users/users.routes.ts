@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction, response } from 'express'
 import express from 'express'
 import { isAuthenticated } from '../middleware'
-import { deleteUser, findUserByEmail, findUserById, getGameHistory, getUsers, saveGame, updateUser } from './users.services'
+import { deleteUser, findUserByEmail, findUserById, getUsers, saveGame, updateUser } from './users.services'
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 
-import { Game, Player, User, UserProfile } from '../types/user'
+import { Game, Player, User } from '../types/user'
 
 export const users = express.Router()
 
@@ -19,25 +19,13 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
       const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
 
       const user: User | null = await findUserById(payload.userId)
-      const gameHistory: Game[] = await getGameHistory(payload.userId)
 
       if (!user) {
         res.status(404)
         throw new Error('No user found')
       }
 
-      const userProfile: UserProfile = {
-        name: user.name,
-        id: user.id,
-        email: user.email,
-        password: '',
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        gameHistory: gameHistory,
-        role: user.role,
-      }
-
-      res.json(userProfile)
+      res.json(user)
     }
   } catch (err) {
     next(err)
@@ -46,12 +34,12 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
 
 users.post('/update', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user: User  = req.body
+    const user: User = req.body
 
     const { authorization } = req.headers
 
     if (!authorization) {
-      res.status(401).send("You are not logged in.")
+      res.status(401).send('You are not logged in.')
       throw new Error('No authorization')
     }
 
@@ -60,7 +48,7 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
     const caller: User | null = await findUserById(payload.userId)
 
     if (!caller || caller.role !== 'admin') {
-      res.status(403).send("Forbidden, you are not admin")
+      res.status(403).send('Forbidden, you are not admin')
       throw new Error('Forbidden, you are not admin.')
     }
 
@@ -72,18 +60,18 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
     const existingUser = await findUserById(user.id)
 
     if (!existingUser) {
-      res.status(404).send("No user found to update with that id.")
+      res.status(404).send('No user found to update with that id.')
       throw new Error(`No user found with id: ${user.id}`)
     }
 
-    await updateUser(user).then((d) => {
-      
-      res.status(200).json(user)
-    }).catch((err: Error) => {
-      res.status(500).send("Prisma DB did not approve this update.")
-      throw new Error(err.message)
-    })
-
+    await updateUser(user)
+      .then((d) => {
+        res.status(200).json(user)
+      })
+      .catch((err: Error) => {
+        res.status(500).send('Prisma DB did not approve this update.')
+        throw new Error(err.message)
+      })
   } catch (err) {
     next(err)
   }
@@ -137,7 +125,7 @@ users.get('/list', isAuthenticated, async (req: Request, res: Response, next: Ne
 
     let users: User[] = await getUsers()
 
-    users.forEach((user) => user.password = ":)")
+    users.forEach((user) => (user.password = ':)'))
 
     if (users) {
       res.json(users)

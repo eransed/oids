@@ -10,7 +10,7 @@
   import ProfileModal from '../profile/ProfileModal.svelte'
 
   //Stores
-  import { isLoggedIn, user } from '../../stores/stores'
+  import { isLoggedIn, user, settings } from '../../stores/stores'
 
   //css
   import './style.css'
@@ -66,7 +66,15 @@
         {/if}
       {/each}
     </div>
-
+    <div class="theme">
+      <button on:click={() => ($settings.darkMode = !$settings.darkMode)}>
+        {#if $settings.darkMode}
+          Dark
+        {:else}
+          Light
+        {/if}
+      </button>
+    </div>
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
       <img class="avatar" src={Avatar} alt="Avatar" />
     </div>

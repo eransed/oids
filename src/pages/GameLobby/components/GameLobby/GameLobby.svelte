@@ -305,7 +305,7 @@
     <div class="center">
       {#if joinedSession}
         <div class="sessionInfo">
-          <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: #fff'}>
+          <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
             Host: {joinedSession.host.name}
             {joinedSession.host.readyToPlay ? '✅' : ''}
           </p>
@@ -315,7 +315,7 @@
           {/if}
           {#each joinedSession.players as player}
             {#if !player.isHost}
-              <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: #fff'}>
+              <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
                 {player.name}
                 <!-- {getPlayerPing(player)} - -->
 
@@ -354,7 +354,7 @@
           {:else}
             <div in:fade={{ delay: 100 }}>
               <p style="margin-bottom: 1rem;">
-                <span style="font-size: 0.65rem; color: #cdcdcd;">
+                <span style="font-size: 0.65rem; color: var(--main-text-color)">
                   {dateTimeFormat(msg.timeDate)} -
                   <span style="font-size: 0.8rem; color: #c89;">
                     {msg.user.name}:
@@ -407,10 +407,10 @@
     display: grid;
     margin: 0.5em;
     border-radius: 8px;
-
+    color: var(--main-text-color);
     padding: 0.5em;
     line-break: anywhere;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--main-card-color);
   }
 
   .center,

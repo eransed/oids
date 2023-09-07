@@ -241,6 +241,7 @@
     padding: 0.2em;
   }
   .dataTable {
+    color: var(--main-text-color);
     width: 100%;
     justify-content: center;
     display: flex;
