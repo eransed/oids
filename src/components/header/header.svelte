@@ -29,6 +29,12 @@
   }
 
   $: borderColor = loggedIn ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
+
+  $: pathname = location.pathname
+
+  $: if (pathname) {
+    console.log(pathname)
+  }
 </script>
 
 <div class="header">
@@ -44,8 +50,9 @@
                   buttonText: route.displayText,
                   clickCallback: () => {
                     navigate(route.path)
+                    pathname = location.pathname
                   },
-                  selected: false,
+                  selected: pathname === route.path,
                 }}
               />
             </div>
@@ -57,8 +64,9 @@
                   buttonText: route.displayText,
                   clickCallback: () => {
                     navigate(route.path)
+                    pathname = location.pathname
                   },
-                  selected: false,
+                  selected: pathname === route.path,
                 }}
               />
             </div>

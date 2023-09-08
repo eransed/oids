@@ -68,36 +68,41 @@
     cursor: pointer;
     font-size: 12px;
     font-weight: 900;
-    border: 2px solid rgb(47, 167, 252, 0.5);
-    border-radius: 8px;
-    transition-duration: 1.8s;
+    /* border: 2px solid rgb(47, 167, 252, 0.5); */
+
+    /* transition-duration: 1.8s; */
   }
 
   button:hover {
-    border-color: rgb(161, 211, 247, 1);
-    background: rgb(0, 0, 0);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.7375565610859729) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%);
+    border-color: var(--main-text-color);
+    border-bottom: 1px solid;
+    /* background: rgb(0, 0, 0);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.7375565610859729) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%); */
     transition: all;
     transition-duration: 0s;
-    color: #fff;
+    color: var(--main-text-color);
   }
 
   .notSelected {
+    border: none;
     opacity: 1;
     color: var(--main-text-color);
     /* transition-property: all; */
     /* transition-duration: 0.5s; */
-    background: radial-gradient(800px circle at var(--left) var(--top), var(--main-card-color), transparent 100%);
+    background: none;
   }
   .selected {
+    border: none;
     background-color: var(--main-bg-color);
-    border-color: rgb(161, 211, 247, 1);
-    color: #fff;
+    /* border-color: rgb(161, 211, 247, 1); */
+    border-bottom: 1px solid;
+    border-color: var(--main-text-color);
+    color: var(--main-text-color);
     opacity: 1;
     /* transition-property: all; */
     /* transition-duration: 0.5s; */
-    background: rgb(0, 0, 0);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.7375565610859729) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%);
+    /* background: rgb(0, 0, 0); */
+    /* background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%); */
   }
 
   button:disabled {

@@ -65,7 +65,7 @@
   color: var(--main-text-color);
   transition-property: all;
   transition: 0.6s;
-  border-color: rgb(161, 211, 247, 0.5);
+  /* border-color: rgb(161, 211, 247, 0.5); */
 }
 
 .navButton:hover {
