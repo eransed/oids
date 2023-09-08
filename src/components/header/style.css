@@ -123,6 +123,43 @@ nav {
   display: grid;
   width: 100%;
   grid-template-columns: 1fr 0.06fr auto;
-  min-width: 450px;
   align-items: center;
+}
+
+.hamburger {
+  display: none;
+}
+
+.hamburger button {
+  border: none;
+  background: none;
+  color: var(--main-text-color);
+  font-size: 24px;
+  transform: rotate(90deg);
+  position: absolute;
+  top: 1em;
+  z-index: 1;
+}
+
+@media screen and (max-width: 600px) {
+  .header {
+    overflow: visible;
+  }
+  .menuItem {
+    display: none;
+    inset: 0;
+    width: 100vw;
+    position: absolute;
+    height: 100vh;
+    padding: 0;
+    background-color: var(--main-bg-color);
+    transition: all;
+    transition-duration: 1s;
+  }
+  .hamburger {
+    display: block;
+  }
+  .themeToggle {
+    display: none;
+  }
 }

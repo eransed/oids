@@ -134,7 +134,11 @@
     overflow-x: auto;
   }
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 500px) {
+    .content {
+      min-width: 0px;
+      border: none;
+    }
     .profileWrapper {
       grid-template-columns: 1fr;
     }

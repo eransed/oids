@@ -36,10 +36,11 @@
     }
   }
 
-  @media screen and (max-width: 450px) {
+  @media screen and (max-width: 500px) {
     .pageWrapper {
       justify-content: left;
       margin: 0;
+      top: 75px;
     }
   }
 </style>

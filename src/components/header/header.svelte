@@ -32,14 +32,16 @@
 
   $: pathname = location.pathname
 
-  $: if (pathname) {
-    console.log(pathname)
-  }
+  let toggleMenu: boolean
+
+  $: display = toggleMenu ? 'flex' : 'none'
 </script>
 
 <div class="header">
   <nav>
-    <div class="menuItem">
+    <div class="hamburger"><button on:click={() => (toggleMenu = !toggleMenu)}>|||</button></div>
+
+    <div class="menuItem" style="display: {display};">
       {#each Object.values(routes) as route}
         {#if route.inHeader}
           {#if route.path === '/admin' && $user && $user.role === 'admin'}
@@ -49,6 +51,7 @@
                 buttonConfig={{
                   buttonText: route.displayText,
                   clickCallback: () => {
+                    toggleMenu = false
                     navigate(route.path)
                     pathname = location.pathname
                   },
@@ -63,6 +66,7 @@
                 buttonConfig={{
                   buttonText: route.displayText,
                   clickCallback: () => {
+                    toggleMenu = false
                     navigate(route.path)
                     pathname = location.pathname
                   },
@@ -75,11 +79,11 @@
       {/each}
     </div>
     <div class="theme">
-      <button on:click={() => ($settings.darkMode = !$settings.darkMode)}>
+      <button class="themeToggle" on:click={() => ($settings.darkMode = !$settings.darkMode)}>
         {#if $settings.darkMode}
           Dark
         {:else}
-          Light
+          Lights
         {/if}
       </button>
     </div>
