@@ -8,6 +8,7 @@
   import Page from '../../components/page/page.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
   import { ProfileButtons } from './ProfileButtons'
+  import Card from '../../components/card/card.svelte'
 
   //Util
   import { formatDate } from '../../helpers/util'
@@ -24,8 +25,8 @@
 </script>
 
 <Page>
-  {#if $isLoggedIn && $user}
-    <div class="profileWrapper">
+  <div class="profileWrapper">
+    {#if $isLoggedIn && $user}
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
           <div>
@@ -42,6 +43,7 @@
 
           <!-- <ProfileModal /> -->
         {/if}
+
         {#if $profileComponent === 'matchHistory'}
           <h3>Match History</h3>
           {#if $user.gameHistory}
@@ -75,11 +77,13 @@
           </table>
         {/if}
       </div>
-    </div>
-  {:else}
-    <p style="color: var(--main-text-color)">Please login to see your profile</p>
-    <ProfileModal />
-  {/if}
+    {:else}
+      <div>
+        <p style="color: var(--main-text-color)">Please login to see your profile</p>
+        <ProfileModal />
+      </div>
+    {/if}
+  </div>
 </Page>
 
 <style>
@@ -101,6 +105,9 @@
     flex-wrap: wrap;
     color: #fff;
     grid-template-columns: 1fr auto;
+    background-color: var(--main-card-color);
+    border-radius: 0.5em;
+    padding: 2em;
   }
 
   .content {

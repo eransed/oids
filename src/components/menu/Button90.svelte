@@ -93,7 +93,7 @@
   }
   .selected {
     border: none;
-    background-color: var(--main-bg-color);
+    background-color: transparent;
     /* border-color: rgb(161, 211, 247, 1); */
     border-bottom: 1px solid;
     border-color: var(--main-text-color);

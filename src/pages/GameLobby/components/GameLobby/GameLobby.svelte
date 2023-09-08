@@ -21,6 +21,8 @@
   import { info, log, warn } from 'mathil'
   import TypeWriter from '../../../../components/typeWriter/TypeWriter.svelte'
   import { navigate } from 'svelte-routing'
+  import { alertColors } from '../../../../style/colors'
+  import Alert from '../../../../components/alert/Alert.svelte'
 
   /**
    * Reactive on changes to $user store.
@@ -298,6 +300,7 @@
 </script>
 
 <Page>
+  <Alert severity={'success'} text={`${allReady ? 'All players ready' : ''}`} />
   <div class="lobbyWrapper">
     <div class="left">
       <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
@@ -323,23 +326,30 @@
               </p>
             {/if}
           {/each}
+          {#if allReady}
+            <p>All players ready!</p>
+          {/if}
         </div>
-        {#if allReady}
-          <p>All players ready!</p>
-        {/if}
-        <button on:click={() => toggleReadyToPlay()}>{$localPlayer.readyToPlay ? 'Ready ✅' : 'Ready up!'}</button>
-        <button
-          on:click={() => {
-            leaveSession()
-          }}>Leave session</button
-        >
-        <button
-          disabled={!allReady}
-          on:click={() => {
-            startGame()
-          }}
-          >Start game!
-        </button>
+        <div class="buttonWrapper">
+          <button
+            style={`background-color: ${alertColors.warning}`}
+            on:click={() => {
+              leaveSession()
+            }}>Leave session</button
+          >
+
+          <button style={`background-color: ${$localPlayer.readyToPlay ? alertColors.success : alertColors.info}`} on:click={() => toggleReadyToPlay()}
+            >{$localPlayer.readyToPlay ? 'Ready ✅' : 'Ready up!'}</button
+          >
+          <button
+            style={`background-color: ${allReady ? alertColors.info : alertColors.error}`}
+            disabled={!allReady}
+            on:click={() => {
+              startGame()
+            }}
+            >Start game!
+          </button>
+        </div>
       {:else}
         <p>No session joined</p>
       {/if}
@@ -416,7 +426,7 @@
   .center,
   .right {
     grid-template-rows: 1fr auto;
-    min-width: 15em;
+    min-width: 13em;
   }
 
   .messages {
@@ -426,7 +436,24 @@
     max-width: 100%;
   }
 
-  @media screen and (max-width: 1000px) {
+  .center button {
+    width: 100%;
+    border: none;
+    padding: 0.5em;
+    margin: 0.2em;
+    /* border: none;
+    background: none; */
+    /* color: var(--main-text-color); */
+  }
+
+  .buttonWrapper {
+    display: flex;
+    flex-flow: row;
+    min-width: 34ch;
+    width: 80%;
+  }
+
+  @media screen and (max-width: 1200px) {
     .left,
     .center,
     .right {
@@ -455,7 +482,7 @@
     }
   }
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 750px) {
     .left,
     .center,
     .right {

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
+  import { alertColors } from '../../style/colors'
 
   /**
    * @param severity - error, warning, info, success
@@ -9,19 +10,13 @@
   export let text: string = ''
 
   $: if (text) {
-    color = colors[severity]
+    color = alertColors[severity]
     setTimeout(() => {
       text = ''
     }, 3500)
   }
 
-  const colors = {
-    error: '#fdeded',
-    warning: '#fff4e5',
-    info: '#e5f6fd',
-    success: '#bbffbb',
-  }
-  let color = colors[severity]
+  let color = alertColors[severity]
 </script>
 
 {#if text}
@@ -39,13 +34,20 @@
     position: fixed;
     justify-self: center;
     background-color: var(--theme-color);
+    color: #000;
     padding: 1em;
     min-width: 200px;
+    width: fit-content;
+    max-width: 30%;
+    height: fit-content;
+    max-height: 300px;
     font-size: 12px;
     border-radius: 0.8em;
     z-index: 2;
     opacity: 0.9;
-    top: 25%;
+    inset: 0;
+    margin: auto;
+    margin-top: 300px;
   }
 
   .alertBox p {

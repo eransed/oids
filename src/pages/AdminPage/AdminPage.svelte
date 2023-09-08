@@ -133,87 +133,95 @@
 {#if $user}
   {#if $user.role === 'admin'}
     <Page>
-      <div class="actions">
-        <button on:click={() => (addNewUser = true)}>Add user</button>
-      </div>
-      {#if addNewUser}
-        <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
-          <input bind:value={newUser.name} placeholder="Name" />
-          <input bind:value={newUser.email} placeholder="Email" />
-          <input bind:value={newUser.password} placeholder="Password" />
-          <button on:click={() => (addNewUser = false)}>Cancel</button>
-          <button on:click={() => addUser()}>Save</button>
+      <div class="pageWrapper">
+        <div class="actions">
+          <button on:click={() => (addNewUser = true)}>Add user</button>
         </div>
-      {/if}
+        {#if addNewUser}
+          <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
+            <input bind:value={newUser.name} placeholder="Name" />
+            <input bind:value={newUser.email} placeholder="Email" />
+            <input bind:value={newUser.password} placeholder="Password" />
+            <button on:click={() => (addNewUser = false)}>Cancel</button>
+            <button on:click={() => addUser()}>Save</button>
+          </div>
+        {/if}
 
-      <div class="dataTable">
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-          </tr>
-          {#if users}
-            {#each Object.values(users) as u}
-              {#if edit && u.id === editingUser?.id}
-                <tr>
-                  <td><input on:keypress={onKeyPress} bind:value={name} /></td>
-                  <td><input on:keypress={onKeyPress} bind:value={email} /></td>
-                  <td>
-                    <select bind:value={role}>
-                      {#each roleOptions as value}
-                        <option {value}>{value}</option>
-                      {/each}
-                    </select>
-                  </td>
-                  <td
-                    ><button
-                      on:click={() => {
-                        editingUser = undefined
-                        edit = false
-                      }}>Cancel</button
-                    ></td
-                  >
-                  <td>
-                    <button
-                      on:click={() => {
-                        if (editingUser) {
-                          sendUpdateUser()
-                        }
-                      }}>Save</button
-                    ></td
-                  >
-                </tr>
-              {:else}
-                <tr>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>{u.role}</td>
-                  <td
-                    ><button
-                      on:click={() => {
-                        edit = true
-                        editingUser = u
-                        name = editingUser.name
-                        email = editingUser.email
-                        role = editingUser.role
-                      }}>Edit</button
-                    ></td
-                  >
-                </tr>
-              {/if}
-            {/each}
-          {/if}
-        </table>
+        <div class="dataTable">
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+            </tr>
+            {#if users}
+              {#each Object.values(users) as u}
+                {#if edit && u.id === editingUser?.id}
+                  <tr>
+                    <td><input on:keypress={onKeyPress} bind:value={name} /></td>
+                    <td><input on:keypress={onKeyPress} bind:value={email} /></td>
+                    <td>
+                      <select bind:value={role}>
+                        {#each roleOptions as value}
+                          <option {value}>{value}</option>
+                        {/each}
+                      </select>
+                    </td>
+                    <td
+                      ><button
+                        on:click={() => {
+                          editingUser = undefined
+                          edit = false
+                        }}>Cancel</button
+                      >
+                      <button
+                        on:click={() => {
+                          if (editingUser) {
+                            sendUpdateUser()
+                          }
+                        }}>Save</button
+                      >
+                    </td>
+                  </tr>
+                {:else}
+                  <tr>
+                    <td>{u.name}</td>
+                    <td>{u.email}</td>
+                    <td>{u.role}</td>
+                    <td
+                      ><button
+                        on:click={() => {
+                          edit = true
+                          editingUser = u
+                          name = editingUser.name
+                          email = editingUser.email
+                          role = editingUser.role
+                        }}>Edit</button
+                      ></td
+                    >
+                  </tr>
+                {/if}
+              {/each}
+            {/if}
+          </table>
+        </div>
       </div>
     </Page>
   {/if}
 {/if}
 
 <style>
-  .actions {
+  .pageWrapper {
     display: flex;
-    justify-content: flex-start;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100ch;
+  }
+  .actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
     margin: 1em;
     flex-flow: row;
     padding: 1em;
@@ -221,9 +229,11 @@
 
   .addUser {
     display: flex;
-    width: 100%;
     justify-content: center;
     flex-wrap: wrap;
+    background-color: var(--main-card-color);
+    padding: 1em;
+    width: fit-content;
   }
 
   .addUser input {
@@ -242,15 +252,23 @@
   }
   .dataTable {
     color: var(--main-text-color);
-    width: 100%;
     justify-content: center;
     display: flex;
-    margin: 1em;
+    background-color: var(--main-card-color);
+    border-radius: 0.5em;
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .dataTable table tr:nth-child(even) {
+    background-color: var(--main-card-color);
   }
 
   .dataTable table {
-    width: 50%;
+    width: 100%;
     text-align: left;
+    border-radius: 0.8em;
+    padding: 1em;
   }
 
   .dataTable input {

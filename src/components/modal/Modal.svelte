@@ -1,29 +1,29 @@
 <script lang="ts">
-  type positionType = "fixed" | "absolute" | "relative"
+  type positionType = 'fixed' | 'absolute' | 'relative'
 
-  export let title: string = "Title"
+  export let title: string = 'Title'
   export let closeBtn: boolean = true
   export let showModal: boolean = true
   export let isEditable: boolean = false
   export let closedCallback: () => void = () => {}
   export let backDrop: boolean = true
-  export let position: positionType = "fixed"
+  export let position: positionType = 'fixed'
 
-  import { fade } from "svelte/transition"
-  import { gameState } from "../../lib/input"
+  import { fade } from 'svelte/transition'
+  import { gameState } from '../../lib/input'
 
-  $: width = backDrop ? "100%" : "fit-content"
-  $: height = backDrop ? "100vh" : "fit-content"
-  $: position = backDrop ? "absolute" : position
+  $: width = backDrop ? '100%' : 'fit-content'
+  $: height = backDrop ? '100vh' : 'fit-content'
+  $: position = backDrop ? 'absolute' : position
 
   function handleClick() {
     showModal = false
     closedCallback()
   }
 
-  const modalExplain = "This will be deleted if you give the <Modal> component any children </Modal>"
+  const modalExplain = 'This will be deleted if you give the <Modal> component any children </Modal>'
 
-  $: m = { x: "", y: "" }
+  $: m = { x: '', y: '' }
   $: shipLocation = {
     x: $gameState ? $gameState.scoreScreenData.player.position.x / 3 : 0,
     y: $gameState ? $gameState.scoreScreenData.player.position.y / 3 : 0,
@@ -80,8 +80,8 @@
 
 <style>
   :root {
-    --width: "";
-    --height: "";
+    --width: '';
+    --height: '';
     --left: 0;
     --top: 0;
   }
@@ -94,17 +94,14 @@
     width: var(--width);
     height: var(--height);
     z-index: 2;
-    color: #fff;
+    color: var(--main-text-color);
     top: 0.2em;
     right: 0.2em;
     transition: all;
     transition-duration: 0.5s;
-    background: #000;
+    background: var(--main-bg-color);
     opacity: 0.95;
-    border: 2px solid rgb(99, 136, 179, 1);
-    border-radius: 4px;
-    outline: 2px solid rgb(36, 22, 159);
-
+    border-radius: 0.5em;
   }
 
   #modalContent {
@@ -139,7 +136,7 @@
       width: 90%;
 
       background: #000;
-      background-image: "";
+      background-image: '';
       justify-content: center;
       align-content: center;
       flex-wrap: wrap;
@@ -181,7 +178,7 @@
     border-color: rgb(47, 167, 252, 1);
     border-style: ridge;
     border-width: 0.15em;
-    background-color: #000;
+    background-color: var(--main-bg-color);
     transition: all;
     transition-duration: 1s;
     transition-timing-function: cubic-bezier(1, -2, 0.26, 1.1);
@@ -189,9 +186,9 @@
 
   #closeBtn::before,
   #closeBtn::after {
-    content: "";
+    content: '';
     position: absolute;
-    background-color: #fff;
+    background-color: var(--main-text-color);
     left: 50%;
     width: 10%;
     margin-left: -4%;
@@ -210,7 +207,7 @@
 
   #closeBtn:hover {
     transform: rotate(90deg);
-    transition: transform opacity;
+    transition: transform;
     transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
     transition-duration: 1s;
     opacity: 1;

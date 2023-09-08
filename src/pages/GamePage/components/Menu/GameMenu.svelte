@@ -1,16 +1,15 @@
 <script lang="ts">
-  import { navigate } from "svelte-routing"
+  import { navigate } from 'svelte-routing'
 
   //Components
-  import Menu from "../../../../components/menu/Menu.svelte"
-  import type { Button90Config } from "../../../../interfaces/menu"
-  import { stopGame } from "../Game/Utils/gameUtils"
-  import type { Game } from "../../../../lib/game"
-  import { settings } from "../../../../stores/stores"
-  import { getDefaultTheme } from "../Game/Utils/getTheme"
-  
+  import Menu from '../../../../components/menu/Menu.svelte'
+  import type { Button90Config } from '../../../../interfaces/menu'
+  import { stopGame } from '../Game/Utils/gameUtils'
+  import type { Game } from '../../../../lib/game'
+  import { settings } from '../../../../stores/stores'
+
   export let currentGame: Game
-  
+
   const theme: Button90Config = {
     buttonText: 'Theme',
     clickCallback() {
@@ -39,9 +38,7 @@
     selected: false,
   }
 
-  const buttons = [theme, continueGame,exit]
-
-
+  const buttons = [theme, continueGame, exit]
 </script>
 
-<Menu buttons={buttons} menuOpen={false} menuHeader="In-game menu" />
+<Menu {buttons} menuOpen={false} menuHeader="In-game menu" />

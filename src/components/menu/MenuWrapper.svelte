@@ -24,11 +24,11 @@
     border-style: solid;
     border-width: 2px;
     border-color: var(--color);
-    outline: 2px solid rgb(36, 22, 159);
+    /* outline: 2px solid rgb(36, 22, 159);
     background: rgb(25, 0, 255, 0.1);
     box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
     -webkit-box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
-    -moz-box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
+    -moz-box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity)); */
     z-index: 1;
     color: #fff;
   }
