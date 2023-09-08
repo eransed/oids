@@ -483,12 +483,22 @@
   }
 
   @media screen and (max-width: 750px) {
-    .left,
-    .center,
-    .right {
+    .left {
       grid-column-start: 1;
-      grid-column-end: 4;
-      width: 100%;
+      grid-column-end: 2;
+    }
+    .center {
+      grid-column-start: 1;
+      grid-column-end: 2;
+      grid-row-start: 2;
+      grid-row-end: 4;
+    }
+    .right {
+      grid-row-start: 5;
+      grid-row-end: 5;
+      grid-column-start: 1;
+      grid-column-end: 1;
+      max-height: 22em;
     }
     .lobbyWrapper {
       width: 100%;
@@ -501,6 +511,7 @@
       left: 0;
       margin: auto;
       max-height: none;
+      width: 92%;
     }
 
     .messages {

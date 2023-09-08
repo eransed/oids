@@ -32,7 +32,7 @@
 
   $: pathname = location.pathname
 
-  let toggleMenu: boolean
+  let toggleMenu: boolean = false
 
   $: display = toggleMenu ? 'flex' : 'none'
 </script>
@@ -41,7 +41,7 @@
   <nav>
     <div class="hamburger"><button on:click={() => (toggleMenu = !toggleMenu)}>|||</button></div>
 
-    <div class="menuItem" style="display: {display};">
+    <div class="menuItem" style="--display: {display};">
       {#each Object.values(routes) as route}
         {#if route.inHeader}
           {#if route.path === '/admin' && $user && $user.role === 'admin'}
@@ -51,7 +51,9 @@
                 buttonConfig={{
                   buttonText: route.displayText,
                   clickCallback: () => {
-                    toggleMenu = false
+                    if (window.innerWidth < 600) {
+                      toggleMenu = false
+                    }
                     navigate(route.path)
                     pathname = location.pathname
                   },
@@ -66,7 +68,9 @@
                 buttonConfig={{
                   buttonText: route.displayText,
                   clickCallback: () => {
-                    toggleMenu = false
+                    if (window.innerWidth < 600) {
+                      toggleMenu = false
+                    }
                     navigate(route.path)
                     pathname = location.pathname
                   },

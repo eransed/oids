@@ -2,6 +2,7 @@
   --borderColor: rgb(255, 165, 0);
   --borderSize: 3px;
   --borderStyle: solid;
+  --display: none;
 }
 
 .header {
@@ -14,7 +15,6 @@
   justify-content: space-between;
   width: 100%;
   height: fit-content;
-
   z-index: 2;
   transition: all;
   transition-duration: 0s;
@@ -55,6 +55,7 @@
 .menuItem {
   width: fit-content;
   height: fit-content;
+  display: flex;
 }
 
 .navButton {
@@ -139,6 +140,13 @@ nav {
   position: absolute;
   top: 1em;
   z-index: 1;
+  cursor: pointer;
+}
+
+@media screen and(min-width: 600px) {
+  .menuItem {
+    display: block;
+  }
 }
 
 @media screen and (max-width: 600px) {
@@ -146,7 +154,7 @@ nav {
     overflow: visible;
   }
   .menuItem {
-    display: none;
+    display: var(--display);
     inset: 0;
     width: 100vw;
     position: absolute;
@@ -155,9 +163,11 @@ nav {
     background-color: var(--main-bg-color);
     transition: all;
     transition-duration: 1s;
+    cursor: inherit;
   }
   .hamburger {
     display: block;
+    cursor: pointer;
   }
   .themeToggle {
     display: none;

@@ -274,4 +274,10 @@
   .dataTable input {
     width: fit-content;
   }
+
+  @media screen and (max-width: 600px) {
+    .dataTable {
+      overflow-x: auto;
+    }
+  }
 </style>
