@@ -25,6 +25,7 @@
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
   import type { Settings, UIStyle } from './lib/interface'
   import { setGameSettings } from './pages/GamePage/components/Game/Utils/mainGame'
+  import { setGraphLineColor } from './lib/constants'
 
   $: if ($settings) {
     setCssFromSettings()
@@ -41,6 +42,8 @@
     const themeTextColor = document.documentElement.style.getPropertyValue('--main-text-color')
     const spaceColor = document.documentElement.style.getPropertyValue('--main-bg-color')
     const cardColor = document.documentElement.style.getPropertyValue('--main-card-color')
+
+    setGraphLineColor(themeTextColor)
 
     const uiStyle: UIStyle = {
       unarmedShotColor: themeTextColor,

@@ -26,3 +26,13 @@ export const thrustSteer = false
 export const thrustSteerPowerFactor = 0.05
 
 export const angularFriction = 0.985
+
+export let graphLineColor = '#fff'
+
+export function setGraphLineColor(color: string): void {
+    graphLineColor = color
+}
+
+export function getGraphLineColor(): string {
+    return graphLineColor
+}

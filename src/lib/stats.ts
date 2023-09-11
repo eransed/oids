@@ -1,5 +1,6 @@
 import { linearTransform, round2dec, type Vec2d } from 'mathil'
 import { setScaledFont } from './render/render2d'
+import { getGraphLineColor } from './constants'
 
 const defaultSize = 700
 
@@ -148,8 +149,8 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
     points.push({ x: xmap, y: ymap })
   })
 
-  ctx.fillStyle = '#fff'
-  ctx.strokeStyle = '#fff'
+  ctx.fillStyle = getGraphLineColor()
+  ctx.strokeStyle = getGraphLineColor()
 
   if (points.length > 1) {
     ctx.lineWidth = thinLine
