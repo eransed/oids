@@ -1,4 +1,4 @@
-import { linearTransform, round2dec, type Vec2d } from 'mathil'
+import { linearTransform, round2dec, type Vec2 } from 'mathil'
 import { setScaledFont } from './render/render2d'
 import { getGraphLineColor } from './constants'
 
@@ -88,7 +88,7 @@ export function siPretty(value: number, baseUnit = ''): string {
   return `${round2dec(value, 0)} ${baseUnit}`
 }
 
-export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: CanvasRenderingContext2D): void {
+export function renderGraph(ds: DataStats, topLeft: Vec2, size: Vec2, ctx: CanvasRenderingContext2D): void {
   // const st = performance.now()
   ctx.save()
   ctx.translate(topLeft.x, topLeft.y)
@@ -141,7 +141,7 @@ export function renderGraph(ds: DataStats, topLeft: Vec2d, size: Vec2d, ctx: Can
     ctx.fillText(`Lo: ${ds.prettyPrint(min, ds.baseUnit)}`, leftPad, 10 + ymin)
   }
 
-  const points: Vec2d[] = []
+  const points: Vec2[] = []
 
   ds.data.forEach((n, i) => {
     const xmap = linearTransform(i, 0, ds.maxSize, edgePad, size.x - edgePad)

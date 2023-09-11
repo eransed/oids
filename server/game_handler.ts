@@ -1,4 +1,4 @@
-import { info, warn, usNow, EveryInterval, newVec2d } from 'mathil'
+import { info, warn, usNow, EveryInterval, newVec2 } from 'mathil'
 import { MessageType, NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
 import { createNpc } from '../src/lib/factory'
 import { updateNonPlayerCharacter } from '../src/lib/physics'
@@ -16,7 +16,7 @@ export class GameHandler {
   private dt = performance.now()
   private minTickTimeMs = 1 / 60
   private every = new EveryInterval(2)
-  private screenSize = newVec2d(1200, 720)
+  private screenSize = newVec2(1200, 720)
   broadcaster: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void
 
   constructor(bc: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void) {

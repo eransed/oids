@@ -1,5 +1,5 @@
 import type { Bounded, Remote, SpaceObject } from '../interface'
-import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string, type Vec2d } from 'mathil'
+import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string2, type Vec2 } from 'mathil'
 import { getScreenFromCanvas, getScreenRect } from '../canvas_util'
 import { getNamesAsString, setScaledFont } from './render2d'
 // import { getConnInfo, getReadyStateText } from '../websocket/webSocket'
@@ -15,7 +15,7 @@ export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remo
 }
 
 export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: SpaceObject, ctx: CanvasRenderingContext2D): void {
-  const screen: Vec2d = getScreenFromCanvas(ctx)
+  const screen: Vec2 = getScreenFromCanvas(ctx)
   const yrow1: number = screen.y - 30
   const ydiff = 60
   const yrow2: number = screen.y - ydiff - 30
@@ -25,7 +25,7 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const xposBar = 20
   const scale = setScaledFont(ctx)
 
-  const renderSpeedometer = (screen: Vec2d, so: SpaceObject, ctx: CanvasRenderingContext2D) => {
+  const renderSpeedometer = (screen: Vec2, so: SpaceObject, ctx: CanvasRenderingContext2D) => {
     renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 150, 'y m/s')
     renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 150, 'x m/s')
   }
@@ -43,9 +43,9 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   // ctx.fillText(so.health + 'hp', xpos + offset * 0.5, yrow1)
   // ctx.fillText('Ammo: ' + so.ammo, xpos + offset * 0.9, yrow1)
   // ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', xpos + offset * 1.5, ypos)
-  ctx.fillText('P' + to_string(so.position, 0), xpos + 600, yrow1)
-  ctx.fillText('V' + to_string(so.velocity, 1), xpos + 1000, yrow1)
-  ctx.fillText('A' + to_string(scalarMultiply(so.acceleration, 1000), 1), xpos + 1400, yrow1)
+  ctx.fillText('P' + to_string2(so.position, 0), xpos + 600, yrow1)
+  ctx.fillText('V' + to_string2(so.velocity, 1), xpos + 1000, yrow1)
+  ctx.fillText('A' + to_string2(scalarMultiply(so.acceleration, 1000), 1), xpos + 1400, yrow1)
   const firstBar = 170
   const barDiff = 80
   renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, 'hp', so.health, 250, ctx, 75)
@@ -63,7 +63,7 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
 export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, fc: number, game: Game, ctx: CanvasRenderingContext2D): void {
   const xpos = 26
   const dec = 1
-  const screen: Vec2d = getScreenRect(ctx)
+  const screen: Vec2 = getScreenRect(ctx)
   const ratio: number = round2dec(screen.x / screen.y, 2)
   setScaledFont(ctx)
   ctx.fillStyle = '#fff'
@@ -77,7 +77,7 @@ export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, f
 }
 
 export function renderProgressBar(
-  pos: Vec2d,
+  pos: Vec2,
   label: string,
   amount: number,
   max: number,
@@ -137,7 +137,7 @@ export function renderProgressBar(
   ctx.restore()
 }
 
-export function renderNumber(num: number, pos: Vec2d, ctx: CanvasRenderingContext2D, angleAdjDeg = 0) {
+export function renderNumber(num: number, pos: Vec2, ctx: CanvasRenderingContext2D, angleAdjDeg = 0) {
   ctx.save()
   ctx.translate(pos.x, pos.y)
   ctx.rotate(degToRad(angleAdjDeg))
@@ -149,7 +149,7 @@ export function renderNumber(num: number, pos: Vec2d, ctx: CanvasRenderingContex
 }
 
 export function renderRoundIndicator(
-  centerPos: Vec2d,
+  centerPos: Vec2,
   value: number,
   min: number,
   max: number,

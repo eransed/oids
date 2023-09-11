@@ -1,5 +1,5 @@
-import type { Vec2d } from 'mathil'
-import { angle, degToRad, direction, dist, norm, smul, sub, newVec2d } from 'mathil'
+import type { Vec2 } from 'mathil'
+import { angle, degToRad, direction, dist2, norm, smul, sub, newVec2 } from 'mathil'
 import { renderPoint } from './render/render2d'
 
 export interface ViewSlice {
@@ -8,13 +8,13 @@ export interface ViewSlice {
 }
 
 export class LightSource {
- position: Vec2d
- direction: Vec2d
+ position: Vec2
+ direction: Vec2
  rays: Ray[] = []
  fovDegrees: number
  rayAngleDiff: number
 
- constructor(_position: Vec2d, _direction: Vec2d, _fovDegrees = 45, _rayAngleDiff = 2) {
+ constructor(_position: Vec2, _direction: Vec2, _fovDegrees = 45, _rayAngleDiff = 2) {
   this.position = _position
   this.direction = _direction
   this.fovDegrees = _fovDegrees
@@ -33,12 +33,12 @@ export class LightSource {
   }
   for (const ray of this.rays) {
    let min = Infinity
-   let nearestIntersect: Vec2d | null = null
+   let nearestIntersect: Vec2 | null = null
    let color = '#000'
    for (const segment of segments) {
     const p = ray.cast(segment)
     if (p) {
-     const distance = dist(this.position, p)
+     const distance = dist2(this.position, p)
      const angleRayDirection = angle(ray.direction) - angle(this.direction)
      const projection = distance * Math.cos(degToRad(angleRayDirection))
      if (projection < min) {
@@ -67,20 +67,20 @@ export class LightSource {
 }
 
 export class Ray {
- position: Vec2d
- direction: Vec2d
+ position: Vec2
+ direction: Vec2
 
- constructor(_position: Vec2d, _direction: Vec2d) {
+ constructor(_position: Vec2, _direction: Vec2) {
   this.position = _position
   this.direction = _direction
  }
 
- lookAt(p: Vec2d): void {
+ lookAt(p: Vec2): void {
   this.direction = sub(p, this.position)
   this.direction = norm(this.direction)
  }
 
- cast(ls: LineSegment): Vec2d | undefined {
+ cast(ls: LineSegment): Vec2 | undefined {
   const x1 = ls.p0.x
   const y1 = ls.p0.y
   const x2 = ls.p1.x
@@ -102,7 +102,7 @@ export class Ray {
   const u = -(numerator_u / denominator)
 
   if (t > 0 && t < 1 && u > 0) {
-   const intersect = newVec2d()
+   const intersect = newVec2()
    intersect.x = x1 + t * (x2 - x1)
    intersect.y = y1 + t * (y2 - y1)
    return intersect
@@ -127,11 +127,11 @@ export class Ray {
 }
 
 export class LineSegment {
- p0: Vec2d
- p1: Vec2d
+ p0: Vec2
+ p1: Vec2
  color: string
 
- constructor(_p0: Vec2d, _p1: Vec2d, _color = '#fff') {
+ constructor(_p0: Vec2, _p1: Vec2, _color = '#fff') {
   this.p0 = _p0
   this.p1 = _p1
   this.color = _color

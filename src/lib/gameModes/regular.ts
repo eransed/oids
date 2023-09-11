@@ -1,7 +1,7 @@
 import type { Game } from '../game'
 import { setCanvasSize, getScreenRect, getScreenCenterPosition } from '../canvas_util'
 import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
-import { add, direction, info, log, magnitude, newVec2d, rndfVec2d, round2dec } from 'mathil'
+import { add, direction, info, log, magnitude, newVec2, rndfVec2, round2dec } from 'mathil'
 import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions } from '../physics'
 import { loadingText } from '../render/render2d'
@@ -132,7 +132,7 @@ export function initRegularGame(game: Game): void {
 
   setCanvasSize(game.ctx)
 
-  game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2d(-offset, offset))
+  game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
 
   //Local player init
   game.reset()
@@ -159,11 +159,11 @@ export function initRegularGame(game: Game): void {
   // const asteroidCount = 1
   // for (let i = 0; i < asteroidCount; i++) {
   //   const asteroid = createSpaceObject()
-  //   asteroid.position = rndfVec2d(0, 1200)
+  //   asteroid.position = rndfVec2(0, 1200)
   //   asteroid.health = 1000
   //   asteroid.name = 'asteroid-' + i
   //   asteroid.hitRadius = 220
-  //   asteroid.size = newVec2d(200, 200)
+  //   asteroid.size = newVec2(200, 200)
   //   asteroid.mass = 10
   //   game.bodies.push(asteroid)
   // }
@@ -175,7 +175,7 @@ export function initRegularGame(game: Game): void {
 
   let startTime = 0
 
-  console.log('Setting game socket listener...')
+  info('Setting game socket listener...')
 
   game.websocket.addListener(
     (su) => {
@@ -183,7 +183,7 @@ export function initRegularGame(game: Game): void {
       //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
       if (su.dataObject.messageType === MessageType.SERVICE) {
         game.serverVersion = su.dataObject.serverVersion
-        console.log(`Service message: server version: ${su.dataObject.serverVersion}`)
+        info(`Service message: server version: ${su.dataObject.serverVersion}`)
         return
       } else if (su.dataObject) {
         const so: SpaceObject = su.dataObject
@@ -236,7 +236,7 @@ export function initRegularGame(game: Game): void {
         }
         if (so.name !== game.localPlayer.name) {
           game.remotePlayers.push(so)
-          console.log(`New ship online: ${so.name}`)
+          log(`New ship online: ${so.name}`)
         }
       }
     },

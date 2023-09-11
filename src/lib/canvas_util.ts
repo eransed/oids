@@ -1,7 +1,7 @@
-import { floor, type Vec2d } from 'mathil'
+import { floor, type Vec2 } from 'mathil'
 import { screenScale } from './constants'
 
-export const getScreenRect = (ctx: CanvasRenderingContext2D): Vec2d => {
+export const getScreenRect = (ctx: CanvasRenderingContext2D): Vec2 => {
  return { x: ctx.canvas.width, y: ctx.canvas.height }
 }
 
@@ -12,7 +12,7 @@ export function setCanvasSize(ctx: CanvasRenderingContext2D): void {
  ctx.canvas.height = vh * screenScale
 }
 
-export function getScreenCenterPosition(ctx: CanvasRenderingContext2D): Vec2d {
+export function getScreenCenterPosition(ctx: CanvasRenderingContext2D): Vec2 {
  return floor({ x: ctx.canvas.width / 2, y: ctx.canvas.height / 2 })
 }
 
@@ -23,7 +23,7 @@ export function getScreenCenterPositionFromClient() {
  }
 }
 
-export function getScreenFromCanvas(ctx: CanvasRenderingContext2D): Vec2d {
+export function getScreenFromCanvas(ctx: CanvasRenderingContext2D): Vec2 {
  return { x: ctx.canvas.width, y: ctx.canvas.height }
 }
 

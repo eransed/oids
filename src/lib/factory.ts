@@ -1,6 +1,6 @@
 import type { NonPlayerCharacter, PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceShape } from './interface'
-import { newVec2d, rndf, rndfVec2d, rndi, type Vec2d } from 'mathil'
+import { newVec2, rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 import { randomAnyColor, randomAnyLightColor, randomBlue } from './color'
 
@@ -35,8 +35,8 @@ export function currentTimeDate(): string {
 }
 
 export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
-  const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
-  const initPos: Vec2d = {
+  const initVel: Vec2 = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
+  const initPos: Vec2 = {
     x: rndi(0, 100),
     y: rndi(0, 100),
   }
@@ -127,15 +127,15 @@ export function createNpc(): NonPlayerCharacter {
     obliterated: false,
     lastDamagedByName: '',
     killedByName: '',
-    position: rndfVec2d(100, 2000),
+    position: rndfVec2(100, 2000),
     color: randomBlue(),
     colliding: false,
     hitRadius: 100,
     mass: 1,
-    size: rndfVec2d(50, 100),
-    velocity: rndfVec2d(0.5, 1),
-    acceleration: newVec2d(),
-    viewport: newVec2d(1200, 720),
+    size: rndfVec2(50, 100),
+    velocity: rndfVec2(0.5, 1),
+    acceleration: newVec2(),
+    viewport: newVec2(1200, 720),
     viewportScale: 1,
     messageType: MessageType.SERVER_GAME_UPDATE,
     angleDegree: 0,

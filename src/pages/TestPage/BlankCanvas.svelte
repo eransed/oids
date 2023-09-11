@@ -1,6 +1,6 @@
 <script lang="ts">
  import { onDestroy, onMount } from 'svelte'
- import { error, info, vec2dArray, to_string, log, warn, EveryInterval, type Vec2d, type Line, connectPoints, boundingBox } from 'mathil'
+ import { error, info, Vec2Array, to_string, log, warn, EveryInterval, type Vec2, type Line, connectPoints, boundingBox } from 'mathil'
  import { clearScreen, renderLine, renderPoint } from '../../lib/render/render2d'
   import type { UIStyle } from '../../lib/interface'
 
@@ -17,12 +17,12 @@
    return
   }
 
-  let points: Vec2d[] = []
+  let points: Vec2[] = []
   let lines: Line[] | null = []
   let sqLines: Line[] | null = []
   function updatePoints(count = 1) {
-   // points = vec2dArray(count, 250, 50)
-   points = points.concat(vec2dArray(1, 280, 20))
+   // points = Vec2Array(count, 250, 50)
+   points = points.concat(Vec2Array(1, 280, 20))
    lines = connectPoints(points)
    sqLines = connectPoints(boundingBox(points), true)
    if (points.length > 3) points.splice(0, 1)

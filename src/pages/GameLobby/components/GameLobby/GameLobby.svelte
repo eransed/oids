@@ -23,6 +23,7 @@
   import { navigate } from 'svelte-routing'
   import { alertColors } from '../../../../style/colors'
   import Alert from '../../../../components/alert/Alert.svelte'
+  import { info, log } from 'mathil'
 
   /**
    * Reactive on changes to $user store.
@@ -133,7 +134,7 @@
           $socket.resetListeners()
           navigate(`/play/${sess}`)
         } else if (incomingUpdate.messageType === MessageType.SERVICE) {
-          console.log(`Service message: server version: ${incomingUpdate.serverVersion}`)
+          log(`Service message: server version: ${incomingUpdate.serverVersion}`)
           $localPlayer.serverVersion = incomingUpdate.serverVersion
         } else {
           if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {

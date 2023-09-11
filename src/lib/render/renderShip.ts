@@ -1,5 +1,5 @@
 import type { SpaceObject, UIStyle } from '../interface'
-import { round2dec, type Vec2d } from 'mathil'
+import { round2dec, type Vec2 } from 'mathil'
 import { screenScale } from '../constants'
 // import * as ship from '../../assets/ship.svg'
 import { renderShot, setScaledFont } from './render2d'
@@ -7,7 +7,7 @@ import { renderShot, setScaledFont } from './render2d'
 export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle): void {
 
  const scale = setScaledFont(ctx)
- const shipSize: Vec2d = { x: 60, y: 100 }
+ const shipSize: Vec2 = { x: 60, y: 100 }
  so.size = shipSize
 
  const shipSvg = new Image()

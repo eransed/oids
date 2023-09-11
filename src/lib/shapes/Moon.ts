@@ -1,6 +1,6 @@
 import { randomAnyLightColor } from '../color'
 import type { Damageable } from '../interface'
-import { maxElem, newVec2d, rndfVec2d } from 'mathil'
+import { maxElem, newVec2, rndfVec2 } from 'mathil'
 import { setScaledFont } from '../render/render2d'
 import type { Shape } from './Shape'
 
@@ -10,10 +10,10 @@ export function newMoon(): Moon {
  const moon: Moon = {
   render: renderMoon,
   mass: 1,
-  size: newVec2d(),
-  velocity: newVec2d(),
-  acceleration: newVec2d(),
-  position: newVec2d(),
+  size: newVec2(),
+  velocity: newVec2(),
+  acceleration: newVec2(),
+  position: newVec2(),
   color: randomAnyLightColor(),
   health: 100,
   isDead: false,
@@ -25,10 +25,10 @@ export function newMoon(): Moon {
   killedByName: '',
  }
 
- // moon.acceleration = rndfVec2d(0.001, 0.001)
- moon.position = rndfVec2d(100, 1000)
- moon.velocity = rndfVec2d(0.1, 10)
- moon.size = rndfVec2d(10, 100)
+ // moon.acceleration = rndfVec2(0.001, 0.001)
+ moon.position = rndfVec2(100, 1000)
+ moon.velocity = rndfVec2(0.1, 10)
+ moon.size = rndfVec2(10, 100)
 
  function renderMoon(ctx: CanvasRenderingContext2D, scale = 1): void {
   ctx.save()

@@ -1,5 +1,5 @@
 import type { Writable } from 'svelte/store'
-import type { Vec2d } from 'mathil'
+import type { Vec2 } from 'mathil'
 import type { Steerable } from './traits/Steerable'
 
 export enum GameType {
@@ -45,7 +45,7 @@ export interface Motivated {
 }
 
 export interface Bounded {
-  viewport: Vec2d
+  viewport: Vec2
   viewportScale: number
 }
 
@@ -71,14 +71,14 @@ export interface Local {
 }
 
 export interface Positionable {
-  position: Vec2d
+  position: Vec2
 }
 
 export interface Physical extends Positionable {
   mass: number
-  size: Vec2d
-  velocity: Vec2d
-  acceleration: Vec2d
+  size: Vec2
+  velocity: Vec2
+  acceleration: Vec2
 }
 
 export interface Rotatable extends Positionable {
@@ -292,3 +292,16 @@ export interface UIStyle {
   spaceColor: string
 }
 
+export interface ShipUpgrades {
+  hyperdrive: boolean
+  photonLaserPower: number
+  hullStrength: number
+  shieldStrength: number
+  engineStrength: number
+  maxEnergyLevel: number
+  steeringPower: number
+}
+
+export interface CoreProps {
+  energyLevel: number // boost engine, shields and cannons. can be 
+}

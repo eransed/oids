@@ -1,7 +1,7 @@
 import type { Boostable, Bounceable, Damageable, Damager, NonPlayerCharacter, PhotonLaser, Physical, Positionable, SpaceObject, Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
-import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2d } from 'mathil'
+import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2 } from 'mathil'
 import { maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
@@ -25,7 +25,7 @@ export function applySteer(so: Steerable, dir: number, deltaTimeScaled: number):
   }
 }
 
-export function getThrustVector(so: Thrustable & Steerable & Boostable, dirAng: number, boost = false): Vec2d {
+export function getThrustVector(so: Thrustable & Steerable & Boostable, dirAng: number, boost = false): Vec2 {
   const angleRadians: number = degToRad(so.angleDegree + dirAng)
   const engine: number = applyEngine(so, boost)
   return {
@@ -39,7 +39,7 @@ export function applyEngineThrust(so: Thrustable & Steerable & Boostable, direct
   // so.acceleration = add(so.acceleration, getThrustVector(so, directionDeg))
 }
 
-export function wrapSpaceObject(so: Positionable, screen: Vec2d): void {
+export function wrapSpaceObject(so: Positionable, screen: Vec2): void {
   // To do: Make it appear where it entered...
   wrap(so.position, screen)
   // mirrorWrap(so.position, screen)
@@ -71,7 +71,7 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   shot.size = { x: rndi(4, 6), y: rndi(20, 30) }
   // shot.color = randomLightGreen()
   shot.color = so.photonColor
-  let head: Vec2d = copy(so.position)
+  let head: Vec2 = copy(so.position)
   const aimError = 8 // 8
   const headError = 0.34 // 0.019
   const speedError = 3 // 1.8
@@ -135,7 +135,7 @@ export function handleHittingShot(shot: PhotonLaser, ctx: CanvasRenderingContext
   }
 }
 
-export function offScreen(v: Vec2d, screen: Vec2d): boolean {
+export function offScreen(v: Vec2, screen: Vec2): boolean {
   if (v.x > screen.x) return true
   if (v.x < 0) return true
   if (v.y > screen.y) return true
@@ -163,7 +163,7 @@ export function handleDeathExplosion(so: NonPlayerCharacter, maximumIncrement: n
   so.deadFrameCount++
 }
 
-export function bounceSpaceObject(so: NonPlayerCharacter, screen: Vec2d, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
+export function bounceSpaceObject(so: NonPlayerCharacter, screen: Vec2, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
   if (so.position.x < gap) {
     so.velocity.x = -so.velocity.x * energyFactor
     so.position.x = gap

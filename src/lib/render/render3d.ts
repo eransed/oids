@@ -1,4 +1,4 @@
-import type { Vec2d } from 'mathil'
+import type { Vec2 } from 'mathil'
 import { linearTransform } from 'mathil'
 import { getScreenRect } from '../canvas_util'
 import type { Game } from '../game'
@@ -7,7 +7,7 @@ import { LineSegment } from '../shapes'
 const render3DFrame = (game: Game) => {
  const scr = getScreenRect(game.ctx)
  const padding = 0
- const pad: Vec2d = { x: padding, y: padding }
+ const pad: Vec2 = { x: padding, y: padding }
  game.segments.push(new LineSegment(pad, { x: scr.x, y: padding }, '#f00'))
  game.segments.push(new LineSegment({ x: scr.x, y: padding }, { x: scr.x, y: scr.y }, '#00f'))
  game.segments.push(new LineSegment({ x: scr.x, y: scr.y }, { x: padding, y: scr.y }, '#0f0'))

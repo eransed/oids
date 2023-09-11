@@ -1,5 +1,5 @@
 import type { Bounceable, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
-import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, warn, type Vec2d } from 'mathil'
+import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, warn, type Vec2 } from 'mathil'
 import { getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
@@ -9,8 +9,8 @@ import type { Shape } from './shapes/Shape'
 export function updateShape(shape: Shape, dt: number): void {
   if (isNaN(dt)) return
   const deltaTime: number = dt * timeScale
-  const v: Vec2d = scalarMultiply(shape.velocity, deltaTime)
-  const a: Vec2d = scalarMultiply(shape.acceleration, deltaTime)
+  const v: Vec2 = scalarMultiply(shape.velocity, deltaTime)
+  const a: Vec2 = scalarMultiply(shape.acceleration, deltaTime)
   shape.velocity = add(shape.velocity, a)
   shape.position = add(shape.position, v)
   shape.acceleration = { x: 0, y: 0 }
@@ -27,8 +27,8 @@ export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: num
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) return
   const deltaTime: number = dt * timeScale
-  const v: Vec2d = scalarMultiply(npc.velocity, deltaTime)
-  const a: Vec2d = scalarMultiply(npc.acceleration, deltaTime)
+  const v: Vec2 = scalarMultiply(npc.velocity, deltaTime)
+  const a: Vec2 = scalarMultiply(npc.acceleration, deltaTime)
   npc.velocity = add(npc.velocity, a)
   npc.position = add(npc.position, v)
   npc.acceleration = { x: 0, y: 0 }
@@ -46,8 +46,8 @@ export function updateNonPlayerCharacter(npc: NonPlayerCharacter, dt: number): N
     return npc
   }
   const deltaTime: number = dt * timeScale
-  const v: Vec2d = scalarMultiply(npc.velocity, deltaTime)
-  const a: Vec2d = scalarMultiply(npc.acceleration, deltaTime)
+  const v: Vec2 = scalarMultiply(npc.velocity, deltaTime)
+  const a: Vec2 = scalarMultiply(npc.acceleration, deltaTime)
   npc.velocity = add(npc.velocity, a)
   npc.position = add(npc.position, v)
   npc.acceleration = { x: 0, y: 0 }
@@ -77,8 +77,8 @@ export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number, 
   }
 
   for (const shot of npc.shotsInFlight) {
-    const v: Vec2d = scalarMultiply(shot.velocity, dts)
-    const a: Vec2d = scalarMultiply(shot.acceleration, dts)
+    const v: Vec2 = scalarMultiply(shot.velocity, dts)
+    const a: Vec2 = scalarMultiply(shot.acceleration, dts)
     shot.velocity = add(shot.velocity, a)
     shot.position = add(shot.position, v)
     shot.angleDegree += shot.angularVelocity * dts
@@ -94,19 +94,19 @@ export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number, 
   // removeShotsAfterBounces(npc, 2)
 }
 
-export function decayOffScreenShots(npc: SpaceObject | NonPlayerCharacter, screen: Vec2d) {
+export function decayOffScreenShots(npc: SpaceObject | NonPlayerCharacter, screen: Vec2) {
   npc.shotsInFlight = npc.shotsInFlight.filter(function (e) {
     return !offScreen(e.position, screen)
   })
 }
 
-export function decayOffScreenShotsPadded(npc: SpaceObject | NonPlayerCharacter, screen: Vec2d, padFac = 1) {
+export function decayOffScreenShotsPadded(npc: SpaceObject | NonPlayerCharacter, screen: Vec2, padFac = 1) {
   npc.shotsInFlight = npc.shotsInFlight.filter(function (e) {
     return !offScreen_mm(e.position, scalarMultiply(screen, -padFac), scalarMultiply(screen, padFac))
   })
 }
 
-export function offScreen(v: Vec2d, screen: Vec2d) {
+export function offScreen(v: Vec2, screen: Vec2) {
   if (v.x > screen.x) return true
   if (v.x < 0) return true
   if (v.y > screen.y) return true
@@ -114,7 +114,7 @@ export function offScreen(v: Vec2d, screen: Vec2d) {
   return false
 }
 
-export function offScreen_mm(v: Vec2d, screen_min: Vec2d, screen_max: Vec2d) {
+export function offScreen_mm(v: Vec2, screen_min: Vec2, screen_max: Vec2) {
   if (v.x > screen_max.x) return true
   if (v.x < screen_min.x) return true
   if (v.y > screen_max.y) return true
@@ -126,17 +126,17 @@ export function gravity(from: Physical, to: Physical, G = 1): void {
   // F = G((m0 * m1)/r^2)
   const m0: number = from.mass
   const m1: number = to.mass
-  const v01: Vec2d = sub(from.position, to.position)
+  const v01: Vec2 = sub(from.position, to.position)
   const r: number = magnitude(v01)
   const r2: number = Math.pow(r, 2)
   const F: number = G * ((m0 * m1) / r2)
-  const gvec: Vec2d = scalarMultiply(v01, F)
+  const gvec: Vec2 = scalarMultiply(v01, F)
   to.acceleration = add(to.acceleration, gvec)
 }
 
 export function friction(p: Physical & Rotatable) {
-  // const head: Vec2d = getHeading(p)
-  // const fric: Vec2d = mul(head, linearFriction)
+  // const head: Vec2 = getHeading(p)
+  // const fric: Vec2 = mul(head, linearFriction)
   p.velocity = smul(p.velocity, linearFriction.x)
   p.angularVelocity = p.angularVelocity * angularFriction
 }
@@ -145,14 +145,14 @@ export function applyFriction(npc: Physical, friction: number) {
   npc.velocity = scalarMultiply(npc.velocity, friction)
 }
 
-export function getHeading(p: Physical & Rotatable): Vec2d {
+export function getHeading(p: Physical & Rotatable): Vec2 {
   return {
     x: Math.cos(degToRad(p.angleDegree)),
     y: Math.sin(degToRad(p.angleDegree)),
   }
 }
 
-export function headingFromAngle(angleDegree: number): Vec2d {
+export function headingFromAngle(angleDegree: number): Vec2 {
   return {
     x: Math.cos(degToRad(angleDegree)),
     y: Math.sin(degToRad(angleDegree)),
@@ -187,7 +187,7 @@ export function isWithinRadius(p0: Physical, p1: Physical, radius: number): bool
   return false
 }
 
-export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2d, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
+export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
   if (p.position.x < gap) {
     p.velocity.x = -p.velocity.x * energyFactor
     p.position.x = gap
@@ -238,7 +238,7 @@ export function handleCollisions(spaceObjects: NonPlayerCharacter[], ctx: Canvas
       }
       for (const shot of npc0.shotsInFlight) {
         if (shot.armedDelay < 0) {
-          const heading: Vec2d = scalarMultiply(headingFromAngle(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
+          const heading: Vec2 = scalarMultiply(headingFromAngle(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
           if (isWithinRadius(shot, npc1, npc1.hitRadius) && shot.didHit === false) {
             npc1.health -= shot.damage
             npc1.velocity = add(npc1.velocity, heading)
