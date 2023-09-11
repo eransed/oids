@@ -18,7 +18,7 @@
   import SessionList from './SessionList/SessionList.svelte'
 
   import { onDestroy, onMount } from 'svelte'
-  import { info, log, warn } from 'mathil'
+  // import { info, log, warn } from 'mathil'
   import TypeWriter from '../../../../components/typeWriter/TypeWriter.svelte'
   import { navigate } from 'svelte-routing'
   import { alertColors } from '../../../../style/colors'
@@ -34,7 +34,7 @@
   }
 
   $: if ($isLoggedIn === false) {
-    info('User logged out - renaming to guest name')
+    console.log('User logged out - renaming to guest name')
     $localPlayer.name = $guestUser.name
     $socket.send($localPlayer)
     updateSessions()
@@ -53,20 +53,20 @@
       $localPlayer.sessionId = createSessionId()
       $localPlayer.messageType = MessageType.SESSION_UPDATE
       $localPlayer.isHost = true
-      info(`Says hello to online players, new session ${$localPlayer.sessionId}`)
+      console.log(`Says hello to online players, new session ${$localPlayer.sessionId}`)
       $socket.send($localPlayer)
     } else {
-      info(`Reusing old session ${$localPlayer.sessionId}`)
+      console.log(`Reusing old session ${$localPlayer.sessionId}`)
     }
   }
 
   function checkReady(): void {
-    info('Checking which player are ready...')
+    console.log('Checking which player are ready...')
     let readyPlayers = []
 
     if (joinedSession?.players) {
       joinedSession?.players.forEach((player) => {
-        info(`${player.name}: ${player.readyToPlay ? 'ready' : 'not ready'}`)
+        console.log(`${player.name}: ${player.readyToPlay ? 'ready' : 'not ready'}`)
         if (player.readyToPlay) {
           readyPlayers.push(player)
         }
@@ -74,7 +74,7 @@
     }
 
     if (readyPlayers.length === joinedSession?.players.length) {
-      info('All players are ready!')
+      console.log('All players are ready!')
       allReady = true
     } else {
       allReady = false
@@ -98,22 +98,22 @@
     $localPlayer.name = $user ? $user.name : $guestUserName
 
     $socket.connect().then(() => {
-      info(`Connected to websocket`)
+      console.log(`Connected to websocket`)
       hostSession()
     })
 
-    log('Adding lobby websocket listener...')
+    console.log('Adding lobby websocket listener...')
 
     $socket.addListener(
       (su) => {
         const incomingUpdate = su.dataObject
 
         if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
-          log(`Got an session update message from ${incomingUpdate.name}`)
+          console.log(`Got an session update message from ${incomingUpdate.name}`)
           updateSessions()
         } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
           const msg = incomingUpdate.lastMessage
-          log(`${incomingUpdate.name} says: ${msg}`)
+          console.log(`${incomingUpdate.name} says: ${msg}`)
           const newMsg: ChatMessage = {
             message: incomingUpdate.lastMessage,
             timeDate: new Date(),
@@ -121,7 +121,7 @@
           }
           $chatMessageHistory = [...$chatMessageHistory, newMsg]
         } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
-          warn(`${incomingUpdate.name} left the lobby`)
+          console.log(`${incomingUpdate.name} left the lobby`)
           setTimeout(() => {
             updateSessions()
           }, 1000)
@@ -129,15 +129,15 @@
           // handlePing(incomingUpdate, $socket)
         } else if (incomingUpdate.messageType === MessageType.START_GAME) {
           const sess = incomingUpdate.sessionId
-          log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
+          console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
           $socket.resetListeners()
           navigate(`/play/${sess}`)
         } else if (incomingUpdate.messageType === MessageType.SERVICE) {
-          info(`Service message: server version: ${incomingUpdate.serverVersion}`)
+          console.log(`Service message: server version: ${incomingUpdate.serverVersion}`)
           $localPlayer.serverVersion = incomingUpdate.serverVersion
         } else {
           if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
-            warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
+            console.log(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
           }
         }
       },
@@ -154,7 +154,7 @@
     $socket.resetListeners()
 
     if (pingTimer) {
-      info(`Clears ping timer ${pingTimer}`)
+      console.log(`Clears ping timer ${pingTimer}`)
       clearInterval(pingTimer)
     }
   })
@@ -172,7 +172,7 @@
         return
       }
     }
-    warn('No joined session/host closed the session')
+    console.log('No joined session/host closed the session')
     leaveSession()
   }
 
@@ -206,7 +206,7 @@
 
   function joinSession_(otherPlayerWithSession: SpaceObject | null) {
     if (otherPlayerWithSession) {
-      log(`${$localPlayer.name}: joining session ${otherPlayerWithSession.sessionId} hosted by ${otherPlayerWithSession.name}`)
+      console.log(`${$localPlayer.name}: joining session ${otherPlayerWithSession.sessionId} hosted by ${otherPlayerWithSession.name}`)
       $localPlayer.sessionId = otherPlayerWithSession.sessionId
       // send some update that localPlayer joined a/the session
       $localPlayer.messageType = MessageType.SESSION_UPDATE
@@ -224,7 +224,7 @@
 
   function leaveSession() {
     $chatMessageHistory = []
-    log(`Leaving session`)
+    console.log(`Leaving session`)
     joinedSession = null
     hostSession(true)
     setTimeout(() => {
@@ -282,7 +282,7 @@
   }
 
   function setReadyToPlay(ready: boolean) {
-    info(`Sending ${ready ? 'ready' : 'not ready'} to play to session peers`)
+    console.log(`Sending ${ready ? 'ready' : 'not ready'} to play to session peers`)
     $localPlayer.readyToPlay = ready
     $localPlayer.messageType = MessageType.SESSION_UPDATE
     $socket.send($localPlayer)
