@@ -233,6 +233,7 @@
     flex-wrap: wrap;
     background-color: var(--main-card-color);
     padding: 1em;
+    width: -moz-fit-content;
     width: fit-content;
   }
 
@@ -272,6 +273,7 @@
   }
 
   .dataTable input {
+    width: -moz-fit-content;
     width: fit-content;
   }
 

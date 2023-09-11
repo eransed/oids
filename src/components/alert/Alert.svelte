@@ -37,6 +37,7 @@
     color: #000;
     padding: 1em;
     min-width: 200px;
+    width: -moz-fit-content;
     width: fit-content;
     max-width: 30%;
     height: fit-content;

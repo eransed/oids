@@ -12,10 +12,12 @@
     position: relative;
     inset: 0;
     margin: auto;
-    zoom: 1.5;
+
     padding: 20px;
     /* max-width: 300px; */
+    width: -moz-fit-content;
     width: fit-content;
+
     height: fit-content;
     list-style-type: none;
     opacity: 0.85;

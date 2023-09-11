@@ -58,6 +58,7 @@
     background: var(--main-card-color);
     color: var(--main-text-color);
     padding: 10px;
+    width: -moz-fit-content;
     width: fit-content;
     height: 4em;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;

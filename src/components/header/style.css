@@ -53,6 +53,7 @@
 }
 
 .menuItem {
+  width: -moz-fit-content;
   width: fit-content;
   height: fit-content;
   display: flex;
@@ -99,6 +100,7 @@
   transition-property: all;
   transition: 1s;
   cursor: pointer;
+  width: -moz-fit-content;
   width: fit-content;
 }
 
@@ -149,11 +151,12 @@ nav {
   }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 750px) {
   .header {
     overflow: visible;
   }
   .menuItem {
+    flex-direction: column;
     display: var(--display);
     inset: 0;
     width: 100vw;

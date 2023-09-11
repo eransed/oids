@@ -453,7 +453,21 @@
     width: 80%;
   }
 
+  .sessionInfo {
+    max-height: 235px;
+    overflow-x: auto;
+  }
+
   @media screen and (max-width: 1200px) {
+    .sessionInfo p {
+      padding: 0.2em;
+    }
+
+    .sessionInfo {
+      max-height: 33vh;
+      overflow-x: auto;
+    }
+
     .left,
     .center,
     .right {
@@ -483,6 +497,10 @@
   }
 
   @media screen and (max-width: 750px) {
+    .lobbyWrapper {
+      grid-template-columns: auto;
+    }
+
     .left {
       grid-column-start: 1;
       grid-column-end: 2;
@@ -511,6 +529,7 @@
       left: 0;
       margin: auto;
       max-height: none;
+      height: 300px;
       width: 92%;
     }
 

@@ -20,6 +20,7 @@
     flex-wrap: wrap;
     justify-content: center;
     color: #fff;
+    max-height: 95vh;
   }
 
   @media screen and (max-width: 1000px) {
@@ -27,12 +28,7 @@
       margin: 0em;
       justify-content: center;
       width: 100%;
-    }
-  }
-
-  @media screen and (max-width: 700px) {
-    .pageWrapper {
-      top: 200px;
+      max-height: 90vh;
     }
   }
 
@@ -41,6 +37,7 @@
       justify-content: left;
       margin: 0;
       top: 75px;
+      max-height: 90vh;
     }
   }
 </style>

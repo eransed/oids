@@ -134,7 +134,7 @@
     overflow-x: auto;
   }
 
-  @media screen and (max-width: 500px) {
+  @media screen and (max-width: 750px) {
     .content {
       min-width: 0px;
       border: none;
