@@ -1,8 +1,7 @@
-import { info, usPretty, warn } from "mathil"
-import { type SpaceObject, MessageType } from "./interface"
-import type { OidsSocket } from "./websocket/ws"
+import { info, usPretty, warn } from 'mathil'
+import { type SpaceObject, MessageType } from './interface'
+import type { OidsSocket } from './websocket/ws'
 import { v4 as uuidv4 } from 'uuid'
-
 
 export interface Ping {
   otherClientName: string
@@ -106,7 +105,6 @@ function getPlayerPing(so: SpaceObject): string {
   }
   return ''
 }
-
 
 // pingTimer = setInterval(() => {
 //   ping(localPlayer, $socket)

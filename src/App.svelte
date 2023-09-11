@@ -32,7 +32,6 @@
   }
 
   function setCssFromSettings(): void {
-
     const darkMode = $settings.darkMode
 
     document.documentElement.style.setProperty('--main-bg-color', `${darkMode ? '#000' : '#fff'}`)
@@ -49,21 +48,16 @@
       unarmedShotColor: themeTextColor,
       armedShotColor: '#0f0',
       shipColor: '',
-      spaceColor: spaceColor
+      spaceColor: spaceColor,
     }
 
     const sets: Settings = {
       darkMode: darkMode,
-      uiStyle: uiStyle
+      uiStyle: uiStyle,
     }
 
     setGameSettings(sets)
-
   }
-
-  
-
-
 </script>
 
 {#if $pageHasHeader}

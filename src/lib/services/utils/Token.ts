@@ -51,7 +51,7 @@ export const validateToken = async (): Promise<User | undefined> => {
       }
     })
     .catch((err) => {
-      warn(err)
+      console.log(err)
     })
 
   return userProfile ? userProfile : undefined

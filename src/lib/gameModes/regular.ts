@@ -6,7 +6,16 @@ import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions } from '../physics'
 import { loadingText } from '../render/render2d'
 import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type ServerUpdate, type SpaceObject, MessageType, type NonPlayerCharacter, type UIStyle } from '../interface'
+import {
+  GameType,
+  getRenderableObjectCount,
+  SpaceShape,
+  type ServerUpdate,
+  type SpaceObject,
+  MessageType,
+  type NonPlayerCharacter,
+  type UIStyle,
+} from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
 import { explosionDuration } from '../constants'
@@ -166,7 +175,7 @@ export function initRegularGame(game: Game): void {
 
   let startTime = 0
 
-  log('Setting game socket listener...')
+  console.log('Setting game socket listener...')
 
   game.websocket.addListener(
     (su) => {
@@ -174,7 +183,7 @@ export function initRegularGame(game: Game): void {
       //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
       if (su.dataObject.messageType === MessageType.SERVICE) {
         game.serverVersion = su.dataObject.serverVersion
-        info(`Service message: server version: ${su.dataObject.serverVersion}`)
+        console.log(`Service message: server version: ${su.dataObject.serverVersion}`)
         return
       } else if (su.dataObject) {
         const so: SpaceObject = su.dataObject

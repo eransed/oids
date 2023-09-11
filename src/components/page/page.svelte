@@ -20,6 +20,7 @@
     flex-wrap: wrap;
     justify-content: center;
     color: #fff;
+    max-height: 95vh;
   }
 
   @media screen and (max-width: 1000px) {
@@ -27,19 +28,32 @@
       margin: 0em;
       justify-content: center;
       width: 100%;
+      max-height: 90vh;
     }
   }
 
-  @media screen and (max-width: 700px) {
+  @media screen and (max-width: 500px) {
     .pageWrapper {
-      top: 200px;
+      justify-content: center;
+      margin: 0;
+      top: 75px;
+      max-height: 90vh;
     }
   }
 
-  @media screen and (max-width: 450px) {
+  @media screen and (max-width: 360px) {
     .pageWrapper {
       justify-content: left;
-      margin: 0;
+    }
+  }
+
+  @media screen and (max-width: 750px) and (min-width: 400px) {
+    .pageWrapper {
+      height: 100vh;
+      width: 100vw;
+      top: 55px;
+      padding: 0px;
+      margin: 0px;
     }
   }
 </style>

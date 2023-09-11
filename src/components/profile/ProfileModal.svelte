@@ -122,6 +122,7 @@
     padding-left: 0.6em;
   }
   .button {
+    width: -moz-fit-content;
     width: fit-content;
     justify-self: center;
     margin-top: 10px;

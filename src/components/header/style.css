@@ -2,6 +2,8 @@
   --borderColor: rgb(255, 165, 0);
   --borderSize: 3px;
   --borderStyle: solid;
+  --display: flex;
+  --menuOpen: 90deg;
 }
 
 .header {
@@ -14,7 +16,6 @@
   justify-content: space-between;
   width: 100%;
   height: fit-content;
-
   z-index: 2;
   transition: all;
   transition-duration: 0s;
@@ -53,8 +54,10 @@
 }
 
 .menuItem {
+  width: -moz-fit-content;
   width: fit-content;
   height: fit-content;
+  display: flex;
 }
 
 .navButton {
@@ -98,6 +101,7 @@
   transition-property: all;
   transition: 1s;
   cursor: pointer;
+  width: -moz-fit-content;
   width: fit-content;
 }
 
@@ -122,7 +126,74 @@
 nav {
   display: grid;
   width: 100%;
-  grid-template-columns: 1fr 0.06fr auto;
-  min-width: 450px;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
+}
+
+.hamburger {
+  display: none;
+}
+
+.hamburger button {
+  border: none;
+  background: none;
+  color: var(--main-text-color);
+  font-size: 24px;
+  transform: rotate(var(--menuOpen));
+  position: absolute;
+  top: 1em;
+  z-index: 1;
+  cursor: pointer;
+  transition-property: transform;
+  transition-duration: 1s;
+}
+
+.themeToggle {
+  border: none;
+  background: none;
+  color: var(--main-text-color);
+  margin: 1.5em;
+  z-index: 1;
+}
+
+@media screen and (max-width: 750px) {
+  .header {
+    overflow: visible;
+  }
+  .menuItem {
+    display: var(--display);
+    flex-direction: column;
+    justify-content: flex-start;
+    inset: 0;
+    width: 100vw;
+    position: absolute;
+    height: 100vh;
+    padding: 0;
+    background-color: var(--main-bg-color);
+    transition: all;
+    transition-duration: 1s;
+    cursor: inherit;
+  }
+
+  .menuItem :first-child {
+    margin-top: 1em;
+  }
+
+  .hamburger {
+    display: block;
+    cursor: pointer;
+    transition: rotate;
+    transition-duration: 1s;
+  }
+}
+
+@media screen and (max-width: 750px) and (min-width: 400px) {
+  .menuItem {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .menuItem :first-child {
+    margin-top: inherit;
+  }
 }

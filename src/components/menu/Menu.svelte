@@ -109,24 +109,6 @@
     z-index: 1;
   }
 
-  @media screen and (max-width: 600px) {
-    .buttonList {
-      zoom: 1;
-    }
-  }
-
-  @media screen and (max-width: 350px) {
-    .buttonList {
-      zoom: 0.8;
-    }
-  }
-
-  @media screen and (max-width: 300px) {
-    .buttonList {
-      zoom: 0.5;
-    }
-  }
-
   .buttonList li {
     width: 95%;
     margin-top: 0.5em;

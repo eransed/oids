@@ -42,7 +42,7 @@ export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: num
 export function updateNonPlayerCharacter(npc: NonPlayerCharacter, dt: number): NonPlayerCharacter {
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) {
-    warn(`nan!`)
+    console.log(`nan!`)
     return npc
   }
   const deltaTime: number = dt * timeScale
@@ -246,7 +246,7 @@ export function handleCollisions(spaceObjects: NonPlayerCharacter[], ctx: Canvas
             shot.didHit = true
             if (npc1.health < 1) {
               if (addIfNotExists(npc1.name, npc0.kills) === true) {
-                info('You killed: ' + npc1.name)
+                console.log('You killed: ' + npc1.name)
                 npc0.killCount = npc0.kills.length
                 npc1.killedByName = npc1.lastDamagedByName
                 npc1.isDead = true

@@ -41,4 +41,11 @@
     font-weight: bold;
     font-size: 14px;
   }
+
+  @media screen and (max-width: 750px) {
+    table {
+      max-height: 30vh;
+      overflow-y: auto;
+    }
+  }
 </style>
