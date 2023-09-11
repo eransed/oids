@@ -68,7 +68,7 @@
                 buttonConfig={{
                   buttonText: route.displayText,
                   clickCallback: () => {
-                    if (window.innerWidth < 750) {
+                    if (window.innerWidth <= 750) {
                       toggleMenu = false
                     }
                     navigate(route.path)

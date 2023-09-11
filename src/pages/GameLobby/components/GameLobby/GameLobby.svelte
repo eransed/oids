@@ -355,7 +355,7 @@
       {/if}
     </div>
     <div class="right">
-      <p>Chat - {joinedSession?.id}</p>
+      <p style="margin-left: 0.5em">Chat - {joinedSession?.id}</p>
 
       <div class="messages" id="messagesDiv">
         {#each $chatMessageHistory as msg}
@@ -425,8 +425,15 @@
 
   .center,
   .right {
-    grid-template-rows: 1fr auto;
     min-width: 13em;
+  }
+
+  .center {
+    grid-template-rows: 1fr auto;
+  }
+
+  .right {
+    grid-template-rows: 1fr auto auto;
   }
 
   .messages {
@@ -434,6 +441,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     max-width: 100%;
+    padding: 0.5em;
   }
 
   .center button {
@@ -471,7 +479,9 @@
     .left,
     .center,
     .right {
-      min-width: none;
+      min-width: unset;
+      padding-left: 0px;
+      margin-left: 0px;
     }
 
     .lobbyWrapper {
@@ -525,12 +535,9 @@
     }
 
     .right {
-      bottom: 0;
-      left: 0;
-      margin: auto;
       max-height: none;
       height: 300px;
-      width: 92%;
+      width: 95%;
     }
 
     .messages {

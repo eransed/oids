@@ -34,10 +34,16 @@
 
   @media screen and (max-width: 500px) {
     .pageWrapper {
-      justify-content: left;
+      justify-content: center;
       margin: 0;
       top: 75px;
       max-height: 90vh;
+    }
+  }
+
+  @media screen and (max-width: 360px) {
+    .pageWrapper {
+      justify-content: left;
     }
   }
 </style>
