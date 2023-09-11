@@ -1,6 +1,6 @@
 <script lang="ts">
   //Svelte
-  import { fade } from 'svelte/transition'
+  import { fade, slide } from 'svelte/transition'
 
   //Stores
   import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket, chatMessageHistory } from '../../../../stores/stores'
@@ -513,7 +513,7 @@
 
     .left {
       grid-column-start: 1;
-      grid-column-end: 2;
+      grid-column-end: 1;
     }
     .center {
       grid-column-start: 1;
@@ -538,6 +538,42 @@
       max-height: none;
       height: 300px;
       width: 95%;
+    }
+
+    .messages {
+      height: 100%;
+    }
+  }
+
+  @media screen and (max-width: 750px) and (max-height: 400px) {
+    .lobbyWrapper {
+      grid-template-columns: auto;
+    }
+
+    .left {
+      grid-column-start: 1;
+      grid-column-end: 3;
+    }
+    .center {
+      grid-column-start: 1;
+      grid-column-end: 3;
+      grid-row-start: 2;
+      grid-row-end: 2;
+    }
+    .right {
+      grid-row-start: 3;
+      grid-row-end: 3;
+      grid-column-start: 1;
+      grid-column-end: 3;
+      max-height: 300px;
+      width: 95%;
+      overflow-x: auto;
+    }
+    .lobbyWrapper {
+      width: 100%;
+      position: relative;
+      height: fit-content;
+      overflow: auto;
     }
 
     .messages {

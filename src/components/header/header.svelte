@@ -16,6 +16,7 @@
   import './style.css'
   import Modal from '../modal/Modal.svelte'
   import { navigate } from 'svelte-routing/src/history'
+  import { slide, fade, fly } from 'svelte/transition'
 
   let showLogin: boolean | undefined = false
 
@@ -35,23 +36,26 @@
   let toggleMenu: boolean = false
 
   $: display = toggleMenu ? 'flex' : 'none'
+  $: menuOpen = toggleMenu ? '90deg' : '0deg'
 </script>
 
 <div class="header">
   <nav>
-    <div class="hamburger"><button on:click={() => (toggleMenu = !toggleMenu)}>|||</button></div>
+    <div class="hamburger" style="--menuOpen: {menuOpen}">
+      <button on:click={() => (toggleMenu = !toggleMenu)}>{toggleMenu ? '{ o }' : '{ o }'} </button>
+    </div>
 
-    <div class="menuItem" style="--display: {display};">
+    <div in:fade={{ duration: 500, delay: 0 }} out:fade={{ duration: 500, delay: 500 }} class="menuItem" style="--display: {display};">
       {#each Object.values(routes) as route}
         {#if route.inHeader}
           {#if route.path === '/admin' && $user && $user.role === 'admin'}
-            <div class="navButton">
+            <div in:slide={{ duration: 500, delay: 500 }} out:slide={{ duration: 500, delay: 0 }} class="navButton">
               <Button90
                 mouseTracking={false}
                 buttonConfig={{
                   buttonText: route.displayText,
                   clickCallback: () => {
-                    if (window.innerWidth < 600) {
+                    if (window.innerWidth < 750) {
                       toggleMenu = false
                     }
                     navigate(route.path)
@@ -62,7 +66,7 @@
               />
             </div>
           {:else if route.path !== '/admin'}
-            <div class="navButton">
+            <div in:slide={{ duration: 500, delay: 500 }} out:slide={{ duration: 500, delay: 0 }} class="navButton">
               <Button90
                 mouseTracking={false}
                 buttonConfig={{
@@ -82,12 +86,13 @@
         {/if}
       {/each}
     </div>
+
     <div class="theme">
       <button class="themeToggle" on:click={() => ($settings.darkMode = !$settings.darkMode)}>
         {#if $settings.darkMode}
-          Dark
+          <i in:fade={{ duration: 500, delay: 500 }} out:fly={{ duration: 250, delay: 0 }} class="fa-solid fa-moon fa-2xl" />
         {:else}
-          Lights
+          <i in:fade={{ duration: 500, delay: 500 }} out:fly={{ duration: 250, delay: 0 }} class="fa-solid fa-sun fa-2xl" />
         {/if}
       </button>
     </div>

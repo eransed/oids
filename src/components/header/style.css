@@ -2,7 +2,8 @@
   --borderColor: rgb(255, 165, 0);
   --borderSize: 3px;
   --borderStyle: solid;
-  --display: none;
+  --display: flex;
+  --menuOpen: 90deg;
 }
 
 .header {
@@ -125,7 +126,7 @@
 nav {
   display: grid;
   width: 100%;
-  grid-template-columns: 1fr 0.06fr auto;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
 }
 
@@ -138,17 +139,21 @@ nav {
   background: none;
   color: var(--main-text-color);
   font-size: 24px;
-  transform: rotate(90deg);
+  transform: rotate(var(--menuOpen));
   position: absolute;
   top: 1em;
   z-index: 1;
   cursor: pointer;
+  transition-property: transform;
+  transition-duration: 1s;
 }
 
-@media screen and(min-width: 600px) {
-  .menuItem {
-    display: block;
-  }
+.themeToggle {
+  border: none;
+  background: none;
+  color: var(--main-text-color);
+  margin: 1.5em;
+  z-index: 1;
 }
 
 @media screen and (max-width: 750px) {
@@ -156,8 +161,9 @@ nav {
     overflow: visible;
   }
   .menuItem {
-    flex-direction: column;
     display: var(--display);
+    flex-direction: column;
+    justify-content: flex-start;
     inset: 0;
     width: 100vw;
     position: absolute;
@@ -168,11 +174,26 @@ nav {
     transition-duration: 1s;
     cursor: inherit;
   }
+
+  .menuItem :first-child {
+    margin-top: 1em;
+  }
+
   .hamburger {
     display: block;
     cursor: pointer;
+    transition: rotate;
+    transition-duration: 1s;
   }
-  .themeToggle {
-    display: none;
+}
+
+@media screen and (max-width: 750px) and (min-width: 400px) {
+  .menuItem {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .menuItem :first-child {
+    margin-top: inherit;
   }
 }

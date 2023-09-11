@@ -31,10 +31,6 @@
   }
 
   function setCssFromSettings(): void {
-    //Debugging mobile sizes
-    console.log('width:', window.innerWidth)
-    console.log('height:', window.innerHeight)
-
     const darkMode = $settings.darkMode
 
     document.documentElement.style.setProperty('--main-bg-color', `${darkMode ? '#000' : '#fff'}`)

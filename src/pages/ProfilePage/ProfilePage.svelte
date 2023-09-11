@@ -147,4 +147,13 @@
       display: flex;
     }
   }
+
+  @media screen and (max-width: 750px) and (min-width: 400px) {
+    .profileWrapper {
+      width: 100%;
+      justify-items: center;
+      grid-template-rows: auto 1fr;
+      background-color: var(--main-bg-color);
+    }
+  }
 </style>

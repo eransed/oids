@@ -46,4 +46,14 @@
       justify-content: left;
     }
   }
+
+  @media screen and (max-width: 750px) and (min-width: 400px) {
+    .pageWrapper {
+      height: 100vh;
+      width: 100vw;
+      top: 55px;
+      padding: 0px;
+      margin: 0px;
+    }
+  }
 </style>
