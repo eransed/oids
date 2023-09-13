@@ -34,9 +34,19 @@
   function setCssFromSettings(): void {
     const darkMode = $settings.darkMode
 
-    document.documentElement.style.setProperty('--main-bg-color', `${darkMode ? '#000' : '#fff'}`)
-    document.documentElement.style.setProperty('--main-text-color', `${darkMode ? '#fff' : '#000'}`)
-    document.documentElement.style.setProperty('--main-card-color', `${darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`)
+    /**
+     * A dark blue midnight theme to be used
+     */
+    const DeepMidnight = {
+      bg: '#000033',
+      card: '#000022',
+      font: '#CCCCCC',
+      accent: '#8B7BFF',
+    }
+
+    document.documentElement.style.setProperty('--main-bg-color', `${darkMode ? '#EAEAEA' : DeepMidnight.bg}`)
+    document.documentElement.style.setProperty('--main-text-color', `${darkMode ? '#555555' : DeepMidnight.font}`)
+    document.documentElement.style.setProperty('--main-card-color', `${darkMode ? '#F5F5F5' : DeepMidnight.card}`)
 
     const themeTextColor = document.documentElement.style.getPropertyValue('--main-text-color')
     const spaceColor = document.documentElement.style.getPropertyValue('--main-bg-color')
