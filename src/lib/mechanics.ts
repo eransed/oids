@@ -71,7 +71,7 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   shot.size = { x: rndi(4, 6), y: rndi(20, 30) }
   // shot.color = randomLightGreen()
   shot.color = so.photonColor
-  let head: Vec2 = copy(so.position)
+  let head: Vec2 = copy(add(so.cameraPosition,so.viewFramePosition))
   const aimError = 8 // 8
   const headError = 0.34 // 0.019
   const speedError = 3 // 1.8
@@ -83,7 +83,7 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
     y: rndi(-aimError, aimError),
   })
 
-  shot.velocity = scalarMultiply(getHeading(so), so.missileSpeed + rndf(0, speedError))
+  shot.velocity = scalarMultiply(getHeading(so), .6 * so.missileSpeed + rndf(0, speedError))
 
   shot.velocity = add(shot.velocity, {
     x: rndf(-headError, headError),

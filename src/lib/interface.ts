@@ -48,7 +48,7 @@ export interface Bounded {
   viewport: Vec2
   viewportScale: number
   worldSize: Vec2
-  viewFramePosition: Vec2
+  cameraPosition: Vec2
 }
 
 export function boundVec2(): Vec2 {
@@ -78,6 +78,7 @@ export interface Local {
 
 export interface Positionable {
   position: Vec2
+  viewFramePosition: Vec2
 }
 
 export interface Physical extends Positionable {

@@ -1,7 +1,8 @@
-import { round2dec, type Line, type Vec2 } from 'mathil'
+import { round2dec, type Line, type Vec2, sub, add, smul } from 'mathil'
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
 import type { SpaceObject, UIStyle } from '../interface'
+import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
 
 export function clearScreen(ctx: CanvasRenderingContext2D, style: UIStyle) {
   // ctx.fillStyle = document.documentElement.style.getPropertyValue('--main-bg-color')
@@ -118,7 +119,10 @@ export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D, style
       ctx.fillStyle = shot.armedDelay < 0 ? shot.color : style.unarmedShotColor
     }
     ctx.save()
-    ctx.translate(shot.position.x, shot.position.y)
+    // ctx.translate(shot.position.x, shot.position.y)
+    // const relative = sub(add(so.viewFramePosition, so.cameraPosition), smul(game.localPlayer.cameraPosition, 1))
+    const relative = sub(shot.position, smul(game.localPlayer.cameraPosition, 1))
+    ctx.translate(relative.x, relative.y)
     ctx.rotate(((90 + shot.angleDegree) * Math.PI) / 180)
     ctx.fillRect(-shot.size.x / 2, -shot.size.y / 2, shot.size.x, shot.size.y)
     ctx.restore()

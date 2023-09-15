@@ -33,7 +33,7 @@
     buttonText: 'Exit game',
     clickCallback() {
       stopGame(currentGame)
-      navigate('/play/end')
+      navigate('/play')
     },
     selected: false,
   }

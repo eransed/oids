@@ -1,11 +1,11 @@
 import type { SpaceObject, UIStyle } from '../interface'
-import { add, newVec2, round2dec, type Vec2 } from 'mathil'
+import { add, newVec2, round2dec, to_string2, type Vec2 } from 'mathil'
 import { screenScale } from '../constants'
 // import * as ship from '../../assets/ship.svg'
 import { renderShot, setScaledFont } from './render2d'
 import { renderVec2 } from './renderUI'
 
-export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle): void {
+export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle, renderPos: Vec2 | null = null): void {
 
 
     const scale = setScaledFont(ctx)
@@ -20,7 +20,13 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
     //renderHitRadius(so, ctx)
     
     ctx.save()
-    ctx.translate(so.position.x, so.position.y)
+    if (!renderPos) {
+        ctx.translate(so.viewFramePosition.x, so.viewFramePosition.y)
+        // renderVec2(`world: ${to_string2(so.position)}`, so.viewFramePosition, ctx)
+    } else {
+        ctx.translate(renderPos.x, renderPos.y)
+        // renderVec2(`world: ${to_string2(renderPos)}`, renderPos, ctx)
+    }
     ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
     ctx.lineWidth = 3 * screenScale
     
@@ -57,5 +63,6 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
     
     // Draw shots
     renderShot(so, ctx, style)
-    renderVec2(so.position, so.position, ctx)
+
+
 }

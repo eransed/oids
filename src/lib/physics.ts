@@ -1,6 +1,6 @@
 import type { Bounceable, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
-import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, warn, type Vec2 } from 'mathil'
-import { getScreenFromCanvas } from './canvas_util'
+import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, warn, type Vec2, getScreenRect } from 'mathil'
+import { getScreenCenterPosition, getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
 import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, screenPaddingFactor, timeScale } from './constants'
@@ -31,6 +31,7 @@ export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: num
   const a: Vec2 = scalarMultiply(npc.acceleration, deltaTime)
   npc.velocity = add(npc.velocity, a)
   npc.position = add(npc.position, v)
+  // npc.position = vec2Bound(npc.position, sub(smul(npc.worldSize, 0.5), getScreenRect(ctx)))
   npc.acceleration = { x: 0, y: 0 }
   npc.velocity = limitv(npc.velocity, { x: 250, y: 250 })
   npc.angleDegree += npc.angularVelocity * deltaTime
@@ -68,7 +69,7 @@ export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number, 
   if (isNaN(dts)) return
 
   //  decayOffScreenShotsPadded(npc, getScreenFromCanvas(ctx), screenPaddingFactor)
-  decayOffScreenShots(npc, getScreenFromCanvas(ctx))
+  decayOffScreenShots(npc, npc.worldSize)
   decayDeadShots(npc)
 
   coolDown(npc)

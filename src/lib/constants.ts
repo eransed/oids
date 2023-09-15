@@ -20,12 +20,12 @@ export const explosionDuration = 60
 export const screenPaddingFactor = 1
 
 // add thrust to so direction - so will keep turning until opposite force
-export const thrustSteer = false
+export const thrustSteer = true
 
 // factor of thrust when using thrust steering
 export const thrustSteerPowerFactor = 0.05
 
-export const angularFriction = 0.985
+export const angularFriction = 0.945
 
 export const bounceFactor = 0.8
 
@@ -39,4 +39,4 @@ export function getGraphLineColor(): string {
     return graphLineColor
 }
 
-export const worldSize = newVec2(16000, 16000)
+export const worldSize = newVec2(1e5, 1e5)

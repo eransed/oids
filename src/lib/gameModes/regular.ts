@@ -1,7 +1,7 @@
 import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition } from '../canvas_util'
 import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
-import { add, direction, dist2, info, log, magnitude, newVec2, rndfVec2, round2dec, smul, sub } from 'mathil'
+import { add, direction, dist2, info, log, magnitude, newVec2, rndfVec2, rndi, round2dec, smul, sub, to_string2 } from 'mathil'
 import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions, offScreen, vec2Bound, vec2Bound_mm } from '../physics'
 import { loadingText, renderPoint } from '../render/render2d'
@@ -147,20 +147,24 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.health = 100
   game.localPlayer.batteryLevel = 500
   game.localPlayer.steeringPower = 1.4
-  game.localPlayer.enginePower = 0.2
+  game.localPlayer.enginePower = 1
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
   game.localPlayer.hitRadius = 120
   game.localPlayer.color = '#db8'
   game.localPlayer.worldSize = worldSize // server sends size of world
-  game.localPlayer.viewFramePosition = newVec2(0, 0)
+  game.localPlayer.cameraPosition = newVec2(0, 0)
 
-  for (let i = 0; i < 8000; i++) {
+  for (let i = 0; i < 1e4; i++) {
     // create starts
-    const star = rndfVec2(0, game.localPlayer.worldSize.y) // fix me..
+    const star = rndfVec2(0, 0)
+    star.x = rndi(0, worldSize.x)
+    star.y = rndi(0, worldSize.y)
     game.stars.push(star)
-  }  
+  }
+
+  game.stars.push(newVec2())
 
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
@@ -278,7 +282,7 @@ function exists(entity: NonPlayerCharacter, entities: NonPlayerCharacter[]): boo
   return false
 }
 
-function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext2D, style: UIStyle): SpaceObject[] {
+function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] {
   remotes.forEach((so) => {
     so.framesSinceLastServerUpdate++
   })
@@ -299,17 +303,20 @@ function handleRemotePlayers(remotes: SpaceObject[], ctx: CanvasRenderingContext
 
   stillPlaying.forEach((so) => {
     if (so.shape === SpaceShape.Moon) {
-      renderMoon(so, ctx)
+      renderMoon(so, game.ctx)
     } else {
       if (so.health <= 0) {
         handleDeathExplosion(so, explosionDuration)
         if (!so.obliterated) {
-          renderExplosionFrame(so, ctx)
+          renderExplosionFrame(so, game.ctx)
         }
         return
       } else {
-        renderViewport(ctx, so)
-        renderShip(so, ctx, false, style)
+        // renderViewport(game.ctx, so)
+        // const renderPos = add(so.viewFramePosition, so.cameraPosition)
+        const remotePos = sub(add(so.viewFramePosition, so.cameraPosition), smul(game.localPlayer.cameraPosition, 1))
+
+        renderShip(so, game.ctx, false, game.style, remotePos)
       }
     }
   })
@@ -342,19 +349,26 @@ function moveView(game: Game) {
   const pad = newVec2(250, 250)
 
   const center = getScreenCenterPosition(game.ctx)
+  const distanceToCenter = dist2(game.localPlayer.position, center)  
+  const offsetCenter = 400
 
-  if (dist2(game.localPlayer.position, center) > 400) {
-    console.log('round edge')
-  }
+  const camBound = sub(smul(game.localPlayer.worldSize, .5), getScreenRect(game.ctx))
+  // console.log (camBound)
+  game.localPlayer.cameraPosition = add(game.localPlayer.cameraPosition, game.localPlayer.velocity)
+  game.localPlayer.cameraPosition = vec2Bound(game.localPlayer.cameraPosition, camBound)
+
+  // game.localPlayer.viewFramePosition = smul(center, .1*dist2(game.localPlayer.velocity, newVec2(0, 0)))
+  game.localPlayer.viewFramePosition = add(center, smul(game.localPlayer.velocity, 10))
+  // game.localPlayer.viewFramePosition = center
   
-  game.localPlayer.position = vec2Bound_mm(game.localPlayer.position, pad, sub(getScreenRect(game.ctx), pad), () => {
-    if (game.localPlayer.position.x + game.localPlayer.viewFramePosition.x > game.localPlayer.worldSize.x - 250) {
-      game.localPlayer.velocity.x = -game.localPlayer.velocity.x * 0.5
-    }
-    if (game.localPlayer.position.y + game.localPlayer.viewFramePosition.y > game.localPlayer.worldSize.y - 250) {
-      game.localPlayer.velocity.y = -game.localPlayer.velocity.y * 0.5
-    }
-  })
+  // game.localPlayer.position = vec2Bound_mm(game.localPlayer.position, pad, sub(getScreenRect(game.ctx), pad), () => {
+  //   if (game.localPlayer.position.x + game.localPlayer.viewFramePosition.x > game.localPlayer.worldSize.x - 250) {
+  //     game.localPlayer.velocity.x = -game.localPlayer.velocity.x * 0.5
+  //   }
+  //   if (game.localPlayer.position.y + game.localPlayer.viewFramePosition.y > game.localPlayer.worldSize.y - 250) {
+  //     game.localPlayer.velocity.y = -game.localPlayer.velocity.y * 0.5
+  //   }
+  // })
   
   // const padInner = newVec2(200, 200)
   // game.localPlayer.position = vec2Bound_mm(game.localPlayer.position, padInner, sub(game.localPlayer.worldSize, padInner), () => {
@@ -363,37 +377,37 @@ function moveView(game: Game) {
 
 
 
-  const padNum = 0
+  // const padNum = 0
   
-  // move viewframe on x axis with ship velocity
-  if (game.localPlayer.viewFramePosition.x >= padNum || game.localPlayer.viewFramePosition.x <= game.localPlayer.worldSize.x - getScreenRect(game.ctx).x) {
-    game.localPlayer.viewFramePosition = add(game.localPlayer.viewFramePosition, game.localPlayer.velocity)
-  }
+  // // move viewframe on x axis with ship velocity
+  // if (game.localPlayer.viewFramePosition.x >= padNum || game.localPlayer.viewFramePosition.x <= game.localPlayer.worldSize.x - getScreenRect(game.ctx).x) {
+  //   game.localPlayer.viewFramePosition = add(game.localPlayer.viewFramePosition, game.localPlayer.velocity)
+  // }
 
-  // Bound left x to zero
-  if (game.localPlayer.viewFramePosition.x < padNum) {
-    game.localPlayer.viewFramePosition.x = padNum
-  }
+  // // Bound left x to zero
+  // if (game.localPlayer.viewFramePosition.x < padNum) {
+  //   game.localPlayer.viewFramePosition.x = padNum
+  // }
 
-  // Bound right x to world size - view rect
-  if (game.localPlayer.viewFramePosition.x > game.localPlayer.worldSize.x - getScreenRect(game.ctx).x) {
-    game.localPlayer.viewFramePosition.x = game.localPlayer.worldSize.x - getScreenRect(game.ctx).x
-  }
+  // // Bound right x to world size - view rect
+  // if (game.localPlayer.viewFramePosition.x > game.localPlayer.worldSize.x - getScreenRect(game.ctx).x) {
+  //   game.localPlayer.viewFramePosition.x = game.localPlayer.worldSize.x - getScreenRect(game.ctx).x
+  // }
 
-  // move viewframe on y axis with ship velocity
-  if (game.localPlayer.viewFramePosition.y >= padNum || game.localPlayer.viewFramePosition.y <= game.localPlayer.worldSize.y - getScreenRect(game.ctx).y) {
-    game.localPlayer.viewFramePosition = add(game.localPlayer.viewFramePosition, game.localPlayer.velocity)
-  } 
+  // // move viewframe on y axis with ship velocity
+  // if (game.localPlayer.viewFramePosition.y >= padNum || game.localPlayer.viewFramePosition.y <= game.localPlayer.worldSize.y - getScreenRect(game.ctx).y) {
+  //   game.localPlayer.viewFramePosition = add(game.localPlayer.viewFramePosition, game.localPlayer.velocity)
+  // } 
 
-  // Bound top y axis to world size - view rect
-  if (game.localPlayer.viewFramePosition.y < padNum) {
-    game.localPlayer.viewFramePosition.y = padNum
-  }
+  // // Bound top y axis to world size - view rect
+  // if (game.localPlayer.viewFramePosition.y < padNum) {
+  //   game.localPlayer.viewFramePosition.y = padNum
+  // }
 
-  // Bound bottom y axis to world size - view rect
-  if (game.localPlayer.viewFramePosition.y > game.localPlayer.worldSize.y - getScreenRect(game.ctx).y) {
-    game.localPlayer.viewFramePosition.y = game.localPlayer.worldSize.y - getScreenRect(game.ctx).y
-  }
+  // // Bound bottom y axis to world size - view rect
+  // if (game.localPlayer.viewFramePosition.y > game.localPlayer.worldSize.y - getScreenRect(game.ctx).y) {
+  //   game.localPlayer.viewFramePosition.y = game.localPlayer.worldSize.y - getScreenRect(game.ctx).y
+  // }
 
 
 
@@ -425,7 +439,7 @@ export function renderFrame(game: Game, dt: number): void {
     s.render(ctx)
   })
 
-  game.remotePlayers = handleRemotePlayers(game.remotePlayers, ctx, game.style)
+  game.remotePlayers = handleRemotePlayers(game.remotePlayers, game)
 
   // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
 
@@ -512,9 +526,11 @@ export function renderFrame(game: Game, dt: number): void {
   }
 
   // renderRect(game.ctx,game.localPlayer.worldSize, newVec2(), '#aaa', 50)
-  renderVec2(game.localPlayer.viewFramePosition, add(game.localPlayer.position, newVec2(-100, -100)), ctx)
-  renderVec2(game.localPlayer.velocity, add(game.localPlayer.position, newVec2(100, 100)), ctx)
-
+  // renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx)
+  // renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -100)), ctx)
+  // renderVec2(`world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`, add(game.localPlayer.viewFramePosition, newVec2(-200, 100)), ctx)
+  // renderVec2(`v: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(100, 100)), ctx)
+  
 
   const scrollPad = 500
 
@@ -529,10 +545,12 @@ export function renderFrame(game: Game, dt: number): void {
 
   // move star ref with inverted view frame position and factor
   for (let i = 0; i < game.stars.length; i++) {
-    let starpos = add(game.stars[i], smul(game.localPlayer.viewFramePosition, -1))
-    starpos = vec2Bound(starpos, game.localPlayer.worldSize)
-    renderPoint(game.ctx, starpos, '#000', screenScale * 1)
+    const starpos = sub(game.stars[i], smul(game.localPlayer.cameraPosition, 1))
+    // starpos = vec2Bound(starpos, sub(game.localPlayer.worldSize, getScreenCenterPosition(game.ctx)))
+    // starpos = vec2Bound(starpos, sub(game.localPlayer.worldSize, getScreenCenterPosition(game.ctx)))
+    renderPoint(game.ctx, starpos, '#000', screenScale * 5)
   }
+
 
 
 }

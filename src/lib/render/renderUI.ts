@@ -155,7 +155,7 @@ export function renderNumber(num: number, pos: Vec2, ctx: CanvasRenderingContext
 }
 
 
-export function renderVec2(showVec: Vec2, pos: Vec2, ctx: CanvasRenderingContext2D, angleAdjDeg = 0) {
+export function renderVec2(str: string, pos: Vec2, ctx: CanvasRenderingContext2D, angleAdjDeg = 0) {
   ctx.save()
   ctx.translate(pos.x, pos.y)
   ctx.rotate(degToRad(angleAdjDeg))
@@ -163,7 +163,7 @@ export function renderVec2(showVec: Vec2, pos: Vec2, ctx: CanvasRenderingContext
   ctx.font = `bold 24px courier`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(`${to_string2(showVec)}`, 0, 0)
+  ctx.fillText(`${str}`, 0, 0)
   ctx.restore()
 }
 

@@ -25,6 +25,7 @@ export function newPhotonLaser(): PhotonLaser {
     ownerName: '',
     lastDamagedByName: '',
     killedByName: '',
+    viewFramePosition: newVec2()
   }
 
   return shot
@@ -115,6 +116,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     ttl: 0,
     rtt: 0,
     worldSize: newVec2(),
+    cameraPosition: newVec2(),
     viewFramePosition: newVec2()
   }
 
@@ -168,7 +170,9 @@ export function createNpc(): NonPlayerCharacter {
     shotsInFlightNew: [],
     shotsFiredThisFrame: false,
     worldSize: newVec2(),
+    cameraPosition: newVec2(),
     viewFramePosition: newVec2()
   }
   return npc
 }
+undefined
