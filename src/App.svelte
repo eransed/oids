@@ -44,9 +44,9 @@
       accent: '#8B7BFF',
     }
 
-    document.documentElement.style.setProperty('--main-bg-color', `${darkMode ? '#EAEAEA' : DeepMidnight.bg}`)
-    document.documentElement.style.setProperty('--main-text-color', `${darkMode ? '#555555' : DeepMidnight.font}`)
-    document.documentElement.style.setProperty('--main-card-color', `${darkMode ? '#F5F5F5' : DeepMidnight.card}`)
+    document.documentElement.style.setProperty('--main-bg-color', `${darkMode ?  DeepMidnight.bg  : '#EAEAEA'}`)
+    document.documentElement.style.setProperty('--main-text-color', `${darkMode ? DeepMidnight.font  : '#555555'}`)
+    document.documentElement.style.setProperty('--main-card-color', `${darkMode ? DeepMidnight.card  : '#F5F5F5'}`)
 
     const themeTextColor = document.documentElement.style.getPropertyValue('--main-text-color')
     const spaceColor = document.documentElement.style.getPropertyValue('--main-bg-color')

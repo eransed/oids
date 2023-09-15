@@ -39,4 +39,4 @@ export const socket: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
 
 export const chatMessageHistory: Writable<ChatMessage[]> = writable([])
 
-export const settings: Writable<Settings> = writable({ darkMode: true, uiStyle: getDefaultTheme()})
+export const settings: Writable<Settings> = writable({ darkMode: false, uiStyle: getDefaultTheme()})

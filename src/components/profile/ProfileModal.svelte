@@ -17,10 +17,15 @@
 
   //Assets
   import Avatar from '../../assets/avatar.png'
+  import Alert from '../alert/Alert.svelte'
+  import type { AlertType } from '../alert/AlertType'
 
-  let errorText: any = ''
-  let wrongPassword: boolean = false
   let loading: boolean = false
+
+  let alert: AlertType = {
+    severity: 'error',
+    text: ''
+  }
 
   const handleSubmit = async (e: Event): Promise<void> => {
     loading = true
@@ -28,11 +33,13 @@
     const formData = new FormData(e.target as HTMLFormElement)
     const response = await login(formData)
     if (response.status === 200) {
-      errorText = ''
       await getProfile()
     } else {
-      wrongPassword = true
-      errorText = 'Wrong email or password, try again!'
+      alert = {
+        severity: 'error',
+        text: 'Wrong email or password, try again!'
+      }
+      
     }
     loading = false
   }
@@ -42,15 +49,17 @@
 </script>
 
 {#if !$isLoggedIn}
+
   <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <form on:submit|preventDefault={handleSubmit} on:formdata class="form">
       <input placeholder="Email" name="email" type="email" autocomplete="email" />
 
-      <input placeholder="Password" name="password" type="password" autocomplete="current-password" style="border: {wrongPassword && '2px solid red'}" />
+      <input placeholder="Password" name="password" type="password" autocomplete="current-password"  />
       <div class="button">
         <Button90 {loading} buttonConfig={loginButton} mouseTracking={false} />
       </div>
     </form>
+    <Alert severity={alert.severity} text={alert.text}/>
   </div>
 {/if}
 {#if $isLoggedIn}
