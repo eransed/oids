@@ -14,6 +14,12 @@ export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remo
   ctx.strokeRect(0, 0, viewport.x, viewport.y)
 }
 
+export function renderRect(ctx: CanvasRenderingContext2D, size: Vec2, pos: Vec2, color='#ccc', lineWidth=10): void {
+  ctx.strokeStyle = color
+  ctx.lineWidth = lineWidth
+  ctx.strokeRect(pos.x, pos.y, size.x, size.y)
+}
+
 export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   const screen: Vec2 = getScreenFromCanvas(ctx)
   const yrow1: number = screen.y - 30
@@ -145,6 +151,19 @@ export function renderNumber(num: number, pos: Vec2, ctx: CanvasRenderingContext
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(`${num}`, 0, 0)
+  ctx.restore()
+}
+
+
+export function renderVec2(showVec: Vec2, pos: Vec2, ctx: CanvasRenderingContext2D, angleAdjDeg = 0) {
+  ctx.save()
+  ctx.translate(pos.x, pos.y)
+  ctx.rotate(degToRad(angleAdjDeg))
+  ctx.fillStyle = '#000'
+  ctx.font = `bold 24px courier`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(`${to_string2(showVec)}`, 0, 0)
   ctx.restore()
 }
 

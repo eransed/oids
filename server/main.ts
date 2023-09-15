@@ -30,10 +30,10 @@ const server: WebSocketServer = new WebSocketServer({
 
 export let globalConnectedClients: Client[] = []
 
-const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
-  // info(`Sending to session: ${sessionId}`)
-  serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
-})
+// const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
+//   // info(`Sending to session: ${sessionId}`)
+//   serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
+// })
 
 export class Client {
   ws: WebSocket
@@ -111,7 +111,7 @@ export class Client {
           }
         }
 
-        gameHandler.checkMessage(so)
+        // gameHandler.checkMessage(so)
 
         if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
           broadcastToAllClients(this, globalConnectedClients, so)

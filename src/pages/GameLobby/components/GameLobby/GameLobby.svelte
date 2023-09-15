@@ -21,7 +21,7 @@
   // import { info, log, warn } from 'mathil'
   import TypeWriter from '../../../../components/typeWriter/TypeWriter.svelte'
   import { navigate } from 'svelte-routing'
-  import { alertColors } from '../../../../style/colors'
+  import { alertColors } from '../../../../style/defaultColors'
   import Alert from '../../../../components/alert/Alert.svelte'
   import { info, log } from 'mathil'
 

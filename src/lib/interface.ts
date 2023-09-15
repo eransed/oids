@@ -1,5 +1,5 @@
 import type { Writable } from 'svelte/store'
-import type { Vec2 } from 'mathil'
+import { newVec2, type Vec2 } from 'mathil'
 import type { Steerable } from './traits/Steerable'
 
 export enum GameType {
@@ -47,6 +47,12 @@ export interface Motivated {
 export interface Bounded {
   viewport: Vec2
   viewportScale: number
+  worldSize: Vec2
+  viewFramePosition: Vec2
+}
+
+export function boundVec2(): Vec2 {
+  return newVec2()
 }
 
 export interface Remote {
@@ -304,4 +310,11 @@ export interface ShipUpgrades {
 
 export interface CoreProps {
   energyLevel: number // boost engine, shields and cannons. can be 
+}
+
+export interface Theme {
+  bg: string
+  card: string
+  font: string
+  accent: string
 }

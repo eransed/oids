@@ -1,4 +1,4 @@
-import type { Vec2 } from 'mathil'
+import { newVec2, type Vec2 } from 'mathil'
 
 export const frontVersion = '0.1.0'
 export const screenScale = 3
@@ -27,6 +27,8 @@ export const thrustSteerPowerFactor = 0.05
 
 export const angularFriction = 0.985
 
+export const bounceFactor = 0.8
+
 export let graphLineColor = '#fff'
 
 export function setGraphLineColor(color: string): void {
@@ -36,3 +38,5 @@ export function setGraphLineColor(color: string): void {
 export function getGraphLineColor(): string {
     return graphLineColor
 }
+
+export const worldSize = newVec2(16000, 16000)

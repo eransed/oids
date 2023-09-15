@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
-  import { alertColors } from '../../style/colors'
+  import { alertColors } from '../../style/defaultColors'
 
   /**
    * @param severity - error, warning, info, success

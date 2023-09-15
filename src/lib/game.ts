@@ -7,6 +7,7 @@ import type { Shape } from './shapes/Shape'
 import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
 import { getDefaultTheme } from '../pages/GamePage/components/Game/Utils/getTheme'
+import type { Vec2 } from 'mathil'
 
 export class Game {
   websocket: OidsSocket
@@ -29,6 +30,7 @@ export class Game {
   stopper: (() => Promise<number>) | null = null
   serverVersion = '_unknown_server_version_'
   style: UIStyle = getDefaultTheme()
+  stars: Vec2[] = []
 
   constructor(
     _canvas: HTMLCanvasElement,

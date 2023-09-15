@@ -23,7 +23,7 @@
   import Page from './components/page/page.svelte'
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
-  import type { Settings, UIStyle } from './lib/interface'
+  import type { Settings, Theme, UIStyle } from './lib/interface'
   import { setGameSettings } from './pages/GamePage/components/Game/Utils/mainGame'
   import { setGraphLineColor } from './lib/constants'
 
@@ -37,7 +37,7 @@
     /**
      * A dark blue midnight theme to be used
      */
-    const DeepMidnight = {
+    const DeepMidnight: Theme = {
       bg: '#000033',
       card: '#000022',
       font: '#CCCCCC',

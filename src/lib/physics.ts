@@ -106,6 +106,37 @@ export function decayOffScreenShotsPadded(npc: SpaceObject | NonPlayerCharacter,
   })
 }
 
+
+export function vec2Bound(v: Vec2, bound: Vec2) {
+  if (v.x > bound.x) v.x = bound.x
+  if (v.x < 0) v.x = 0
+  if (v.y > bound.y) v.y = bound.y
+  if (v.y < 0) v.y = 0
+  return v
+}
+
+export function vec2Bound_mm(v: Vec2, bound_min: Vec2, bound_max: Vec2, callback: () => void = () => {/** default */}) {
+  if (v.x > bound_max.x) {
+    v.x = bound_max.x
+    callback()
+  }
+  if (v.x < bound_min.x) {
+    v.x = bound_min.x
+    callback()
+  }
+  if (v.y > bound_max.y) {
+    v.y = bound_max.y
+    callback()
+  }
+  if (v.y < bound_min.y) {
+    v.y = bound_min.y
+    callback()
+  }
+  return v
+}
+
+
+
 export function offScreen(v: Vec2, screen: Vec2) {
   if (v.x > screen.x) return true
   if (v.x < 0) return true

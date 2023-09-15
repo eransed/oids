@@ -114,6 +114,8 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     hops: 0,
     ttl: 0,
     rtt: 0,
+    worldSize: newVec2(),
+    viewFramePosition: newVec2()
   }
 
   return spaceObject
@@ -165,6 +167,8 @@ export function createNpc(): NonPlayerCharacter {
     shotsInFlight: [],
     shotsInFlightNew: [],
     shotsFiredThisFrame: false,
+    worldSize: newVec2(),
+    viewFramePosition: newVec2()
   }
   return npc
 }

@@ -5,7 +5,7 @@ export const getScreenRect = (ctx: CanvasRenderingContext2D): Vec2 => {
  return { x: ctx.canvas.width, y: ctx.canvas.height }
 }
 
-export function setCanvasSize(ctx: CanvasRenderingContext2D): void {
+export function setCanvasSizeToClientViewFrame(ctx: CanvasRenderingContext2D): void {
  const vw: number = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
  const vh: number = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
  ctx.canvas.width = vw * screenScale

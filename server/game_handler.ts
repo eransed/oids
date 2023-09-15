@@ -5,6 +5,7 @@ import { updateNonPlayerCharacter } from '../src/lib/physics'
 import { Client, getActivePlayersFromSession, getPlayersFromSessionId, globalConnectedClients } from './main'
 import { bounceSpaceObject } from '../src/lib/mechanics'
 import { saveGame } from './api/users/users.services'
+import { bounceFactor } from '../src/lib/constants'
 
 export class GameHandler {
   game_started = false
@@ -32,7 +33,7 @@ export class GameHandler {
       this.dt = performance.now() - this.lastTime
       for (let i = 0; i < this.asteroids.length; i++) {
         this.asteroids[i] = updateNonPlayerCharacter(this.asteroids[i], this.dt)
-        bounceSpaceObject(this.asteroids[i], this.asteroids[i].viewport, 0.8, 10, 0)
+        bounceSpaceObject(this.asteroids[i], this.asteroids[i].viewport, bounceFactor, 10, 0)
         this.every.tick(() => {
           this.broadcaster(globalConnectedClients, this.asteroids[i], sessionId)
         })

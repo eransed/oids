@@ -135,13 +135,13 @@ export function handleHittingShot(shot: PhotonLaser, ctx: CanvasRenderingContext
   }
 }
 
-export function offScreen(v: Vec2, screen: Vec2): boolean {
-  if (v.x > screen.x) return true
-  if (v.x < 0) return true
-  if (v.y > screen.y) return true
-  if (v.y < 0) return true
-  return false
-}
+// export function offScreen(v: Vec2, screen: Vec2): boolean {
+//   if (v.x > screen.x) return true
+//   if (v.x < 0) return true
+//   if (v.y > screen.y) return true
+//   if (v.y < 0) return true
+//   return false
+// }
 
 export function decayDeadSpaceObjects(so: Damageable[]): Damageable[] {
   const out: Damageable[] = so.filter(function (e) {
