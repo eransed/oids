@@ -3,7 +3,7 @@
   import { fade, slide } from 'svelte/transition'
 
   //Stores
-  import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket, chatMessageHistory } from '../../../../stores/stores'
+  import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket, chatMessageHistory, gameSessionId } from '../../../../stores/stores'
 
   //Interfaces
   import { MessageType, type SpaceObject } from '../../../../lib/interface'
@@ -51,13 +51,13 @@
 
   function hostSession(forceNewSessionId = false) {
     if ($localPlayer.sessionId.length === 0 || forceNewSessionId === true) {
-      $localPlayer.sessionId = createSessionId()
+      $localPlayer.sessionId = $gameSessionId ? $gameSessionId : createSessionId()
       $localPlayer.messageType = MessageType.SESSION_UPDATE
       $localPlayer.isHost = true
       console.log(`Says hello to online players, new session ${$localPlayer.sessionId}`)
       $socket.send($localPlayer)
     } else {
-      console.log(`Reusing old session ${$localPlayer.sessionId}`)
+      console.log(`Reusing old session ${$gameSessionId}`)
     }
   }
 

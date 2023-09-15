@@ -1,7 +1,7 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import type { Settings, SpaceObject } from '../../../../lib/interface'
+  import type { Session, Settings, SpaceObject } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
@@ -21,10 +21,12 @@
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame } from '../../../../lib/gameModes/regular'
-  import { socket } from '../../../../stores/stores'
+  import { guestUserName, localPlayer, socket, user } from '../../../../stores/stores'
   import { saveGame } from '../../../../lib/services/game/saveGame'
   import type { GameHistory } from '../../../../interfaces/game'
   import { gameRef } from './Utils/mainGame'
+  import { playersInSession } from '../../../../lib/services/game/playersInSession'
+  import type { AxiosResponse } from 'axios'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -34,7 +36,9 @@
 
   //Props
   export let sessionId: string
-  export let player: SpaceObject
+
+
+  console.log(sessionId)
 
   let canvas: HTMLCanvasElement
   // let cleanup: () => void
@@ -46,12 +50,26 @@
     e.preventDefault()
   })
 
+  async function players (): Promise<Session> {
+   const players: Session = await playersInSession(sessionId).then((d) => d.data)
+
+   return players
+  } 
+
   onMount(() => {
     // cleanup = initSettingsControl()
-    game = new Game(canvas, player, $socket, getKeyMap(), showDeadMenu)
+    $localPlayer.name = $user ? $user.name : $guestUserName
+    game = new Game(canvas, $localPlayer, $socket, getKeyMap(), showDeadMenu)
     gameRef(game)
     game.localPlayer.sessionId = sessionId
-    game.localPlayer.joinedGame = currentTimeDate()
+    players().then((d) => {
+      const players = d.players
+      console.log(players)
+      if (players.length === 1) {
+        game.localPlayer.isHost = true
+      }
+    })
+
     game.startGame(initRegularGame, renderFrame, nextFrame)
   })
 
@@ -76,7 +94,7 @@
 
   <InGameInfo title={'Key Map'} showModal={$showHotKeys}>
     <div class="hotKeys">
-      <HotKeys activeColor={player.color} />
+      <HotKeys activeColor={$localPlayer.color} />
     </div>
   </InGameInfo>
 

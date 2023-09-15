@@ -6,17 +6,20 @@
   import Game from '../GamePage/components/Game/Game.svelte'
 
   //Stores
-  import { gameSessionId, pageHasHeader, localPlayer } from '../../stores/stores'
+  import { gameSessionId, pageHasHeader, localPlayer, socket } from '../../stores/stores'
+
 
   pageHasHeader.set(false)
 
   export let gameIdParam: string
 
   let sessionId: string = $gameSessionId ? $gameSessionId : gameIdParam
+  
+
 </script>
 
 <div class="gamePage" in:fade={{ delay: 300 }} out:fade>
-  <Game {sessionId} player={$localPlayer} />
+  <Game {sessionId} />
 </div>
 
 <style>

@@ -145,7 +145,7 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.ammo = 1000000
   game.localPlayer.angleDegree = -120
   game.localPlayer.health = 100
-  game.localPlayer.batteryLevel = 500
+  game.localPlayer.batteryLevel = 50000
   game.localPlayer.steeringPower = 1.4
   game.localPlayer.enginePower = 1
   game.localPlayer.color = randomAnyColor()
@@ -156,15 +156,16 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.worldSize = worldSize // server sends size of world
   game.localPlayer.cameraPosition = newVec2(0, 0)
 
-  for (let i = 0; i < 1e4; i++) {
+  for (let i = 0; i < 1.2 * 1e4; i++) {
     // create starts
     const star = rndfVec2(0, 0)
-    star.x = rndi(0, worldSize.x)
-    star.y = rndi(0, worldSize.y)
+    star.x = rndi(0, worldSize.x / 2)
+    star.y = rndi(0, worldSize.y / 2)
     game.stars.push(star)
   }
 
   game.stars.push(newVec2())
+  game.stars.push(smul(worldSize, .5))
 
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
@@ -349,7 +350,7 @@ function moveView(game: Game) {
   const pad = newVec2(250, 250)
 
   const center = getScreenCenterPosition(game.ctx)
-  const distanceToCenter = dist2(game.localPlayer.position, center)  
+  const distanceToCenter = dist2(game.localPlayer.position, center)
   const offsetCenter = 400
 
   const camBound = sub(smul(game.localPlayer.worldSize, .5), getScreenRect(game.ctx))
@@ -360,7 +361,7 @@ function moveView(game: Game) {
   // game.localPlayer.viewFramePosition = smul(center, .1*dist2(game.localPlayer.velocity, newVec2(0, 0)))
   game.localPlayer.viewFramePosition = add(center, smul(game.localPlayer.velocity, 10))
   // game.localPlayer.viewFramePosition = center
-  
+
   // game.localPlayer.position = vec2Bound_mm(game.localPlayer.position, pad, sub(getScreenRect(game.ctx), pad), () => {
   //   if (game.localPlayer.position.x + game.localPlayer.viewFramePosition.x > game.localPlayer.worldSize.x - 250) {
   //     game.localPlayer.velocity.x = -game.localPlayer.velocity.x * 0.5
@@ -369,7 +370,7 @@ function moveView(game: Game) {
   //     game.localPlayer.velocity.y = -game.localPlayer.velocity.y * 0.5
   //   }
   // })
-  
+
   // const padInner = newVec2(200, 200)
   // game.localPlayer.position = vec2Bound_mm(game.localPlayer.position, padInner, sub(game.localPlayer.worldSize, padInner), () => {
   //   game.localPlayer.velocity = newVec2()
@@ -378,7 +379,7 @@ function moveView(game: Game) {
 
 
   // const padNum = 0
-  
+
   // // move viewframe on x axis with ship velocity
   // if (game.localPlayer.viewFramePosition.x >= padNum || game.localPlayer.viewFramePosition.x <= game.localPlayer.worldSize.x - getScreenRect(game.ctx).x) {
   //   game.localPlayer.viewFramePosition = add(game.localPlayer.viewFramePosition, game.localPlayer.velocity)
@@ -415,7 +416,7 @@ function moveView(game: Game) {
 
 }
 
-export function renderFrame(game: Game, dt: number): void { 
+export function renderFrame(game: Game, dt: number): void {
 
 
 
@@ -508,6 +509,14 @@ export function renderFrame(game: Game, dt: number): void {
     return !body.obliterated
   })
 
+  // move star ref with inverted view frame position and factor
+  for (let i = 0; i < game.stars.length; i++) {
+    const starpos = sub(game.stars[i], smul(game.localPlayer.cameraPosition, 1))
+    // starpos = vec2Bound(starpos, sub(game.localPlayer.worldSize, getScreenCenterPosition(game.ctx)))
+    // starpos = vec2Bound(starpos, sub(game.localPlayer.worldSize, getScreenCenterPosition(game.ctx)))
+    renderPoint(game.ctx, starpos, '#000', screenScale * 2)
+  }
+
   if (game.localPlayer.health <= 0) {
     //Local player is dead
 
@@ -528,9 +537,9 @@ export function renderFrame(game: Game, dt: number): void {
   // renderRect(game.ctx,game.localPlayer.worldSize, newVec2(), '#aaa', 50)
   // renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx)
   // renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -100)), ctx)
-  // renderVec2(`world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`, add(game.localPlayer.viewFramePosition, newVec2(-200, 100)), ctx)
+  renderVec2(`world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`, add(game.localPlayer.viewFramePosition, newVec2(0, 100)), ctx)
   // renderVec2(`v: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(100, 100)), ctx)
-  
+
 
   const scrollPad = 500
 
@@ -541,15 +550,9 @@ export function renderFrame(game: Game, dt: number): void {
   //     } else {
   //       // game.localPlayer.viewFramePosition = newVec2()
   //     }
-      moveView(game)
+  moveView(game)
 
-  // move star ref with inverted view frame position and factor
-  for (let i = 0; i < game.stars.length; i++) {
-    const starpos = sub(game.stars[i], smul(game.localPlayer.cameraPosition, 1))
-    // starpos = vec2Bound(starpos, sub(game.localPlayer.worldSize, getScreenCenterPosition(game.ctx)))
-    // starpos = vec2Bound(starpos, sub(game.localPlayer.worldSize, getScreenCenterPosition(game.ctx)))
-    renderPoint(game.ctx, starpos, '#000', screenScale * 5)
-  }
+
 
 
 
