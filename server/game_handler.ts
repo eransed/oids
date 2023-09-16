@@ -12,6 +12,7 @@ export class GameHandler {
   asteroids: NonPlayerCharacter[] = []
   game_interval: NodeJS.Timer | undefined = undefined
   start_time_us: number = usNow()
+  tied_session_id: string | null = null
 
   private lastTime = performance.now()
   private dt = performance.now()
@@ -22,6 +23,13 @@ export class GameHandler {
 
   constructor(bc: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void) {
     this.broadcaster = bc
+  }
+
+  quit_game(): void {
+    info(`Quitting game ${this.tied_session_id}`)
+    this.game_started = false
+    this.asteroids = []
+    clearInterval(this.game_interval)
   }
 
   game_session_start(sessionId: string) {
@@ -39,10 +47,9 @@ export class GameHandler {
         })
       }
       this.lastTime = performance.now()
-      if (getActivePlayersFromSession(sessionId).length === 0) {
-        //do something when no players left in session
-        // clearInterval(this.game_interval)
-      }
+      // if (getActivePlayersFromSession(sessionId).length === 0) {
+      //   this.quit_game()
+      // }
     }, this.minTickTimeMs)
     /**
      * ToDo: Save the game when finished to all clients.
@@ -53,11 +60,12 @@ export class GameHandler {
   checkMessage(obj: SpaceObject) {
     if (obj.messageType === MessageType.START_GAME) {
       if (this.game_started) {
-        warn(`Game already running`)
+        warn(`Game ${this.tied_session_id} already running`)
       } else {
         info(`Starting new game`)
         this.game_session_start(obj.sessionId)
-        this.game_started = false
+        if (this.tied_session_id === null) this.tied_session_id = obj.sessionId
+        this.game_started = true
       }
     }
   }

@@ -30,10 +30,27 @@ const server: WebSocketServer = new WebSocketServer({
 
 export let globalConnectedClients: Client[] = []
 
-// const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
-//   // info(`Sending to session: ${sessionId}`)
-//   serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
-// })
+const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
+  // info(`Sending to session: ${sessionId}`)
+  const sendCount = serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
+  info (`SendCount: ${sendCount}`)
+  if (sendCount > 0 && sessionId) {
+    const sessionClients = getClientsFromSessionId(sessionId)
+    info(`Num: ${sessionClients.length}`)
+    let somePlays = false
+    for (let i = 0; i < sessionClients.length; i++) {
+      info(`Playing ${sessionClients[i].lastDataObject?.isPlaying}`)
+      if (sessionClients[i].lastDataObject?.isPlaying) {
+        somePlays = true
+      }
+    }
+    
+    if (somePlays === false) {
+      gameHandler.quit_game()
+    }
+
+  }
+})
 
 export class Client {
   ws: WebSocket
@@ -109,16 +126,18 @@ export class Client {
           } else {
             info('No clients connected')
           }
-        }
-
-        // gameHandler.checkMessage(so)
-
-        if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
-          broadcastToAllClients(this, globalConnectedClients, so)
         } else {
-          broadcastToSessionClients(this, globalConnectedClients, so)
-          //  info(`${this.name} with ${this.sessionId} broadcasts game info to possible ${globalConnectedClients.length}`)
+
+          gameHandler.checkMessage(so)
+
+          if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
+            broadcastToAllClients(this, globalConnectedClients, so)
+          } else {
+            broadcastToSessionClients(this, globalConnectedClients, so)
+            //  info(`${this.name} with ${this.sessionId} broadcasts game info to possible ${globalConnectedClients.length}`)
+          }
         }
+
       } catch (e) {
         error(`Failed with: ${e}`)
       }
@@ -224,19 +243,33 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   }
 }
 
-function serverBroadcast<T extends SpaceObject | NonPlayerCharacter>(data: T, connectedClients: Client[], sessionId: string | null = null): void {
+function serverBroadcast<T extends SpaceObject | NonPlayerCharacter>(data: T, connectedClients: Client[], sessionId: string | null = null): number {
+  let sendCount = 0
   if (sessionId === null) {
     for (const client of connectedClients) {
       client.ws.send(JSON.stringify(data))
+      sendCount++
     }
   } else {
     for (const client of connectedClients) {
       if (client.sessionId === sessionId) {
         // info(`Sending to ${client.name} with session ${sessionId}`)
         client.ws.send(JSON.stringify(data))
+        sendCount++
       }
     }
   }
+  return sendCount
+}
+
+export function getClientsFromSessionId(sessionId: string): Client[] {
+  const playerList: Client[] = []
+  for (const client of globalConnectedClients) {
+    if (sessionId === client.sessionId && client) {
+      playerList.push(client)
+    }
+  }
+  return playerList
 }
 
 export function getPlayersFromSessionId(sessionId: string): SpaceObject[] {

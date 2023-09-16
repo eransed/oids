@@ -27,6 +27,7 @@
   import { gameRef } from './Utils/mainGame'
   import { playersInSession } from '../../../../lib/services/game/playersInSession'
   import type { AxiosResponse } from 'axios'
+  import { info } from 'mathil'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -65,7 +66,8 @@
     players().then((d) => {
       const players = d.players
       console.log(players)
-      if (players.length === 1) {
+      if (players.length === 0) {
+        info(`You are the host!`)
         game.localPlayer.isHost = true
       }
     })

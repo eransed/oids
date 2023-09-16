@@ -23,7 +23,7 @@
   import { navigate } from 'svelte-routing'
   import { alertColors } from '../../../../style/defaultColors'
   import Alert from '../../../../components/alert/Alert.svelte'
-  import { info, log } from 'mathil'
+  import { info, log, warn } from 'mathil'
 
   /**
    * Reactive on changes to $user store.
@@ -130,6 +130,7 @@
           // handlePing(incomingUpdate, $socket)
         } else if (incomingUpdate.messageType === MessageType.START_GAME) {
           const sess = incomingUpdate.sessionId
+          $localPlayer.isPlaying = true
           console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
           $socket.resetListeners()
           navigate(`/play/${sess}`)
@@ -138,7 +139,7 @@
           $localPlayer.serverVersion = incomingUpdate.serverVersion
         } else {
           if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
-            console.log(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
+            warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
           }
         }
       },
@@ -274,6 +275,7 @@
 
   function startGame() {
     $localPlayer.messageType = MessageType.START_GAME
+    $localPlayer.isPlaying = true
     $socket.send($localPlayer)
     navigate(`/play/${$localPlayer.sessionId}`)
   }
