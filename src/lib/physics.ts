@@ -1,4 +1,4 @@
-import type { Bounceable, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
+import type { Bounceable, Bounded, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
 import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, warn, type Vec2, getScreenRect } from 'mathil'
 import { getScreenCenterPosition, getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
@@ -211,13 +211,26 @@ export function isColliding(p0: Physical, p1: Physical): boolean {
   return false
 }
 
-export function isWithinRadius(p0: Physical, p1: Physical, radius: number): boolean {
-  const d: number = magnitude(sub(p0.position, p1.position))
+export function isWithinRadiusWorld(p0: Physical & Bounded, p1: Physical & Bounded, radius: number): boolean {
+  const d: number = magnitude(sub(getWorldCoordinates(p0), getWorldCoordinates(p1)))
   if (d < radius) {
     return true
   }
   return false
 }
+
+export function isWithinRadius(p0: Physical, p1: Physical & Bounded, radius: number): boolean {
+  const d: number = magnitude(sub(p0.position, getWorldCoordinates(p1)))
+  if (d < radius) {
+    return true
+  }
+  return false
+}
+
+export function getWorldCoordinates(e: Physical & Bounded): Vec2 {
+  return add(e.viewFramePosition, e.cameraPosition)
+}
+
 
 export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
   if (p.position.x < gap) {
@@ -246,7 +259,7 @@ export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen
   }
 }
 
-export function handleCollisions(spaceObjects: NonPlayerCharacter[], ctx: CanvasRenderingContext2D): void {
+export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCharacter[], ctx: CanvasRenderingContext2D): void {
   resetCollisions(spaceObjects)
   for (const npc0 of spaceObjects) {
     if (npc0.isDead) continue
@@ -254,23 +267,27 @@ export function handleCollisions(spaceObjects: NonPlayerCharacter[], ctx: Canvas
     for (const npc1 of spaceObjects) {
       if (npc1.isDead) continue
       //  if (isColliding(npc0, npc1) && npc0.name !== npc1.name) {
-      if (isWithinRadius(npc0, npc1, npc1.hitRadius) && npc0.name !== npc1.name) {
+      if (isWithinRadiusWorld(npc0, npc1, npc1.hitRadius) && npc0.name !== npc1.name) {
         npc0.colliding = true
         npc1.colliding = true
         npc0.collidingWith.push(npc1)
         npc1.collidingWith.push(npc0)
         npc0.health -= collisionFrameDamage
         npc1.health -= collisionFrameDamage
-        renderHitExplosion(npc0.position, ctx)
-        renderHitExplosion(npc1.position, ctx)
+
+        const relative0 = sub(getWorldCoordinates(npc0), smul(cameraPosition, 1))
+        const relative1 = sub(getWorldCoordinates(npc1), smul(cameraPosition, 1))
+        renderHitExplosion(relative0, ctx)
+        renderHitExplosion(relative1, ctx)
 
         const f = -0.005
-        npc0.velocity = smul(npc0.velocity, f * npc1.mass)
-        npc1.velocity = smul(npc0.velocity, -f * npc0.mass)
+        // npc0.velocity = smul(npc0.velocity, f * npc1.mass)
+        // npc1.velocity = smul(npc0.velocity, -f * npc0.mass)
       }
       for (const shot of npc0.shotsInFlight) {
         if (shot.armedDelay < 0) {
           const heading: Vec2 = scalarMultiply(headingFromAngle(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
+
           if (isWithinRadius(shot, npc1, npc1.hitRadius) && shot.didHit === false) {
             npc1.health -= shot.damage
             npc1.velocity = add(npc1.velocity, heading)
@@ -285,10 +302,10 @@ export function handleCollisions(spaceObjects: NonPlayerCharacter[], ctx: Canvas
                 npc1.health = 0
               }
             }
-          }
+          } 
         }
-
-        handleHittingShot(shot, ctx)
+        
+        handleHittingShot(cameraPosition, shot, ctx)
       }
     }
   }

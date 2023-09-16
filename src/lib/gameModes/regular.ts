@@ -602,5 +602,5 @@ export function nextFrame(game: Game, dt: number): void {
 
   const currentSpaceObjects = game.all.concat(game.remotePlayers)
 
-  handleCollisions(currentSpaceObjects, game.ctx)
+  handleCollisions(game.localPlayer.cameraPosition, currentSpaceObjects, game.ctx)
 }

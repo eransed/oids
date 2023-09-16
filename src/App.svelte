@@ -26,6 +26,7 @@
   import type { Settings, Theme, UIStyle } from './lib/interface'
   import { setGameSettings } from './pages/GamePage/components/Game/Utils/mainGame'
   import { setGraphLineColor } from './lib/constants'
+  import { info } from 'mathil'
 
   $: if ($settings) {
     setCssFromSettings()
@@ -67,7 +68,10 @@
     }
 
     setGameSettings(sets)
+    
   }
+
+
 </script>
 
 {#if $pageHasHeader}

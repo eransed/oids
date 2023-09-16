@@ -1,7 +1,7 @@
 import type { Boostable, Bounceable, Damageable, Damager, NonPlayerCharacter, PhotonLaser, Physical, Positionable, SpaceObject, Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
-import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2 } from 'mathil'
+import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2, sub, smul } from 'mathil'
 import { maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
@@ -124,11 +124,12 @@ export function fire(so: SpaceObject): void {
   so.ammo -= shotLeftToFire
 }
 
-export function handleHittingShot(shot: PhotonLaser, ctx: CanvasRenderingContext2D): void {
+export function handleHittingShot(cameraPosition: Vec2, shot: PhotonLaser, ctx: CanvasRenderingContext2D): void {
   if (shot.didHit) {
     shot.shotBlowFrame--
     shot.velocity = scalarMultiply(shot.velocity, shotHitReversFactor)
-    renderHitExplosion(shot.position, ctx)
+    const relative = sub(shot.position, smul(cameraPosition, 1))
+    renderHitExplosion(relative, ctx)
     if (shot.shotBlowFrame < 0) {
       shot.health = 0
     }
