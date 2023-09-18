@@ -16,7 +16,7 @@
   import PostGamePage from './pages/PostGamePage/PostGamePage.svelte'
   import ProfilePage from './pages/ProfilePage/ProfilePage.svelte'
   import Header from './components/header/header.svelte'
-  import GameLobby from './pages/GameLobby/components/GameLobby/GameLobby.svelte'
+  import GameLobby from './pages/GameLobby/GameLobby.svelte'
   import TestPage from './pages/TestPage/TestPage.svelte'
 
   //Components
@@ -45,9 +45,9 @@
       accent: '#8B7BFF',
     }
 
-    document.documentElement.style.setProperty('--main-bg-color', `${darkMode ?  DeepMidnight.bg  : '#EAEAEA'}`)
-    document.documentElement.style.setProperty('--main-text-color', `${darkMode ? DeepMidnight.font  : '#555555'}`)
-    document.documentElement.style.setProperty('--main-card-color', `${darkMode ? DeepMidnight.card  : '#F5F5F5'}`)
+    document.documentElement.style.setProperty('--main-bg-color', `${darkMode ? DeepMidnight.bg : '#EAEAEA'}`)
+    document.documentElement.style.setProperty('--main-text-color', `${darkMode ? DeepMidnight.font : '#555555'}`)
+    document.documentElement.style.setProperty('--main-card-color', `${darkMode ? DeepMidnight.card : '#F5F5F5'}`)
 
     const themeTextColor = document.documentElement.style.getPropertyValue('--main-text-color')
     const spaceColor = document.documentElement.style.getPropertyValue('--main-bg-color')
@@ -68,10 +68,7 @@
     }
 
     setGameSettings(sets)
-    
   }
-
-
 </script>
 
 {#if $pageHasHeader}

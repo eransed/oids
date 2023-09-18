@@ -1,29 +1,25 @@
 <script lang="ts">
-  //Svelte
-  import { fade, slide } from 'svelte/transition'
-
   //Stores
-  import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket, chatMessageHistory, gameSessionId } from '../../../../stores/stores'
+  import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket, chatMessageHistory, gameSessionId } from '../../stores/stores'
 
   //Interfaces
-  import { MessageType, type SpaceObject } from '../../../../lib/interface'
+  import { MessageType, type SpaceObject } from '../../lib/interface'
 
   //Components
-  import Page from '../../../../components/page/page.svelte'
+  import Page from '../../components/page/page.svelte'
 
   //Services
-  import type { ChatMessage, Session } from '../../../../lib/interface'
-  import { createSessionId } from '../../../../helpers/util'
-  import { activeSessions } from '../../../../lib/services/game/activeSessions'
-  import SessionList from './SessionList/SessionList.svelte'
+  import type { ChatMessage, Session } from '../../lib/interface'
+  import { createSessionId } from '../../helpers/util'
+  import { activeSessions } from '../../lib/services/game/activeSessions'
+  import SessionList from './components/SessionList/SessionList.svelte'
 
   import { onDestroy, onMount } from 'svelte'
-  // import { info, log, warn } from 'mathil'
-  import TypeWriter from '../../../../components/typeWriter/TypeWriter.svelte'
   import { navigate } from 'svelte-routing'
-  import { alertColors } from '../../../../style/defaultColors'
-  import Alert from '../../../../components/alert/Alert.svelte'
+  import { alertColors } from '../../style/defaultColors'
+  import Alert from '../../components/alert/Alert.svelte'
   import { info, log, warn } from 'mathil'
+  import Chat from '../../components/chat/chat.svelte'
 
   /**
    * Reactive on changes to $user store.
@@ -178,11 +174,6 @@
     leaveSession()
   }
 
-  function dateTimeFormat(d: Date): string {
-    const ms = ('' + d.getMilliseconds()).padStart(3, '0')
-    return `${d.toLocaleString('sv-SE')}.${ms}`
-  }
-
   function updateSessions() {
     activeSessions()
       .then((s) => {
@@ -235,44 +226,6 @@
     // pingIdArray = []
   }
 
-  let chatMsg: string = ''
-
-  function sendRawChatMessage(msgStr: string) {
-    const chatMessage: ChatMessage = {
-      message: msgStr,
-      user: $localPlayer,
-      timeDate: new Date(),
-    }
-    $chatMessageHistory.push(chatMessage)
-    $chatMessageHistory = $chatMessageHistory
-
-    $localPlayer.messageType = MessageType.CHAT_MESSAGE
-    $localPlayer.lastMessage = msgStr
-    $socket.send($localPlayer)
-    chatMsg = ''
-    scrollToBottom()
-  }
-
-  function sendChatMessage() {
-    const msgSet: Set<string> = new Set()
-
-    let uniqueMsg: string[] = []
-
-    chatMsg.split('').forEach((msg) => {
-      msgSet.add(msg)
-    })
-
-    msgSet.forEach((msg) => {
-      uniqueMsg.push(msg)
-    })
-
-    if (chatMsg.length > 0) {
-      if (uniqueMsg.length === 1 && uniqueMsg[0] === ' ') {
-        return
-      } else sendRawChatMessage(chatMsg)
-    }
-  }
-
   function startGame() {
     $localPlayer.messageType = MessageType.START_GAME
     $localPlayer.isPlaying = true
@@ -290,15 +243,6 @@
     $localPlayer.messageType = MessageType.SESSION_UPDATE
     $socket.send($localPlayer)
     updateSessions()
-  }
-
-  function scrollToBottom(): void {
-    const messageDiv = document.getElementById('messagesDiv')
-    if (messageDiv) {
-      setTimeout(() => {
-        messageDiv.scrollTop = messageDiv.scrollHeight
-      }, 300)
-    }
   }
 </script>
 
@@ -358,49 +302,14 @@
       {/if}
     </div>
     <div class="right">
-      <p style="margin-left: 0.5em">Chat - {joinedSession?.id}</p>
-
-      <div class="messages" id="messagesDiv">
-        {#each $chatMessageHistory as msg}
-          {#if msg.serviceMsg}
-            <span style="font-size: 0.8rem; font-style: italic; opacity: 0.5;">{msg.message}</span>
-          {:else}
-            <div in:fade={{ delay: 100 }}>
-              <p style="margin-bottom: 1rem;">
-                <span style="font-size: 0.65rem; color: var(--main-text-color)">
-                  {dateTimeFormat(msg.timeDate)} -
-                  <span style="font-size: 0.8rem; color: #c89;">
-                    {msg.user.name}:
-                  </span>
-                </span>
-                <br />
-                <TypeWriter text={msg.message} delaySpeed={250} speed={35} startCallback={() => scrollToBottom()} />
-              </p>
-            </div>
-          {/if}
-        {/each}
-      </div>
-      <div class="msgInput">
-        <form on:submit|preventDefault={sendChatMessage}>
-          <input bind:value={chatMsg} placeholder="Got something to say?" type="text" />
-          <button type="submit">Send</button>
-        </form>
-      </div>
+      {#if joinedSession}
+        <Chat joinedSessionId={joinedSession?.id} />
+      {/if}
     </div>
   </div>
 </Page>
 
 <style>
-  .msgInput input {
-    min-height: 2em;
-  }
-
-  .msgInput form {
-    display: grid;
-    grid-auto-columns: 4fr 1fr;
-    grid-auto-flow: column;
-  }
-
   .lobbyWrapper {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
@@ -437,14 +346,6 @@
 
   .right {
     grid-template-rows: 1fr auto auto;
-  }
-
-  .messages {
-    max-height: 14em;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-width: 100%;
-    padding: 0.5em;
   }
 
   .center button {
@@ -542,10 +443,6 @@
       height: 300px;
       width: 95%;
     }
-
-    .messages {
-      height: 100%;
-    }
   }
 
   @media screen and (max-width: 750px) and (max-height: 400px) {
@@ -577,10 +474,6 @@
       position: relative;
       height: fit-content;
       overflow: auto;
-    }
-
-    .messages {
-      height: 100%;
     }
   }
 </style>

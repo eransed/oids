@@ -33,22 +33,21 @@ export let globalConnectedClients: Client[] = []
 const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
   // info(`Sending to session: ${sessionId}`)
   const sendCount = serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
-  info (`SendCount: ${sendCount}`)
+  // info (`SendCount: ${sendCount}`)
   if (sendCount > 0 && sessionId) {
     const sessionClients = getClientsFromSessionId(sessionId)
-    info(`Num: ${sessionClients.length}`)
+    // info(`Num: ${sessionClients.length}`)
     let somePlays = false
     for (let i = 0; i < sessionClients.length; i++) {
-      info(`Playing ${sessionClients[i].lastDataObject?.isPlaying}`)
+      // info(`Playing ${sessionClients[i].lastDataObject?.isPlaying}`)
       if (sessionClients[i].lastDataObject?.isPlaying) {
         somePlays = true
       }
     }
-    
+
     if (somePlays === false) {
       gameHandler.quit_game()
     }
-
   }
 })
 
@@ -127,7 +126,6 @@ export class Client {
             info('No clients connected')
           }
         } else {
-
           gameHandler.checkMessage(so)
 
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
@@ -137,7 +135,6 @@ export class Client {
             //  info(`${this.name} with ${this.sessionId} broadcasts game info to possible ${globalConnectedClients.length}`)
           }
         }
-
       } catch (e) {
         error(`Failed with: ${e}`)
       }
