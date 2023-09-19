@@ -5,6 +5,7 @@
   //Components
   import Page from '../../components/page/page.svelte'
   import Alert from '../../components/alert/Alert.svelte'
+  import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
 
   //Services
   import updateUser from '../../lib/services/user/updateUser'
@@ -147,14 +148,14 @@
           </div>
         {/if}
 
-        <div class="dataTable">
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-            </tr>
-            {#if users}
+        {#if users}
+          <div class="dataTable">
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+              </tr>
               {#each Object.values(users) as u}
                 {#if edit && u.id === editingUser?.id}
                   <tr>
@@ -202,12 +203,16 @@
                   </tr>
                 {/if}
               {/each}
-            {/if}
-          </table>
-        </div>
+            </table>
+          </div>
+        {:else}
+          <CircularSpinner />
+        {/if}
       </div>
     </Page>
   {/if}
+{:else}
+  <CircularSpinner />
 {/if}
 
 <style>

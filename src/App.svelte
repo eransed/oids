@@ -5,7 +5,7 @@
   import { routes } from './routes'
 
   //Stores
-  import { pageHasHeader, settings } from './stores/stores'
+  import { pageHasHeader, settings, user } from './stores/stores'
 
   //Helpers
   import { onAppMount } from './helpers/onAppMount'
@@ -26,7 +26,6 @@
   import type { Settings, Theme, UIStyle } from './lib/interface'
   import { setGameSettings } from './pages/GamePage/components/Game/Utils/mainGame'
   import { setGraphLineColor } from './lib/constants'
-  import { info } from 'mathil'
 
   $: if ($settings) {
     setCssFromSettings()

@@ -20,6 +20,7 @@
   import Alert from '../../components/alert/Alert.svelte'
   import { info, log, warn } from 'mathil'
   import Chat from '../../components/chat/chat.svelte'
+  import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
 
   /**
    * Reactive on changes to $user store.
@@ -37,13 +38,12 @@
     updateSessions()
   }
 
-  $: if ($user) console.log($user)
-
   $: allReady = false
 
   pageHasHeader.set(true)
 
   let sessions: Session[] = []
+  let loadingSession: boolean = true
 
   function hostSession(forceNewSessionId = false) {
     if ($localPlayer.sessionId.length === 0 || forceNewSessionId === true) {
@@ -174,18 +174,17 @@
     leaveSession()
   }
 
-  function updateSessions() {
-    activeSessions()
+  async function updateSessions() {
+    loadingSession = true
+    await activeSessions()
       .then((s) => {
         if (s.status === 200) {
           sessions = s.data
           checkJoinedSession()
+          loadingSession = false
         } else {
           console.error(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
         }
-      })
-      .then(() => {
-        // console.log('Sessions: ', sessions)
       })
       .catch((e) => {
         console.error(`Failed to fetch sessions: ${e}`)
@@ -247,65 +246,69 @@
 </script>
 
 <Page>
-  <div class="lobbyWrapper">
-    <div class="left">
-      <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
-    </div>
-    <div class="center">
-      {#if joinedSession}
-        <div class="sessionInfo">
-          <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
-            Host: {joinedSession.host.name}
-            {joinedSession.host.readyToPlay ? '✅' : ''}
-          </p>
-          <br />
-          {#if joinedSession.players.length > 1}
-            <p>Players</p>
-          {/if}
-          {#each joinedSession.players as player}
-            {#if !player.isHost}
-              <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
-                {player.name}
-                <!-- {getPlayerPing(player)} - -->
-
-                {player.readyToPlay ? '✅' : ''}
-              </p>
+  {#if loadingSession}
+    <CircularSpinner />
+  {:else}
+    <div class="lobbyWrapper">
+      <div class="left">
+        <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
+      </div>
+      <div class="center">
+        {#if joinedSession}
+          <div class="sessionInfo">
+            <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
+              Host: {joinedSession.host.name}
+              {joinedSession.host.readyToPlay ? '✅' : ''}
+            </p>
+            <br />
+            {#if joinedSession.players.length > 1}
+              <p>Players</p>
             {/if}
-          {/each}
-          {#if allReady}
-            <p>All players ready!</p>
-          {/if}
-        </div>
-        <div class="buttonWrapper">
-          <button
-            style={`background-color: ${alertColors.warning}`}
-            on:click={() => {
-              leaveSession()
-            }}>Leave session</button
-          >
+            {#each joinedSession.players as player}
+              {#if !player.isHost}
+                <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
+                  {player.name}
+                  <!-- {getPlayerPing(player)} - -->
 
-          <button style={`background-color: ${$localPlayer.readyToPlay ? alertColors.success : alertColors.info}`} on:click={() => toggleReadyToPlay()}
-            >{$localPlayer.readyToPlay ? 'Ready ✅' : 'Ready up!'}</button
-          >
-          <button
-            style={`background-color: ${allReady ? alertColors.info : alertColors.error}`}
-            disabled={!allReady}
-            on:click={() => {
-              startGame()
-            }}
-            >Start game!
-          </button>
-        </div>
-      {:else}
-        <p>No session joined</p>
-      {/if}
+                  {player.readyToPlay ? '✅' : ''}
+                </p>
+              {/if}
+            {/each}
+            {#if allReady}
+              <p>All players ready!</p>
+            {/if}
+          </div>
+          <div class="buttonWrapper">
+            <button
+              style={`background-color: ${alertColors.warning}`}
+              on:click={() => {
+                leaveSession()
+              }}>Leave session</button
+            >
+
+            <button style={`background-color: ${$localPlayer.readyToPlay ? alertColors.success : alertColors.info}`} on:click={() => toggleReadyToPlay()}
+              >{$localPlayer.readyToPlay ? 'Ready ✅' : 'Ready up!'}</button
+            >
+            <button
+              style={`background-color: ${allReady ? alertColors.info : alertColors.error}`}
+              disabled={!allReady}
+              on:click={() => {
+                startGame()
+              }}
+              >Start game!
+            </button>
+          </div>
+        {:else}
+          <CircularSpinner />
+        {/if}
+      </div>
+      <div class="right">
+        {#if joinedSession}
+          <Chat joinedSessionId={joinedSession?.id} />
+        {/if}
+      </div>
     </div>
-    <div class="right">
-      {#if joinedSession}
-        <Chat joinedSessionId={joinedSession?.id} />
-      {/if}
-    </div>
-  </div>
+  {/if}
 </Page>
 
 <style>
