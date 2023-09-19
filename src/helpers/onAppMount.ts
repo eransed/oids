@@ -1,6 +1,6 @@
 import { info } from 'mathil'
 import { validateToken } from '../lib/services/utils/Token'
-import { user, settings } from '../stores/stores'
+import { settings } from '../stores/stores'
 
 /**
  * Asynchronus function that runs at startup.

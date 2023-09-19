@@ -1,31 +1,21 @@
 import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition } from '../canvas_util'
 import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
-import { add, direction, dist2, info, log, magnitude, newVec2, rndfVec2, rndi, round2dec, smul, sub, to_string2 } from 'mathil'
-import { bounceSpaceObject, handleDeathExplosion } from '../mechanics'
-import { friction, handleCollisions, offScreen, vec2Bound, vec2Bound_mm } from '../physics'
+import { add, direction, dist2, info, log, magnitude, newVec2, rndf, rndfVec2, rndi, round2dec, smul, sub, to_string2 } from 'mathil'
+import { handleDeathExplosion } from '../mechanics'
+import { friction, gravity, gravityStars, handleCollisions, vec2Bound } from '../physics'
 import { loadingText, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
-import {
-  GameType,
-  getRenderableObjectCount,
-  SpaceShape,
-  type ServerUpdate,
-  type SpaceObject,
-  MessageType,
-  type NonPlayerCharacter,
-  type UIStyle,
-  boundVec2,
-} from '../interface'
+import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type NonPlayerCharacter } from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
-import { bounceFactor, explosionDuration, screenScale, worldSize } from '../constants'
+import { explosionDuration, screenScale, worldSize } from '../constants'
 import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from '../stats'
-import { createNpc, createSpaceObject, newPhotonLaser } from '../factory'
+import { createNpc, newPhotonLaser } from '../factory'
 import { reduceShotSize, reduceSoSize } from '../websocket/util'
 import { renderMoon } from '../render/renderDebris'
 import { renderShip } from '../render/renderShip'
-import { renderRect, renderVec2, renderViewport } from '../render/renderUI'
+import { renderVec2 } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
 
 //Stores
@@ -156,7 +146,7 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.worldSize = worldSize // server sends size of world
   game.localPlayer.cameraPosition = newVec2(0, 0)
 
-  for (let i = 0; i < 1.2 * 1e4; i++) {
+  for (let i = 0; i < 1.2 * 6e3; i++) {
     // create starts
     const star = rndfVec2(0, 0)
     star.x = rndi(0, worldSize.x / 2)
@@ -164,8 +154,8 @@ export function initRegularGame(game: Game): void {
     game.stars.push(star)
   }
 
-  game.stars.push(newVec2())
-  game.stars.push(smul(worldSize, .5))
+  // game.stars.push(newVec2())
+  // game.stars.push(smul(worldSize, 0.5))
 
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
@@ -345,7 +335,6 @@ export class Every {
 const every = new Every(25)
 
 function moveView(game: Game) {
-
   // bound ship to viewframe
   const pad = newVec2(250, 250)
 
@@ -353,7 +342,7 @@ function moveView(game: Game) {
   const distanceToCenter = dist2(game.localPlayer.position, center)
   const offsetCenter = 400
 
-  const camBound = sub(smul(game.localPlayer.worldSize, .5), getScreenRect(game.ctx))
+  const camBound = sub(smul(game.localPlayer.worldSize, 0.5), getScreenRect(game.ctx))
   // console.log (camBound)
   game.localPlayer.cameraPosition = add(game.localPlayer.cameraPosition, game.localPlayer.velocity)
   game.localPlayer.cameraPosition = vec2Bound(game.localPlayer.cameraPosition, camBound)
@@ -376,8 +365,6 @@ function moveView(game: Game) {
   //   game.localPlayer.velocity = newVec2()
   // })
 
-
-
   // const padNum = 0
 
   // // move viewframe on x axis with ship velocity
@@ -398,7 +385,7 @@ function moveView(game: Game) {
   // // move viewframe on y axis with ship velocity
   // if (game.localPlayer.viewFramePosition.y >= padNum || game.localPlayer.viewFramePosition.y <= game.localPlayer.worldSize.y - getScreenRect(game.ctx).y) {
   //   game.localPlayer.viewFramePosition = add(game.localPlayer.viewFramePosition, game.localPlayer.velocity)
-  // } 
+  // }
 
   // // Bound top y axis to world size - view rect
   // if (game.localPlayer.viewFramePosition.y < padNum) {
@@ -409,17 +396,9 @@ function moveView(game: Game) {
   // if (game.localPlayer.viewFramePosition.y > game.localPlayer.worldSize.y - getScreenRect(game.ctx).y) {
   //   game.localPlayer.viewFramePosition.y = game.localPlayer.worldSize.y - getScreenRect(game.ctx).y
   // }
-
-
-
-
-
 }
 
 export function renderFrame(game: Game, dt: number): void {
-
-
-
   every.tick(() => {
     game.localPlayer.viewport = getScreenRect(game.ctx)
     setCanvasSizeToClientViewFrame(game.ctx)
@@ -537,9 +516,12 @@ export function renderFrame(game: Game, dt: number): void {
   // renderRect(game.ctx,game.localPlayer.worldSize, newVec2(), '#aaa', 50)
   // renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx)
   // renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -100)), ctx)
-  renderVec2(`world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`, add(game.localPlayer.viewFramePosition, newVec2(0, 100)), ctx)
+  renderVec2(
+    `world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
+    add(game.localPlayer.viewFramePosition, newVec2(0, 100)),
+    ctx
+  )
   // renderVec2(`v: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(100, 100)), ctx)
-
 
   const scrollPad = 500
 
@@ -551,11 +533,6 @@ export function renderFrame(game: Game, dt: number): void {
   //       // game.localPlayer.viewFramePosition = newVec2()
   //     }
   moveView(game)
-
-
-
-
-
 }
 
 export function nextFrame(game: Game, dt: number): void {
@@ -580,20 +557,19 @@ export function nextFrame(game: Game, dt: number): void {
 
   game.bodies.forEach((body) => {
     // bounceSpaceObject(body, getScreenRect(game.ctx), 0.4, 0, 0)
-
     // game.bodies.forEach((other) => {
     //   if (body !== other) {
     //     gravity(body, other)
     //   }
     // })
-
-    // gravity(body, game.localPlayer)
-
     // game.localPlayer.shotsInFlight.forEach((shot) => {
     //   gravity(body, shot)
-    // })
-
+    // })e
     // friction(body)
+  })
+
+  game.remotePlayers.forEach((so) => {
+    gravity(so, game.localPlayer, 3)
   })
 
   game.remotePlayers = game.remotePlayers.filter((so) => {

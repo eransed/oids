@@ -247,7 +247,6 @@
 </script>
 
 <Page>
-  <Alert severity={'success'} text={`${allReady ? 'All players ready' : ''}`} />
   <div class="lobbyWrapper">
     <div class="left">
       <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />

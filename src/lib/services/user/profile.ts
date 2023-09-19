@@ -18,7 +18,15 @@ const getProfile = async (): Promise<User> => {
     .then((response: AxiosResponse<User>) => {
       user.set(response.data)
       console.log('Welcome: ', response.data.name, response.data)
-      settings.set({ darkMode: response.data.darkMode })
+      settings.set({
+        darkMode: response.data.darkMode,
+        uiStyle: {
+          unarmedShotColor: '',
+          armedShotColor: '',
+          shipColor: '',
+          spaceColor: '',
+        },
+      })
 
       return response.data
     })

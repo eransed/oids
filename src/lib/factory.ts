@@ -2,7 +2,7 @@ import type { NonPlayerCharacter, PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceShape } from './interface'
 import { newVec2, rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
-import { randomAnyColor, randomAnyLightColor, randomBlue } from './color'
+import { randomBlue } from './color'
 
 export function newPhotonLaser(): PhotonLaser {
   const shot: PhotonLaser = {
@@ -25,7 +25,7 @@ export function newPhotonLaser(): PhotonLaser {
     ownerName: '',
     lastDamagedByName: '',
     killedByName: '',
-    viewFramePosition: newVec2()
+    viewFramePosition: newVec2(),
   }
 
   return shot
@@ -117,7 +117,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     rtt: 0,
     worldSize: newVec2(),
     cameraPosition: newVec2(),
-    viewFramePosition: newVec2()
+    viewFramePosition: newVec2(),
   }
 
   return spaceObject
@@ -151,7 +151,7 @@ export function createNpc(): NonPlayerCharacter {
     didHit: false,
     shotBlowFrame: 0,
     ownerName: '',
-    name: `A-12345`,
+    name: `A-${rndi(10000, 100000000)}`,
     // name: `A-${rndi(100000, 100000000)}`,
     kills: [],
     killCount: 0,
@@ -171,7 +171,7 @@ export function createNpc(): NonPlayerCharacter {
     shotsFiredThisFrame: false,
     worldSize: newVec2(),
     cameraPosition: newVec2(),
-    viewFramePosition: newVec2()
+    viewFramePosition: newVec2(),
   }
   return npc
 }

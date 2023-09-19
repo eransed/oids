@@ -1,5 +1,5 @@
 import type { Bounceable, Bounded, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
-import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, warn, type Vec2, getScreenRect } from 'mathil'
+import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul, sub, warn, type Vec2, getScreenRect, newVec2 } from 'mathil'
 import { getScreenCenterPosition, getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
@@ -107,7 +107,6 @@ export function decayOffScreenShotsPadded(npc: SpaceObject | NonPlayerCharacter,
   })
 }
 
-
 export function vec2Bound(v: Vec2, bound: Vec2) {
   if (v.x > bound.x) v.x = bound.x
   if (v.x < 0) v.x = 0
@@ -116,7 +115,14 @@ export function vec2Bound(v: Vec2, bound: Vec2) {
   return v
 }
 
-export function vec2Bound_mm(v: Vec2, bound_min: Vec2, bound_max: Vec2, callback: () => void = () => {/** default */}) {
+export function vec2Bound_mm(
+  v: Vec2,
+  bound_min: Vec2,
+  bound_max: Vec2,
+  callback: () => void = () => {
+    /** default */
+  }
+) {
   if (v.x > bound_max.x) {
     v.x = bound_max.x
     callback()
@@ -136,8 +142,6 @@ export function vec2Bound_mm(v: Vec2, bound_min: Vec2, bound_max: Vec2, callback
   return v
 }
 
-
-
 export function offScreen(v: Vec2, screen: Vec2) {
   if (v.x > screen.x) return true
   if (v.x < 0) return true
@@ -154,11 +158,24 @@ export function offScreen_mm(v: Vec2, screen_min: Vec2, screen_max: Vec2) {
   return false
 }
 
-export function gravity(from: Physical, to: Physical, G = 1): void {
+export function gravity(from: SpaceObject | NonPlayerCharacter, to: SpaceObject | NonPlayerCharacter, G = 1): void {
   // F = G((m0 * m1)/r^2)
   const m0: number = from.mass
   const m1: number = to.mass
-  const v01: Vec2 = sub(from.position, to.position)
+  const v01: Vec2 = sub(getWorldCoordinates(from), getWorldCoordinates(to))
+  const r: number = magnitude(v01)
+  const r2: number = Math.pow(r, 2)
+  const F: number = G * ((m0 * m1) / r2)
+  const gvec: Vec2 = scalarMultiply(v01, F)
+  to.acceleration = add(to.acceleration, gvec)
+}
+
+export function gravityStars(from: NonPlayerCharacter, to: NonPlayerCharacter, G = 1): void {
+  // F = G((m0 * m1)/r^2)
+
+  const m0 = from.mass
+  const m1: number = to.mass
+  const v01: Vec2 = sub(getWorldCoordinates(from), getWorldCoordinates(to))
   const r: number = magnitude(v01)
   const r2: number = Math.pow(r, 2)
   const F: number = G * ((m0 * m1) / r2)
@@ -231,7 +248,6 @@ export function getWorldCoordinates(e: Physical & Bounded): Vec2 {
   return add(e.viewFramePosition, e.cameraPosition)
 }
 
-
 export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
   if (p.position.x < gap) {
     p.velocity.x = -p.velocity.x * energyFactor
@@ -302,9 +318,9 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCh
                 npc1.health = 0
               }
             }
-          } 
+          }
         }
-        
+
         handleHittingShot(cameraPosition, shot, ctx)
       }
     }

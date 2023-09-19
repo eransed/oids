@@ -2,12 +2,12 @@ import type { Positionable, Sizeable } from './Physical'
 import type { Damager } from '../interface'
 import type { Steerable } from './Steerable'
 import { steerImpl } from './Steerable'
-import type { Vec2 } from 'mathil'
+import { newVec2, type Vec2 } from 'mathil'
 
 export interface Renderable extends Positionable, Sizeable {
- color: string
- ctx: CanvasRenderingContext2D
- render(): void
+  color: string
+  ctx: CanvasRenderingContext2D
+  render(): void
 }
 
 // export class RenderableBase implements Positionable, Sizeable, Damager, Steerable {
@@ -55,43 +55,44 @@ export interface Renderable extends Positionable, Sizeable {
 // }
 
 export class PhotonMissile implements Renderable, Steerable, Damager {
- position: Vec2 = { x: 0, y: 0 }
- steeringPower = 1
- angleDegree = 120
- angularVelocity = 0
- color = '#fff'
- size: Vec2 = { x: 10, y: 10 }
- damage = 1
- armedDelay = 20
- didHit = false
- shotBlowFrame = 0
+  position: Vec2 = { x: 0, y: 0 }
+  steeringPower = 1
+  angleDegree = 120
+  angularVelocity = 0
+  color = '#fff'
+  size: Vec2 = { x: 10, y: 10 }
+  damage = 1
+  armedDelay = 20
+  didHit = false
+  shotBlowFrame = 0
+  viewFramePosition: Vec2 = newVec2()
 
- readonly ctx: CanvasRenderingContext2D
+  readonly ctx: CanvasRenderingContext2D
 
- constructor(cc: CanvasRenderingContext2D) {
-  this.ctx = cc
- }
- ownerName = ''
+  constructor(cc: CanvasRenderingContext2D) {
+    this.ctx = cc
+  }
+  ownerName = ''
 
- steer(direction: number, deltaTime: number): void {
-  steerImpl(this, direction, deltaTime)
- }
-
- render(): void {
-  if (Math.random() > 0.99) {
-   this.ctx.fillStyle = this.armedDelay < 0 ? '#00f' : '#fff'
-  } else if (Math.random() > 0.985) {
-   this.ctx.fillStyle = this.armedDelay < 0 ? '#ff0' : '#fff'
-  } else if (Math.random() > 0.975) {
-   this.ctx.fillStyle = this.armedDelay < 0 ? '#f00' : '#fff'
-  } else {
-   this.ctx.fillStyle = this.armedDelay < 0 ? this.color : '#fff'
+  steer(direction: number, deltaTime: number): void {
+    steerImpl(this, direction, deltaTime)
   }
 
-  this.ctx.save()
-  this.ctx.translate(this.position.x, this.position.y)
-  this.ctx.rotate(((90 + this.angleDegree) * Math.PI) / 180)
-  this.ctx.fillRect(-this.size.x / 2, -this.size.y / 2, this.size.x, this.size.y)
-  this.ctx.restore()
- }
+  render(): void {
+    if (Math.random() > 0.99) {
+      this.ctx.fillStyle = this.armedDelay < 0 ? '#00f' : '#fff'
+    } else if (Math.random() > 0.985) {
+      this.ctx.fillStyle = this.armedDelay < 0 ? '#ff0' : '#fff'
+    } else if (Math.random() > 0.975) {
+      this.ctx.fillStyle = this.armedDelay < 0 ? '#f00' : '#fff'
+    } else {
+      this.ctx.fillStyle = this.armedDelay < 0 ? this.color : '#fff'
+    }
+
+    this.ctx.save()
+    this.ctx.translate(this.position.x, this.position.y)
+    this.ctx.rotate(((90 + this.angleDegree) * Math.PI) / 180)
+    this.ctx.fillRect(-this.size.x / 2, -this.size.y / 2, this.size.x, this.size.y)
+    this.ctx.restore()
+  }
 }

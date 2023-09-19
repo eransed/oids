@@ -21,7 +21,7 @@ export class Game {
   lightSource = new LightSource({ x: 1000, y: 750 }, { x: 1, y: 0 }, 45, 1)
   segments: LineSegment[] = []
   gameOver = false
-  bodies: (SpaceObject | NonPlayerCharacter) [] = []
+  bodies: (SpaceObject | NonPlayerCharacter)[] = []
   all: (SpaceObject | NonPlayerCharacter)[] = []
   shouldSendToServer = false
   hasCalledCallback = false
