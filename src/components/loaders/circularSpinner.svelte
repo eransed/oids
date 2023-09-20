@@ -1,7 +1,16 @@
 <script lang="ts">
+  import Ship from '../../assets/ship.svg'
+
+  export let ship: boolean = false
 </script>
 
-<div class="circle" />
+{#if ship}
+  <div class="ship">
+    <img alt="Ship" src={Ship} />
+  </div>
+{:else}
+  <div class="circle" />
+{/if}
 
 <style>
   .circle {
@@ -19,9 +28,42 @@
     margin: auto;
   }
 
+  .ship {
+    justify-content: center;
+    align-content: center;
+    width: 200px;
+    height: 200px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgb(47, 167, 252, 0.5);
+    border-right-color: rgb(47, 167, 252, 0);
+    border-radius: 50%;
+    margin: auto;
+    animation-name: spin;
+    animation-duration: 3.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    display: flex;
+  }
+
+  .ship img {
+    justify-self: center;
+    width: 50%;
+    animation: spinShip 3s linear infinite;
+    opacity: 0.8;
+    margin-top: 1em;
+  }
+
   @keyframes spin {
     100% {
       -webkit-transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spinShip {
+    100% {
+      -webkit-transform: rotate(-360deg);
+      /* margin-top: 1em; */
     }
   }
 </style>

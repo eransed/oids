@@ -9,17 +9,25 @@ import { settings } from '../stores/stores'
  */
 export const onAppMount = async (): Promise<void> => {
   info('onAppmount')
-  await validateToken().then((d) => {
-    if (d?.darkMode) {
-      settings.set({
-        darkMode: d?.darkMode,
-        uiStyle: {
-          unarmedShotColor: '',
-          armedShotColor: '',
-          shipColor: '',
-          spaceColor: '',
-        },
+
+  return new Promise<void>((resolve, reject) => {
+    validateToken()
+      .then((d) => {
+        if (d?.darkMode) {
+          settings.set({
+            darkMode: d?.darkMode,
+            uiStyle: {
+              unarmedShotColor: '',
+              armedShotColor: '',
+              shipColor: '',
+              spaceColor: '',
+            },
+          })
+        }
       })
-    }
+      .catch((err) => {
+        reject(err)
+      })
+    resolve()
   })
 }

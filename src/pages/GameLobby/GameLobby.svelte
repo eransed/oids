@@ -28,6 +28,7 @@
   $: if ($user && $user.name !== $localPlayer.name) {
     $localPlayer.name = $user.name
     $socket.send($localPlayer)
+    log('$: if ($user && $user.name !== $localPlayer.name)')
     updateSessions()
   }
 
@@ -35,6 +36,8 @@
     console.log('User logged out - renaming to guest name')
     $localPlayer.name = $guestUser.name
     $socket.send($localPlayer)
+    log('$: if ($isLoggedIn === false)')
+
     updateSessions()
   }
 
@@ -43,7 +46,6 @@
   pageHasHeader.set(true)
 
   let sessions: Session[] = []
-  let loadingSession: boolean = true
 
   function hostSession(forceNewSessionId = false) {
     if ($localPlayer.sessionId.length === 0 || forceNewSessionId === true) {
@@ -101,50 +103,47 @@
 
     console.log('Adding lobby websocket listener...')
 
-    $socket.addListener(
-      (su) => {
-        const incomingUpdate = su.dataObject
+    $socket
+      .addListener(
+        (su) => {
+          const incomingUpdate = su.dataObject
 
-        if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
-          console.log(`Got an session update message from ${incomingUpdate.name}`)
-          updateSessions()
-        } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
-          const msg = incomingUpdate.lastMessage
-          console.log(`${incomingUpdate.name} says: ${msg}`)
-          const newMsg: ChatMessage = {
-            message: incomingUpdate.lastMessage,
-            timeDate: new Date(),
-            user: incomingUpdate,
-          }
-          $chatMessageHistory = [...$chatMessageHistory, newMsg]
-        } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
-          console.log(`${incomingUpdate.name} left the lobby`)
-          setTimeout(() => {
+          if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
+            console.log(`Got an session update message from ${incomingUpdate.name}`)
             updateSessions()
-          }, 1000)
-        } else if (incomingUpdate.messageType === MessageType.PING) {
-          // handlePing(incomingUpdate, $socket)
-        } else if (incomingUpdate.messageType === MessageType.START_GAME) {
-          const sess = incomingUpdate.sessionId
-          $localPlayer.isPlaying = true
-          console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
-          $socket.resetListeners()
-          navigate(`/play/${sess}`)
-        } else if (incomingUpdate.messageType === MessageType.SERVICE) {
-          log(`Service message: server version: ${incomingUpdate.serverVersion}`)
-          $localPlayer.serverVersion = incomingUpdate.serverVersion
-        } else {
-          if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
-            warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
+          } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
+            const msg = incomingUpdate.lastMessage
+            console.log(`${incomingUpdate.name} says: ${msg}`)
+            const newMsg: ChatMessage = {
+              message: incomingUpdate.lastMessage,
+              timeDate: new Date(),
+              user: incomingUpdate,
+            }
+            $chatMessageHistory = [...$chatMessageHistory, newMsg]
+          } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
+            console.log(`${incomingUpdate.name} left the lobby`)
+          } else if (incomingUpdate.messageType === MessageType.PING) {
+            // handlePing(incomingUpdate, $socket)
+          } else if (incomingUpdate.messageType === MessageType.START_GAME) {
+            const sess = incomingUpdate.sessionId
+            $localPlayer.isPlaying = true
+            console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
+            $socket.resetListeners()
+            navigate(`/play/${sess}`)
+          } else if (incomingUpdate.messageType === MessageType.SERVICE) {
+            log(`Service message: server version: ${incomingUpdate.serverVersion}`)
+            $localPlayer.serverVersion = incomingUpdate.serverVersion
+          } else {
+            if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
+              warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
+            }
           }
-        }
-      },
-      () => {}
-    )
-
-    setTimeout(() => {
-      updateSessions()
-    }, 300)
+        },
+        () => {}
+      )
+      .then(() => {
+        updateSessions()
+      })
   })
 
   onDestroy(() => {
@@ -175,13 +174,11 @@
   }
 
   async function updateSessions() {
-    loadingSession = true
     await activeSessions()
       .then((s) => {
         if (s.status === 200) {
           sessions = s.data
           checkJoinedSession()
-          loadingSession = false
         } else {
           console.error(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
         }
@@ -246,69 +243,65 @@
 </script>
 
 <Page>
-  {#if loadingSession}
-    <CircularSpinner />
-  {:else}
-    <div class="lobbyWrapper">
-      <div class="left">
-        <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
-      </div>
-      <div class="center">
-        {#if joinedSession}
-          <div class="sessionInfo">
-            <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
-              Host: {joinedSession.host.name}
-              {joinedSession.host.readyToPlay ? '✅' : ''}
-            </p>
-            <br />
-            {#if joinedSession.players.length > 1}
-              <p>Players</p>
-            {/if}
-            {#each joinedSession.players as player}
-              {#if !player.isHost}
-                <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
-                  {player.name}
-                  <!-- {getPlayerPing(player)} - -->
-
-                  {player.readyToPlay ? '✅' : ''}
-                </p>
-              {/if}
-            {/each}
-            {#if allReady}
-              <p>All players ready!</p>
-            {/if}
-          </div>
-          <div class="buttonWrapper">
-            <button
-              style={`background-color: ${alertColors.warning}`}
-              on:click={() => {
-                leaveSession()
-              }}>Leave session</button
-            >
-
-            <button style={`background-color: ${$localPlayer.readyToPlay ? alertColors.success : alertColors.info}`} on:click={() => toggleReadyToPlay()}
-              >{$localPlayer.readyToPlay ? 'Ready ✅' : 'Ready up!'}</button
-            >
-            <button
-              style={`background-color: ${allReady ? alertColors.info : alertColors.error}`}
-              disabled={!allReady}
-              on:click={() => {
-                startGame()
-              }}
-              >Start game!
-            </button>
-          </div>
-        {:else}
-          <CircularSpinner />
-        {/if}
-      </div>
-      <div class="right">
-        {#if joinedSession}
-          <Chat joinedSessionId={joinedSession?.id} />
-        {/if}
-      </div>
+  <div class="lobbyWrapper">
+    <div class="left">
+      <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
     </div>
-  {/if}
+    <div class="center">
+      {#if joinedSession}
+        <div class="sessionInfo">
+          <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
+            Host: {joinedSession.host.name}
+            {joinedSession.host.readyToPlay ? '✅' : ''}
+          </p>
+          <br />
+          {#if joinedSession.players.length > 1}
+            <p>Players</p>
+          {/if}
+          {#each joinedSession.players as player}
+            {#if !player.isHost}
+              <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
+                {player.name}
+                <!-- {getPlayerPing(player)} - -->
+
+                {player.readyToPlay ? '✅' : ''}
+              </p>
+            {/if}
+          {/each}
+          {#if allReady}
+            <p>All players ready!</p>
+          {/if}
+        </div>
+        <div class="buttonWrapper">
+          <button
+            style={`background-color: ${alertColors.warning}`}
+            on:click={() => {
+              leaveSession()
+            }}>Leave session</button
+          >
+
+          <button style={`background-color: ${$localPlayer.readyToPlay ? alertColors.success : alertColors.info}`} on:click={() => toggleReadyToPlay()}
+            >{$localPlayer.readyToPlay ? 'Ready ✅' : 'Ready up!'}</button
+          >
+          <button
+            style={`background-color: ${allReady ? alertColors.info : alertColors.error}`}
+            disabled={!allReady}
+            on:click={() => {
+              startGame()
+            }}
+            >Start game!
+          </button>
+        </div>
+      {:else}
+        <CircularSpinner ship />
+      {/if}
+    </div>
+    <div class="right">
+      {#if joinedSession}
+        <Chat joinedSessionId={joinedSession?.id} />
+      {/if}
+    </div>
+  </div>
 </Page>
 
 <style>

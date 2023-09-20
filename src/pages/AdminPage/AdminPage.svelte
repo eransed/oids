@@ -24,8 +24,10 @@
   import { fade } from 'svelte/transition'
 
   async function getUsers(): Promise<User[]> {
+    loading = true
     return await userList()
       .then((v) => {
+        loading = false
         return (users = v.data)
       })
       .catch((err) => {
@@ -47,7 +49,7 @@
   let alert: AlertType | undefined = undefined
   let addNewUser = false
   let users: User[]
-  let oldList: User[]
+  let loading = false
 
   let newUser = {
     name: '',
@@ -56,6 +58,8 @@
   }
 
   async function sendUpdateUser() {
+    loading = true
+
     const editedUser = editingUser
 
     if (editedUser) {
@@ -65,6 +69,7 @@
       await updateUser(editedUser)
         .then((res) => {
           if (res.status === 200) {
+            loading = false
             alert = {
               severity: 'success',
               text: `User updated successfully to ${editedUser.name}, ${editedUser.email}, ${editedUser.role} `,
@@ -93,9 +98,12 @@
   }
 
   async function addUser() {
+    loading = true
     await register(newUser.email, newUser.name, newUser.password)
       .then((res) => {
         if (res.status === 200) {
+          loading = false
+
           alert = {
             severity: 'success',
             text: `New user ${newUser.name} added!`,
@@ -140,15 +148,15 @@
         </div>
         {#if addNewUser}
           <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
-            <input bind:value={newUser.name} placeholder="Name" />
-            <input bind:value={newUser.email} placeholder="Email" />
-            <input bind:value={newUser.password} placeholder="Password" />
-            <button on:click={() => (addNewUser = false)}>Cancel</button>
-            <button on:click={() => addUser()}>Save</button>
+            <input disabled={loading} bind:value={newUser.name} placeholder="Name" />
+            <input disabled={loading} bind:value={newUser.email} placeholder="Email" />
+            <input disabled={loading} bind:value={newUser.password} placeholder="Password" />
+            <button disabled={loading} on:click={() => (addNewUser = false)}>Cancel</button>
+            <button disabled={loading} on:click={() => addUser()}>Save</button>
           </div>
         {/if}
 
-        {#if users}
+        {#if users && !loading}
           <div class="dataTable">
             <table>
               <tr>
@@ -159,10 +167,10 @@
               {#each Object.values(users) as u}
                 {#if edit && u.id === editingUser?.id}
                   <tr>
-                    <td><input on:keypress={onKeyPress} bind:value={name} /></td>
-                    <td><input on:keypress={onKeyPress} bind:value={email} /></td>
+                    <td><input disabled={loading} on:keypress={onKeyPress} bind:value={name} /></td>
+                    <td><input disabled={loading} on:keypress={onKeyPress} bind:value={email} /></td>
                     <td>
-                      <select bind:value={role}>
+                      <select disabled={loading} bind:value={role}>
                         {#each roleOptions as value}
                           <option {value}>{value}</option>
                         {/each}
@@ -170,18 +178,26 @@
                     </td>
                     <td
                       ><button
+                        disabled={loading}
                         on:click={() => {
                           editingUser = undefined
                           edit = false
                         }}>Cancel</button
                       >
                       <button
+                        disabled={loading}
                         on:click={() => {
                           if (editingUser) {
                             sendUpdateUser()
                           }
-                        }}>Save</button
+                        }}
                       >
+                        {#if loading}
+                          Saving...
+                        {:else}
+                          Save
+                        {/if}
+                      </button>
                     </td>
                   </tr>
                 {:else}

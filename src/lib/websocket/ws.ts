@@ -130,46 +130,49 @@ export class OidsSocket {
     return this.prettyStatusString
   }
 
-  addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<NonPlayerCharacter>) => void): void {
-    if (!this.ws) {
-      console.log('trying to connect')
-      this.connect()
-    }
+  addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<NonPlayerCharacter>) => void): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      if (!this.ws) {
+        console.log('trying to connect')
+        this.connect()
+      }
 
-    this.sockMsgListener = {
-      event: 'message',
-      fn: (event: MessageEvent) => {
-        const data = JSON.parse(event.data)
+      this.sockMsgListener = {
+        event: 'message',
+        fn: (event: MessageEvent) => {
+          const data = JSON.parse(event.data)
 
-        // if (!data.messageType) {
-        //   console.error(data)
-        //   throw new Error('Unvalid json')
-        // }
+          // if (!data.messageType) {
+          //   console.error(data)
+          //   throw new Error('Unvalid json')
+          // }
 
-        function serverUpdateObject<T extends SpaceObject | NonPlayerCharacter>(data: T): ServerUpdate<T> {
-          const serverUpdate: ServerUpdate<T> = {
-            spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(data)).length,
-            unparsedDataLength: event.data.length,
-            numberOfSpaceObjectKeys: Object.keys(data).length,
-            dataObject: data,
+          function serverUpdateObject<T extends SpaceObject | NonPlayerCharacter>(data: T): ServerUpdate<T> {
+            const serverUpdate: ServerUpdate<T> = {
+              spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(data)).length,
+              unparsedDataLength: event.data.length,
+              numberOfSpaceObjectKeys: Object.keys(data).length,
+              dataObject: data,
+            }
+
+            return serverUpdate
           }
 
-          return serverUpdate
-        }
+          if (data.messageType === MessageType.SERVER_GAME_UPDATE) {
+            const su = serverUpdateObject<NonPlayerCharacter>(data)
+            callbackNpc(su)
+          } else {
+            const su = serverUpdateObject<SpaceObject>(data)
+            su.dataObject = data
+            su.dataObject.isLocal = false
+            callbackSo(su)
+          }
+        },
+      }
 
-        if (data.messageType === MessageType.SERVER_GAME_UPDATE) {
-          const su = serverUpdateObject<NonPlayerCharacter>(data)
-          callbackNpc(su)
-        } else {
-          const su = serverUpdateObject<SpaceObject>(data)
-          su.dataObject = data
-          su.dataObject.isLocal = false
-          callbackSo(su)
-        }
-      },
-    }
-
-    this.ws?.addEventListener(this.sockMsgListener.event, this.sockMsgListener.fn)
+      this.ws?.addEventListener(this.sockMsgListener.event, this.sockMsgListener.fn)
+      resolve()
+    })
   }
 
   resetListeners(): void {

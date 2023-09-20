@@ -70,15 +70,16 @@
   }
 </script>
 
-{#if $pageHasHeader}
-  <Header />
-{/if}
-
 <body>
   <Router>
     {#await onAppMount()}
-      <Page><CircularSpinner /></Page>
+      <Page>
+        <CircularSpinner ship />
+      </Page>
     {:then}
+      {#if $pageHasHeader}
+        <Header />
+      {/if}
       <Route path={routes.home.path}>
         <LandingPage />
       </Route>
