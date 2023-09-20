@@ -1,7 +1,7 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import type { Session, Settings, SpaceObject } from '../../../../lib/interface'
+  import type { Session, SpaceObject } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'

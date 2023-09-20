@@ -23,52 +23,12 @@
   import Page from './components/page/page.svelte'
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
-  import type { Settings, Theme, UIStyle } from './lib/interface'
-  import { setGameSettings } from './pages/GamePage/components/Game/Utils/mainGame'
-  import { setGraphLineColor } from './lib/constants'
+  import { setCssFromSettings, syncThemeWithCss } from './style/defaultColors'
 
-  $: if ($settings) {
-    setCssFromSettings()
-  }
-
-  function setCssFromSettings(): void {
-    const darkMode = $settings.darkMode
-
-    /**
-     * A dark blue midnight theme to be used
-     */
-    const DeepMidnight: Theme = {
-      bg: '#000033',
-      card: '#000022',
-      font: '#CCCCCC',
-      accent: '#8B7BFF',
-    }
-
-    document.documentElement.style.setProperty('--main-bg-color', `${darkMode ? DeepMidnight.bg : '#EAEAEA'}`)
-    document.documentElement.style.setProperty('--main-text-color', `${darkMode ? DeepMidnight.font : '#555555'}`)
-    document.documentElement.style.setProperty('--main-card-color', `${darkMode ? DeepMidnight.card : '#F5F5F5'}`)
-
-    const themeTextColor = document.documentElement.style.getPropertyValue('--main-text-color')
-    const spaceColor = document.documentElement.style.getPropertyValue('--main-bg-color')
-    const cardColor = document.documentElement.style.getPropertyValue('--main-card-color')
-
-    setGraphLineColor(themeTextColor)
-
-    const uiStyle: UIStyle = {
-      unarmedShotColor: themeTextColor,
-      armedShotColor: '#0f0',
-      shipColor: '',
-      spaceColor: spaceColor,
-      starColor: themeTextColor
-    }
-
-    const sets: Settings = {
-      darkMode: darkMode,
-      uiStyle: uiStyle,
-    }
-
-    setGameSettings(sets)
-  }
+  // $: if ($settings) {
+  //   setCssFromSettings($settings.theme)
+  // }
+  syncThemeWithCss()
 </script>
 
 <body>

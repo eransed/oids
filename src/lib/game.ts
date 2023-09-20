@@ -1,4 +1,4 @@
-import { GameType, type SpaceObject, type KeyFunctionMap, type NonPlayerCharacter, type UIStyle } from './interface'
+import { GameType, type SpaceObject, type KeyFunctionMap, type NonPlayerCharacter } from './interface'
 import { getContext } from './canvas_util'
 import { LightSource, LineSegment } from './shapes'
 import { renderLoop } from './time'
@@ -6,8 +6,9 @@ import { renderLoop } from './time'
 import type { Shape } from './shapes/Shape'
 import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
-import { getDefaultTheme } from '../pages/GamePage/components/Game/Utils/getTheme'
 import type { Vec2 } from 'mathil'
+import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
+import type { UIStyle } from '../style/styleInterfaces'
 
 export class Game {
   websocket: OidsSocket
@@ -29,7 +30,7 @@ export class Game {
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
   serverVersion = '_unknown_server_version_'
-  style: UIStyle = getDefaultTheme()
+  style: UIStyle = getCurrentStyle()
   stars: Vec2[] = []
 
   constructor(
@@ -45,6 +46,7 @@ export class Game {
     this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
     this.ctx = getContext(this.canvas)
     this.keyFuncMap = keyFuncMap
+    syncThemeWithCss()
   }
 
   isRunning(): boolean {

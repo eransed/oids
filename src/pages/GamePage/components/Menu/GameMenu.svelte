@@ -7,16 +7,14 @@
   import { stopGame } from '../Game/Utils/gameUtils'
   import type { Game } from '../../../../lib/game'
   import { settings } from '../../../../stores/stores'
+  import { toggleAndGetTheme } from '../../../../style/defaultColors'
 
   export let currentGame: Game
 
   const theme: Button90Config = {
     buttonText: 'Theme',
     clickCallback() {
-      $settings.darkMode = !$settings.darkMode
-      // setTimeout(() => {
-      //   currentGame.style = getTheme()
-      // }, 100)
+      $settings = toggleAndGetTheme()
     },
     selected: false,
   }
@@ -24,7 +22,7 @@
   const continueGame: Button90Config = {
     buttonText: 'Continue',
     clickCallback() {
-      // ok
+      
     },
     selected: false,
   }

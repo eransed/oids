@@ -12,20 +12,6 @@ export const onAppMount = async (): Promise<void> => {
 
   return new Promise<void>((resolve, reject) => {
     validateToken()
-      .then((d) => {
-        if (d?.darkMode) {
-          settings.set({
-            darkMode: d?.darkMode,
-            uiStyle: {
-              unarmedShotColor: '',
-              armedShotColor: '',
-              shipColor: '',
-              spaceColor: '',
-              starColor: ''
-            },
-          })
-        }
-      })
       .catch((err) => {
         reject(err)
       })
