@@ -25,6 +25,7 @@ export const gUser: User = {
   gameHistory: [],
   role: 'guest',
   darkMode: true,
+  ships: [],
 }
 
 export const guestUser: Writable<User> = writable(gUser)
@@ -39,4 +40,4 @@ export const socket: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
 
 export const chatMessageHistory: Writable<ChatMessage[]> = writable([])
 
-export const settings: Writable<Settings> = writable({ darkMode: false, uiStyle: getDefaultTheme()})
+export const settings: Writable<Settings> = writable({ darkMode: false, uiStyle: getDefaultTheme() })

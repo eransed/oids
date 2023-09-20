@@ -40,6 +40,20 @@
             <h3>{$user.name}</h3>
             <p>Created: <i>{formatDate($user.createdAt)}</i></p>
           </div>
+          <br />
+          <h2>Ships</h2>
+          <div class="ship">
+            {#each $user.ships as ship}
+              <div>
+                <h3>Name: {ship.name}</h3>
+                <p style="font-style: italic">Created: {ship.createdAt}</p>
+                <br />
+                <h3>Level: {ship.level}</h3>
+                <h3>Experience: {ship.experience}</h3>
+                <br />
+              </div>
+            {/each}
+          </div>
 
           <!-- <ProfileModal /> -->
         {/if}
@@ -132,6 +146,14 @@
     max-width: 100vw;
     overflow-y: auto;
     overflow-x: auto;
+  }
+
+  .ship {
+    padding: 1em;
+  }
+
+  .ship :last-child {
+    border-top: 1px solid var(--color);
   }
 
   @media screen and (max-width: 750px) {
