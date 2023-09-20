@@ -5,11 +5,20 @@ import type { Button90Config } from '../../interfaces/menu'
 export const profileComponent: Writable<string> = writable('summary')
 
 const summary: Button90Config = {
-  buttonText: 'Summary',
+  buttonText: 'User info',
   clickCallback: () => {
     profileComponent.set('summary')
   },
   routeParam: 'summary',
+  selected: false,
+}
+
+const shipStation: Button90Config = {
+  buttonText: 'Ship Station',
+  clickCallback: () => {
+    profileComponent.set('shipStation')
+  },
+  routeParam: 'shipStation',
   selected: false,
 }
 
@@ -31,6 +40,6 @@ const settings: Button90Config = {
   selected: false,
 }
 
-const ProfileButtons = { summary, matchHistory, settings }
+const ProfileButtons = { summary, shipStation, matchHistory, settings }
 
 export { ProfileButtons }

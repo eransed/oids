@@ -8,7 +8,6 @@
   import Page from '../../components/page/page.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
   import { ProfileButtons } from './ProfileButtons'
-  import Card from '../../components/card/card.svelte'
 
   //Util
   import { formatDate } from '../../helpers/util'
@@ -41,21 +40,23 @@
             <p>Created: <i>{formatDate($user.createdAt)}</i></p>
           </div>
           <br />
-          <h2>Ships</h2>
+
+          <!-- <ProfileModal /> -->
+        {/if}
+        {#if $profileComponent === 'shipStation'}
+          <h3>Your ships</h3>
           <div class="ship">
             {#each $user.ships as ship}
               <div>
-                <h3>Name: {ship.name}</h3>
-                <p style="font-style: italic">Created: {ship.createdAt}</p>
+                <h4>{ship.name}</h4>
+                <p style="font-style: italic">Created: {formatDate(ship.createdAt)}</p>
                 <br />
-                <h3>Level: {ship.level}</h3>
-                <h3>Experience: {ship.experience}</h3>
+                <p>Level {ship.level}</p>
+                <p>Experience {ship.experience}</p>
                 <br />
               </div>
             {/each}
           </div>
-
-          <!-- <ProfileModal /> -->
         {/if}
 
         {#if $profileComponent === 'matchHistory'}
@@ -150,10 +151,6 @@
 
   .ship {
     padding: 1em;
-  }
-
-  .ship :last-child {
-    border-top: 1px solid var(--color);
   }
 
   @media screen and (max-width: 750px) {
