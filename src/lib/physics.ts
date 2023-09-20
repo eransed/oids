@@ -158,6 +158,13 @@ export function offScreen_mm(v: Vec2, screen_min: Vec2, screen_max: Vec2) {
   return false
 }
 
+export function wrap_mm(v: Vec2, min: Vec2, max: Vec2): void {
+  if (v.x > max.x) v.x = min.x
+  if (v.x < min.x) v.x = max.x
+  if (v.y > max.y) v.y = min.y
+  if (v.y < min.y) v.y = max.y
+}
+
 export function gravity(from: SpaceObject | NonPlayerCharacter, to: SpaceObject | NonPlayerCharacter, G = 1): void {
   // F = G((m0 * m1)/r^2)
   const m0: number = from.mass

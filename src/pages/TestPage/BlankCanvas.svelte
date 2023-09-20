@@ -1,6 +1,6 @@
 <script lang="ts">
  import { onDestroy, onMount } from 'svelte'
- import { error, info, Vec2Array, to_string, log, warn, EveryInterval, type Vec2, type Line, connectPoints, boundingBox } from 'mathil'
+ import { error, info, vec2Array, to_string2, log, warn, EveryInterval, type Vec2, type Line, connectPoints, boundingBox } from 'mathil'
  import { clearScreen, renderLine, renderPoint } from '../../lib/render/render2d'
   import type { UIStyle } from '../../lib/interface'
 
@@ -22,7 +22,7 @@
   let sqLines: Line[] | null = []
   function updatePoints(count = 1) {
    // points = Vec2Array(count, 250, 50)
-   points = points.concat(Vec2Array(1, 280, 20))
+   points = points.concat(vec2Array(1, 280, 20))
    lines = connectPoints(points)
    sqLines = connectPoints(boundingBox(points), true)
    if (points.length > 3) points.splice(0, 1)
@@ -32,7 +32,7 @@
 
   const every = new EveryInterval(10)
   points.forEach((p) => {
-   log(to_string(p))
+   log(to_string2(p))
   })
 
   let frame = requestAnimationFrame(loop)
@@ -46,7 +46,8 @@
      armedShotColor: '',
      unarmedShotColor: '',
      shipColor: '',
-     spaceColor: '#fff'
+     spaceColor: '#fff',
+     starColor: ''
    }
    clearScreen(ctx, s)
 

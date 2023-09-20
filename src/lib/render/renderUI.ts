@@ -1,4 +1,4 @@
-import type { Bounded, Remote, SpaceObject } from '../interface'
+import type { Bounded, Remote, SpaceObject, UIStyle } from '../interface'
 import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string2, type Vec2 } from 'mathil'
 import { getScreenFromCanvas, getScreenRect } from '../canvas_util'
 import { getNamesAsString, setScaledFont } from './render2d'
@@ -155,11 +155,11 @@ export function renderNumber(num: number, pos: Vec2, ctx: CanvasRenderingContext
 }
 
 
-export function renderVec2(str: string, pos: Vec2, ctx: CanvasRenderingContext2D, angleAdjDeg = 0) {
+export function renderVec2(str: string, pos: Vec2, ctx: CanvasRenderingContext2D, style: UIStyle, angleAdjDeg = 0) {
   ctx.save()
   ctx.translate(pos.x, pos.y)
   ctx.rotate(degToRad(angleAdjDeg))
-  ctx.fillStyle = '#000'
+  ctx.fillStyle = style.starColor
   ctx.font = `bold 24px courier`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'

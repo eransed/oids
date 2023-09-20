@@ -1,9 +1,9 @@
 import type { Game } from '../game'
-import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition } from '../canvas_util'
+import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
 import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
-import { add, direction, dist2, info, log, magnitude, newVec2, rndf, rndfVec2, rndi, round2dec, smul, sub, to_string2 } from 'mathil'
+import { add, direction, dist2, info, log, magnitude, newVec2, rndf, rndfVec2, rndi, round2dec, smul, sub, to_string2, wrap } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
-import { friction, gravity, gravityStars, handleCollisions, vec2Bound } from '../physics'
+import { friction, gravity, gravityStars, handleCollisions, offScreen, offScreen_mm, vec2Bound, wrap_mm } from '../physics'
 import { loadingText, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type NonPlayerCharacter } from '../interface'
@@ -146,11 +146,11 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.worldSize = worldSize // server sends size of world
   game.localPlayer.cameraPosition = newVec2(0, 0)
 
-  for (let i = 0; i < 1.2 * 6e3; i++) {
+  for (let i = 0; i < 400; i++) {
     // create starts
     const star = rndfVec2(0, 0)
-    star.x = rndi(0, worldSize.x / 2)
-    star.y = rndi(0, worldSize.y / 2)
+    star.x = rndi(0, getScreenFromCanvas(game.ctx).x)
+    star.y = rndi(0, getScreenFromCanvas(game.ctx).y)
     game.stars.push(star)
   }
 
@@ -490,10 +490,23 @@ export function renderFrame(game: Game, dt: number): void {
 
   // move star ref with inverted view frame position and factor
   for (let i = 0; i < game.stars.length; i++) {
+
+    if (offScreen_mm(game.stars[i], game.localPlayer.cameraPosition, add(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)))) {
+      // start bunch up behind the ship when using new random positions for stars:
+      // game.stars[i].x = rndi(game.localPlayer.cameraPosition.x, game.localPlayer.cameraPosition.x + getScreenFromCanvas(game.ctx).x)
+      // game.stars[i].y = rndi(game.localPlayer.cameraPosition.y, game.localPlayer.cameraPosition.y + getScreenFromCanvas(game.ctx).y)
+
+      // just wrapping the stars looks better:
+      // but this causes the stars to bunch up in a line or grid pattern after flying around some
+      // so add some randomness when wrapping and regenerate them outside of the screen...
+      const minRand = 0
+      const maxRand = 300
+      wrap_mm(game.stars[i], sub(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)), add(add(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand)))
+    }
+
+
     const starpos = sub(game.stars[i], smul(game.localPlayer.cameraPosition, 1))
-    // starpos = vec2Bound(starpos, sub(game.localPlayer.worldSize, getScreenCenterPosition(game.ctx)))
-    // starpos = vec2Bound(starpos, sub(game.localPlayer.worldSize, getScreenCenterPosition(game.ctx)))
-    renderPoint(game.ctx, starpos, '#000', screenScale * 2)
+    renderPoint(game.ctx, starpos, game.style.starColor, screenScale * 1.5)
   }
 
   if (game.localPlayer.health <= 0) {
@@ -516,11 +529,7 @@ export function renderFrame(game: Game, dt: number): void {
   // renderRect(game.ctx,game.localPlayer.worldSize, newVec2(), '#aaa', 50)
   // renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx)
   // renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -100)), ctx)
-  renderVec2(
-    `world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
-    add(game.localPlayer.viewFramePosition, newVec2(0, 100)),
-    ctx
-  )
+  renderVec2(`world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`, add(game.localPlayer.viewFramePosition, newVec2(0, 100)), ctx, game.style)
   // renderVec2(`v: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(100, 100)), ctx)
 
   const scrollPad = 500
@@ -534,6 +543,8 @@ export function renderFrame(game: Game, dt: number): void {
   //     }
   moveView(game)
 }
+
+
 
 export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
