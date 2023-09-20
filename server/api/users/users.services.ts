@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import db from '../utils/db'
 
-import { User } from '../types/user'
+import { User, newUser } from '../types/user'
 
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({
@@ -11,7 +11,7 @@ export const findUserByEmail = (email: string) => {
   })
 }
 
-export const createUser = (user: User) => {
+export const createUser = (user: newUser) => {
   if (user.password) {
     user.password = bcrypt.hashSync(user.password, 12)
   }
@@ -28,6 +28,7 @@ export const findUserById = (id: string) => {
     },
     include: {
       gameHistory: true,
+      ships: true,
     },
   })
 }

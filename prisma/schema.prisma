@@ -21,6 +21,7 @@ model User {
   gameHistory   Game[]
   role          String         @default("player")
   darkMode      Boolean        @default(true)
+  ships         Ship[]
 }
 
 model RefreshToken {
@@ -49,4 +50,15 @@ model Player {
   Game          Game?  @relation(fields: [gameId], references: [id])
   gameId        Int?
   gameSessionId String
+}
+
+model Ship {
+  id         Int      @id @unique @default(autoincrement())
+  level      Int      @default(1)
+  name       String
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  experience Int?     @default(0)
+  owner      User     @relation(fields: [userId], references: [id])
+  userId     String
 }

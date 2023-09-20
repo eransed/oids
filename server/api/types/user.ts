@@ -6,7 +6,7 @@ export interface User {
   createdAt: Date
   updatedAt: Date
   role: string
-  darkMode: boolean
+  darkMode?: boolean
 }
 
 export type Game = {
@@ -22,4 +22,10 @@ export interface GameHistory {
 
 export interface Player {
   name: string
+}
+
+export interface newUser {
+  name: string
+  email: string
+  password: string
 }

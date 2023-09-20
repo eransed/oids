@@ -5,32 +5,36 @@ import { generateTokens } from '../utils/jwt'
 import { addRefreshTokenToWhitelist, deleteRefreshToken, findRefreshTokenById, revokeTokens } from './auth.services'
 import { findUserById } from '../users/users.services'
 import hashToken from '../utils/hashToken'
-const jwt = require('jsonwebtoken')
 import type { JwtPayload } from 'jsonwebtoken'
 import { JWT_REFRESH_SECRET } from '../../pub_config'
 import { warn } from 'mathil'
 
 export const auth = express.Router()
 
-const { findUserByEmail, createUser } = require('../users/users.services')
+import { createUser, findUserByEmail } from '../users/users.services'
 
+import jwt from 'jsonwebtoken'
 //Register endpoint
 auth.post('/register', async (req, res, next) => {
   try {
     const { email, password, name } = req.body
     if (!email || !password || !name) {
-      res.status(400).send("You must provide a name, email and a password.")
+      res.status(400).send('You must provide a name, email and a password.')
       throw new Error('You must provide a name, email and a password.')
     }
 
     const existingUser = await findUserByEmail(email)
 
     if (existingUser) {
-      res.status(400).send("Email already in use!")
+      res.status(400).send('Email already in use!')
       throw new Error('Email already in use.')
     }
 
-    const user = await createUser({ email, password, name })
+    const user = await createUser({
+      email,
+      password,
+      name,
+    })
     const jti = uuidv4()
     const { accessToken, refreshToken } = generateTokens(user, jti)
     await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id })
@@ -92,7 +96,7 @@ auth.post('/refreshToken', async (req, res, next) => {
       throw new Error('Missing refresh token.')
     }
 
-    const payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET, (err: Error, decoded: JwtPayload) => {
+    const payload: any = jwt.verify(refreshToken, JWT_REFRESH_SECRET, (err: any, decoded: any) => {
       if (err) {
         res.status(401)
         warn('Refreshtoken is not valid')

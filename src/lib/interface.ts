@@ -310,7 +310,7 @@ export interface ShipUpgrades {
 }
 
 export interface CoreProps {
-  energyLevel: number // boost engine, shields and cannons. can be 
+  energyLevel: number // boost engine, shields and cannons. can be
 }
 
 export interface Theme {

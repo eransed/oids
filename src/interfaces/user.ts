@@ -1,3 +1,4 @@
+import type { Ship } from '@prisma/client'
 import type { GameHistory } from './game'
 
 export interface User {
@@ -9,4 +10,5 @@ export interface User {
   gameHistory: GameHistory[]
   role: string
   darkMode: boolean
+  ships: Ship[]
 }

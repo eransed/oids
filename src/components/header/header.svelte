@@ -40,7 +40,7 @@
 </script>
 
 <div class="header">
-  <nav>
+  <nav in:slide={{ duration: 500 }}>
     <div class="hamburger" style="--menuOpen: {menuOpen}">
       <button on:click={() => (toggleMenu = !toggleMenu)}>{toggleMenu ? '{ o }' : '{ o }'} </button>
     </div>
