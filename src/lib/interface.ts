@@ -297,6 +297,7 @@ export interface UIStyle {
   armedShotColor: string
   shipColor: string
   spaceColor: string
+  starColor: string
 }
 
 export interface ShipUpgrades {

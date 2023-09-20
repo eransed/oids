@@ -59,6 +59,7 @@
       armedShotColor: '#0f0',
       shipColor: '',
       spaceColor: spaceColor,
+      starColor: themeTextColor
     }
 
     const sets: Settings = {

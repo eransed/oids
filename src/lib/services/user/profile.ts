@@ -25,6 +25,7 @@ const getProfile = async (): Promise<User> => {
           armedShotColor: '',
           shipColor: '',
           spaceColor: '',
+          starColor: ''
         },
       })
 

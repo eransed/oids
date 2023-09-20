@@ -21,6 +21,7 @@ export const onAppMount = async (): Promise<void> => {
               armedShotColor: '',
               shipColor: '',
               spaceColor: '',
+              starColor: ''
             },
           })
         }
