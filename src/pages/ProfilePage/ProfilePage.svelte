@@ -13,6 +13,9 @@
   import { formatDate } from '../../helpers/util'
   import getProfile from '../../lib/services/user/profile'
   import { onMount } from 'svelte'
+  import Modal from '../../components/modal/Modal.svelte'
+  import { fade } from 'svelte/transition'
+  import { createShip, deleteShip } from '../../lib/services/ship/ship.services'
 
   onMount(() => {
     if ($isLoggedIn && !$user) {
@@ -21,6 +24,58 @@
   })
 
   pageHasHeader.set(true)
+
+  let openModal: boolean = false
+
+  let newShip = {
+    name: '',
+  }
+
+  let loading: boolean = false
+
+  async function handleNewShip(): Promise<void> {
+    loading = true
+    return new Promise<void>((resolve, reject) => {
+      createShip(newShip.name)
+        .then((response) => {
+          if (response.status === 200) {
+            loading = false
+            openModal = false
+            getProfile().then(() => {
+              resolve()
+            })
+          }
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
+  }
+
+  async function handleDeleteShip(id: number, name: string): Promise<void> {
+    const result = confirm(`Want to delete ship: ${name}`)
+    if (result) {
+      const prompt = window.prompt(`Write ${name} in the box to delete it.`)
+      if (prompt === name) {
+        loading = true
+        return new Promise<void>((resolve, reject) => {
+          deleteShip(id)
+            .then((response) => {
+              if (response.status === 200) {
+                loading = false
+                openModal = false
+                getProfile().then(() => {
+                  resolve()
+                })
+              }
+            })
+            .catch((err) => {
+              reject(err)
+            })
+        })
+      }
+    }
+  }
 </script>
 
 <Page>
@@ -45,18 +100,28 @@
         {/if}
         {#if $profileComponent === 'shipStation'}
           <h3>Your ships</h3>
-          <div class="ship">
-            {#each $user.ships as ship}
-              <div>
-                <h4>{ship.name}</h4>
-                <p style="font-style: italic">Created: {formatDate(ship.createdAt)}</p>
-                <br />
-                <p>Level {ship.level}</p>
-                <p>Experience {ship.experience}</p>
-                <br />
-              </div>
-            {/each}
-          </div>
+
+          <div class="newShip"><button on:click={() => (openModal = true)} title="Add ship">+</button></div>
+          {#if openModal}
+            <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
+              <p>Add a new ship to your collection</p>
+              <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
+              <button disabled={loading} on:click={() => (openModal = false)}>Cancel</button>
+              <button disabled={loading} on:click={() => handleNewShip()}>Save</button>
+            </div>
+          {/if}
+          {#each $user.ships as ship}
+            <div class="ship">
+              <h4>
+                {ship.name} <button disabled={loading} on:click={() => handleDeleteShip(ship.id, ship.name)}><i class="fa-regular fa-trash-can" /></button>
+              </h4>
+              <p style="font-style: italic">Created: {formatDate(ship.createdAt)}</p>
+              <br />
+              <p>Level {ship.level}</p>
+              <p>Experience {ship.experience}</p>
+              <br />
+            </div>
+          {/each}
         {/if}
 
         {#if $profileComponent === 'matchHistory'}
@@ -137,6 +202,7 @@
     border-left-style: ridge;
     border-left-width: 2px;
     border-left-color: var(--color);
+    display: grid;
   }
 
   .buttons > * {
@@ -151,6 +217,18 @@
 
   .ship {
     padding: 1em;
+    margin: 0.5em;
+    display: grid;
+    border-radius: 0.5em;
+    background-color: rgba(255, 166, 0, 0.025);
+  }
+
+  .newShip {
+    display: grid;
+    justify-self: end;
+    position: absolute;
+    top: 50px;
+    width: 20px;
   }
 
   @media screen and (max-width: 750px) {

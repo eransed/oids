@@ -25,7 +25,7 @@ export const createShip = async (name: string): Promise<AxiosResponse<Ship>> => 
   }
 
   const response: AxiosResponse<Ship> = await axios
-    .post(`http://${location.hostname}:6060/api/v1/ship/create`, name, config)
+    .post(`http://${location.hostname}:6060/api/v1/ship/create`, { name }, config)
     .then((response: AxiosResponse<Ship>) => {
       return response
     })
@@ -48,6 +48,27 @@ export const getShips = async (): Promise<AxiosResponse<Ship[]>> => {
   const response: AxiosResponse<Ship[]> = await axios
     .get(`http://${location.hostname}:6060/api/v1/ship/list`, config)
     .then((response: AxiosResponse<Ship[]>) => {
+      return response
+    })
+    .catch((err) => {
+      throw new Error(err)
+    })
+
+  return response
+}
+
+export const deleteShip = async (id: number): Promise<AxiosResponse<Ship>> => {
+  const token = localStorage.getItem('accessToken')
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+
+  const response: AxiosResponse<Ship> = await axios
+    .post(`http://${location.hostname}:6060/api/v1/ship/delete`, { id }, config)
+    .then((response: AxiosResponse<Ship>) => {
       return response
     })
     .catch((err) => {

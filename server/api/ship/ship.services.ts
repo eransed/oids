@@ -14,3 +14,11 @@ export async function getShips(id: string) {
     },
   })
 }
+
+export async function deleteShip(id: number) {
+  return await db.ship.delete({
+    where: {
+      id: id,
+    },
+  })
+}
