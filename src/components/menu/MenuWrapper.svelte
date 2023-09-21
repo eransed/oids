@@ -26,6 +26,7 @@
     border-style: solid;
     border-width: 2px;
     border-color: var(--color);
+    background-color: var(--main-card-color);
     /* outline: 2px solid rgb(36, 22, 159);
     background: rgb(25, 0, 255, 0.1);
     box-shadow: -1px 1px 86px 0px rgba(0, 41, 255, var(--opacity));
