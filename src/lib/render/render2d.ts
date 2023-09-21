@@ -1,7 +1,8 @@
 import { round2dec, type Line, type Vec2, sub, add, smul } from 'mathil'
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
-import type { SpaceObject, UIStyle } from '../interface'
+import type { SpaceObject } from '../interface'
+import type { UIStyle } from '../../style/styleInterfaces'
 import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
 
 export function clearScreen(ctx: CanvasRenderingContext2D, style: UIStyle) {
@@ -103,7 +104,6 @@ export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D):
   ctx.stroke()
   ctx.restore()
 }
-
 
 export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D, style: UIStyle) {
   ctx.save()
