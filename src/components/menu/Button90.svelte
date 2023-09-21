@@ -2,6 +2,7 @@
   import type { Button90Config } from '../../interfaces/menu'
   import CircularSpinner from '../loaders/circularSpinner.svelte'
 
+  export let borderBottom: boolean = false
   export let mouseTracking: boolean = false
   export let selected: boolean = false
   export let loading: boolean = false
@@ -30,13 +31,15 @@
       m.y = '0px'
     }
   }
+
+  $: border = borderBottom ? '1px solid' : 'none'
 </script>
 
 <div on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
   <button
     title={buttonConfig.buttonText}
     {disabled}
-    style="--left: {m.x}; --top: {m.y}"
+    style="--left: {m.x}; --top: {m.y}; border-bottom: {buttonConfig.selected ? border : 'none'}"
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
@@ -104,6 +107,7 @@
     border-color: var(--main-text-color);
     color: var(--main-text-color);
     opacity: 1;
+
     /* transition-property: all; */
     /* transition-duration: 0.5s; */
     /* background: rgb(0, 0, 0); */

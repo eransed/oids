@@ -21,9 +21,7 @@
 
   const continueGame: Button90Config = {
     buttonText: 'Continue',
-    clickCallback() {
-      
-    },
+    clickCallback() {},
     selected: false,
   }
 
