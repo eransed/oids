@@ -16,15 +16,16 @@
   import getProfile from '../../lib/services/user/profile'
 
   //Assets
-  import Avatar from '../../assets/avatar.png'
+  import { ProfilePics } from '../../pages/ProfilePage/ProfilePics'
   import Alert from '../alert/Alert.svelte'
   import type { AlertType } from '../alert/AlertType'
+  import { Icons } from '../../style/icons'
 
   let loading: boolean = false
 
   let alert: AlertType = {
     severity: 'error',
-    text: ''
+    text: '',
   }
 
   const handleSubmit = async (e: Event): Promise<void> => {
@@ -37,9 +38,8 @@
     } else {
       alert = {
         severity: 'error',
-        text: 'Wrong email or password, try again!'
+        text: 'Wrong email or password, try again!',
       }
-      
     }
     loading = false
   }
@@ -49,17 +49,16 @@
 </script>
 
 {#if !$isLoggedIn}
-
   <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <form on:submit|preventDefault={handleSubmit} on:formdata class="form">
       <input placeholder="Email" name="email" type="email" autocomplete="email" />
 
-      <input placeholder="Password" name="password" type="password" autocomplete="current-password"  />
+      <input placeholder="Password" name="password" type="password" autocomplete="current-password" />
       <div class="button">
         <Button90 {loading} buttonConfig={loginButton} mouseTracking={false} />
       </div>
     </form>
-    <Alert severity={alert.severity} text={alert.text}/>
+    <Alert severity={alert.severity} text={alert.text} />
   </div>
 {/if}
 {#if $isLoggedIn}
@@ -67,7 +66,7 @@
     <div class="row1">
       <div class="column" style={'flex: 0.5;'}>
         <div class="modalProfile" style="--borderColor: {borderColor};">
-          <img class="avatar" src={Avatar} alt="Avatar" />
+          <img class="avatar" src={ProfilePics.AstronautMale} alt="Rocket Ship" />
         </div>
       </div>
       <div class="column">

@@ -17,6 +17,9 @@
   import { fade } from 'svelte/transition'
   import { createShip, deleteShip } from '../../lib/services/ship/ship.services'
 
+  //Assets
+  import { Icons } from '../../style/icons'
+
   onMount(() => {
     if ($isLoggedIn && !$user) {
       getProfile()
@@ -84,7 +87,7 @@
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
           <div>
-            <Button90 buttonConfig={button} selected={$profileComponent === button.routeParam} />
+            <Button90 icon={button.icon} buttonConfig={button.config} selected={$profileComponent === button.config.routeParam} />
           </div>
         {/each}
       </div>

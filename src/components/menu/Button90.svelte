@@ -6,7 +6,7 @@
   export let selected: boolean = false
   export let loading: boolean = false
   export let disabled: boolean = loading
-
+  export let icon: string = ''
   export let buttonConfig: Button90Config = {
     buttonText: '',
     clickCallback: () => {
@@ -34,6 +34,7 @@
 
 <div on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
   <button
+    title={buttonConfig.buttonText}
     {disabled}
     style="--left: {m.x}; --top: {m.y}"
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
@@ -41,6 +42,10 @@
   >
     {#if loading}
       <CircularSpinner />
+    {:else if icon}
+      <div class="icon">
+        <img src={icon} alt={icon} />
+      </div>
     {:else}
       {buttonConfig.buttonText}
     {/if}
@@ -51,6 +56,12 @@
   :root {
     --left: 100px;
     --top: 100px;
+  }
+
+  .icon img {
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(30%);
+    width: 35px;
+    height: 35px;
   }
 
   button {
@@ -74,14 +85,8 @@
     /* transition-duration: 1.8s; */
   }
 
-  button:hover {
-    border-color: var(--main-text-color);
-    border-bottom: 1px solid;
-    /* background: rgb(0, 0, 0);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.7375565610859729) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%); */
-    transition: all;
-    transition-duration: 0s;
-    color: var(--main-text-color);
+  button:hover img {
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
   }
 
   .notSelected {
@@ -96,7 +101,6 @@
     border: none;
     background-color: transparent;
     /* border-color: rgb(161, 211, 247, 1); */
-    border-bottom: 1px solid;
     border-color: var(--main-text-color);
     color: var(--main-text-color);
     opacity: 1;
@@ -104,6 +108,10 @@
     /* transition-duration: 0.5s; */
     /* background: rgb(0, 0, 0); */
     /* background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(6, 122, 201, 1) 86%, rgba(255, 255, 255, 0.4660633484162896) 100%); */
+  }
+
+  .selected img {
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
   }
 
   button:disabled {

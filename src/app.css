@@ -15,9 +15,10 @@ button {
 }
 
 :root {
-  --main-bg-color: #000;
+  --main-bg-color: #000033;
   --main-text-color: #fff;
-  --main-card-color: rgba(255, 255, 255, 0.05);
+  --main-card-color: #000022;
+  --main-accent-color: #8b7bff;
 }
 
 /* width */

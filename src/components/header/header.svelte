@@ -3,7 +3,8 @@
   import { routes } from '../../routes'
 
   //Avatar imgs
-  import Avatar from '../../assets/avatar.png'
+  import { ProfilePics } from '../../pages/ProfilePage/ProfilePics'
+  import { Icons } from '../../style/icons'
 
   //Components
   import Button90 from '../menu/Button90.svelte'
@@ -17,6 +18,7 @@
   import Modal from '../modal/Modal.svelte'
   import { navigate } from 'svelte-routing/src/history'
   import { slide, fade, fly } from 'svelte/transition'
+  import AdminPage from '../../pages/AdminPage/AdminPage.svelte'
 
   let showLogin: boolean | undefined = false
 
@@ -51,6 +53,7 @@
           {#if route.path === '/admin' && $user && $user.role === 'admin'}
             <div in:slide={{ duration: 500, delay: 500 }} out:slide={{ duration: 500, delay: 0 }} class="navButton">
               <Button90
+                icon={route.icon}
                 mouseTracking={false}
                 buttonConfig={{
                   buttonText: route.displayText,
@@ -68,6 +71,7 @@
           {:else if route.path !== '/admin'}
             <div in:slide={{ duration: 500, delay: 500 }} out:slide={{ duration: 500, delay: 0 }} class="navButton">
               <Button90
+                icon={route.icon}
                 mouseTracking={false}
                 buttonConfig={{
                   buttonText: route.displayText,
@@ -97,7 +101,7 @@
       </button>
     </div>
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-      <img class="avatar" src={Avatar} alt="Avatar" />
+      <img class="avatar" src={ProfilePics.AstronautMale} alt="Avatar" />
     </div>
 
     {#if showLogin}

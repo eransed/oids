@@ -1,11 +1,13 @@
 import type { Route } from './lib/interface'
 
+import { Icons } from './style/icons'
+
 export const routes = {
-  home: <Route>{ path: '/', displayText: 'Home', inHeader: true },
-  profile: <Route>{ path: '/profile', displayText: 'Profile', inHeader: true },
+  home: <Route>{ path: '/', displayText: 'Home', inHeader: true, icon: Icons.MoonLanding },
+  profile: <Route>{ path: '/profile', displayText: 'Profile', inHeader: true, icon: Icons.Astronaut },
   game: <Route>{ path: '/play/:id', displayText: 'Game', inHeader: false },
-  play: <Route>{ path: '/play', displayText: 'Play', inHeader: true },
+  play: <Route>{ path: '/play', displayText: 'Play', inHeader: true, icon: Icons.PlanetLamp },
   end: <Route>{ path: '/play/end', displayText: 'Score Screen', inHeader: false },
   test: <Route>{ path: '/test', displayText: 'Test', inHeader: false },
-  admin: <Route>{ path: '/admin', displayText: 'Admin', inHeader: true },
+  admin: <Route>{ path: '/admin', displayText: 'Admin', inHeader: true, icon: Icons.Admin },
 }
