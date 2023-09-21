@@ -99,7 +99,7 @@
     right: 0.2em;
     transition: all;
     transition-duration: 0.5s;
-    background: var(--main-bg-color);
+    background: var(--main-card-color);
     opacity: 0.95;
     border-radius: 0.5em;
   }
