@@ -295,8 +295,8 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCh
         npc1.colliding = true
         npc0.collidingWith.push(npc1)
         npc1.collidingWith.push(npc0)
-        npc0.health -= collisionFrameDamage
-        npc1.health -= collisionFrameDamage
+        // npc0.health -= collisionFrameDamage
+        // npc1.health -= collisionFrameDamage
 
         const relative0 = sub(getWorldCoordinates(npc0), smul(cameraPosition, 1))
         const relative1 = sub(getWorldCoordinates(npc1), smul(cameraPosition, 1))

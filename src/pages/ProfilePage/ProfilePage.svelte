@@ -152,7 +152,7 @@
                 ><button
                   on:click={() => {
                     $user.darkMode = !$user.darkMode
-                    $settings.darkMode = $user.darkMode
+                    // $settings.darkMode = $user.darkMode
                   }}>{$user.darkMode}</button
                 ></td
               >

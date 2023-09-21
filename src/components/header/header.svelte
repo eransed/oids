@@ -18,6 +18,7 @@
   import Modal from '../modal/Modal.svelte'
   import { navigate } from 'svelte-routing/src/history'
   import { slide, fade, fly } from 'svelte/transition'
+  import { DeepMidnight, cnvTheme, setCssFromSettings, toggleAndGetTheme } from '../../style/defaultColors'
   import AdminPage from '../../pages/AdminPage/AdminPage.svelte'
 
   let showLogin: boolean | undefined = false
@@ -39,6 +40,11 @@
 
   $: display = toggleMenu ? 'flex' : 'none'
   $: menuOpen = toggleMenu ? '90deg' : '0deg'
+
+  function themeToggler() {
+    const t = toggleAndGetTheme()
+    $settings = t
+  }
 </script>
 
 <div class="header">
@@ -92,8 +98,8 @@
     </div>
 
     <div class="theme">
-      <button class="themeToggle" on:click={() => ($settings.darkMode = !$settings.darkMode)}>
-        {#if $settings.darkMode}
+      <button class="themeToggle" on:click={() => themeToggler()}>
+        {#if $settings.theme === DeepMidnight}
           <i in:fade={{ duration: 500, delay: 500 }} out:fly={{ duration: 250, delay: 0 }} class="fa-solid fa-moon fa-2xl" />
         {:else}
           <i in:fade={{ duration: 500, delay: 500 }} out:fly={{ duration: 250, delay: 0 }} class="fa-solid fa-sun fa-2xl" />

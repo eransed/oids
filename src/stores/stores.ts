@@ -1,11 +1,12 @@
 import { writable, type Writable } from 'svelte/store'
 import type { User } from '../interfaces/user'
 import { rndi } from 'mathil'
-import type { ChatMessage, Settings, SpaceObject } from '../lib/interface'
+import type { ChatMessage, SpaceObject } from '../lib/interface'
 import { createSpaceObject } from '../lib/factory'
 import { OidsSocket } from '../lib/websocket/ws'
 import { getWsUrl } from '../lib/websocket/ws'
-import { getDefaultTheme } from '../pages/GamePage/components/Game/Utils/getTheme'
+import type { Settings } from '../style/styleInterfaces'
+import { cnvTheme, DeepMidnight } from '../style/defaultColors'
 
 export const isLoggedIn: Writable<boolean> = writable()
 
@@ -40,4 +41,4 @@ export const socket: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
 
 export const chatMessageHistory: Writable<ChatMessage[]> = writable([])
 
-export const settings: Writable<Settings> = writable({ darkMode: false, uiStyle: getDefaultTheme() })
+export const settings: Writable<Settings> = writable({ uiStyle: cnvTheme(DeepMidnight), theme: DeepMidnight})

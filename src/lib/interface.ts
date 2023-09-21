@@ -99,9 +99,14 @@ export interface Collidable extends Positionable {
   collidingWith: Collidable[]
 }
 
+export interface ThrustFlameAtom extends Positionable, Physical {
+
+} 
+
 export interface Thrustable extends Positionable, Physical {
   batteryLevel: number
   enginePower: number
+  thrustFlames: ThrustFlameAtom[]
 }
 
 export interface Fireable extends Positionable, Physical {
@@ -288,18 +293,7 @@ export interface ChatMessage {
 
 export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable, Bounded {}
 
-export interface Settings {
-  darkMode: boolean
-  uiStyle: UIStyle
-}
 
-export interface UIStyle {
-  unarmedShotColor: string
-  armedShotColor: string
-  shipColor: string
-  spaceColor: string
-  starColor: string
-}
 
 export interface ShipUpgrades {
   hyperdrive: boolean
@@ -315,9 +309,3 @@ export interface CoreProps {
   energyLevel: number // boost engine, shields and cannons. can be
 }
 
-export interface Theme {
-  bg: string
-  card: string
-  font: string
-  accent: string
-}

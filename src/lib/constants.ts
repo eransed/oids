@@ -39,4 +39,4 @@ export function getGraphLineColor(): string {
     return graphLineColor
 }
 
-export const worldSize = newVec2(1e9, 1e9)
+export const worldSize = newVec2(1e308, 1e308)

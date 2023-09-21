@@ -136,14 +136,14 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.health = 100
   game.localPlayer.batteryLevel = 50000
   game.localPlayer.steeringPower = 1.4
-  game.localPlayer.enginePower = 1
+  game.localPlayer.enginePower = 0.1
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
   game.localPlayer.hitRadius = 120
   game.localPlayer.color = '#db8'
   game.localPlayer.worldSize = worldSize // server sends size of world
-  game.localPlayer.cameraPosition = rndfVec2(0, 0)
+  game.localPlayer.cameraPosition = rndfVec2(1e6, 1e6)
   game.localPlayer.viewFramePosition = rndfVec2(0, 0)
   game.localPlayer.position = rndfVec2(0, 0)
   // game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
@@ -152,8 +152,8 @@ export function initRegularGame(game: Game): void {
   for (let i = 0; i < 400; i++) {
     // create starts
     const star = rndfVec2(0, 0)
-    star.x = rndi(0, getScreenFromCanvas(game.ctx).x)
-    star.y = rndi(0, getScreenFromCanvas(game.ctx).y)
+    star.x = rndi(game.localPlayer.cameraPosition.x, game.localPlayer.cameraPosition.x + getScreenFromCanvas(game.ctx).x)
+    star.y = rndi(game.localPlayer.cameraPosition.y, game.localPlayer.cameraPosition.y + getScreenFromCanvas(game.ctx).y)
     game.stars.push(star)
   }
 
@@ -586,9 +586,9 @@ export function nextFrame(game: Game, dt: number): void {
     // friction(body)
   })
 
-  game.remotePlayers.forEach((so) => {
-    gravity(so, game.localPlayer, 3)
-  })
+  // game.remotePlayers.forEach((so) => {
+  //   gravity(so, game.localPlayer, 3)
+  // })
 
   game.remotePlayers = game.remotePlayers.filter((so) => {
     return so.online || so.isLocal
