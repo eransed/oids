@@ -2,12 +2,15 @@
   import type { Button90Config } from '../../interfaces/menu'
   import CircularSpinner from '../loaders/circularSpinner.svelte'
 
+  export let addInfo: string = ''
+  export let minWidth: string = '10em'
   export let borderBottom: boolean = false
   export let mouseTracking: boolean = false
   export let selected: boolean = false
   export let loading: boolean = false
   export let disabled: boolean = loading
   export let icon: string = ''
+  export let buttonType: 'submit' | 'button' | 'reset' = 'button'
   export let buttonConfig: Button90Config = {
     buttonText: '',
     clickCallback: () => {
@@ -32,14 +35,17 @@
     }
   }
 
-  $: border = borderBottom ? '1px solid' : 'none'
+  $: border = borderBottom ? '1px solid var(--main-accent-color)' : 'none'
+  $: minWidth = minWidth
 </script>
 
-<div on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
+<div class="wrapper" on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
+  <p class="addInfo">{addInfo}</p>
   <button
+    type={buttonType}
     title={buttonConfig.buttonText}
     {disabled}
-    style="--left: {m.x}; --top: {m.y}; border-bottom: {buttonConfig.selected ? border : 'none'}"
+    style="min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border-bottom: {buttonConfig.selected ? border : 'none'}"
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
@@ -61,13 +67,30 @@
     --top: 100px;
   }
 
+  .addInfo {
+    font-size: 0.7em;
+    position: absolute;
+    display: flex;
+    margin-top: -0.5em;
+  }
+
   .icon img {
     filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(30%);
     width: 35px;
     height: 35px;
   }
 
+  .wrapper {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    /* align-content: center; */
+  }
+
   button {
+    justify-content: center;
+    align-content: center;
+    display: flex;
     min-width: 10em;
     background: var(--main-card-color);
     color: var(--main-text-color);
@@ -119,12 +142,7 @@
   }
 
   button:disabled {
-    cursor: default;
-  }
-
-  button:disabled:hover {
-    cursor: default;
-    border: 2px solid rgb(47, 167, 252, 0.5);
-    background: transparent;
+    cursor: not-allowed;
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(1%);
   }
 </style>

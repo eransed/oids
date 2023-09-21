@@ -16,11 +16,13 @@
 
   import { onDestroy, onMount } from 'svelte'
   import { navigate } from 'svelte-routing'
-  import { alertColors } from '../../style/defaultColors'
-  import Alert from '../../components/alert/Alert.svelte'
-  import { info, log, warn } from 'mathil'
+  import { log, warn } from 'mathil'
   import Chat from '../../components/chat/chat.svelte'
   import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
+  import Button90 from '../../components/menu/Button90.svelte'
+
+  //Assets
+  import { Icons } from '../../style/icons'
 
   /**
    * Reactive on changes to $user store.
@@ -42,6 +44,7 @@
   }
 
   $: allReady = false
+  let readyPlayers = []
 
   pageHasHeader.set(true)
 
@@ -61,9 +64,9 @@
 
   function checkReady(): void {
     console.log('Checking which player are ready...')
-    let readyPlayers = []
 
     if (joinedSession?.players) {
+      readyPlayers = []
       joinedSession?.players.forEach((player) => {
         console.log(`${player.name}: ${player.readyToPlay ? 'ready' : 'not ready'}`)
         if (player.readyToPlay) {
@@ -73,7 +76,6 @@
     }
 
     if (readyPlayers.length === joinedSession?.players.length) {
-      console.log('All players are ready!')
       allReady = true
     } else {
       allReady = false
@@ -252,45 +254,41 @@
         <div class="sessionInfo">
           <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
             Host: {joinedSession.host.name}
-            {joinedSession.host.readyToPlay ? '✅' : ''}
+            {#if joinedSession.host.readyToPlay}
+              <img class="readyFlag" src={Icons.Done} alt="Ready" />
+            {/if}
           </p>
           <br />
-          {#if joinedSession.players.length > 1}
-            <p>Players</p>
-          {/if}
+
           {#each joinedSession.players as player}
             {#if !player.isHost}
               <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
                 {player.name}
                 <!-- {getPlayerPing(player)} - -->
-
-                {player.readyToPlay ? '✅' : ''}
+                {#if player.readyToPlay}
+                  <img class="readyFlag" src={Icons.Done} alt="Ready" />
+                {/if}
               </p>
             {/if}
           {/each}
-          {#if allReady}
-            <p>All players ready!</p>
-          {/if}
         </div>
         <div class="buttonWrapper">
-          <button
-            style={`background-color: ${alertColors.warning}`}
-            on:click={() => {
-              leaveSession()
-            }}>Leave session</button
-          >
+          <Button90 icon={Icons.Exit} buttonConfig={{ buttonText: 'Leave Session', clickCallback: () => leaveSession(), selected: false }} />
+          <Button90
+            icon={Icons.Done}
+            buttonConfig={{ buttonText: 'Toggle ready!', clickCallback: () => toggleReadyToPlay(), selected: $localPlayer.readyToPlay }}
+          />
 
-          <button style={`background-color: ${$localPlayer.readyToPlay ? alertColors.success : alertColors.info}`} on:click={() => toggleReadyToPlay()}
-            >{$localPlayer.readyToPlay ? 'Ready ✅' : 'Ready up!'}</button
-          >
-          <button
-            style={`background-color: ${allReady ? alertColors.info : alertColors.error}`}
+          <Button90
+            addInfo={allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length}`}
+            icon={Icons.StartGame}
             disabled={!allReady}
-            on:click={() => {
-              startGame()
+            buttonConfig={{
+              buttonText: allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length} ready!`,
+              clickCallback: () => startGame(),
+              selected: false,
             }}
-            >Start game!
-          </button>
+          />
         </div>
       {:else}
         <CircularSpinner ship />
@@ -305,6 +303,12 @@
 </Page>
 
 <style>
+  .readyFlag {
+    margin-left: 0em;
+    width: 15px;
+    height: 15px;
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
+  }
   .lobbyWrapper {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;

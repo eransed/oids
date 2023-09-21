@@ -9,6 +9,10 @@
   import TypeWriter from '../typeWriter/TypeWriter.svelte'
   import { MessageType, type ChatMessage } from '../../lib/interface'
 
+  //Assets
+  import { Icons } from '../../style/icons'
+  import Button90 from '../menu/Button90.svelte'
+
   let chatMsg: string
   export let joinedSessionId: string
 
@@ -87,23 +91,52 @@
 </div>
 <div class="msgInput">
   <form on:submit|preventDefault={sendChatMessage}>
-    <input bind:value={chatMsg} placeholder="Got something to say?" type="text" />
-    <button type="submit">Send</button>
+    <input bind:value={chatMsg} placeholder={`Aa`} type="text" />
+    <!-- <button type="submit">Send</button> -->
+
+    <Button90 minWidth="2em" borderBottom buttonType="submit" icon={Icons.Send} />
   </form>
 </div>
 
 <style>
   .msgInput input {
+    height: 3em;
+    margin: auto;
+    inset: 0;
     min-height: 2em;
+    padding-left: 1em;
+    border: none;
+    outline: none;
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
+    border-bottom: 1px solid var(--main-bg-color);
+    border-radius: 0.8em;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom: 1px solid var(--main-accent-color);
+    opacity: 0.7;
+    width: 80%;
+    transition: all 500ms;
+  }
+
+  .msgInput input:focus {
+    height: 3.5em;
+    width: 95%;
+    opacity: 1;
+    border-bottom: 1px solid var(--main-accent-color);
+  }
+
+  ::placeholder {
+    color: var(--main-text-color);
   }
 
   .msgInput form {
     display: grid;
-    grid-auto-columns: 4fr 1fr;
+    grid-auto-columns: 4fr auto;
     grid-auto-flow: column;
   }
   .messages {
-    max-height: 14em;
+    max-height: 12.5em;
     overflow-y: auto;
     overflow-x: hidden;
     max-width: 100%;
