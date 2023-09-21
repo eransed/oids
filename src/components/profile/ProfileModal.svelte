@@ -55,7 +55,7 @@
 
       <input placeholder="Password" name="password" type="password" autocomplete="current-password" />
       <div class="button">
-        <Button90 {loading} buttonConfig={loginButton} mouseTracking={false} />
+        <Button90 buttonType="submit" {loading} buttonConfig={loginButton} mouseTracking={false} />
       </div>
     </form>
     <Alert severity={alert.severity} text={alert.text} />
