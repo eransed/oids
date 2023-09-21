@@ -1,6 +1,6 @@
 import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
-import { gameState, initKeyControllers, spaceObjectKeyController } from '../input'
+import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController } from '../input'
 import { add, direction, dist2, info, log, magnitude, newVec2, rndf, rndfVec2, rndi, round2dec, smul, sub, to_string2, wrap } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
 import { friction, gravity, gravityStars, handleCollisions, offScreen, offScreen_mm, vec2Bound, wrap_mm } from '../physics'
@@ -118,11 +118,11 @@ export function initRegularGame(game: Game): void {
 
   loadingText('Loading...', game.ctx)
   initKeyControllers()
+  initTouchControls()
 
   const offset = 500
 
   setCanvasSizeToClientViewFrame(game.ctx)
-
 
   //Local player init
   game.reset()
@@ -147,7 +147,6 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.viewFramePosition = rndfVec2(0, 0)
   game.localPlayer.position = rndfVec2(0, 0)
   // game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
-
 
   for (let i = 0; i < 400; i++) {
     // create starts
@@ -514,7 +513,12 @@ export function renderFrame(game: Game, dt: number): void {
   renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
   renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
   renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
-  renderVec2(`world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`, add(game.localPlayer.viewFramePosition, newVec2(0, 100)), ctx, game.style)
+  renderVec2(
+    `world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
+    add(game.localPlayer.viewFramePosition, newVec2(0, 100)),
+    ctx,
+    game.style
+  )
   // renderVec2(`v: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(100, 100)), ctx)
 
   const scrollPad = 500
@@ -532,7 +536,6 @@ export function renderFrame(game: Game, dt: number): void {
 function handleStarBackdrop(game: Game): void {
   // move star ref with inverted view frame position and factor
   for (let i = 0; i < game.stars.length; i++) {
-
     if (offScreen_mm(game.stars[i], game.localPlayer.cameraPosition, add(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)))) {
       // start bunch up behind the ship when using new random positions for stars:
       // game.stars[i].x = rndi(game.localPlayer.cameraPosition.x, game.localPlayer.cameraPosition.x + getScreenFromCanvas(game.ctx).x)
@@ -543,15 +546,17 @@ function handleStarBackdrop(game: Game): void {
       // so add some randomness when wrapping and regenerate them outside of the screen...
       const minRand = 0
       const maxRand = 500
-      wrap_mm(game.stars[i], sub(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)), add(add(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand)))
+      wrap_mm(
+        game.stars[i],
+        sub(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)),
+        add(add(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand))
+      )
     }
-
 
     const starpos = sub(game.stars[i], smul(game.localPlayer.cameraPosition, 1))
     renderPoint(game.ctx, starpos, game.style.starColor, screenScale * 1.5)
   }
 }
-
 
 export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {

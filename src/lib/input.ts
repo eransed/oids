@@ -3,6 +3,7 @@ import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
 import type { Vec2 } from 'mathil'
 import { writable, type Writable } from 'svelte/store'
+import { game } from '../pages/GamePage/components/Game/Utils/mainGame'
 
 export const activeKeyStates: Writable<KeyFunction[]> = writable()
 export const gameState: Writable<GameState> = writable()
@@ -185,5 +186,50 @@ export function getMousePosition(canvas: HTMLCanvasElement, mouseEvent: MouseEve
   return {
     x: (mouseEvent.clientX - rect.left) * scaleX,
     y: (mouseEvent.clientY - rect.top) * scaleY,
+  }
+}
+export function initTouchControls() {
+  document.addEventListener('touchstart', touchStartHandler)
+  document.addEventListener('touchend', touchEndHandler)
+  document.addEventListener('touchmove', touchMoveHandler)
+}
+
+export function removeTouchControls() {
+  document.removeEventListener('touchstart', touchStartHandler)
+  document.removeEventListener('touchend', touchEndHandler)
+  document.removeEventListener('touchmove', touchMoveHandler)
+}
+
+function touchStartHandler(event: TouchEvent) {
+  const touches = event.touches
+
+  //Handle multi-touch scenarios here if needed
+  for (let i = 0; i < touches.length; i++) {
+    const touch = touches[i]
+    handleTouch(touch)
+  }
+}
+
+function touchEndHandler(event: TouchEvent) {
+  const touches = event.changedTouches
+
+  // Handle touch end
+  for (let i = 0; i < touches.length; i++) {
+    const touch = touches[i]
+  }
+}
+
+function touchMoveHandler(event: TouchEvent) {
+  const touches = event.touches
+
+  // Handle touch move
+  for (let i = 0; i < touches.length; i++) {
+    const touch = touches[i]
+  }
+}
+
+function handleTouch(touch: Touch) {
+  if (touch.clientX > 500) {
+    applyEngineThrust(game.localPlayer, 0, true)
   }
 }

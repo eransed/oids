@@ -7,7 +7,7 @@
   import { onDestroy, onMount } from 'svelte'
   import { createSpaceObject, currentTimeDate } from '../../../../lib/factory'
   import { Game } from '../../../../lib/game'
-  import { getKeyMap, removeKeyControllers } from '../../../../lib/input'
+  import { getKeyMap, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
 
   //Components
   import GameMenu from '../Menu/GameMenu.svelte'
@@ -38,7 +38,6 @@
   //Props
   export let sessionId: string
 
-
   console.log(sessionId)
 
   let canvas: HTMLCanvasElement
@@ -51,11 +50,11 @@
     e.preventDefault()
   })
 
-  async function players (): Promise<Session> {
-   const players: Session = await playersInSession(sessionId).then((d) => d.data)
+  async function players(): Promise<Session> {
+    const players: Session = await playersInSession(sessionId).then((d) => d.data)
 
-   return players
-  } 
+    return players
+  }
 
   onMount(() => {
     // cleanup = initSettingsControl()
@@ -77,6 +76,7 @@
 
   const showDeadMenu = (): void => {
     removeKeyControllers()
+    removeTouchControls()
     game.stopGame()
     game.websocket.resetListeners()
     navigate('/play')
@@ -123,7 +123,7 @@
     top: 0;
     position: fixed;
     background-color: var(--main-bg-color);
-    cursor: none; 
+    cursor: none;
   }
   .gameInfo {
     display: flex;
