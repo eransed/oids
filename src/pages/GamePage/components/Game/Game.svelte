@@ -108,7 +108,8 @@
 </div>
 
 <GameMenu currentGame={game} />
-<canvas class="game_canvas" id="noContextMenu" bind:this={canvas} />
+
+<canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} />
 
 <style>
   :root {
@@ -124,6 +125,10 @@
     position: fixed;
     background-color: var(--main-bg-color);
     cursor: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE/Edge */
+    user-select: none;
   }
   .gameInfo {
     display: flex;

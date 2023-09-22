@@ -255,7 +255,9 @@
           <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
             Host: {joinedSession.host.name}
             {#if joinedSession.host.readyToPlay}
-              <img class="readyFlag" src={Icons.Done} alt="Ready" />
+              <span style="filter: hue-rotate(72deg)">
+                <img class="readyFlag" src={Icons.Done} alt="Ready" />
+              </span>
             {/if}
           </p>
           <br />
@@ -266,7 +268,9 @@
                 {player.name}
                 <!-- {getPlayerPing(player)} - -->
                 {#if player.readyToPlay}
-                  <img class="readyFlag" src={Icons.Done} alt="Ready" />
+                  <span style="filter: hue-rotate(72deg)">
+                    <img class="readyFlag" src={Icons.Done} alt="Ready" />
+                  </span>
                 {/if}
               </p>
             {/if}
@@ -274,10 +278,12 @@
         </div>
         <div class="buttonWrapper">
           <Button90 icon={Icons.Exit} buttonConfig={{ buttonText: 'Leave Session', clickCallback: () => leaveSession(), selected: false }} />
-          <Button90
-            icon={Icons.Done}
-            buttonConfig={{ buttonText: 'Toggle ready!', clickCallback: () => toggleReadyToPlay(), selected: $localPlayer.readyToPlay }}
-          />
+          <span style="filter: {$localPlayer.readyToPlay ? 'hue-rotate(72deg)' : ''}">
+            <Button90
+              icon={Icons.Done}
+              buttonConfig={{ buttonText: 'Toggle ready!', clickCallback: () => toggleReadyToPlay(), selected: $localPlayer.readyToPlay }}
+            />
+          </span>
 
           <Button90
             addInfo={allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length}`}

@@ -8,14 +8,11 @@
   //Stores
   import { gameSessionId, pageHasHeader, localPlayer, socket } from '../../stores/stores'
 
-
   pageHasHeader.set(false)
 
   export let gameIdParam: string
 
   let sessionId: string = $gameSessionId ? $gameSessionId : gameIdParam
-  
-
 </script>
 
 <div class="gamePage" in:fade={{ delay: 300 }} out:fade>

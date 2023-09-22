@@ -3,6 +3,7 @@ import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
 import { dist2, newVec2, round, round2dec, type Vec2 } from 'mathil'
 import { writable, type Writable } from 'svelte/store'
+import { menuOpen } from '../components/menu/MenuStore'
 import { game } from '../pages/GamePage/components/Game/Utils/mainGame'
 
 export const activeKeyStates: Writable<KeyFunction[]> = writable()
@@ -30,6 +31,7 @@ const DefaultTouchMap: TouchFunctionMap = {
   thrust: false,
   reverseThrust: false,
   fire: false,
+  menu: false,
 }
 
 // Input helper functions
@@ -200,12 +202,12 @@ export function initTouchControls() {
   document.addEventListener('touchend', touchEndHandler)
   document.addEventListener('touchmove', touchMoveHandler)
 }
-
 export function removeTouchControls() {
   document.removeEventListener('touchstart', touchStartHandler)
   document.removeEventListener('touchend', touchEndHandler)
   document.removeEventListener('touchmove', touchMoveHandler)
 }
+
 export function spaceTouchController(so: SpaceObject, dt = 1) {
   const dts: number = dt * timeScale
 
@@ -220,12 +222,18 @@ export function spaceTouchController(so: SpaceObject, dt = 1) {
   if (ActiveTouch.fire) {
     fire(so)
   }
+
+  if (ActiveTouch.menu) {
+    menuOpen.set(true)
+    ActiveTouch.menu = false
+  }
 }
 
 interface TouchAreas {
   Thrust: Vec2
   ReverseThrust: Vec2
   Fire: Vec2
+  Menu: Vec2
 }
 
 let touchPos: Vec2 = { x: 0, y: 0 }
@@ -234,6 +242,7 @@ const touchPoints: TouchAreas = {
   Thrust: newVec2(90, 90),
   ReverseThrust: newVec2(70, 90),
   Fire: newVec2(20, 90),
+  Menu: newVec2(50, 0),
 }
 
 function setTouchPos(pos: Vec2): void {
@@ -277,7 +286,7 @@ function touchMoveHandler(event: TouchEvent) {
   // Handle touch move
   for (let i = 0; i < touches.length; i++) {
     const touch = touches[i]
-
+    console.log('moving')
     setTouchPos({ x: touch.clientX, y: touch.clientY })
     handleTouch()
   }
@@ -292,6 +301,8 @@ function resetActiveTouch() {
 function handleTouch() {
   resetActiveTouch()
 
+  console.log(touchPos)
+
   if (dist2(touchPos, touchPoints.Thrust) < 10) {
     ActiveTouch.thrust = true
   }
@@ -301,5 +312,9 @@ function handleTouch() {
   }
   if (dist2(touchPos, touchPoints.Fire) < 10) {
     ActiveTouch.fire = true
+  }
+
+  if (dist2(touchPos, touchPoints.Menu) < 15) {
+    ActiveTouch.menu = true
   }
 }

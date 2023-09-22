@@ -5,22 +5,25 @@
   import MenuWrapper from './MenuWrapper.svelte'
   import { onDestroy } from 'svelte'
   import { addKeyDownListener } from '../../stores/eventListenerStore'
+  import { menuOpen } from './MenuStore'
+
+  import { writable } from 'svelte/store'
 
   // used to disable game controllers while menu is open
-  import { initKeyControllers, removeKeyControllers } from '../../lib/input'
+  import { initKeyControllers, removeKeyControllers, removeTouchControls } from '../../lib/input'
 
   //Exports
-  export let menuOpen: boolean = false
   export let buttons: Button90Config[]
   export let menuHeader: string = 'Menu'
 
+  $: if ($menuOpen) {
+    console.log($menuOpen)
+    removeKeyControllers()
+    removeTouchControls()
+  }
+
   const toggleMenu = (): void => {
-    menuOpen = !menuOpen
-    if (menuOpen) {
-      removeKeyControllers()
-    } else {
-      initKeyControllers()
-    }
+    $menuOpen = !$menuOpen
   }
 
   const handleKeyDown = (event: KeyboardEvent): void => {
@@ -71,14 +74,14 @@
     // console.log('code =', event.code, ', key =',event.key)
   }
 
-  $: if (menuOpen) {
+  $: if ($menuOpen) {
     document.addEventListener('keydown', handleMenuSelection)
   } else {
     document.removeEventListener('keydown', handleMenuSelection)
   }
 </script>
 
-{#if menuOpen}
+{#if $menuOpen}
   <MenuWrapper>
     <ul class="buttonList">
       <h3 class="menuHeader">{menuHeader}</h3>

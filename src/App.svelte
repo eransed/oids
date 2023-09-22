@@ -31,29 +31,27 @@
   syncThemeWithCss()
 </script>
 
-<body>
-  <Router>
-    {#await onAppMount()}
-      <Page>
-        <CircularSpinner ship />
-      </Page>
-    {:then}
-      {#if $pageHasHeader}
-        <Header />
-      {/if}
-      <Route path={routes.home.path}>
-        <LandingPage />
-      </Route>
-      <Route path={routes.game.path} let:params><GamePage gameIdParam={params.id} /></Route>
-      <Route path={routes.end.path}><PostGamePage /></Route>
-      <Route path={routes.profile.path}>
-        <ProfilePage />
-      </Route>
-      <Route path={routes.play.path}>
-        <GameLobby />
-      </Route>
-      <Route path={routes.test.path}><TestPage /></Route>
-      <Route path={routes.admin.path}><AdminPage /></Route>
-    {/await}
-  </Router>
-</body>
+<Router>
+  {#await onAppMount()}
+    <Page>
+      <CircularSpinner ship />
+    </Page>
+  {:then}
+    {#if $pageHasHeader}
+      <Header />
+    {/if}
+    <Route path={routes.home.path}>
+      <LandingPage />
+    </Route>
+    <Route path={routes.game.path} let:params><GamePage gameIdParam={params.id} /></Route>
+    <Route path={routes.end.path}><PostGamePage /></Route>
+    <Route path={routes.profile.path}>
+      <ProfilePage />
+    </Route>
+    <Route path={routes.play.path}>
+      <GameLobby />
+    </Route>
+    <Route path={routes.test.path}><TestPage /></Route>
+    <Route path={routes.admin.path}><AdminPage /></Route>
+  {/await}
+</Router>

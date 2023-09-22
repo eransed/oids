@@ -243,6 +243,7 @@ export interface KeyFunctionMap {
 
 export interface TouchFunctionMap {
   thrust: boolean
+  menu: boolean
   reverseThrust: boolean
   // boost: boolean
   // halt: boolean
