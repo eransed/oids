@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Session, SpaceObject } from '../../../../../lib/interface'
+  import type { Session, SpaceObject } from '../../../../lib/interface'
   import SessionListRow from './SessionListRow.svelte'
 
   export let sessions: Session[]

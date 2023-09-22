@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SpaceObject } from "../../../../../lib/interface"
+  import type { SpaceObject } from '../../../../lib/interface'
 
   export let player: SpaceObject | null = null
   export let theLocalPlayer = false

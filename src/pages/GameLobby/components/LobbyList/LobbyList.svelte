@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { gameState } from "../../../../../lib/input"
+  import { gameState } from '../../../../lib/input'
 
-  import ScoreRow from "./LobbyListRow.svelte"
+  import ScoreRow from './LobbyListRow.svelte'
 
   export let showLocalPlayer = true
 
