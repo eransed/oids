@@ -99,9 +99,7 @@ export interface Collidable extends Positionable {
   collidingWith: Collidable[]
 }
 
-export interface ThrustFlameAtom extends Positionable, Physical {
-
-} 
+export interface ThrustFlameAtom extends Positionable, Physical {}
 
 export interface Thrustable extends Positionable, Physical {
   batteryLevel: number
@@ -243,6 +241,24 @@ export interface KeyFunctionMap {
   shipSettings: KeyFunctionStore
 }
 
+export interface TouchFunctionMap {
+  thrust: boolean
+  reverseThrust: boolean
+  // boost: boolean
+  // halt: boolean
+  // turnLeft: boolean
+  // turnRight: boolean
+  // strafeLeft: boolean
+  // strafeRight: boolean
+  fire: boolean
+  // reload: boolean
+  // selfDestroy: boolean
+  // systemGraphs: boolean
+  // leaderBoard: boolean
+  // hotKeys: boolean
+  // shipSettings: boolean
+}
+
 export interface KeyFunction {
   activators: string[]
   keyStatus: boolean
@@ -293,8 +309,6 @@ export interface ChatMessage {
 
 export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable, Bounded {}
 
-
-
 export interface ShipUpgrades {
   hyperdrive: boolean
   photonLaserPower: number
@@ -308,4 +322,3 @@ export interface ShipUpgrades {
 export interface CoreProps {
   energyLevel: number // boost engine, shields and cannons. can be
 }
-

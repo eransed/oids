@@ -383,7 +383,7 @@
     .center,
     .right {
       min-width: unset;
-      padding-left: 0px;
+
       margin-left: 0px;
     }
 
@@ -411,7 +411,12 @@
 
   @media screen and (max-width: 750px) {
     .lobbyWrapper {
+      top: 1.5em;
+      width: 100%;
+      position: relative;
+      height: 100vh;
       grid-template-columns: auto;
+      zoom: 0.8;
     }
 
     .left {
@@ -431,11 +436,6 @@
       grid-column-end: 1;
       max-height: 22em;
     }
-    .lobbyWrapper {
-      width: 100%;
-      position: relative;
-      height: 100vh;
-    }
 
     .right {
       max-height: none;
@@ -447,6 +447,7 @@
   @media screen and (max-width: 750px) and (max-height: 400px) {
     .lobbyWrapper {
       grid-template-columns: auto;
+      zoom: 0.5;
     }
 
     .left {

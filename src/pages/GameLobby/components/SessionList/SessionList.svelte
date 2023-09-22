@@ -28,7 +28,7 @@
 <style>
   .scoreTable {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     flex-wrap: wrap;
     position: relative;
     inset: 0;

@@ -117,6 +117,7 @@
     opacity: 0.7;
     width: 80%;
     transition: all 500ms;
+    margin-bottom: 0.5em;
   }
 
   .msgInput input:focus {

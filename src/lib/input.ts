@@ -1,7 +1,7 @@
-import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject } from './interface'
+import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject, TouchFunctionMap } from './interface'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
-import type { Vec2 } from 'mathil'
+import { dist2, newVec2, round, round2dec, type Vec2 } from 'mathil'
 import { writable, type Writable } from 'svelte/store'
 import { game } from '../pages/GamePage/components/Game/Utils/mainGame'
 
@@ -26,6 +26,12 @@ const DefaultKeyMap: KeyFunctionMap = {
   shipSettings: { activators: ['i'], keyStatus: false, store: writable<boolean>(false), toggle: true },
 }
 
+const DefaultTouchMap: TouchFunctionMap = {
+  thrust: false,
+  reverseThrust: false,
+  fire: false,
+}
+
 // Input helper functions
 export function keyDisplayName(key: string) {
   if (key === ' ') return 'Spacebar'
@@ -43,6 +49,7 @@ Object.entries(DefaultKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
 })
 
 let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
+const ActiveTouch: TouchFunctionMap = DefaultTouchMap
 
 export function setKeyStateStore() {
   activeKeyStates.set(keyFuncArrayFromKeyFunctionMap(ActiveKeyMap))
@@ -199,6 +206,46 @@ export function removeTouchControls() {
   document.removeEventListener('touchend', touchEndHandler)
   document.removeEventListener('touchmove', touchMoveHandler)
 }
+export function spaceTouchController(so: SpaceObject, dt = 1) {
+  const dts: number = dt * timeScale
+
+  if (ActiveTouch.thrust) {
+    applyEngineThrust(so, 0, false)
+  }
+
+  if (ActiveTouch.reverseThrust) {
+    applyEngineThrust(so, 180)
+  }
+
+  if (ActiveTouch.fire) {
+    fire(so)
+  }
+}
+
+interface TouchAreas {
+  Thrust: Vec2
+  ReverseThrust: Vec2
+  Fire: Vec2
+}
+
+let touchPos: Vec2 = { x: 0, y: 0 }
+
+const touchPoints: TouchAreas = {
+  Thrust: newVec2(90, 90),
+  ReverseThrust: newVec2(70, 90),
+  Fire: newVec2(20, 90),
+}
+
+function setTouchPos(pos: Vec2): void {
+  const windowSize: Vec2 = { x: window.innerWidth, y: window.innerHeight }
+
+  const touchPosition: Vec2 = {
+    x: (pos.x / windowSize.x) * 100,
+    y: (pos.y / windowSize.y) * 100,
+  }
+
+  touchPos = touchPosition
+}
 
 function touchStartHandler(event: TouchEvent) {
   const touches = event.touches
@@ -206,7 +253,9 @@ function touchStartHandler(event: TouchEvent) {
   //Handle multi-touch scenarios here if needed
   for (let i = 0; i < touches.length; i++) {
     const touch = touches[i]
-    handleTouch(touch)
+
+    setTouchPos({ x: touch.clientX, y: touch.clientY })
+    handleTouch()
   }
 }
 
@@ -216,6 +265,9 @@ function touchEndHandler(event: TouchEvent) {
   // Handle touch end
   for (let i = 0; i < touches.length; i++) {
     const touch = touches[i]
+    ActiveTouch.thrust = false
+    ActiveTouch.reverseThrust = false
+    ActiveTouch.fire = false
   }
 }
 
@@ -225,11 +277,29 @@ function touchMoveHandler(event: TouchEvent) {
   // Handle touch move
   for (let i = 0; i < touches.length; i++) {
     const touch = touches[i]
+
+    setTouchPos({ x: touch.clientX, y: touch.clientY })
+    handleTouch()
   }
 }
 
-function handleTouch(touch: Touch) {
-  if (touch.clientX > 500) {
-    applyEngineThrust(game.localPlayer, 0, true)
+function resetActiveTouch() {
+  ActiveTouch.reverseThrust = false
+  ActiveTouch.thrust = false
+  ActiveTouch.fire = false
+}
+
+function handleTouch() {
+  resetActiveTouch()
+
+  if (dist2(touchPos, touchPoints.Thrust) < 10) {
+    ActiveTouch.thrust = true
+  }
+
+  if (dist2(touchPos, touchPoints.ReverseThrust) < 10) {
+    ActiveTouch.reverseThrust = true
+  }
+  if (dist2(touchPos, touchPoints.Fire) < 10) {
+    ActiveTouch.fire = true
   }
 }

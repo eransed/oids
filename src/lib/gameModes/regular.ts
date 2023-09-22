@@ -1,6 +1,6 @@
 import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
-import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController } from '../input'
+import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
 import { add, direction, dist2, info, log, magnitude, newVec2, rndf, rndfVec2, rndi, round2dec, smul, sub, to_string2, wrap } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
 import { friction, gravity, gravityStars, handleCollisions, offScreen, offScreen_mm, vec2Bound, wrap_mm } from '../physics'
@@ -561,6 +561,7 @@ function handleStarBackdrop(game: Game): void {
 export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
     spaceObjectKeyController(game.localPlayer, dt)
+    spaceTouchController(game.localPlayer, dt)
   }
   // bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), bounceFactor, 0, 0)
   // bounceSpaceObject(game.localPlayer, game.localPlayer.worldSize, bounceFactor, 0, 0)
