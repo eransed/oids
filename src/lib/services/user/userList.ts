@@ -1,5 +1,6 @@
 import axios, { type AxiosResponse } from 'axios'
-import type { User } from '../../../interfaces/user'
+// import type { User } from '../../../interfaces/user'
+import type { User } from '@prisma/client'
 
 const userList = async (): Promise<AxiosResponse<User[]>> => {
   const token = localStorage.getItem('accessToken')

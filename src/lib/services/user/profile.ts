@@ -4,7 +4,8 @@ import axios, { type AxiosResponse } from 'axios'
 import { settings, user } from '../../../stores/stores'
 
 //Interface
-import type { User } from '../../../interfaces/user'
+// import type { User } from '../../../interfaces/user'
+import type { User } from '@prisma/client'
 
 const getProfile = async (): Promise<User> => {
   const token = localStorage.getItem('accessToken')

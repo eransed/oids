@@ -1,5 +1,6 @@
 import { writable, type Writable } from 'svelte/store'
-import type { User } from '../interfaces/user'
+// import type { User } from '../interfaces/user'
+import type { User } from '@prisma/client'
 import { rndi } from 'mathil'
 import type { ChatMessage, SpaceObject } from '../lib/interface'
 import { createSpaceObject } from '../lib/factory'
@@ -21,12 +22,12 @@ export const gUser: User = {
   id: createdGuestName,
   email: '',
   name: createdGuestName,
-  createdAt: new Date().toDateString(),
-  updatedAt: new Date().toDateString(),
-  gameHistory: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
   role: 'guest',
   darkMode: true,
-  ships: [],
+  playTime: 0,
+  image: ''
 }
 
 export const guestUser: Writable<User> = writable(gUser)

@@ -63,4 +63,5 @@ model Ship {
   owner      User     @relation(fields: [userId], references: [id])
   userId     String
   image      String   @default("RocketShip")
+  played     Int      
 }

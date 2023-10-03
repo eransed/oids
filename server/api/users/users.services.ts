@@ -1,7 +1,15 @@
 import bcrypt from 'bcrypt'
 import db from '../utils/db'
 
-import { User, newUser } from '../types/user'
+// import { User, newUser } from '../types/user'
+import { User } from '@prisma/client';
+
+// Exclude keys from user
+function exclude(user: any, keys: any) {
+  return Object.fromEntries(
+    Object.entries(user).filter(([key]) => !keys.includes(key))
+  );
+}
 
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({
@@ -11,7 +19,7 @@ export const findUserByEmail = (email: string) => {
   })
 }
 
-export const createUser = (user: newUser) => {
+export const createUser = (user: User) => {
   if (user.password) {
     user.password = bcrypt.hashSync(user.password, 12)
   }
@@ -59,7 +67,12 @@ export const updateUser = async (user: User) => {
 
 export const getUsers = async () => {
   const users = await db.user.findMany({})
-  return users
+  const filtered: any[] = []
+  users.forEach(u => {
+    filtered.push(exclude(u, ['password']))
+  })
+  return filtered
+  // return users
 }
 
 /**

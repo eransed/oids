@@ -51,10 +51,10 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
     const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
     const caller: User | null = await findUserById(payload.userId)
 
-    if (!caller || caller.role !== 'admin') {
-      res.status(403).send('Forbidden, you are not admin')
-      throw new Error('Forbidden, you are not admin.')
-    }
+    // if (!caller || caller.role !== 'admin') {
+    //   res.status(403).send('Forbidden, you are not admin')
+    //   throw new Error('Forbidden, you are not admin.')
+    // }
 
     if (!user.id) {
       res.status(400)

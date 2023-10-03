@@ -19,7 +19,8 @@
   import { onMount } from 'svelte'
 
   //Interfaces
-  import type { User } from '../../interfaces/user'
+  // import type { User } from '../../interfaces/user'
+  import type { User } from '@prisma/client'
   import type { AlertType } from '../../components/alert/AlertType'
   import { fade } from 'svelte/transition'
 
