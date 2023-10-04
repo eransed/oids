@@ -8,6 +8,11 @@ import Exit from '../assets/icons/exit.svg'
 import StartGame from '../assets/icons/startGame.svg'
 import Done from '../assets/icons/done.svg'
 import Send from '../assets/icons/send.svg'
+import Save from '../assets/icons/save.svg'
+import AddUser from '../assets/icons/addUser.svg'
+import EditUser from '../assets/icons/editUser.svg'
+import Cancel from '../assets/icons/cancel.svg'
+import Delete from '../assets/icons/Delete.svg'
 
 export const Icons = {
   Admin,
@@ -20,6 +25,11 @@ export const Icons = {
   StartGame,
   Done,
   Send,
+  Save,
+  AddUser,
+  EditUser,
+  Cancel,
+  Delete,
 }
 
 export const IconColor = '#D2B48C'

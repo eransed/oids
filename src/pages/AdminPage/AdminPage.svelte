@@ -6,6 +6,7 @@
   import Page from '../../components/page/page.svelte'
   import Alert from '../../components/alert/Alert.svelte'
   import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
+  import Button90 from '../../components/menu/Button90.svelte'
 
   //Services
   import updateUser from '../../lib/services/user/updateUser'
@@ -19,11 +20,13 @@
   import { onMount } from 'svelte'
 
   //Interfaces
-  // import type { User } from '../../interfaces/user'
   import type { User } from '@prisma/client'
   import type { AlertType } from '../../components/alert/AlertType'
   import { fade } from 'svelte/transition'
   import { deleteUser } from '../../lib/services/user/delete'
+
+  //Icons
+  import { Icons } from '../../style/icons'
 
   async function getUsers(): Promise<User[]> {
     loading = true
@@ -187,15 +190,48 @@
     <Page>
       <div class="pageWrapper">
         <div class="actions">
-          <button on:click={() => (addNewUser = true)}>Add user</button>
+          <Button90
+            disabled={loading}
+            icon={Icons.AddUser}
+            mouseTracking={false}
+            buttonConfig={{
+              buttonText: 'Add User',
+              clickCallback: () => {
+                addNewUser = true
+              },
+              selected: false,
+            }}
+          />
         </div>
         {#if addNewUser}
           <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
             <input disabled={loading} bind:value={newUser.name} placeholder="Name" />
             <input disabled={loading} bind:value={newUser.email} placeholder="Email" />
             <input disabled={loading} bind:value={newUser.password} placeholder="Password" />
-            <button disabled={loading} on:click={() => (addNewUser = false)}>Cancel</button>
-            <button disabled={loading} on:click={() => addUser()}>Save</button>
+            <Button90
+              disabled={loading}
+              icon={Icons.Cancel}
+              mouseTracking={false}
+              buttonConfig={{
+                buttonText: 'Cancel',
+                clickCallback: () => {
+                  addNewUser = false
+                },
+                selected: false,
+              }}
+            />
+            <Button90
+              disabled={loading}
+              icon={Icons.Save}
+              mouseTracking={false}
+              buttonConfig={{
+                buttonText: 'Save',
+                clickCallback: () => {
+                  addUser()
+                },
+                selected: false,
+              }}
+            />
           </div>
         {/if}
 
@@ -219,47 +255,75 @@
                         {/each}
                       </select>
                     </td>
-                    <td
-                      ><button
+                    <td>
+                      <Button90
                         disabled={loading}
-                        on:click={() => {
-                          editingUser = undefined
-                          edit = false
-                        }}>Cancel</button
-                      >
-                      <button
-                        disabled={loading}
-                        on:click={() => {
-                          if (editingUser) {
-                            sendUpdateUser()
-                          }
+                        icon={Icons.Cancel}
+                        mouseTracking={false}
+                        buttonConfig={{
+                          buttonText: 'Cancel',
+                          clickCallback: () => {
+                            editingUser = undefined
+                            edit = false
+                          },
+                          selected: false,
                         }}
-                      >
-                        {#if loading}
-                          Saving...
-                        {:else}
-                          Save
-                        {/if}
-                      </button>
+                      />
                     </td>
-                    <button disabled={loading} on:click={() => delUser()}><i class="fa-regular fa-trash-can" /></button>
+                    <td>
+                      <Button90
+                        disabled={loading}
+                        icon={Icons.Save}
+                        mouseTracking={false}
+                        buttonConfig={{
+                          buttonText: 'Save',
+                          clickCallback: () => {
+                            if (editingUser) {
+                              sendUpdateUser()
+                            }
+                          },
+                          selected: false,
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <Button90
+                        disabled={loading}
+                        icon={Icons.Delete}
+                        mouseTracking={false}
+                        buttonConfig={{
+                          buttonText: 'Save',
+                          clickCallback: () => {
+                            delUser()
+                          },
+                          selected: false,
+                        }}
+                      />
+                    </td>
                   </tr>
                 {:else}
                   <tr>
                     <td>{u.name}</td>
                     <td>{u.email}</td>
                     <td>{u.role}</td>
-                    <td
-                      ><button
-                        on:click={() => {
-                          edit = true
-                          editingUser = u
-                          name = editingUser.name
-                          email = editingUser.email
-                          role = editingUser.role
-                        }}>Edit</button
-                      ></td
-                    >
+                    <td>
+                      <Button90
+                        disabled={loading}
+                        icon={Icons.EditUser}
+                        mouseTracking={false}
+                        buttonConfig={{
+                          buttonText: 'Edit User',
+                          clickCallback: () => {
+                            edit = true
+                            editingUser = u
+                            name = editingUser.name
+                            email = editingUser.email
+                            role = editingUser.role
+                          },
+                          selected: false,
+                        }}
+                      />
+                    </td>
                   </tr>
                 {/if}
               {/each}
@@ -283,6 +347,21 @@
     justify-content: center;
     width: 100ch;
   }
+
+  .pageWrapper input,
+  .pageWrapper select,
+  .addUser input {
+    background-color: var(--main-bg-color);
+    outline: none;
+    border: none;
+    border-top-right-radius: 1em;
+    border-top-left-radius: 1em;
+    border-bottom: 1px solid var(--main-accent-color);
+    padding: 1em;
+    color: var(--main-text-color);
+    margin: 0.5em;
+  }
+
   .actions {
     width: 100%;
     display: flex;
@@ -302,20 +381,11 @@
     width: fit-content;
   }
 
-  .addUser input {
-    margin: 0.2em;
-    padding: 0.2em;
-  }
-
   button {
     margin: 0.2em;
     padding: 0.2em;
   }
 
-  input {
-    margin: 0.2em;
-    padding: 0.2em;
-  }
   .dataTable {
     color: var(--main-text-color);
     justify-content: center;
