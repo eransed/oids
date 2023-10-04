@@ -5,7 +5,9 @@ import { deleteUser, findUserByEmail, findUserById, getUsers, saveGame, updateUs
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 
-import { Game, Player, User } from '../types/user'
+import { Game, Player } from '../types/user'
+
+import { User } from '@prisma/client'
 
 export const users = express.Router()
 

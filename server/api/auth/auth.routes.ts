@@ -14,6 +14,7 @@ export const auth = express.Router()
 import { createUser, findUserByEmail } from '../users/users.services'
 
 import jwt from 'jsonwebtoken'
+import { createNewUser } from '../utils/factory'
 //Register endpoint
 auth.post('/register', async (req, res, next) => {
   try {
@@ -30,11 +31,9 @@ auth.post('/register', async (req, res, next) => {
       throw new Error('Email already in use.')
     }
 
-    const user = await createUser({
-      email,
-      password,
-      name,
-    })
+    const newUser = createNewUser(email, name, password)
+
+    const user = await createUser(newUser)
     const jti = uuidv4()
     const { accessToken, refreshToken } = generateTokens(user, jti)
     await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id })

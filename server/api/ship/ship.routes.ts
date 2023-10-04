@@ -1,12 +1,13 @@
 import express from 'express'
 import { Request, Response, NextFunction } from 'express'
 import { isAuthenticated } from '../middleware'
-import { newShip } from '../types/ship'
 import { createShip, getShips, deleteShip } from './ship.services'
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 import { findUserById } from '../users/users.services'
 import { User } from '../types/user'
+import { Ship } from '@prisma/client'
+import { createNewShip } from '../utils/factory'
 
 export const ship = express.Router()
 
@@ -29,10 +30,7 @@ ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: 
       throw new Error('No user found.')
     }
 
-    const ship: newShip = {
-      name: name,
-      userId: caller.id,
-    }
+    const ship = createNewShip(name, caller.id)
 
     await createShip(ship).then((ship) => {
       res.json(ship)

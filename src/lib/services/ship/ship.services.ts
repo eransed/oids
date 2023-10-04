@@ -1,19 +1,20 @@
 import axios, { type AxiosResponse } from 'axios'
+import type { Ship } from '@prisma/client'
 
 export interface newShip {
   name: string
   userId: string
 }
 
-export interface Ship {
-  id: number
-  name: string
-  level: number
-  updatedAt: Date
-  createdAt: Date
-  experience: number
-  userId: string
-}
+// export interface Ship {
+//   id: number
+//   name: string
+//   level: number
+//   updatedAt: Date
+//   createdAt: Date
+//   experience: number
+//   userId: string
+// }
 
 export const createShip = async (name: string): Promise<AxiosResponse<Ship>> => {
   const token = localStorage.getItem('accessToken')
@@ -57,7 +58,7 @@ export const getShips = async (): Promise<AxiosResponse<Ship[]>> => {
   return response
 }
 
-export const deleteShip = async (id: number): Promise<AxiosResponse<Ship>> => {
+export const deleteShip = async (id: string): Promise<AxiosResponse<Ship>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {

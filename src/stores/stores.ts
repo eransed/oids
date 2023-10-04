@@ -1,6 +1,6 @@
 import { writable, type Writable } from 'svelte/store'
 // import type { User } from '../interfaces/user'
-import type { User } from '@prisma/client'
+import { type User, Prisma } from '@prisma/client'
 import { rndi } from 'mathil'
 import type { ChatMessage, SpaceObject } from '../lib/interface'
 import { createSpaceObject } from '../lib/factory'
@@ -11,7 +11,11 @@ import { cnvTheme, DeepMidnight } from '../style/defaultColors'
 
 export const isLoggedIn: Writable<boolean> = writable()
 
-export const user: Writable<User> = writable()
+export const userIncludes = Prisma.validator<Prisma.UserArgs>()({
+  include: { ships: true, gameHistory: true },
+})
+
+export const user: Writable<User & Prisma.UserGetPayload<typeof userIncludes>> = writable()
 
 export const userLoading: Writable<boolean> = writable()
 
@@ -22,12 +26,13 @@ export const gUser: User = {
   id: createdGuestName,
   email: '',
   name: createdGuestName,
+  password: '',
   createdAt: new Date(),
   updatedAt: new Date(),
   role: 'guest',
   darkMode: true,
-  playTime: 0,
-  image: ''
+  played: 0,
+  image: '',
 }
 
 export const guestUser: Writable<User> = writable(gUser)
@@ -42,4 +47,4 @@ export const socket: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
 
 export const chatMessageHistory: Writable<ChatMessage[]> = writable([])
 
-export const settings: Writable<Settings> = writable({ uiStyle: cnvTheme(DeepMidnight), theme: DeepMidnight})
+export const settings: Writable<Settings> = writable({ uiStyle: cnvTheme(DeepMidnight), theme: DeepMidnight })

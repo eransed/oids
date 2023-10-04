@@ -55,7 +55,7 @@
     })
   }
 
-  async function handleDeleteShip(id: number, name: string): Promise<void> {
+  async function handleDeleteShip(id: string, name: string): Promise<void> {
     const result = confirm(`Want to delete ship: ${name}`)
     if (result) {
       const prompt = window.prompt(`Write ${name} in the box to delete it.`)

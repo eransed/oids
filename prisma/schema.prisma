@@ -23,6 +23,7 @@ model User {
   darkMode      Boolean        @default(true)
   ships         Ship[]
   image         String         @default("Avatar")
+  played        Int            @default(0)
 }
 
 model RefreshToken {
@@ -54,7 +55,7 @@ model Player {
 }
 
 model Ship {
-  id         Int      @id @unique @default(autoincrement())
+  id         String   @id @unique @default(uuid())
   level      Int      @default(1)
   name       String
   updatedAt  DateTime @updatedAt
@@ -63,5 +64,5 @@ model Ship {
   owner      User     @relation(fields: [userId], references: [id])
   userId     String
   image      String   @default("RocketShip")
-  played     Int      
+  played     Int      @default(0)
 }
