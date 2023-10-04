@@ -8,6 +8,8 @@ import { JWT_ACCESS_SECRET } from '../../pub_config'
 import { Game } from '../types/user'
 
 import { User } from '@prisma/client'
+import type { AxiosRequestConfig } from 'axios'
+import { IncomingHttpHeaders } from 'http'
 
 export const users = express.Router()
 
@@ -141,9 +143,10 @@ users.get('/list', isAuthenticated, async (req: Request, res: Response, next: Ne
   }
 })
 
-users.delete('/delete', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+users.post('/deleteUser', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { authorization } = req.headers
+
     const { email } = req.body
 
     if (!email) {
@@ -164,16 +167,49 @@ users.delete('/delete', isAuthenticated, async (req: Request, res: Response, nex
       res.status(403)
       throw new Error('Forbidden, you are not admin.')
     }
-    const userToDelete: User | null = await findUserByEmail(email)
+    const userToDelete: User | null = await findUserByEmail(email as string)
 
     if (!userToDelete) {
       res.status(404)
       throw new Error('User not found - provide an email to an existing user.')
     }
 
-    const response: string = await deleteUser(userToDelete)
+    const response: User = await deleteUser(userToDelete)
 
     res.send(response)
+  } catch (err) {
+    next(err)
+  }
+})
+
+users.post('/deleteMe', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { authorization } = req.headers
+
+    if (!authorization) {
+      res.status(401)
+      throw new Error('No authorization')
+    }
+
+    const token = authorization.split(' ')[1]
+    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
+    const user: User | null = await findUserById(payload.userId)
+
+    if (!user) {
+      res.status(404)
+      throw new Error('User not found - provide an id to an existing user.')
+    }
+
+    const userToDelete: User | null = await findUserById(user.id)
+
+    if (userToDelete) {
+      const response: User = await deleteUser(userToDelete)
+
+      res.send(response)
+    } else {
+      res.status(500).send('User could not be deleted')
+      throw new Error('User could not be deleted')
+    }
   } catch (err) {
     next(err)
   }

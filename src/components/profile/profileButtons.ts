@@ -4,7 +4,7 @@ import type { Button90Config } from '../../interfaces/menu'
 //Store
 import { isLoggedIn, user, gUser } from '../../stores/stores'
 
-const handleLogout = (): void => {
+export const handleLogout = (): void => {
   localStorage.clear()
   isLoggedIn.set(false)
   user.set(gUser)

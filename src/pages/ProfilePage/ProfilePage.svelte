@@ -8,6 +8,7 @@
   import Page from '../../components/page/page.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
   import { ProfileButtons } from './ProfileButtons'
+  import Alert from '../../components/alert/Alert.svelte'
 
   //Util
   import { formatDate } from '../../helpers/util'
@@ -19,6 +20,10 @@
 
   //Assets
   import { Icons } from '../../style/icons'
+  import { deleteMe } from '../../lib/services/user/delete'
+  import axios from 'axios'
+  import { handleLogout } from '../../components/profile/profileButtons'
+  import type { AlertType } from '../../components/alert/AlertType'
 
   onMount(() => {
     if ($isLoggedIn && !$user) {
@@ -29,7 +34,7 @@
   pageHasHeader.set(true)
 
   let openModal: boolean = false
-
+  let alert: AlertType | undefined = undefined
   let newShip = {
     name: '',
   }
@@ -79,10 +84,40 @@
       }
     }
   }
+
+  async function delUser() {
+    const result = confirm(`Want to delete your account: ${$user.name}?`)
+    if (result) {
+      const prompt = window.prompt(`Write ${$user.name} in the box to delete user.`)
+      if (prompt === $user.name) {
+        loading = true
+
+        await deleteMe()
+          .then((res) => {
+            if (res.status === 200) {
+              handleLogout()
+              alert = {
+                severity: 'success',
+                text: `Your account has been deleted forever :(`,
+              }
+              loading = false
+            }
+          })
+          .catch((err) => {
+            loading = false
+            throw new Error(err)
+          })
+      }
+    }
+  }
 </script>
 
 <Page>
   <div class="profileWrapper">
+    {#if alert}
+      <Alert severity={alert.severity} text={alert.text} />
+    {/if}
+
     {#if $isLoggedIn && $user}
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
@@ -156,6 +191,10 @@
                   }}>{$user.darkMode}</button
                 ></td
               >
+            </tr>
+            <tr>
+              <td>Delete my account</td>
+              <td><button disabled={loading} on:click={() => delUser()}><i class="fa-regular fa-trash-can" /></button></td>
             </tr>
           </table>
         {/if}

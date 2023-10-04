@@ -74,7 +74,7 @@ export const getUsers = async () => {
 /**
  * WARNING: User will be deleted forever!
  */
-export const deleteUser = async (user: User): Promise<string> => {
+export const deleteUser = async (user: User): Promise<User> => {
   const response = await db.user
     .delete({
       where: {
@@ -82,7 +82,7 @@ export const deleteUser = async (user: User): Promise<string> => {
       },
     })
     .then(() => {
-      return `User ${user.email} is now deleted.`
+      return user
     })
     .catch((err) => {
       return err

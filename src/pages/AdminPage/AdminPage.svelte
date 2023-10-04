@@ -23,6 +23,7 @@
   import type { User } from '@prisma/client'
   import type { AlertType } from '../../components/alert/AlertType'
   import { fade } from 'svelte/transition'
+  import { deleteUser } from '../../lib/services/user/delete'
 
   async function getUsers(): Promise<User[]> {
     loading = true
@@ -112,6 +113,7 @@
           addNewUser = false
           getUsers()
         } else {
+          loading = false
           const error = res
           if (axios.isAxiosError(error)) {
             alert = {
@@ -122,11 +124,51 @@
         }
       })
       .catch((error: AxiosError) => {
+        loading = false
         alert = {
           severity: 'warning',
           text: `Could not save: ${error.response?.data}`,
         }
       })
+  }
+
+  async function delUser() {
+    const result = confirm(`Want to delete user: ${editingUser?.name}?`)
+    if (result) {
+      const prompt = window.prompt(`Write ${editingUser?.name} in the box to delete user.`)
+      if (prompt === name) {
+        loading = true
+
+        if (editingUser) {
+          await deleteUser(editingUser.email)
+            .then((res) => {
+              if (res.status === 200) {
+                editingUser = undefined
+                loading = false
+                console.log(res)
+                alert = {
+                  severity: 'success',
+                  text: `${res.data.name} deleted!`,
+                }
+                getUsers()
+              } else {
+                loading = false
+                const error = res
+                if (axios.isAxiosError(error)) {
+                  alert = {
+                    severity: 'warning',
+                    text: `Could not delete user: ${error.response?.data}`,
+                  }
+                }
+              }
+            })
+            .catch((err) => {
+              loading = false
+              throw new Error(err)
+            })
+        }
+      }
+    }
   }
 
   function onKeyPress(e: KeyboardEvent) {
@@ -200,6 +242,7 @@
                         {/if}
                       </button>
                     </td>
+                    <button disabled={loading} on:click={() => delUser()}><i class="fa-regular fa-trash-can" /></button>
                   </tr>
                 {:else}
                   <tr>

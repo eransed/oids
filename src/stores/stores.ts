@@ -22,7 +22,7 @@ export const userLoading: Writable<boolean> = writable()
 const createdGuestName = `p-${rndi(1, 900000)}`
 export const guestUserName: Writable<string> = writable(createdGuestName)
 
-export const gUser: User = {
+export const gUser: User & Prisma.UserGetPayload<typeof userIncludes> = {
   id: createdGuestName,
   email: '',
   name: createdGuestName,
@@ -33,6 +33,8 @@ export const gUser: User = {
   darkMode: true,
   played: 0,
   image: '',
+  ships: [],
+  gameHistory: [],
 }
 
 export const guestUser: Writable<User> = writable(gUser)
