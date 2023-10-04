@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt'
 import db from '../utils/db'
 
 // import { User, newUser } from '../types/user'
