@@ -5,7 +5,6 @@ import { generateTokens } from '../utils/jwt'
 import { addRefreshTokenToWhitelist, deleteRefreshToken, findRefreshTokenById, revokeTokens } from './auth.services'
 import { findUserById } from '../users/users.services'
 import hashToken from '../utils/hashToken'
-import type { JwtPayload } from 'jsonwebtoken'
 import { JWT_REFRESH_SECRET } from '../../pub_config'
 import { warn } from 'mathil'
 

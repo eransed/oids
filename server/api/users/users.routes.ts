@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction, response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import express from 'express'
 import { isAuthenticated } from '../middleware'
 import { deleteUser, findUserByEmail, findUserById, getUsers, saveGame, updateUser } from './users.services'
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 
-import { Game, Player } from '../types/user'
+import { Game } from '../types/user'
 
 import { User } from '@prisma/client'
 

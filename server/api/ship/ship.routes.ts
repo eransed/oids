@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 import { findUserById } from '../users/users.services'
 import { User } from '../types/user'
-import { Ship } from '@prisma/client'
 import { createNewShip } from '../utils/factory'
 
 export const ship = express.Router()
