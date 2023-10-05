@@ -232,14 +232,13 @@
           >
           {#if avatarDialog}
             <dialog open>
-              <h3>Choose an avatar you want!</h3>
+              <h3 style="color: var(--main-text-color); position: absolute">Choose an avatar you want!</h3>
               <div class="dialogWrapper">
                 {#each Object.values(Avatars) as Avatar}
                   <button
                     class="imgCard"
                     style="background: {Avatar === chosenAvatar ? 'var(--main-accent2-color)' : ''}"
-                    on:click={() => (chosenAvatar = Avatar)}
-                    ><img draggable="false" src={Avatar} alt={Avatar} style="height: 100%%; width: 100%; margin: 1em" /></button
+                    on:click={() => (chosenAvatar = Avatar)}><img draggable="false" src={Avatar} alt={Avatar} style=" margin: 1em" /></button
                   >
                 {/each}
 
@@ -381,13 +380,19 @@
 
   dialog {
     padding: 2em;
-    width: 35%;
+    width: 33%;
+    /* min-width: 500px; */
+    max-width: 1200px;
     background: var(--main-card-color);
     border: none;
     border-radius: 1em;
     margin: auto;
-    z-index: 1;
+    margin-top: -2em;
+    top: -3em;
+    z-index: 2;
     text-align: center;
+    display: flex;
+    justify-content: center;
   }
 
   .dialogWrapper {
@@ -396,17 +401,17 @@
     flex-wrap: wrap;
     flex-direction: row;
     width: 100%;
-    background: var(--main-card-color);
+    /* background: var(--main-card-color); */
     border: none;
     border-radius: 1em;
   }
 
   .dialogWrapper .imgCard {
-    max-width: 27%;
     margin: 3%;
+    min-width: 90px;
     background: none;
     border: none;
-    width: 100%;
+    width: 27%;
     display: flex;
     padding: 0.8em;
     align-content: center;
@@ -415,6 +420,11 @@
     z-index: 4;
     background: var(--main-accent-color);
     transition: all 500ms;
+  }
+
+  .imgCard img {
+    width: 100%;
+    min-width: 60px;
   }
 
   .dialogWrapper .imgCard:hover {
@@ -470,7 +480,48 @@
     width: 20px;
   }
 
+  @media screen and (max-width: 1300px) {
+    dialog {
+      width: 40%;
+    }
+
+    .dialogWrapper .imgCard {
+      min-width: unset;
+      width: 19%;
+    }
+
+    .imgCard img {
+      width: 100%;
+      min-width: 35px;
+    }
+  }
+
   @media screen and (max-width: 750px) {
+    dialog {
+      width: 100%;
+      z-index: 3;
+    }
+
+    .dialogWrapper .imgCard {
+      margin: 3%;
+      /* min-width: 30px; */
+      background: none;
+      border: none;
+      width: 10%;
+      display: flex;
+      padding: 0.8em;
+      align-content: center;
+      justify-content: center;
+      border-radius: 1em;
+      z-index: 4;
+      background: var(--main-accent-color);
+      transition: all 500ms;
+    }
+
+    .imgCard img {
+      width: 100%;
+      min-width: 30px;
+    }
     .content {
       min-width: 0px;
       border: none;
@@ -484,7 +535,32 @@
     }
   }
 
-  @media screen and (max-width: 750px) and (min-width: 400px) {
+  @media screen and (max-width: 750px) and (min-width: 100px) {
+    dialog {
+      width: 100%;
+      z-index: 3;
+    }
+
+    .dialogWrapper .imgCard {
+      margin: 3%;
+      /* min-width: 30px; */
+      background: none;
+      border: none;
+      width: 35%;
+      display: flex;
+      padding: 0.8em;
+      align-content: center;
+      justify-content: center;
+      border-radius: 1em;
+      z-index: 4;
+      background: var(--main-accent-color);
+      transition: all 500ms;
+    }
+
+    .imgCard img {
+      width: 100%;
+      min-width: 30px;
+    }
     .profileWrapper {
       width: 100%;
       justify-items: center;
