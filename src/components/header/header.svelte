@@ -107,7 +107,7 @@
       </button>
     </div>
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-      <img class="avatar" src={ProfilePics.AstronautMale} alt="Avatar" />
+      <img draggable="false" class="avatar" src={ProfilePics.AstronautMale} alt="Avatar" />
     </div>
 
     {#if showLogin}

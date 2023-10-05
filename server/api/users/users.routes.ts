@@ -74,10 +74,10 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
 
     await updateUser(user)
       .then((d) => {
-        res.status(200).json(user)
+        res.status(200).json(d)
       })
       .catch((err: Error) => {
-        res.status(500).send('Prisma DB did not approve this update.')
+        res.status(500).send(err.message)
         throw new Error(err.message)
       })
   } catch (err) {

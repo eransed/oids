@@ -6,7 +6,7 @@
 
 {#if ship}
   <div class="ship">
-    <img alt="Ship" src={Ship} />
+    <img draggable="false" alt="Ship" src={Ship} />
   </div>
 {:else}
   <div class="circle" />

@@ -292,7 +292,7 @@
                         icon={Icons.Delete}
                         mouseTracking={false}
                         buttonConfig={{
-                          buttonText: 'Save',
+                          buttonText: 'Delete User',
                           clickCallback: () => {
                             delUser()
                           },

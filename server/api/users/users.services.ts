@@ -48,17 +48,20 @@ export const saveGame = async (id: string, win: boolean, played: Date, sessionId
   })
 }
 
-export const updateUser = async (user: User) => {
-  await db.user.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      role: user.role,
-      name: user.name,
-      email: user.email,
-    },
-  })
+export const updateUser = async (user: User): Promise<User> => {
+  return await db.user
+    .update({
+      where: {
+        id: user.id,
+      },
+      data: user,
+    })
+    .then((d) => {
+      return d
+    })
+    .catch((err) => {
+      throw new Error(err)
+    })
 }
 
 export const getUsers = async () => {

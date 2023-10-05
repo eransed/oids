@@ -20,8 +20,8 @@
 
   //Assets
   import { Icons } from '../../style/icons'
+  import { Avatars } from '../../style/avatars'
   import { deleteMe } from '../../lib/services/user/delete'
-  import axios from 'axios'
   import { handleLogout } from '../../components/profile/profileButtons'
   import type { AlertType } from '../../components/alert/AlertType'
 
@@ -40,6 +40,9 @@
   }
 
   let loading: boolean = false
+  let editSettings: boolean = false
+  let avatarDialog: boolean = false
+  let chosenAvatar: string
 
   async function handleNewShip(): Promise<void> {
     loading = true
@@ -110,6 +113,18 @@
       }
     }
   }
+
+  async function handleSaveSettings() {
+    loading = true
+
+    //Timeout for testing purposes - remove when implementing saving to db
+    setTimeout(() => {
+      //save to db here
+      //Then
+      editSettings = false
+      loading = false
+    }, 2000)
+  }
 </script>
 
 <Page>
@@ -175,23 +190,91 @@
           {/if}
         {/if}
         {#if $profileComponent === 'settings'}
+          <button title="Change avatar" class="avatar" on:click={() => (avatarDialog = true)}
+            ><img class="chosenAvatar" src={$user.image} alt={Avatars.AstronautDog} /></button
+          >
+          {#if avatarDialog}
+            <dialog open>
+              <h3>Choose an avatar you want!</h3>
+              <div class="dialogWrapper">
+                {#each Object.values(Avatars) as Avatar}
+                  <button><img draggable="false" src={Avatar} alt={Avatar} style="height: 100%%; width: 100%; margin: 1em" /></button>
+                {/each}
+
+                <div class="dialogButtons">
+                  <Button90
+                    minWidth={'0px'}
+                    width={'45%'}
+                    disabled={loading}
+                    icon={Icons.Cancel}
+                    mouseTracking={false}
+                    buttonConfig={{
+                      buttonText: 'Close',
+                      clickCallback: async () => {
+                        avatarDialog = false
+                      },
+                      selected: false,
+                    }}
+                  />
+
+                  <Button90
+                    minWidth={'0px'}
+                    width={'45%'}
+                    disabled={loading}
+                    icon={Icons.Save}
+                    mouseTracking={false}
+                    buttonConfig={{
+                      buttonText: 'Save',
+                      clickCallback: async () => {
+                        await handleSaveSettings()
+                      },
+                      selected: false,
+                    }}
+                  />
+                </div>
+              </div>
+            </dialog>
+          {/if}
           <table>
             <tr>
               <th>
                 <p>Settings</p>
+                <div style="position: absolute; top: 8em; margin-left: 2.5em">
+                  {#if !editSettings}
+                    <Button90
+                      disabled={loading}
+                      icon={Icons.EditUser}
+                      mouseTracking={false}
+                      buttonConfig={{
+                        buttonText: 'Edit User',
+                        clickCallback: () => {
+                          editSettings = true
+                        },
+                        selected: false,
+                      }}
+                    />
+                  {/if}
+                  {#if editSettings}
+                    <Button90
+                      disabled={loading}
+                      icon={Icons.Save}
+                      mouseTracking={false}
+                      buttonConfig={{
+                        buttonText: 'Save',
+                        clickCallback: async () => {
+                          await handleSaveSettings()
+                        },
+                        selected: false,
+                      }}
+                    />
+                  {/if}
+                </div>
               </th>
             </tr>
-            <tr>
-              <td>Darkmode</td>
-              <td
-                ><button
-                  on:click={() => {
-                    $user.darkMode = !$user.darkMode
-                    // $settings.darkMode = $user.darkMode
-                  }}>{$user.darkMode}</button
-                ></td
-              >
+            <tr class="editable" style="opacity: 0.8;">
+              <td />
             </tr>
+            <hr style="border-color: var(--main-accent-color)" />
             <tr>
               <td>Delete my account</td>
               <td><button disabled={loading} on:click={() => delUser()}><i class="fa-regular fa-trash-can" /></button></td>
@@ -243,8 +326,67 @@
     transition-duration: 2s;
     border-left-style: ridge;
     border-left-width: 2px;
-    border-left-color: var(--color);
+    border-left-color: var(--main-accent2-color);
     display: grid;
+  }
+
+  .avatar {
+    border: none;
+    background: var(--main-accent-color);
+    border-radius: 1em;
+    width: 25%;
+  }
+
+  dialog {
+    padding: 2em;
+    width: 50%;
+    background: var(--main-card-color);
+    border: none;
+    border-radius: 1em;
+    margin: auto;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .dialogWrapper {
+    padding: 2em;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
+    background: var(--main-card-color);
+    border: none;
+    border-radius: 1em;
+  }
+
+  .dialogWrapper button {
+    max-width: 27%;
+    margin: 3%;
+    background: none;
+    border: none;
+    width: 100%;
+    display: flex;
+    padding: 0.8em;
+    align-content: center;
+    justify-content: center;
+    border-radius: 1em;
+    z-index: 4;
+    background: var(--main-accent-color);
+  }
+
+  .dialogButtons {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: none;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: flex-end;
+  }
+
+  .chosenAvatar {
+    width: 6em;
+    height: 6em;
   }
 
   .buttons > * {

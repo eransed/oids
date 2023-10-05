@@ -4,6 +4,7 @@
 
   export let addInfo: string = ''
   export let minWidth: string = '10em'
+  export let width: string = ''
   export let borderBottom: boolean = false
   export let mouseTracking: boolean = false
   export let selected: boolean = false
@@ -45,7 +46,7 @@
     type={buttonType}
     title={buttonConfig.buttonText}
     {disabled}
-    style="min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border-bottom: {buttonConfig.selected ? border : 'none'}"
+    style="width: {width}; min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border-bottom: {buttonConfig.selected ? border : 'none'}"
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
@@ -53,7 +54,7 @@
       <CircularSpinner />
     {:else if icon}
       <div class="icon">
-        <img src={icon} alt={icon} />
+        <img draggable="false" src={icon} alt={icon} />
       </div>
     {:else}
       {buttonConfig.buttonText}
@@ -84,6 +85,7 @@
     text-align: center;
     display: flex;
     justify-content: center;
+    min-width: 0px;
     /* align-content: center; */
   }
 

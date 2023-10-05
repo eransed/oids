@@ -66,7 +66,7 @@
     <div class="row1">
       <div class="column" style={'flex: 0.5;'}>
         <div class="modalProfile" style="--borderColor: {borderColor};">
-          <img class="avatar" src={ProfilePics.AstronautMale} alt="Rocket Ship" />
+          <img draggable="false" class="avatar" src={ProfilePics.AstronautMale} alt="Rocket Ship" />
         </div>
       </div>
       <div class="column">

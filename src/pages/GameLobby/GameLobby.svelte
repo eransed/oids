@@ -256,7 +256,7 @@
             Host: {joinedSession.host.name}
             {#if joinedSession.host.readyToPlay}
               <span style="filter: hue-rotate(72deg)">
-                <img class="readyFlag" src={Icons.Done} alt="Ready" />
+                <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
               </span>
             {/if}
           </p>
@@ -269,7 +269,7 @@
                 <!-- {getPlayerPing(player)} - -->
                 {#if player.readyToPlay}
                   <span style="filter: hue-rotate(72deg)">
-                    <img class="readyFlag" src={Icons.Done} alt="Ready" />
+                    <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
                   </span>
                 {/if}
               </p>
