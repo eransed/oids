@@ -115,6 +115,12 @@
 
   button:hover img {
     filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
+    transform: scale(1.5);
+    transition: all 0.3s;
+  }
+
+  button img {
+    transition: all 0.3s;
   }
 
   .notSelected {

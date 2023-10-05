@@ -23,11 +23,18 @@
   import { Avatars } from '../../style/avatars'
   import { deleteMe } from '../../lib/services/user/delete'
   import { handleLogout } from '../../components/profile/profileButtons'
+  import updateUser from '../../lib/services/user/updateUser'
+  import type { User } from '@prisma/client'
+  import type { AxiosResponse } from 'axios'
   import type { AlertType } from '../../components/alert/AlertType'
 
   onMount(() => {
     if ($isLoggedIn && !$user) {
       getProfile()
+    }
+
+    if ($user) {
+      chosenAvatar = $user.image
     }
   })
 
@@ -117,13 +124,39 @@
   async function handleSaveSettings() {
     loading = true
 
-    //Timeout for testing purposes - remove when implementing saving to db
-    setTimeout(() => {
-      //save to db here
-      //Then
-      editSettings = false
-      loading = false
-    }, 2000)
+    $user.image = chosenAvatar
+
+    await updateUser($user)
+      .then((d) => {
+        if (d.status === 200) {
+          editSettings = false
+          loading = false
+          getProfile()
+        }
+      })
+      .catch((err) => {
+        loading = false
+
+        throw new Error(err)
+      })
+  }
+
+  async function handleSaveAvatar() {
+    console.log('handleSaveAvatar')
+
+    await handleSaveSettings()
+      .then((d) => {
+        avatarDialog = false
+        console.log('avatar saved')
+      })
+      .catch((err: Error) => {
+        console.error(err)
+        avatarDialog = false
+        alert = {
+          severity: 'error',
+          text: err.message,
+        }
+      })
   }
 </script>
 
@@ -198,7 +231,12 @@
               <h3>Choose an avatar you want!</h3>
               <div class="dialogWrapper">
                 {#each Object.values(Avatars) as Avatar}
-                  <button><img draggable="false" src={Avatar} alt={Avatar} style="height: 100%%; width: 100%; margin: 1em" /></button>
+                  <button
+                    class="imgCard"
+                    style="background: {Avatar === chosenAvatar ? 'var(--main-accent2-color)' : ''}"
+                    on:click={() => (chosenAvatar = Avatar)}
+                    ><img draggable="false" src={Avatar} alt={Avatar} style="height: 100%%; width: 100%; margin: 1em" /></button
+                  >
                 {/each}
 
                 <div class="dialogButtons">
@@ -226,7 +264,7 @@
                     buttonConfig={{
                       buttonText: 'Save',
                       clickCallback: async () => {
-                        await handleSaveSettings()
+                        await handleSaveAvatar()
                       },
                       selected: false,
                     }}
@@ -359,7 +397,7 @@
     border-radius: 1em;
   }
 
-  .dialogWrapper button {
+  .dialogWrapper .imgCard {
     max-width: 27%;
     margin: 3%;
     background: none;
@@ -372,6 +410,19 @@
     border-radius: 1em;
     z-index: 4;
     background: var(--main-accent-color);
+    transition: all 500ms;
+  }
+
+  .dialogWrapper .imgCard:hover {
+    transition: all 500ms;
+    filter: contrast(120%);
+    box-shadow: 0px 0px 2em var(--main-accent2-color);
+    transform: skew(1deg) scale(1.3);
+  }
+
+  .dialogWrapper .imgCard:focus {
+    scale: 1.05;
+    transition: all 500ms;
   }
 
   .dialogButtons {

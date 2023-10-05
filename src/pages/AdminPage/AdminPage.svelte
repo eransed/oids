@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { user } from '../../stores/stores'
+  import { user, userIncludes } from '../../stores/stores'
 
   //Components
   import Page from '../../components/page/page.svelte'
@@ -8,19 +8,18 @@
   import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
 
-  //Services
   import updateUser from '../../lib/services/user/updateUser'
   import userList from '../../lib/services/user/userList'
   import register from '../../lib/services/auth/register'
   import getProfile from '../../lib/services/user/profile'
   import axios from 'axios'
-  import type { AxiosError } from 'axios'
+  import type { AxiosError, AxiosResponse } from 'axios'
 
   //Svelte
   import { onMount } from 'svelte'
 
   //Interfaces
-  import type { User } from '@prisma/client'
+  import type { Prisma, User } from '@prisma/client'
   import type { AlertType } from '../../components/alert/AlertType'
   import { fade } from 'svelte/transition'
   import { deleteUser } from '../../lib/services/user/delete'
@@ -28,7 +27,7 @@
   //Icons
   import { Icons } from '../../style/icons'
 
-  async function getUsers(): Promise<User[]> {
+  async function getUsers(): Promise<User & Prisma.UserGetPayload<typeof userIncludes>[]> {
     loading = true
     return await userList()
       .then((v) => {
@@ -44,7 +43,7 @@
     getUsers()
   })
 
-  let editingUser: User | undefined = undefined
+  let editingUser: (User & Prisma.UserGetPayload<typeof userIncludes>) | undefined = undefined
   let edit: boolean = false
 
   let name = ''
@@ -53,7 +52,7 @@
   let roleOptions = ['admin', 'player', 'guest']
   let alert: AlertType | undefined = undefined
   let addNewUser = false
-  let users: User[]
+  let users: (User & Prisma.UserGetPayload<typeof userIncludes>)[] = []
   let loading = false
 
   let newUser = {
@@ -316,6 +315,7 @@
                           clickCallback: () => {
                             edit = true
                             editingUser = u
+
                             name = editingUser.name
                             email = editingUser.email
                             role = editingUser.role

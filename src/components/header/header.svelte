@@ -20,6 +20,7 @@
   import { slide, fade, fly } from 'svelte/transition'
   import { DeepMidnight, cnvTheme, setCssFromSettings, toggleAndGetTheme } from '../../style/defaultColors'
   import AdminPage from '../../pages/AdminPage/AdminPage.svelte'
+  import { Avatars } from '../../style/avatars'
 
   let showLogin: boolean | undefined = false
 
@@ -107,7 +108,7 @@
       </button>
     </div>
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-      <img draggable="false" class="avatar" src={ProfilePics.AstronautMale} alt="Avatar" />
+      <img draggable="false" class="avatar" src={loggedIn ? $user.image : Avatars.AstronautMale} alt="Avatar" />
     </div>
 
     {#if showLogin}

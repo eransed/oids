@@ -1,7 +1,7 @@
 import db from '../utils/db'
 
 // import { User, newUser } from '../types/user'
-import { User } from '@prisma/client'
+import { Prisma, User } from '@prisma/client'
 import { randomUUID } from 'crypto'
 
 // Exclude keys from user
@@ -54,7 +54,15 @@ export const updateUser = async (user: User): Promise<User> => {
       where: {
         id: user.id,
       },
-      data: user,
+      data: {
+        id: user.id,
+        email: user.email,
+        image: user.image,
+        name: user.name,
+        role: user.role,
+        played: user.played,
+        darkMode: user.darkMode,
+      },
     })
     .then((d) => {
       return d

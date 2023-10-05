@@ -7,7 +7,7 @@ import { JWT_ACCESS_SECRET } from '../../pub_config'
 
 import { Game } from '../types/user'
 
-import { User } from '@prisma/client'
+import { Prisma, User } from '@prisma/client'
 import type { AxiosRequestConfig } from 'axios'
 import { IncomingHttpHeaders } from 'http'
 
@@ -40,9 +40,13 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
   }
 })
 
+const userIncludes = Prisma.validator<Prisma.UserArgs>()({
+  include: { ships: true, gameHistory: true },
+})
+
 users.post('/update', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user: User = req.body
+    const user: User & Prisma.UserGetPayload<typeof userIncludes> = req.body
 
     const { authorization } = req.headers
 

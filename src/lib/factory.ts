@@ -118,7 +118,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     worldSize: newVec2(),
     cameraPosition: newVec2(),
     viewFramePosition: newVec2(),
-    thrustFlames: []
+    thrustFlames: [],
   }
 
   return spaceObject
