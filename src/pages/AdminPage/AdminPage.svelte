@@ -95,8 +95,13 @@
             }
           }
         })
-        .catch((err) => {
-          throw new Error(err)
+        .catch((err: AxiosError) => {
+          loading = false
+          alert = {
+            severity: 'error',
+            text: err.message,
+          }
+          throw new Error(err.message)
         })
     }
   }

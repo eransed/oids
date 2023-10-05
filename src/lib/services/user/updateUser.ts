@@ -17,7 +17,7 @@ const updateUser = async (user: User & Prisma.UserGetPayload<typeof userIncludes
       return data
     })
     .catch((err: AxiosResponse<Error>) => {
-      throw new Error(err.data.message)
+      return err
     })
 
   return response
