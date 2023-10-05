@@ -30,13 +30,14 @@
 
   onMount(() => {
     if ($isLoggedIn && !$user) {
+      console.log('trying')
       getProfile()
     }
-
-    if ($user) {
-      chosenAvatar = $user.image
-    }
   })
+
+  $: if ($user) {
+    chosenAvatar = $user.image
+  }
 
   pageHasHeader.set(true)
 
@@ -147,7 +148,11 @@
     await handleSaveSettings()
       .then((d) => {
         avatarDialog = false
-        console.log('avatar saved')
+
+        alert = {
+          severity: 'success',
+          text: 'Your avatar is now updated!',
+        }
       })
       .catch((err: Error) => {
         console.error(err)
@@ -160,12 +165,11 @@
   }
 </script>
 
+{#if alert}
+  <Alert severity={alert.severity} text={alert.text} />
+{/if}
 <Page>
   <div class="profileWrapper">
-    {#if alert}
-      <Alert severity={alert.severity} text={alert.text} />
-    {/if}
-
     {#if $isLoggedIn && $user}
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
@@ -370,14 +374,14 @@
 
   .avatar {
     border: none;
-    background: var(--main-accent-color);
-    border-radius: 1em;
+    background: var(--main-accent2-color);
+    border-radius: 1.5em;
     width: 25%;
   }
 
   dialog {
     padding: 2em;
-    width: 50%;
+    width: 35%;
     background: var(--main-card-color);
     border: none;
     border-radius: 1em;

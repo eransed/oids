@@ -94,6 +94,10 @@
   transition-duration: 1s;
 }
 
+.modalProfile img {
+  border-radius: 100%;
+}
+
 .modalProfile:hover {
   filter: saturate(5);
   opacity: 1;
