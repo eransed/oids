@@ -20,6 +20,7 @@
   import Alert from '../alert/Alert.svelte'
   import type { AlertType } from '../alert/AlertType'
   import { Icons } from '../../style/icons'
+  import { navigate } from 'svelte-routing'
 
   let loading: boolean = false
 
@@ -66,7 +67,8 @@
     <div class="row1">
       <div class="column" style={'flex: 0.5;'}>
         <div class="modalProfile" style="--borderColor: {borderColor};">
-          <img draggable="false" class="avatar" src={$user.image} alt="Rocket Ship" />
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <img on:click={() => navigate('/profile')} draggable="false" class="avatar" src={$user.image} alt="Rocket Ship" />
         </div>
       </div>
       <div class="column">

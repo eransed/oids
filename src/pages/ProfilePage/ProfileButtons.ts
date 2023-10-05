@@ -36,7 +36,7 @@ const shipStation: ProfileButton = {
 }
 
 const matchHistory: ProfileButton = {
-  icon: Icons.PlanetLamp,
+  icon: Icons.Play,
   config: {
     buttonText: 'Match history',
     clickCallback: () => {

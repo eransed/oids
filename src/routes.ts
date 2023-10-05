@@ -6,7 +6,7 @@ export const routes = {
   home: <Route>{ path: '/', displayText: 'Home', inHeader: true, icon: Icons.MoonLanding },
   profile: <Route>{ path: '/profile', displayText: 'Profile', inHeader: true, icon: Icons.Astronaut },
   game: <Route>{ path: '/play/:id', displayText: 'Game', inHeader: false },
-  play: <Route>{ path: '/play', displayText: 'Play', inHeader: true, icon: Icons.PlanetLamp },
+  play: <Route>{ path: '/play', displayText: 'Play', inHeader: true, icon: Icons.Play },
   end: <Route>{ path: '/play/end', displayText: 'Score Screen', inHeader: false },
   test: <Route>{ path: '/test', displayText: 'Test', inHeader: false },
   admin: <Route>{ path: '/admin', displayText: 'Admin', inHeader: true, icon: Icons.Admin },
