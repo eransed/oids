@@ -24,16 +24,11 @@
 
   let showLogin: boolean | undefined = false
 
-  let loggedIn = false
-  isLoggedIn.subscribe((value) => {
-    loggedIn = value
-  })
-
   const handleClickProfile = () => {
     showLogin = !showLogin
   }
 
-  $: borderColor = loggedIn ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
+  $: borderColor = $user ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
 
   $: pathname = location.pathname
 
@@ -108,13 +103,13 @@
       </button>
     </div>
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-      <img draggable="false" class="avatar" src={loggedIn ? $user.image : Avatars.AstronautMale} alt="Avatar" />
+      <img draggable="false" class="avatar" src={$user ? $user.image : Avatars.AstronautMale} alt="Avatar" />
     </div>
 
     {#if showLogin}
       <Modal
         backDrop={false}
-        title={loggedIn ? 'Profile' : 'Log in'}
+        title={$user ? 'Profile' : 'Log in'}
         showModal={showLogin}
         closedCallback={() => {
           showLogin = false

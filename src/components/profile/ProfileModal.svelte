@@ -62,7 +62,7 @@
     <Alert severity={alert.severity} text={alert.text} />
   </div>
 {/if}
-{#if $isLoggedIn}
+{#if $user && $isLoggedIn}
   <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <div class="row1">
       <div class="column" style={'flex: 0.5;'}>

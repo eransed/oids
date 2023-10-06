@@ -12,3 +12,8 @@ export interface User {
   darkMode: boolean
   ships: Ship[]
 }
+
+export interface Tokens {
+  accessToken: string
+  refreshToken: string
+}

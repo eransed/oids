@@ -1,25 +1,23 @@
 //On mount -> validate refreshtoken and make a new auth token.
 
-import axios, { Axios } from 'axios'
+import axios from 'axios'
 import type { AxiosResponse } from 'axios'
 import getProfile from '../user/profile'
 
 import { isLoggedIn, userLoading } from '../../../stores/stores'
 
-import type { User } from '../../../interfaces/user'
-import { log, warn } from 'mathil'
+import type { Tokens } from '../../../interfaces/user'
 
 //Check if token is valid and renew
-export const validateToken = async (): Promise<User | undefined> => {
+export const validateToken = async () => {
   let accessToken
   let refreshToken
-  let userProfile: User | undefined
 
   const storedRefreshToken = localStorage.getItem('refreshToken')
 
   //If no refreshToken stored in localstorage -> return undefined and user needs to login
   if (!storedRefreshToken) {
-    return undefined
+    throw new Error()
   }
 
   const body = {
@@ -28,31 +26,29 @@ export const validateToken = async (): Promise<User | undefined> => {
 
   userLoading.set(true)
 
-  await axios
+  return await axios
     .post(`http://${location.hostname}:6060/api/v1/auth/refreshToken`, body)
-
-    .then(async (response: AxiosResponse<any>) => {
+    .then(async (response: AxiosResponse<Tokens>) => {
       if (response.status === 200) {
         accessToken = response.data.accessToken
         refreshToken = response.data.refreshToken
         localStorage.setItem('refreshToken', refreshToken)
         localStorage.setItem('accessToken', accessToken)
 
-        userProfile = await getProfile().then((user) => user)
-
-        if (userProfile) {
-          isLoggedIn.set(true)
-          userLoading.set(false)
-        }
-        return userProfile
+        return await getProfile()
+          .then((user) => {
+            isLoggedIn.set(true)
+            userLoading.set(false)
+            return user
+          })
+          .catch((err) => {
+            throw new Error(err)
+          })
       } else {
-        userLoading.set(false)
-        return undefined
+        throw new Error()
       }
     })
     .catch((err) => {
       console.log(err)
     })
-
-  return userProfile ? userProfile : undefined
 }

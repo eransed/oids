@@ -1,13 +1,13 @@
 import axios, { type AxiosResponse } from 'axios'
 
 //Svelte store
-import { settings, user, userIncludes } from '../../../stores/stores'
+import { isLoggedIn, settings, user, userIncludes } from '../../../stores/stores'
 
 //Interface
 // import type { User } from '../../../interfaces/user'
 import type { Prisma, User } from '@prisma/client'
 
-const getProfile = async (): Promise<User> => {
+const getProfile = async (): Promise<User & Prisma.UserGetPayload<typeof userIncludes>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {
@@ -18,6 +18,7 @@ const getProfile = async (): Promise<User> => {
     .get(`http://${location.hostname}:6060/api/v1/users/profile`, config)
     .then((response: AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>>) => {
       user.set(response.data)
+      isLoggedIn.set(true)
       console.log('Welcome: ', response.data, response.data)
       settings.set({
         theme: {
@@ -38,7 +39,7 @@ const getProfile = async (): Promise<User> => {
       return response.data
     })
     .catch((err) => {
-      return err
+      throw new Error(err)
     })
 
   return response
