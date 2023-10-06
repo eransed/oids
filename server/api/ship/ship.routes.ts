@@ -1,7 +1,7 @@
 import express from 'express'
 import { Request, Response, NextFunction } from 'express'
 import { isAuthenticated } from '../middleware'
-import { createShip, getShips, deleteShip } from './ship.services'
+import { createShip, getShips, deleteShip, updateShip } from './ship.services'
 import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 import { findUserById } from '../users/users.services'
@@ -13,7 +13,7 @@ export const ship = express.Router()
 ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { authorization } = req.headers
-    const { name } = req.body
+    const { name, image } = req.body
 
     if (!authorization) {
       res.status(401).send('You are not logged in.')
@@ -29,7 +29,7 @@ ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: 
       throw new Error('No user found.')
     }
 
-    const ship = createNewShip(name, caller.id)
+    const ship = createNewShip(name, image, caller.id)
 
     await createShip(ship).then((ship) => {
       res.json(ship)
@@ -85,6 +85,35 @@ ship.post('/delete', isAuthenticated, async (req: Request, res: Response, next: 
     }
 
     await deleteShip(id).then((ship) => {
+      res.json(ship)
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+ship.post('/update', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { authorization } = req.headers
+    const { name, image, id } = req.body
+
+    if (!authorization) {
+      res.status(401).send('You are not logged in.')
+      throw new Error('No authorization')
+    }
+
+    const token = authorization.split(' ')[1]
+    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
+    const caller: User | null = await findUserById(payload.userId)
+
+    if (!caller) {
+      res.status(401).send('No user found, cant create ship')
+      throw new Error('No user found.')
+    }
+
+    const ship = createNewShip(name, image, caller.id, id)
+
+    await updateShip(ship).then((ship) => {
       res.json(ship)
     })
   } catch (err) {

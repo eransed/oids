@@ -7,6 +7,18 @@ export async function createShip(ship: Ship) {
   })
 }
 
+export async function updateShip(ship: Ship) {
+  return await db.ship.update({
+    where: {
+      id: ship.id,
+    },
+    data: {
+      name: ship.name,
+      image: ship.image,
+    },
+  })
+}
+
 export async function getShips(id: string) {
   return await db.ship.findMany({
     where: {

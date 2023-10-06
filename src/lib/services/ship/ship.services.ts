@@ -16,7 +16,7 @@ export interface newShip {
 //   userId: string
 // }
 
-export const createShip = async (name: string): Promise<AxiosResponse<Ship>> => {
+export const createShip = async (name: string, image: string): Promise<AxiosResponse<Ship>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {
@@ -25,8 +25,10 @@ export const createShip = async (name: string): Promise<AxiosResponse<Ship>> => 
     },
   }
 
+  const body = { name, image }
+
   const response: AxiosResponse<Ship> = await axios
-    .post(`http://${location.hostname}:6060/api/v1/ship/create`, { name }, config)
+    .post(`http://${location.hostname}:6060/api/v1/ship/create`, body, config)
     .then((response: AxiosResponse<Ship>) => {
       return response
     })
@@ -69,6 +71,30 @@ export const deleteShip = async (id: string): Promise<AxiosResponse<Ship>> => {
 
   const response: AxiosResponse<Ship> = await axios
     .post(`http://${location.hostname}:6060/api/v1/ship/delete`, { id }, config)
+    .then((response: AxiosResponse<Ship>) => {
+      return response
+    })
+    .catch((err) => {
+      throw new Error(err)
+    })
+
+  return response
+}
+
+export const updateShip = async (name: string, image: string, id: string): Promise<AxiosResponse<Ship>> => {
+  const token = localStorage.getItem('accessToken')
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+
+  const body = { name, image, id }
+  console.log(body)
+
+  const response: AxiosResponse<Ship> = await axios
+    .post(`http://${location.hostname}:6060/api/v1/ship/update`, body, config)
     .then((response: AxiosResponse<Ship>) => {
       return response
     })

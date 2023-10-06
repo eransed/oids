@@ -22,7 +22,7 @@ model User {
   role          String         @default("player")
   darkMode      Boolean        @default(true)
   ships         Ship[]
-  image         String         @default("Avatar")
+  image         String         @default("/src/assets/avatars/astronautDog.svg")
   played        Int            @default(0)
 }
 
@@ -63,6 +63,6 @@ model Ship {
   experience Int?     @default(0)
   owner      User     @relation(fields: [userId], references: [id])
   userId     String
-  image      String   @default("RocketShip")
+  image      String   @default("/src/assets/ships/retro.svg")
   played     Int      @default(0)
 }

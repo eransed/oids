@@ -21,15 +21,15 @@ export function createNewUser(email: string, name: string, password: string): Us
   return newUser
 }
 
-export function createNewShip(name: string, userId: string): Ship {
+export function createNewShip(name: string, image: string, userId: string, id?: string): Ship {
   const newShip: Ship = {
-    id: randomUUID(),
+    id: id ? id : randomUUID(),
     name: name,
     userId: userId,
     level: 0,
     experience: 0,
     played: 0,
-    image: '',
+    image: image,
     createdAt: new Date(),
     updatedAt: new Date(),
   }

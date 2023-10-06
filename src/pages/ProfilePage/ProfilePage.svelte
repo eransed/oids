@@ -9,6 +9,8 @@
   import Button90 from '../../components/menu/Button90.svelte'
   import { ProfileButtons } from './ProfileButtons'
   import Alert from '../../components/alert/Alert.svelte'
+  import AddShip from './AddShip.svelte'
+  import Ships from './Ships.svelte'
 
   //Util
   import { formatDate } from '../../helpers/util'
@@ -20,12 +22,13 @@
   //Assets
   import { Icons } from '../../style/icons'
   import { Avatars } from '../../style/avatars'
-  import { Ships } from '../../style/ships'
+
   import { deleteMe } from '../../lib/services/user/delete'
   import { handleLogout } from '../../components/profile/profileButtons'
   import updateUser from '../../lib/services/user/updateUser'
   import type { AlertType } from '../../components/alert/AlertType'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
+  import type { Ship } from '@prisma/client'
 
   onMount(() => {
     if ($isLoggedIn && !$user) {
@@ -42,58 +45,11 @@
 
   let openModal: boolean = false
   let alert: AlertType | undefined = undefined
-  let newShip = {
-    name: '',
-  }
 
   let loading: boolean = false
   let editSettings: boolean = false
   let avatarDialog: boolean = false
   let chosenAvatar: string
-
-  async function handleNewShip(): Promise<void> {
-    loading = true
-    return new Promise<void>((resolve, reject) => {
-      createShip(newShip.name)
-        .then((response) => {
-          if (response.status === 200) {
-            loading = false
-            openModal = false
-            getProfile().then(() => {
-              resolve()
-            })
-          }
-        })
-        .catch((err) => {
-          reject(err)
-        })
-    })
-  }
-
-  async function handleDeleteShip(id: string, name: string): Promise<void> {
-    const result = confirm(`Want to delete ship: ${name}`)
-    if (result) {
-      const prompt = window.prompt(`Write ${name} in the box to delete it.`)
-      if (prompt === name) {
-        loading = true
-        return new Promise<void>((resolve, reject) => {
-          deleteShip(id)
-            .then((response) => {
-              if (response.status === 200) {
-                loading = false
-                openModal = false
-                getProfile().then(() => {
-                  resolve()
-                })
-              }
-            })
-            .catch((err) => {
-              reject(err)
-            })
-        })
-      }
-    }
-  }
 
   async function delUser() {
     const result = confirm(`Want to delete your account: ${$user.name}?`)
@@ -191,40 +147,8 @@
           <h3>Your ships</h3>
 
           <div class="newShip"><button on:click={() => (openModal = true)} title="Add ship">+</button></div>
-          {#if openModal}
-            <ModalSimple
-              title="Add a new ship to your collection"
-              disabled={loading}
-              closeBtn={() => (openModal = false)}
-              saveBtn={async () => handleNewShip()}
-            >
-              <div style="color: var(--main-text-color); display: flex; width: 100%" in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }}>
-                <h3>Name your new ship 🚀</h3>
-                <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
-              </div>
-
-              {#each Object.values(Ships) as Ship, i}
-                <button
-                  class="imgCard"
-                  style="background: {Ship === chosenAvatar ? 'var(--main-accent2-color)' : ''};
-                  animation-delay: {150 * i}ms;"
-                  on:click={() => (chosenAvatar = Ship)}><img draggable="false" src={Ship} alt={Ship} style=" margin: 1em" /></button
-                >
-              {/each}
-            </ModalSimple>
-          {/if}
-          {#each $user.ships as ship}
-            <div class="ship">
-              <h4>
-                {ship.name} <button disabled={loading} on:click={() => handleDeleteShip(ship.id, ship.name)}><i class="fa-regular fa-trash-can" /></button>
-              </h4>
-              <p style="font-style: italic">Created: {formatDate(ship.createdAt)}</p>
-              <br />
-              <p>Level {ship.level}</p>
-              <p>Experience {ship.experience}</p>
-              <br />
-            </div>
-          {/each}
+          <Ships />
+          <AddShip {openModal} closeModal={() => (openModal = false)} />
         {/if}
 
         {#if $profileComponent === 'matchHistory'}
@@ -339,7 +263,7 @@
   .content {
     color: var(--main-text-color);
     padding: 1em;
-    min-width: 400px;
+    min-width: 500px;
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 80vh;
@@ -349,6 +273,7 @@
     border-left-width: 2px;
     border-left-color: var(--main-accent2-color);
     display: grid;
+    max-width: 500px;
   }
 
   .avatar {
@@ -420,14 +345,6 @@
     max-width: 100vw;
     overflow-y: auto;
     overflow-x: auto;
-  }
-
-  .ship {
-    padding: 1em;
-    margin: 0.5em;
-    display: grid;
-    border-radius: 0.5em;
-    background-color: rgba(255, 166, 0, 0.025);
   }
 
   .newShip {

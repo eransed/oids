@@ -7,13 +7,26 @@
   //Components
   import Button90 from '../menu/Button90.svelte'
 
+  interface Step {
+    //Desc = description
+    desc: string
+    completed: boolean
+  }
+
   //Props
   export let closeBtn = () => {}
   export let saveBtn = async () => {}
   export let disabled: boolean = false
   export let title: string = ''
+  export let steps: Step[] = []
+  export let doneCallback: () => void = () => {}
+
+  $: if (steps) {
+    checkProgress()
+  }
 
   let dialog: HTMLDialogElement
+  $: stepProgress = 0
 
   onMount(() => {
     console.log('showModal')
@@ -27,18 +40,42 @@
       closeBtn()
     }
   }
+
+  function checkProgress() {
+    stepProgress = steps.filter((step) => {
+      if (step.completed) {
+        return step
+      }
+    }).length
+
+    if (stepProgress === steps.length) {
+      doneCallback()
+    }
+  }
 </script>
 
-<dialog id="dialogen" bind:this={dialog}>
+<dialog bind:this={dialog}>
   <h3 style="color: var(--main-text-color); position: absolute">{title}</h3>
   <div class="dialogWrapper">
     <slot />
 
     <div class="dialogButtons">
+      {#if steps.length > 0}
+        <ol style="text-align: left;">
+          <p>
+            Done: {stepProgress}/{steps.length}
+          </p>
+
+          {#each steps as step}
+            <li style="color: {step.completed ? 'var(--main-accent2-color)' : ''}">{step.desc}</li>
+          {/each}
+        </ol>
+        <br />
+      {/if}
+
       <Button90
         minWidth={'0px'}
         width={'45%'}
-        {disabled}
         icon={Icons.Cancel}
         mouseTracking={false}
         buttonConfig={{
@@ -84,6 +121,7 @@
     display: flex;
     justify-content: center;
     animation: show 1s ease-in-out forwards;
+    color: var(--main-text-color);
   }
 
   dialog::backdrop {
