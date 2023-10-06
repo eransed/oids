@@ -1,5 +1,4 @@
 import { writable, type Writable } from 'svelte/store'
-// import type { User } from '../interfaces/user'
 import { type User, Prisma } from '@prisma/client'
 import { rndi } from 'mathil'
 import type { ChatMessage, SpaceObject } from '../lib/interface'

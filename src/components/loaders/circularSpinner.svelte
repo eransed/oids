@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Ship from '../../assets/ship.svg'
+  import Ship from '../../assets/ships/ship.svg'
 
   export let ship: boolean = false
 </script>

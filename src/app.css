@@ -23,6 +23,37 @@ button {
   --main-accent2-color: #b9d3c2;
 }
 
+input {
+  background-color: var(--main-bg-color);
+  outline: none;
+  border: none;
+  border-top-right-radius: 1em;
+  border-top-left-radius: 1em;
+  border-bottom: 1px solid var(--main-accent-color);
+  padding: 1em;
+  color: var(--main-text-color);
+  margin: 0.5em;
+}
+
+/* Prepared to make all text lowercase */
+/* p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+td,
+tr,
+div,
+input,
+dialog,
+span,
+button,
+img {
+  text-transform: lowercase;
+} */
+
 /* width */
 ::-webkit-scrollbar {
   width: 3px;

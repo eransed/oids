@@ -2,24 +2,19 @@
   //Routes
   import { routes } from '../../routes'
 
-  //Avatar imgs
-  import { ProfilePics } from '../../pages/ProfilePage/ProfilePics'
-  import { Icons } from '../../style/icons'
-
   //Components
   import Button90 from '../menu/Button90.svelte'
   import ProfileModal from '../profile/ProfileModal.svelte'
 
   //Stores
-  import { isLoggedIn, user, settings } from '../../stores/stores'
+  import { user, settings } from '../../stores/stores'
 
   //css
   import './style.css'
   import Modal from '../modal/Modal.svelte'
   import { navigate } from 'svelte-routing/src/history'
   import { slide, fade, fly } from 'svelte/transition'
-  import { DeepMidnight, cnvTheme, setCssFromSettings, toggleAndGetTheme } from '../../style/defaultColors'
-  import AdminPage from '../../pages/AdminPage/AdminPage.svelte'
+  import { DeepMidnight, toggleAndGetTheme } from '../../style/defaultColors'
   import { Avatars } from '../../style/avatars'
 
   let showLogin: boolean | undefined = false

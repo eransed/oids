@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { pageHasHeader, user, isLoggedIn, settings } from '../../stores/stores'
+  import { pageHasHeader, user, isLoggedIn } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -14,19 +14,18 @@
   import { formatDate } from '../../helpers/util'
   import getProfile from '../../lib/services/user/profile'
   import { onMount } from 'svelte'
-  import Modal from '../../components/modal/Modal.svelte'
   import { fade } from 'svelte/transition'
   import { createShip, deleteShip } from '../../lib/services/ship/ship.services'
 
   //Assets
   import { Icons } from '../../style/icons'
   import { Avatars } from '../../style/avatars'
+  import { Ships } from '../../style/ships'
   import { deleteMe } from '../../lib/services/user/delete'
   import { handleLogout } from '../../components/profile/profileButtons'
   import updateUser from '../../lib/services/user/updateUser'
-  import type { User } from '@prisma/client'
-  import type { AxiosResponse } from 'axios'
   import type { AlertType } from '../../components/alert/AlertType'
+  import ModalSimple from '../../components/modal/ModalSimple.svelte'
 
   onMount(() => {
     if ($isLoggedIn && !$user) {
@@ -193,12 +192,26 @@
 
           <div class="newShip"><button on:click={() => (openModal = true)} title="Add ship">+</button></div>
           {#if openModal}
-            <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
-              <p>Add a new ship to your collection</p>
-              <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
-              <button disabled={loading} on:click={() => (openModal = false)}>Cancel</button>
-              <button disabled={loading} on:click={() => handleNewShip()}>Save</button>
-            </div>
+            <ModalSimple
+              title="Add a new ship to your collection"
+              disabled={loading}
+              closeBtn={() => (openModal = false)}
+              saveBtn={async () => handleNewShip()}
+            >
+              <div style="color: var(--main-text-color); display: flex; width: 100%" in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }}>
+                <h3>Name your new ship 🚀</h3>
+                <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
+              </div>
+
+              {#each Object.values(Ships) as Ship, i}
+                <button
+                  class="imgCard"
+                  style="background: {Ship === chosenAvatar ? 'var(--main-accent2-color)' : ''};
+                  animation-delay: {150 * i}ms;"
+                  on:click={() => (chosenAvatar = Ship)}><img draggable="false" src={Ship} alt={Ship} style=" margin: 1em" /></button
+                >
+              {/each}
+            </ModalSimple>
           {/if}
           {#each $user.ships as ship}
             <div class="ship">
@@ -231,51 +244,18 @@
             ><img class="chosenAvatar" src={$user.image} alt={Avatars.AstronautDog} /></button
           >
           {#if avatarDialog}
-            <dialog open>
-              <h3 style="color: var(--main-text-color); position: absolute">Choose an avatar you want!</h3>
-              <div class="dialogWrapper">
-                {#each Object.values(Avatars) as Avatar}
-                  <button
-                    class="imgCard"
-                    style="background: {Avatar === chosenAvatar ? 'var(--main-accent2-color)' : ''}"
-                    on:click={() => (chosenAvatar = Avatar)}><img draggable="false" src={Avatar} alt={Avatar} style=" margin: 1em" /></button
-                  >
-                {/each}
-
-                <div class="dialogButtons">
-                  <Button90
-                    minWidth={'0px'}
-                    width={'45%'}
-                    disabled={loading}
-                    icon={Icons.Cancel}
-                    mouseTracking={false}
-                    buttonConfig={{
-                      buttonText: 'Close',
-                      clickCallback: async () => {
-                        avatarDialog = false
-                      },
-                      selected: false,
-                    }}
-                  />
-
-                  <Button90
-                    minWidth={'0px'}
-                    width={'45%'}
-                    disabled={loading}
-                    icon={Icons.Save}
-                    mouseTracking={false}
-                    buttonConfig={{
-                      buttonText: 'Save',
-                      clickCallback: async () => {
-                        await handleSaveAvatar()
-                      },
-                      selected: false,
-                    }}
-                  />
-                </div>
-              </div>
-            </dialog>
+            <ModalSimple title="Choose an avatar!" disabled={loading} saveBtn={async () => await handleSaveAvatar()} closeBtn={() => (avatarDialog = false)}>
+              {#each Object.values(Avatars) as Avatar, i}
+                <button
+                  class="imgCard"
+                  style="background: {Avatar === chosenAvatar ? 'var(--main-accent2-color)' : ''};
+                  animation-delay: {150 * i}ms;"
+                  on:click={() => (chosenAvatar = Avatar)}><img draggable="false" src={Avatar} alt={Avatar} style=" margin: 1em" /></button
+                >
+              {/each}
+            </ModalSimple>
           {/if}
+
           <table>
             <tr>
               <th>
@@ -378,35 +358,7 @@
     width: 25%;
   }
 
-  dialog {
-    padding: 2em;
-    width: 33%;
-    /* min-width: 500px; */
-    max-width: 1200px;
-    background: var(--main-card-color);
-    border: none;
-    border-radius: 1em;
-    margin: auto;
-    margin-top: -2em;
-    top: -3em;
-    z-index: 2;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-  }
-
-  .dialogWrapper {
-    padding: 2em;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    width: 100%;
-    /* background: var(--main-card-color); */
-    border: none;
-    border-radius: 1em;
-  }
-
-  .dialogWrapper .imgCard {
+  .imgCard {
     margin: 3%;
     min-width: 90px;
     background: none;
@@ -420,6 +372,8 @@
     z-index: 4;
     background: var(--main-accent-color);
     transition: all 500ms;
+    animation: spin 1s ease-in-out forwards;
+    transform: scale(0);
   }
 
   .imgCard img {
@@ -427,26 +381,30 @@
     min-width: 60px;
   }
 
-  .dialogWrapper .imgCard:hover {
+  .imgCard:hover {
     transition: all 500ms;
     filter: contrast(120%);
     box-shadow: 0px 0px 2em var(--main-accent2-color);
     transform: skew(1deg) scale(1.3);
   }
 
-  .dialogWrapper .imgCard:focus {
+  .imgCard:focus {
     scale: 1.05;
     transition: all 500ms;
   }
 
-  .dialogButtons {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    max-width: none;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: flex-end;
+  @keyframes spin {
+    0% {
+      transform: rotate(-25deg) scale(0);
+    }
+    50% {
+      transform: rotateY(180deg) scale(0.5) translate(50px, -250px);
+      box-shadow: 0px 0px 2em var(--main-accent2-color);
+    }
+
+    100% {
+      transform: scale(1);
+    }
   }
 
   .chosenAvatar {
@@ -481,11 +439,7 @@
   }
 
   @media screen and (max-width: 1300px) {
-    dialog {
-      width: 40%;
-    }
-
-    .dialogWrapper .imgCard {
+    .imgCard {
       min-width: unset;
       width: 19%;
     }
@@ -497,12 +451,7 @@
   }
 
   @media screen and (max-width: 750px) {
-    dialog {
-      width: 100%;
-      z-index: 3;
-    }
-
-    .dialogWrapper .imgCard {
+    .imgCard {
       margin: 3%;
       /* min-width: 30px; */
       background: none;
@@ -536,12 +485,7 @@
   }
 
   @media screen and (max-width: 750px) and (min-width: 100px) {
-    dialog {
-      width: 100%;
-      z-index: 3;
-    }
-
-    .dialogWrapper .imgCard {
+    .imgCard {
       margin: 3%;
       /* min-width: 30px; */
       background: none;

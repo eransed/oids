@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from 'axios'
 
-import type { User } from '../../../interfaces/user'
+import type { User } from '@prisma/client'
 
 const register = async (email: string, name: string, password: string): Promise<AxiosResponse<User | Error>> => {
   const token = localStorage.getItem('accessToken')
@@ -12,7 +12,6 @@ const register = async (email: string, name: string, password: string): Promise<
   const response: AxiosResponse<User | Error> = await axios
     .post(`http://${location.hostname}:6060/api/v1/auth/register`, { email, name, password }, config)
     .then((data: AxiosResponse<User>) => {
-      
       return data
     })
     .catch((err: AxiosResponse<Error>) => {

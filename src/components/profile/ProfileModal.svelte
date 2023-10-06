@@ -6,7 +6,7 @@
   import { logOutButton, loginButton } from './profileButtons'
 
   //Stores
-  import { isLoggedIn, localPlayer, user } from '../../stores/stores'
+  import { isLoggedIn, user } from '../../stores/stores'
 
   //Svelte
   import { fade } from 'svelte/transition'
@@ -16,10 +16,8 @@
   import getProfile from '../../lib/services/user/profile'
 
   //Assets
-  import { ProfilePics } from '../../pages/ProfilePage/ProfilePics'
   import Alert from '../alert/Alert.svelte'
   import type { AlertType } from '../alert/AlertType'
-  import { Icons } from '../../style/icons'
   import { navigate } from 'svelte-routing'
 
   let loading: boolean = false

@@ -1,5 +1,4 @@
 import axios, { type AxiosResponse } from 'axios'
-// import type { User } from '../../../interfaces/user'
 import type { Prisma, User } from '@prisma/client'
 import type { userIncludes } from '../../../stores/stores'
 
