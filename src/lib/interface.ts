@@ -29,6 +29,7 @@ export enum SpaceShape {
 
 export interface Shapable {
   shape: SpaceShape
+  shipImage: string
 }
 
 export interface Colorable {

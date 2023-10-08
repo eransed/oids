@@ -14,6 +14,7 @@
   import InGameInfo from '../InGameInfo/inGameInfo.svelte'
   import HotKeys from '../Hotkeys/hotKeys.svelte'
   import ShipSettings from '../ShipSettings/ShipSettings.svelte'
+  import { Ships } from '../../../../style/ships'
 
   //Websocket
   // import { disconnect } from "../../../../lib/websocket/webSocket"
@@ -28,6 +29,7 @@
   import { playersInSession } from '../../../../lib/services/game/playersInSession'
   import type { AxiosResponse } from 'axios'
   import { info } from 'mathil'
+  import getProfile from '../../../../lib/services/user/profile'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -56,9 +58,18 @@
     return players
   }
 
-  onMount(() => {
+  onMount(async () => {
     // cleanup = initSettingsControl()
-    $localPlayer.name = $user ? $user.name : $guestUserName
+
+    await getProfile()
+      .then(() => {
+        $localPlayer.name = $user ? $user.name : $guestUserName
+        $localPlayer.shipImage = $user ? $user.ships[0].image : Ships.Ship
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+
     game = new Game(canvas, $localPlayer, $socket, getKeyMap(), showDeadMenu)
     gameRef(game)
     game.localPlayer.sessionId = sessionId

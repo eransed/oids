@@ -14,7 +14,7 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
 
   const shipSvg = new Image()
 
-  //  shipSvg.src = ship.default
+  shipSvg.src = so.shipImage
 
   // Render hit box of ship after contex restore
   //renderHitRadius(so, ctx)
@@ -31,25 +31,19 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   ctx.lineWidth = 3 * screenScale
 
   // Hull
-  ctx.strokeStyle = so.colliding ? '#f00' : so.color
-  ctx.fillStyle = so.colliding ? '#f00' : so.color
-  ctx.beginPath()
-  ctx.moveTo(0, (-shipSize.y / 3) * scale)
-  ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
-  ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
-  ctx.lineTo(0, (-shipSize.y / 3) * scale)
+  // ctx.strokeStyle = so.colliding ? '#f00' : so.color
+  // ctx.fillStyle = so.colliding ? '#f00' : so.color
+  // ctx.beginPath()
+  // ctx.moveTo(0, (-shipSize.y / 3) * scale)
+  // ctx.lineTo((-shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
+  // ctx.lineTo((shipSize.x / 4) * scale, (shipSize.y / 4) * scale)
+  // ctx.lineTo(0, (-shipSize.y / 3) * scale)
 
   ctx.closePath()
 
-  if (renderAsLocalPlayer) {
-    // ctx.filter = "hue-rotate(250deg)"
-    // ctx.drawImage(shipSvg, -75, -75, 150, 150)
-    ctx.stroke()
-  } else {
-    // ctx.filter = "hue-rotate(360deg)"
-    // ctx.drawImage(shipSvg, -75, -75, 150, 150)
-    ctx.fill()
-  }
+  // Draw ship image
+  ctx.drawImage(shipSvg, -75, -75, 150, 150)
+  ctx.stroke()
 
   ctx.fillStyle = '#f00'
   ctx.rotate((20 * Math.PI) / 180)

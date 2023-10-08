@@ -3,6 +3,7 @@ import { MessageType, SpaceShape } from './interface'
 import { newVec2, rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 import { randomBlue } from './color'
+import { Ships } from '../style/ships'
 
 export function newPhotonLaser(): PhotonLaser {
   const shot: PhotonLaser = {
@@ -119,6 +120,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     cameraPosition: newVec2(),
     viewFramePosition: newVec2(),
     thrustFlames: [],
+    shipImage: Ships.Ship,
   }
 
   return spaceObject

@@ -23,6 +23,7 @@
 
   //Assets
   import { Icons } from '../../style/icons'
+  import { Ships } from '../../style/ships'
 
   /**
    * Reactive on changes to $user store.
@@ -97,6 +98,7 @@
 
   onMount(() => {
     $localPlayer.name = $user ? $user.name : $guestUserName
+    $localPlayer.shipImage = $user ? $user.ships[0].image : Ships.Ship
 
     $socket.connect().then(() => {
       console.log(`Connected to websocket`)
