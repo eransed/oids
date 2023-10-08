@@ -29,7 +29,7 @@ export function createNewShip(name: string, image: string, userId: string, id?: 
     level: 0,
     experience: 0,
     played: 0,
-    image: image,
+    variant: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
   }

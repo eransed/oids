@@ -14,7 +14,7 @@ export async function updateShip(ship: Ship) {
     },
     data: {
       name: ship.name,
-      image: ship.image,
+      variant: ship.variant,
     },
   })
 }

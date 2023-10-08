@@ -1,5 +1,6 @@
 import axios, { type AxiosResponse } from 'axios'
 import type { Ship } from '@prisma/client'
+import type { ShipBundle, ShipVariant } from '../../../style/ships'
 
 export interface newShip {
   name: string
@@ -16,7 +17,7 @@ export interface newShip {
 //   userId: string
 // }
 
-export const createShip = async (name: string, image: string): Promise<AxiosResponse<Ship>> => {
+export const createShip = async (newShip: ShipBundle): Promise<AxiosResponse<Ship>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {
@@ -25,7 +26,7 @@ export const createShip = async (name: string, image: string): Promise<AxiosResp
     },
   }
 
-  const body = { name, image }
+  const body = { newShip }
 
   const response: AxiosResponse<Ship> = await axios
     .post(`http://${location.hostname}:6060/api/v1/ship/create`, body, config)
@@ -81,7 +82,7 @@ export const deleteShip = async (id: string): Promise<AxiosResponse<Ship>> => {
   return response
 }
 
-export const updateShip = async (name: string, image: string, id: string): Promise<AxiosResponse<Ship>> => {
+export const updateShip = async (name: string, variant: ShipVariant, id: string): Promise<AxiosResponse<Ship>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {
@@ -90,7 +91,7 @@ export const updateShip = async (name: string, image: string, id: string): Promi
     },
   }
 
-  const body = { name, image, id }
+  const body = { name, variant, id }
   console.log(body)
 
   const response: AxiosResponse<Ship> = await axios

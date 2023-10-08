@@ -64,7 +64,7 @@
     await getProfile()
       .then(() => {
         $localPlayer.name = $user ? $user.name : $guestUserName
-        $localPlayer.shipImage = $user ? $user.ships[0].image : Ships.Ship
+        $localPlayer.shipVariant = $user ? $user.ships[0].variant : Ships.Ship.type
       })
       .catch((err) => {
         console.error(err)

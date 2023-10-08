@@ -1,6 +1,7 @@
 import type { Writable } from 'svelte/store'
 import { newVec2, type Vec2 } from 'mathil'
 import type { Steerable } from './traits/Steerable'
+import type { ShipVariant } from '../style/ships'
 
 export enum GameType {
   SinglePlayer,
@@ -29,7 +30,7 @@ export enum SpaceShape {
 
 export interface Shapable {
   shape: SpaceShape
-  shipImage: string
+  shipVariant: ShipVariant
 }
 
 export interface Colorable {

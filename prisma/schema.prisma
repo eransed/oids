@@ -63,6 +63,6 @@ model Ship {
   experience Int?     @default(0)
   owner      User     @relation(fields: [userId], references: [id])
   userId     String
-  image      String   @default("/src/assets/ships/retro.svg")
+  variant    Int      @default(0)
   played     Int      @default(0)
 }

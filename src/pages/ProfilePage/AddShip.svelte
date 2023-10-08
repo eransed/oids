@@ -7,7 +7,7 @@
   //Services
   import { createShip } from '../../lib/services/ship/ship.services'
   import getProfile from '../../lib/services/user/profile'
-  import { Ships } from '../../style/ships'
+  import { ShipVariant, Ships, type ShipBundle, createShipBundle } from '../../style/ships'
 
   //Props
   export let loading: boolean = false
@@ -15,15 +15,13 @@
   export let closeModal: () => void = () => {}
 
   let newShipDone: boolean = false
-  let newShip = {
-    name: '',
-    image: '',
-  }
+
+  let newShip: ShipBundle = createShipBundle()
 
   async function handleNewShip(): Promise<void> {
     loading = true
     return new Promise<void>((resolve, reject) => {
-      createShip(newShip.name, newShip.image)
+      createShip(newShip)
         .then((response) => {
           if (response.status === 200) {
             loading = false
@@ -71,9 +69,9 @@
     {#each Object.values(Ships) as Ship, i}
       <button
         class="imgCard"
-        style="background: {Ship === newShip.image ? 'var(--main-accent2-color)' : ''};
+        style="background: {Ship.type === newShip.type ? 'var(--main-accent2-color)' : ''};
                   animation-delay: {150 * i}ms;"
-        on:click={() => (newShip.image = Ship)}><img draggable="false" src={Ship} alt={Ship} style=" margin: 1em" /></button
+        on:click={() => (newShip.svgUrl = Ship.svgUrl)}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
       >
     {/each}
   </ModalSimple>

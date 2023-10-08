@@ -5,7 +5,7 @@
   import getProfile from '../../lib/services/user/profile'
   import { user } from '../../stores/stores'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
-  import { Ships as ShipImgs } from '../../style/ships'
+  import { Ships, getShipBundleCache } from '../../style/ships'
   import { fade } from 'svelte/transition'
   import { Icons } from '../../style/icons'
   import Button90 from '../../components/menu/Button90.svelte'
@@ -42,7 +42,7 @@
 
   async function handleSaveAvatar() {
     if (changeShip) {
-      await updateShip(changeShip.name, changeShip.image, changeShip.id).then((d) => {
+      await updateShip(changeShip.name, changeShip.variant, changeShip.id).then((d) => {
         if (d.status === 200) {
           getProfile()
           changeShip = undefined
@@ -56,7 +56,7 @@
   <div class="ship" style="animation-delay: {150 * i}ms;">
     <!-- svelte-ignore a11y-missing-attribute -->
     <button class="avatar" style="animation-delay: {150 * i}ms;" title="Edit Ship" on:click={() => (changeShip = ship)}>
-      <img class="chosenAvatar" src={ship.image} />
+      <img class="chosenAvatar" src={getShipBundleCache(ship.variant).svgUrl} />
     </button>
 
     <div class="shipInfo">
@@ -100,16 +100,16 @@
       <h3 style="align-self: center">Ship name:</h3>
       <input disabled={loading} bind:value={changeShip.name} placeholder={changeShip.name} />
     </div>
-    {#each Object.values(ShipImgs) as Img, i}
+    {#each Object.values(Ships) as Ship, i}
       <button
         class="imgCard"
-        style=" background: {Img === changeShip.image ? 'var(--main-accent2-color)' : ''};
+        style=" background: {Ship.type === changeShip.variant ? 'var(--main-accent2-color)' : ''};
                   animation-delay: {150 * i}ms;"
         on:click={() => {
           if (changeShip) {
-            changeShip.image = Img
+            changeShip.variant = Ship.type
           }
-        }}><img draggable="false" src={Img} alt={Img} style=" margin: 1em" /></button
+        }}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
       >
     {/each}
   </ModalSimple>
