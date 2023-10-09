@@ -42,7 +42,7 @@ export const pageHasHeader: Writable<boolean> = writable(true)
 
 export const gameSessionId: Writable<string | undefined> = writable('')
 
-export const localPlayer: Writable<SpaceObject> = writable(createSpaceObject())
+export const localPlayer: Writable<SpaceObject> = writable(createSpaceObject(createdGuestName))
 
 export const socket: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
 

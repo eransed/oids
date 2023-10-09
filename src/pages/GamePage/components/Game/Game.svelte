@@ -81,7 +81,6 @@
         game.localPlayer.isHost = true
       }
     })
-
     game.startGame(initRegularGame, renderFrame, nextFrame)
   })
 
