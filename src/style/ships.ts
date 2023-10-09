@@ -5,10 +5,10 @@
 
 import { warn } from 'mathil'
 
-const Retro = '../assets/ships/retro.svg'
-const Ship = '../assets/ships/ship.svg'
-const SpaceCraft = '../assets/ships/spaceCraft.svg'
-const Viking = '../assets/ships/viking.svg'
+const Retro = 'src/assets/ships/retro.svg'
+const Ship = 'src/assets/ships/ship.svg'
+const SpaceCraft = 'src/assets/ships/spaceCraft.svg'
+const Viking = 'src/assets/ships/viking.svg'
 
 export enum ShipVariant {
   Retro = 0,
