@@ -17,7 +17,7 @@
   import getProfile from '../../lib/services/user/profile'
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
-  import { createShip, deleteShip } from '../../lib/services/ship/ship.services'
+  import { createShipService, deleteShip } from '../../lib/services/ship/ship.services'
 
   //Assets
   import { Icons } from '../../style/icons'

@@ -5,7 +5,7 @@
   import getProfile from '../../lib/services/user/profile'
   import { user } from '../../stores/stores'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
-  import { Ships, getShipBundleCache } from '../../style/ships'
+  import { ShipVariant, Ships, getShipBundleCache } from '../../style/ships'
   import { fade } from 'svelte/transition'
   import { Icons } from '../../style/icons'
   import Button90 from '../../components/menu/Button90.svelte'
@@ -42,6 +42,7 @@
 
   async function handleSaveAvatar() {
     if (changeShip) {
+      console.log(changeShip)
       await updateShip(changeShip.name, changeShip.variant, changeShip.id).then((d) => {
         if (d.status === 200) {
           getProfile()

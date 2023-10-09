@@ -3,7 +3,7 @@ import { MessageType, SpaceShape } from './interface'
 import { newVec2, rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 import { randomBlue } from './color'
-import { ShipVariant } from '../style/ships'
+import type { Ship } from '@prisma/client'
 
 export function newPhotonLaser(): PhotonLaser {
   const shot: PhotonLaser = {
@@ -124,6 +124,22 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   }
 
   return spaceObject
+}
+
+export function createShip(userId: string): Ship {
+  const ship: Ship = {
+    id: '', //No need of creating an unique id since API endpoint makes this
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    variant: 0,
+    name: '',
+    userId: userId,
+    level: 0,
+    experience: 0,
+    played: 0,
+  }
+
+  return ship
 }
 
 export function createNpc(): NonPlayerCharacter {

@@ -37,9 +37,9 @@ export function createShipBundle(variant: ShipVariant = ShipVariant.Retro, svgUr
 
 export const Ships = {
   Retro: createShipBundle(ShipVariant.Retro, Retro),
-  Ship: createShipBundle(ShipVariant.Retro, Ship),
-  SpaceCraft: createShipBundle(ShipVariant.Retro, SpaceCraft),
-  Viking: createShipBundle(ShipVariant.Retro, Viking),
+  Ship: createShipBundle(ShipVariant.Ship, Ship),
+  SpaceCraft: createShipBundle(ShipVariant.SpaceCraft, SpaceCraft),
+  Viking: createShipBundle(ShipVariant.Viking, Viking),
 }
 
 export function getShipBundleCache(type: ShipVariant): ShipBundle {

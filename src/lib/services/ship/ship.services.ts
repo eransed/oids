@@ -17,7 +17,7 @@ export interface newShip {
 //   userId: string
 // }
 
-export const createShip = async (newShip: ShipBundle): Promise<AxiosResponse<Ship>> => {
+export const createShipService = async (newShip: Ship): Promise<AxiosResponse<Ship>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {
@@ -26,10 +26,10 @@ export const createShip = async (newShip: ShipBundle): Promise<AxiosResponse<Shi
     },
   }
 
-  const body = { newShip }
+  
 
   const response: AxiosResponse<Ship> = await axios
-    .post(`http://${location.hostname}:6060/api/v1/ship/create`, body, config)
+    .post(`http://${location.hostname}:6060/api/v1/ship/create`, newShip, config)
     .then((response: AxiosResponse<Ship>) => {
       return response
     })
@@ -92,7 +92,7 @@ export const updateShip = async (name: string, variant: ShipVariant, id: string)
   }
 
   const body = { name, variant, id }
-  console.log(body)
+  
 
   const response: AxiosResponse<Ship> = await axios
     .post(`http://${location.hostname}:6060/api/v1/ship/update`, body, config)

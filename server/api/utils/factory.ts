@@ -21,7 +21,7 @@ export function createNewUser(email: string, name: string, password: string): Us
   return newUser
 }
 
-export function createNewShip(name: string, image: string, userId: string, id?: string): Ship {
+export function createNewShip(name: string, variant: number, userId: string, id?: string): Ship {
   const newShip: Ship = {
     id: id ? id : randomUUID(),
     name: name,
@@ -29,7 +29,7 @@ export function createNewShip(name: string, image: string, userId: string, id?: 
     level: 0,
     experience: 0,
     played: 0,
-    variant: 0,
+    variant: variant,
     createdAt: new Date(),
     updatedAt: new Date(),
   }

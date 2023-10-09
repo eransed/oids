@@ -5,9 +5,13 @@
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
 
   //Services
-  import { createShip } from '../../lib/services/ship/ship.services'
+  import { createShipService } from '../../lib/services/ship/ship.services'
   import getProfile from '../../lib/services/user/profile'
-  import { ShipVariant, Ships, type ShipBundle, createShipBundle } from '../../style/ships'
+  import { Ships } from '../../style/ships'
+  import {} from 'os'
+  import type { Ship } from '@prisma/client'
+  import { user } from '../../stores/stores'
+  import { createShip } from '../../lib/factory'
 
   //Props
   export let loading: boolean = false
@@ -16,12 +20,12 @@
 
   let newShipDone: boolean = false
 
-  let newShip: ShipBundle = createShipBundle()
+  let newShip: Ship = createShip($user.id)
 
   async function handleNewShip(): Promise<void> {
     loading = true
     return new Promise<void>((resolve, reject) => {
-      createShip(newShip)
+      createShipService(newShip)
         .then((response) => {
           if (response.status === 200) {
             loading = false
@@ -36,6 +40,12 @@
         })
     })
   }
+
+  // steps={Object.values(newShip).map((v, i) => {
+  //     const key = Object.keys(newShip)[i]
+
+  //     return { desc: `${key}`, completed: !!v }
+  //   })}
 </script>
 
 {#if openModal}
@@ -47,11 +57,6 @@
       openModal = false
     }}
     saveBtn={async () => handleNewShip()}
-    steps={Object.values(newShip).map((v, i) => {
-      const key = Object.keys(newShip)[i]
-
-      return { desc: `${key}`, completed: !!v }
-    })}
     doneCallback={() => (newShipDone = true)}
   >
     <div
@@ -69,9 +74,9 @@
     {#each Object.values(Ships) as Ship, i}
       <button
         class="imgCard"
-        style="background: {Ship.type === newShip.type ? 'var(--main-accent2-color)' : ''};
+        style="background: {Ship.type === newShip.variant ? 'var(--main-accent2-color)' : ''};
                   animation-delay: {150 * i}ms;"
-        on:click={() => (newShip.svgUrl = Ship.svgUrl)}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
+        on:click={() => (newShip.variant = Ship.type)}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
       >
     {/each}
   </ModalSimple>

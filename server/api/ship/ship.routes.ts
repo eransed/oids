@@ -7,13 +7,14 @@ import { JWT_ACCESS_SECRET } from '../../pub_config'
 import { findUserById } from '../users/users.services'
 import { User } from '../types/user'
 import { createNewShip } from '../utils/factory'
+import { Ship } from '@prisma/client'
 
 export const ship = express.Router()
 
 ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { authorization } = req.headers
-    const { name, image } = req.body
+    const  newShip: Ship = req.body
 
     if (!authorization) {
       res.status(401).send('You are not logged in.')
@@ -29,7 +30,7 @@ ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: 
       throw new Error('No user found.')
     }
 
-    const ship = createNewShip(name, image, caller.id)
+    const ship = createNewShip(newShip.name, newShip.variant, caller.id)
 
     await createShip(ship).then((ship) => {
       res.json(ship)
@@ -95,7 +96,7 @@ ship.post('/delete', isAuthenticated, async (req: Request, res: Response, next: 
 ship.post('/update', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { authorization } = req.headers
-    const { name, image, id } = req.body
+    const { name, variant, id } = req.body
 
     if (!authorization) {
       res.status(401).send('You are not logged in.')
@@ -111,7 +112,7 @@ ship.post('/update', isAuthenticated, async (req: Request, res: Response, next: 
       throw new Error('No user found.')
     }
 
-    const ship = createNewShip(name, image, caller.id, id)
+    const ship = createNewShip(name, variant, caller.id, id)
 
     await updateShip(ship).then((ship) => {
       res.json(ship)
