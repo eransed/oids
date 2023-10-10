@@ -13,7 +13,7 @@
   import Ships from './Ships.svelte'
 
   //Util
-  import { formatDate } from '../../helpers/util'
+  import { formatDate } from '../../utils/utils'
   import getProfile from '../../lib/services/user/profile'
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
@@ -24,7 +24,7 @@
   import { Avatars } from '../../style/avatars'
 
   import { deleteMe } from '../../lib/services/user/delete'
-  import { handleLogout } from '../../components/profile/profileButtons'
+  import { handleLogout } from '../../utils/utils'
   import updateUser from '../../lib/services/user/updateUser'
   import type { AlertType } from '../../components/alert/AlertType'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
@@ -32,7 +32,6 @@
 
   onMount(() => {
     if ($isLoggedIn && !$user) {
-      console.log('trying')
       getProfile()
     }
   })

@@ -1,14 +1,8 @@
 //Interfaces
 import type { Button90Config } from '../../interfaces/menu'
 
-//Store
-import { isLoggedIn, user, gUser } from '../../stores/stores'
-
-export const handleLogout = (): void => {
-  localStorage.clear()
-  isLoggedIn.set(false)
-  user.set(gUser)
-}
+//Utils
+import { handleLogout } from '../../utils/utils'
 
 export const logOutButton: Button90Config = {
   buttonText: 'Log out',

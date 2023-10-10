@@ -7,6 +7,7 @@ import { OidsSocket } from '../lib/websocket/ws'
 import { getWsUrl } from '../lib/websocket/ws'
 import type { Settings } from '../style/styleInterfaces'
 import { cnvTheme, DeepMidnight } from '../style/defaultColors'
+import { gUser, createdGuestName } from '../utils/utils'
 
 export const isLoggedIn: Writable<boolean> = writable()
 
@@ -18,23 +19,8 @@ export const user: Writable<User & Prisma.UserGetPayload<typeof userIncludes>> =
 
 export const userLoading: Writable<boolean> = writable()
 
-const createdGuestName = `p-${rndi(1, 900000)}`
-export const guestUserName: Writable<string> = writable(createdGuestName)
 
-export const gUser: User & Prisma.UserGetPayload<typeof userIncludes> = {
-  id: createdGuestName,
-  email: '',
-  name: createdGuestName,
-  password: '',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  role: 'guest',
-  darkMode: true,
-  played: 0,
-  image: '',
-  ships: [],
-  gameHistory: [],
-}
+export const guestUserName: Writable<string> = writable(createdGuestName)
 
 export const guestUser: Writable<User> = writable(gUser)
 

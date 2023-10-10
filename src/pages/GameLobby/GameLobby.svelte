@@ -10,7 +10,7 @@
 
   //Services
   import type { ChatMessage, Session } from '../../lib/interface'
-  import { createSessionId } from '../../helpers/util'
+  import { createSessionId } from '../../utils/utils'
   import { activeSessions } from '../../lib/services/game/activeSessions'
   import SessionList from './components/SessionList/SessionList.svelte'
 
@@ -353,16 +353,6 @@
 
   .right {
     grid-template-rows: 1fr auto auto;
-  }
-
-  .center button {
-    width: 100%;
-    border: none;
-    padding: 0.5em;
-    margin: 0.2em;
-    /* border: none;
-    background: none; */
-    /* color: var(--main-text-color); */
   }
 
   .buttonWrapper {

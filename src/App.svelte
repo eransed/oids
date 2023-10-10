@@ -5,10 +5,10 @@
   import { routes } from './routes'
 
   //Stores
-  import { pageHasHeader, settings, user } from './stores/stores'
+  import { pageHasHeader } from './stores/stores'
 
   //Helpers
-  import { onAppMount } from './helpers/onAppMount'
+  import { onAppMount } from './utils/onAppMount'
 
   //Pages
   import LandingPage from './pages/LandingPage/LandingPage.svelte'

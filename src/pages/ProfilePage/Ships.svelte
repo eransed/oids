@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Ship } from '@prisma/client'
-  import { formatDate } from '../../helpers/util'
+  import { formatDate } from '../../utils/utils'
   import { deleteShip, getShips, updateShip } from '../../lib/services/ship/ship.services'
   import getProfile from '../../lib/services/user/profile'
   import { user } from '../../stores/stores'
