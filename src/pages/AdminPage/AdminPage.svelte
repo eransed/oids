@@ -257,6 +257,7 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Theme</th>
               </tr>
               {#each Object.values(users) as u}
                 {#if edit && u.id === editingUser?.id}
@@ -328,6 +329,8 @@
                     <td>{u.name}</td>
                     <td>{u.email}</td>
                     <td>{u.role}</td>
+                    <td>{themes[u.theme].name}</td>
+
                     <td>
                       <Button90
                         disabled={loading}
@@ -342,6 +345,7 @@
                             name = editingUser.name
                             email = editingUser.email
                             role = editingUser.role
+                            chosenTheme = themes[editingUser.theme]
                           },
                           selected: false,
                         }}
@@ -416,7 +420,6 @@
     background-color: var(--main-card-color);
     border-radius: 0.5em;
     margin-top: 1em;
-    width: 100%;
   }
 
   .dataTable table tr:nth-child(even) {

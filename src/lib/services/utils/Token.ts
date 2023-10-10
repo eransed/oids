@@ -7,7 +7,7 @@ import getProfile from '../user/profile'
 import { isLoggedIn, userLoading } from '../../../stores/stores'
 
 import type { Tokens } from '../../../interfaces/user'
-import {  setCssFromSettings } from '../../../style/defaultColors'
+import { setCssFromSettings, syncThemeWithCss, themes } from '../../../style/defaultColors'
 
 //Check if token is valid and renew
 export const validateToken = async () => {
@@ -41,6 +41,7 @@ export const validateToken = async () => {
             isLoggedIn.set(true)
             userLoading.set(false)
             setCssFromSettings(user.theme)
+
             return user
           })
           .catch((err) => {

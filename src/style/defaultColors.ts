@@ -1,12 +1,9 @@
-import { setGraphLineColor } from "../lib/constants"
-import { setGameSettings } from "../pages/GamePage/components/Game/Utils/mainGame"
-import type { Settings, Theme, UIStyle } from "./styleInterfaces"
-import {info} from 'mathil'
-
-
+import { setGraphLineColor } from '../lib/constants'
+import { setGameSettings } from '../pages/GamePage/components/Game/Utils/mainGame'
+import type { Settings, Theme, UIStyle } from './styleInterfaces'
+import { info } from 'mathil'
 
 export function getThemeNumber(theme: Theme): number {
-
   let themeNr = 0
 
   themes.filter((t, i) => {
@@ -16,7 +13,6 @@ export function getThemeNumber(theme: Theme): number {
   })
 
   return themeNr
-  
 }
 
 export const alertColors = {
@@ -27,7 +23,7 @@ export const alertColors = {
 }
 
 export const DeepMidnight: Theme = {
-  name: "DeepMidnight",
+  name: 'DeepMidnight',
   bg: '#000033',
   card: '#000022',
   text: '#CCCCCC',
@@ -35,13 +31,12 @@ export const DeepMidnight: Theme = {
 }
 
 export const LightMode: Theme = {
-  name: "LightMode", 
+  name: 'LightMode',
   bg: '#EAEAEA',
   card: '#F5F5F5',
   text: '#555555',
-  accent: '#98AFC7'
+  accent: '#98AFC7',
 }
-
 
 export function cnvTheme(t: Theme): UIStyle {
   const armed = '#0f0'
@@ -50,28 +45,24 @@ export function cnvTheme(t: Theme): UIStyle {
     armedShotColor: t.text,
     shipColor: t.text,
     spaceColor: t.bg,
-    starColor: t.text
+    starColor: t.text,
   }
   return s
 }
 
-
-
 export function setCssFromSettings(theme: number): void {
+  currentThemeIndex = theme
 
   syncThemeWithCss(themes[theme])
   setGraphLineColor(themes[theme].text)
   const sets: Settings = {
     uiStyle: cnvTheme(themes[theme]),
-    theme: themes[theme]
+    theme: themes[theme],
   }
   setGameSettings(sets)
 }
 
-export const themes: Theme[] = [
-  DeepMidnight,
-  LightMode,
-]
+export const themes: Theme[] = [DeepMidnight, LightMode]
 
 let currentThemeIndex = 0
 
@@ -93,17 +84,17 @@ export function getCurrentStyle(): UIStyle {
 
 export function toggleAndGetTheme(): Settings {
   currentThemeIndex++
-  if (currentThemeIndex >= themes.length){
+  if (currentThemeIndex >= themes.length) {
     currentThemeIndex = 0
   }
   info(`index: ${currentThemeIndex}`)
   currentTheme = themes[currentThemeIndex]
-  console.log (currentTheme)
+  console.log(currentTheme)
   setCssFromSettings(currentThemeIndex)
 
   const sets: Settings = {
     uiStyle: cnvTheme(currentTheme),
-    theme: currentTheme
+    theme: currentTheme,
   }
   return sets
 }

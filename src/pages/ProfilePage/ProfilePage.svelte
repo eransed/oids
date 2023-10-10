@@ -145,7 +145,22 @@
         {#if $profileComponent === 'shipStation'}
           <h3>Your ships</h3>
 
-          <div class="newShip"><button on:click={() => (openModal = true)} title="Add ship">+</button></div>
+          <div class="newShip">
+            <Button90
+              disabled={loading}
+              icon={Icons.AddUser}
+              mouseTracking={false}
+              buttonConfig={{
+                buttonText: 'Save',
+                clickCallback: async () => {
+                  openModal = true
+                },
+                selected: false,
+              }}
+            />
+
+            <button on:click={() => (openModal = true)} title="Add ship">+</button>
+          </div>
           <Ships />
           <AddShip {openModal} closeModal={() => (openModal = false)} />
         {/if}

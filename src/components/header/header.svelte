@@ -23,7 +23,7 @@
     showLogin = !showLogin
   }
 
-  $: borderColor = $isLoggedIn ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
+  $: borderColor = $isLoggedIn && $user ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
 
   $: pathname = location.pathname
 
@@ -98,7 +98,7 @@
       </button>
     </div>
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-      <img draggable="false" class="avatar" src={$isLoggedIn ? $user.image : Avatars.AstronautMale} alt="Avatar" />
+      <img draggable="false" class="avatar" src={$isLoggedIn && $user ? $user.image : Avatars.AstronautMale} alt="Avatar" />
     </div>
 
     {#if showLogin}
