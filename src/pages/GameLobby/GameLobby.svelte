@@ -98,7 +98,7 @@
 
   onMount(() => {
     $localPlayer.name = $user ? $user.name : $guestUserName
-    $localPlayer.shipVariant = $user ? $user.ships[0].variant : Ships.Ship.type
+    $localPlayer.shipVariant = $isLoggedIn ? $user.ships[0].variant : Ships.Ship.type
 
     $socket.connect().then(() => {
       console.log(`Connected to websocket`)
