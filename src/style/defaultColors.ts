@@ -3,6 +3,22 @@ import { setGameSettings } from "../pages/GamePage/components/Game/Utils/mainGam
 import type { Settings, Theme, UIStyle } from "./styleInterfaces"
 import {info} from 'mathil'
 
+
+
+export function getThemeNumber(theme: Theme): number {
+
+  let themeNr = 0
+
+  themes.filter((t, i) => {
+    if (t.name === theme.name) {
+      themeNr = i
+    }
+  })
+
+  return themeNr
+  
+}
+
 export const alertColors = {
   error: '#fdeded',
   warning: '#fff4e5',
@@ -11,6 +27,7 @@ export const alertColors = {
 }
 
 export const DeepMidnight: Theme = {
+  name: "DeepMidnight",
   bg: '#000033',
   card: '#000022',
   text: '#CCCCCC',
@@ -18,11 +35,13 @@ export const DeepMidnight: Theme = {
 }
 
 export const LightMode: Theme = {
+  name: "LightMode", 
   bg: '#EAEAEA',
   card: '#F5F5F5',
   text: '#555555',
   accent: '#98AFC7'
 }
+
 
 export function cnvTheme(t: Theme): UIStyle {
   const armed = '#0f0'
@@ -38,17 +57,18 @@ export function cnvTheme(t: Theme): UIStyle {
 
 
 
-export function setCssFromSettings(chosenTheme: Theme): void {
-  syncThemeWithCss(chosenTheme)
-  setGraphLineColor(chosenTheme.text)
+export function setCssFromSettings(theme: number): void {
+
+  syncThemeWithCss(themes[theme])
+  setGraphLineColor(themes[theme].text)
   const sets: Settings = {
-    uiStyle: cnvTheme(chosenTheme),
-    theme: chosenTheme
+    uiStyle: cnvTheme(themes[theme]),
+    theme: themes[theme]
   }
   setGameSettings(sets)
 }
 
-const themes: Theme[] = [
+export const themes: Theme[] = [
   DeepMidnight,
   LightMode,
 ]
@@ -79,7 +99,7 @@ export function toggleAndGetTheme(): Settings {
   info(`index: ${currentThemeIndex}`)
   currentTheme = themes[currentThemeIndex]
   console.log (currentTheme)
-  setCssFromSettings(currentTheme)
+  setCssFromSettings(currentThemeIndex)
 
   const sets: Settings = {
     uiStyle: cnvTheme(currentTheme),

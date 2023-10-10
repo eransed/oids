@@ -12,6 +12,7 @@ export interface UIStyle {
 }
 
 export interface Theme {
+  name: string
   bg: string
   card: string
   text: string

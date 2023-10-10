@@ -28,7 +28,6 @@
   // $: if ($settings) {
   //   setCssFromSettings($settings.theme)
   // }
-  syncThemeWithCss()
 </script>
 
 <Router>

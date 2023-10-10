@@ -27,6 +27,10 @@
   //Icons
   import { Icons } from '../../style/icons'
 
+  //Themes
+  import { getThemeNumber, themes } from '../../style/defaultColors'
+  import type { Theme } from '../../style/styleInterfaces'
+
   async function getUsers(): Promise<User & Prisma.UserGetPayload<typeof userIncludes>[]> {
     loading = true
     return await userList()
@@ -55,6 +59,8 @@
   let users: (User & Prisma.UserGetPayload<typeof userIncludes>)[] = []
   let loading = false
 
+  let chosenTheme: Theme
+
   let newUser = {
     name: '',
     email: '',
@@ -67,9 +73,14 @@
     const editedUser = editingUser
 
     if (editedUser) {
+      const theme = getThemeNumber(chosenTheme)
+
+      console.log(theme)
+
       editedUser.name = name
       editedUser.email = email
       editedUser.role = role
+      editedUser.theme = theme
       await updateUser(editedUser)
         .then((res) => {
           if (res.status === 200) {
@@ -256,6 +267,13 @@
                       <select disabled={loading} bind:value={role}>
                         {#each roleOptions as value}
                           <option {value}>{value}</option>
+                        {/each}
+                      </select>
+                    </td>
+                    <td>
+                      <select disabled={loading} bind:value={chosenTheme}>
+                        {#each themes as value}
+                          <option {value}>{value.name}</option>
                         {/each}
                       </select>
                     </td>

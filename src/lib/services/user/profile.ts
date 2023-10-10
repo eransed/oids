@@ -6,6 +6,8 @@ import { isLoggedIn, settings, user, userIncludes } from '../../../stores/stores
 //Interface
 // import type { User } from '../../../interfaces/user'
 import type { Prisma, User } from '@prisma/client'
+import { syncThemeWithCss } from '../../../style/defaultColors'
+import { DeepMidnight, LightMode } from '../../../style/defaultColors'
 
 const getProfile = async (): Promise<User & Prisma.UserGetPayload<typeof userIncludes>> => {
   const token = localStorage.getItem('accessToken')
@@ -20,8 +22,11 @@ const getProfile = async (): Promise<User & Prisma.UserGetPayload<typeof userInc
       user.set(response.data)
       isLoggedIn.set(true)
       console.log('Welcome: ', response.data, response.data)
+  syncThemeWithCss(LightMode)
+
       settings.set({
         theme: {
+          name: '',
           bg: '',
           card: '',
           text: '',

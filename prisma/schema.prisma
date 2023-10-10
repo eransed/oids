@@ -20,7 +20,7 @@ model User {
   updatedAt     DateTime       @updatedAt
   gameHistory   Game[]
   role          String         @default("player")
-  darkMode      Boolean        @default(true)
+  theme         Int            @default(0)
   ships         Ship[]
   image         String         @default("/src/assets/avatars/astronautDog.svg")
   played        Int            @default(0)

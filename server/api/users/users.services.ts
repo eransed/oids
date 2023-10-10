@@ -61,7 +61,7 @@ export const updateUser = async (user: User): Promise<User> => {
         name: user.name,
         role: user.role,
         played: user.played,
-        darkMode: user.darkMode,
+        theme: user.theme,
       },
     })
     .then((d) => {

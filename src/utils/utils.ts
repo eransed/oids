@@ -35,7 +35,7 @@ export const gUser: User & Prisma.UserGetPayload<typeof userIncludes> = {
   createdAt: new Date(),
   updatedAt: new Date(),
   role: 'guest',
-  darkMode: true,
+  theme: 0,
   played: 0,
   image: '',
   ships: [],
