@@ -384,13 +384,13 @@
 
   .imgCard {
     margin: 3%;
-    min-width: 90px;
+    /* min-width: 180px; */
     background: none;
     border: none;
-    width: 27%;
+    width: 25%;
     display: flex;
     padding: 0.8em;
-    align-content: center;
+    align-content: flex-start;
     justify-content: center;
     border-radius: 1em;
     z-index: 4;
@@ -398,11 +398,12 @@
     transition: all 500ms;
     animation: spin 1s ease-in-out forwards;
     transform: scale(0);
+    height: fit-content;
   }
 
   .imgCard img {
     width: 100%;
-    min-width: 60px;
+    /* min-width: 60px; */
   }
 
   .imgCard:hover {

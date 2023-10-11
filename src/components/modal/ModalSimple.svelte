@@ -109,7 +109,9 @@
 <style>
   dialog {
     padding: 2em;
-    width: 50%;
+    width: 30%;
+    /* height: 90vh; */
+    max-height: 80vh;
     /* min-width: 500px; */
     max-width: 1200px;
     background: var(--main-card-color);
@@ -119,9 +121,11 @@
     z-index: 2;
     text-align: center;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     animation: show 1s ease-in-out forwards;
     color: var(--main-text-color);
+    align-content: flex-start;
   }
 
   dialog::backdrop {
@@ -157,7 +161,7 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    width: 100%;
+    width: 80%;
     /* background: var(--main-card-color); */
     border: none;
     border-radius: 1em;
@@ -175,7 +179,7 @@
 
   @media screen and (max-width: 1300px) {
     dialog {
-      width: 40%;
+      width: 50%;
     }
   }
 
