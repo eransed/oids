@@ -5,12 +5,15 @@
   import getProfile from '../../lib/services/user/profile'
   import { user } from '../../stores/stores'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
-  import { ShipVariant, Ships, getShipBundleCache } from '../../style/ships'
+  import { ShipVariant, ShipBundles, getShipBundleCache } from '../../style/ships'
   import { fade } from 'svelte/transition'
   import { Icons } from '../../style/icons'
   import Button90 from '../../components/menu/Button90.svelte'
 
   export let loading: boolean = false
+  export let clickedShipCallback: (ship: Ship) => void = () => {}
+  export let changeShipOnClick: boolean = true
+
   let changeShip: Ship | undefined = undefined
   let updatedShipDone: boolean = false
 
@@ -51,12 +54,19 @@
       })
     }
   }
+
+  function clickedShip(ship: Ship) {
+    if (changeShipOnClick) {
+      changeShip = ship
+    }
+    clickedShipCallback(ship)
+  }
 </script>
 
 {#each $user.ships as ship, i}
   <div class="ship" style="animation-delay: {150 * i}ms;">
     <!-- svelte-ignore a11y-missing-attribute -->
-    <button class="avatar" style="animation-delay: {150 * i}ms;" title="Edit Ship" on:click={() => (changeShip = ship)}>
+    <button class="avatar" style="animation-delay: {150 * i}ms;" title="Edit Ship" on:click={() => clickedShip(ship)}>
       <img class="chosenAvatar" src={getShipBundleCache(ship.variant).svgUrl} />
     </button>
 
@@ -101,7 +111,7 @@
       <h3 style="align-self: center">Ship name:</h3>
       <input disabled={loading} bind:value={changeShip.name} placeholder={changeShip.name} />
     </div>
-    {#each Object.values(Ships) as Ship, i}
+    {#each Object.values(ShipBundles) as Ship, i}
       <button
         class="imgCard"
         style=" background: {Ship.type === changeShip.variant ? 'var(--main-accent2-color)' : ''};

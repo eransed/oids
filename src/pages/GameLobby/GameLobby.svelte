@@ -7,6 +7,7 @@
 
   //Components
   import Page from '../../components/page/page.svelte'
+  import Ships from '../ProfilePage/Ships.svelte'
 
   //Services
   import type { ChatMessage, Session } from '../../lib/interface'
@@ -23,7 +24,9 @@
 
   //Assets
   import { Icons } from '../../style/icons'
-  import { Ships } from '../../style/ships'
+  import { ShipBundles } from '../../style/ships'
+  import ModalSimple from '../../components/modal/ModalSimple.svelte'
+  import type { Ship } from '@prisma/client'
 
   /**
    * Reactive on changes to $user store.
@@ -31,6 +34,8 @@
   $: if ($user && $user.name !== $localPlayer.name) {
     $localPlayer.name = $user.name
     $socket.send($localPlayer)
+    console.log($localPlayer)
+    shipModalOpen = true
     log('$: if ($user && $user.name !== $localPlayer.name)')
     updateSessions()
   }
@@ -95,59 +100,79 @@
   }
 
   let pingTimer: ReturnType<typeof setInterval>
+  let chosenShip: Ship
+  let shipModalOpen: boolean = false
+
+  async function initLobbySocket() {
+    return new Promise<void>((resolve, reject) => {
+      $localPlayer.name = $user ? $user.name : $guestUserName
+      $localPlayer.shipVariant = $isLoggedIn ? $user.ships[0].variant : ShipBundles.Ship.type
+
+      $socket.connect().then(() => {
+        console.log(`Connected to websocket`)
+        hostSession()
+      })
+
+      console.log('Adding lobby websocket listener...')
+
+      $socket
+        .addListener(
+          (su) => {
+            const incomingUpdate = su.dataObject
+
+            if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
+              console.log(`Got an session update message from ${incomingUpdate.name}`)
+              updateSessions()
+            } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
+              const msg = incomingUpdate.lastMessage
+              console.log(`${incomingUpdate.name} says: ${msg}`)
+              const newMsg: ChatMessage = {
+                message: incomingUpdate.lastMessage,
+                timeDate: new Date(),
+                user: incomingUpdate,
+              }
+              $chatMessageHistory = [...$chatMessageHistory, newMsg]
+            } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
+              console.log(`${incomingUpdate.name} left the lobby`)
+            } else if (incomingUpdate.messageType === MessageType.PING) {
+              // handlePing(incomingUpdate, $socket)
+            } else if (incomingUpdate.messageType === MessageType.START_GAME) {
+              const sess = incomingUpdate.sessionId
+              $localPlayer.isPlaying = true
+              console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
+              $socket.resetListeners()
+              navigate(`/play/${sess}`)
+            } else if (incomingUpdate.messageType === MessageType.SERVICE) {
+              log(`Service message: server version: ${incomingUpdate.serverVersion}`)
+              $localPlayer.serverVersion = incomingUpdate.serverVersion
+            } else {
+              if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
+                warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
+              }
+            }
+          },
+          () => {}
+        )
+        .then(() => {
+          updateSessions()
+          resolve()
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
+  }
+
+  let showLobby = false
 
   onMount(() => {
-    $localPlayer.name = $user ? $user.name : $guestUserName
-    $localPlayer.shipVariant = $isLoggedIn ? $user.ships[0].variant : Ships.Ship.type
-
-    $socket.connect().then(() => {
-      console.log(`Connected to websocket`)
-      hostSession()
-    })
-
-    console.log('Adding lobby websocket listener...')
-
-    $socket
-      .addListener(
-        (su) => {
-          const incomingUpdate = su.dataObject
-
-          if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
-            console.log(`Got an session update message from ${incomingUpdate.name}`)
-            updateSessions()
-          } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
-            const msg = incomingUpdate.lastMessage
-            console.log(`${incomingUpdate.name} says: ${msg}`)
-            const newMsg: ChatMessage = {
-              message: incomingUpdate.lastMessage,
-              timeDate: new Date(),
-              user: incomingUpdate,
-            }
-            $chatMessageHistory = [...$chatMessageHistory, newMsg]
-          } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
-            console.log(`${incomingUpdate.name} left the lobby`)
-          } else if (incomingUpdate.messageType === MessageType.PING) {
-            // handlePing(incomingUpdate, $socket)
-          } else if (incomingUpdate.messageType === MessageType.START_GAME) {
-            const sess = incomingUpdate.sessionId
-            $localPlayer.isPlaying = true
-            console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
-            $socket.resetListeners()
-            navigate(`/play/${sess}`)
-          } else if (incomingUpdate.messageType === MessageType.SERVICE) {
-            log(`Service message: server version: ${incomingUpdate.serverVersion}`)
-            $localPlayer.serverVersion = incomingUpdate.serverVersion
-          } else {
-            if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
-              warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
-            }
-          }
-        },
-        () => {}
-      )
-      .then(() => {
-        updateSessions()
+    if ($isLoggedIn && $user && !$localPlayer.chosenShip) {
+      shipModalOpen = true
+    } else {
+      initLobbySocket().then(() => {
+        showLobby = true
       })
+    }
   })
 
   onDestroy(() => {
@@ -246,69 +271,93 @@
   }
 </script>
 
-<Page>
-  <div class="lobbyWrapper">
-    <div class="left">
-      <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
-    </div>
-    <div class="center">
-      {#if joinedSession}
-        <div class="sessionInfo">
-          <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
-            Host: {joinedSession.host.name}
-            {#if joinedSession.host.readyToPlay}
-              <span style="filter: hue-rotate(72deg)">
-                <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
-              </span>
-            {/if}
-          </p>
-          <br />
+{#if $isLoggedIn}
+  {#if shipModalOpen}
+    <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
+      <Ships
+        changeShipOnClick={false}
+        clickedShipCallback={(ship) => {
+          console.log('clickedshipcallback')
+          shipModalOpen = false
+          chosenShip = ship
+          $localPlayer.chosenShip = {
+            level: ship.level,
+            name: ship.name,
+            userId: ship.userId,
+          }
+          initLobbySocket().then(() => {
+            showLobby = true
+          })
+        }}
+      />
+    </ModalSimple>
+  {/if}
+{/if}
+{#if showLobby}
+  <Page>
+    <div class="lobbyWrapper">
+      <div class="left">
+        <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
+      </div>
+      <div class="center">
+        {#if joinedSession}
+          <div class="sessionInfo">
+            <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
+              Host: {joinedSession.host.name}
+              {#if joinedSession.host.readyToPlay}
+                <span style="filter: hue-rotate(72deg)">
+                  <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
+                </span>
+              {/if}
+            </p>
+            <br />
 
-          {#each joinedSession.players as player}
-            {#if !player.isHost}
-              <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
-                {player.name}
-                <!-- {getPlayerPing(player)} - -->
-                {#if player.readyToPlay}
-                  <span style="filter: hue-rotate(72deg)">
-                    <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
-                  </span>
-                {/if}
-              </p>
-            {/if}
-          {/each}
-        </div>
-        <div class="buttonWrapper">
-          <Button90 icon={Icons.Exit} buttonConfig={{ buttonText: 'Leave Session', clickCallback: () => leaveSession(), selected: false }} />
-          <span style="filter: {$localPlayer.readyToPlay ? 'hue-rotate(72deg)' : ''}">
+            {#each joinedSession.players as player}
+              {#if !player.isHost}
+                <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
+                  {player.name}
+                  <!-- {getPlayerPing(player)} - -->
+                  {#if player.readyToPlay}
+                    <span style="filter: hue-rotate(72deg)">
+                      <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
+                    </span>
+                  {/if}
+                </p>
+              {/if}
+            {/each}
+          </div>
+          <div class="buttonWrapper">
+            <Button90 icon={Icons.Exit} buttonConfig={{ buttonText: 'Leave Session', clickCallback: () => leaveSession(), selected: false }} />
+            <span style="filter: {$localPlayer.readyToPlay ? 'hue-rotate(72deg)' : ''}">
+              <Button90
+                icon={Icons.Done}
+                buttonConfig={{ buttonText: 'Toggle ready!', clickCallback: () => toggleReadyToPlay(), selected: $localPlayer.readyToPlay }}
+              />
+            </span>
+
             <Button90
-              icon={Icons.Done}
-              buttonConfig={{ buttonText: 'Toggle ready!', clickCallback: () => toggleReadyToPlay(), selected: $localPlayer.readyToPlay }}
+              addInfo={allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length}`}
+              icon={Icons.StartGame}
+              disabled={!allReady}
+              buttonConfig={{
+                buttonText: allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length} ready!`,
+                clickCallback: () => startGame(),
+                selected: false,
+              }}
             />
-          </span>
-
-          <Button90
-            addInfo={allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length}`}
-            icon={Icons.StartGame}
-            disabled={!allReady}
-            buttonConfig={{
-              buttonText: allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length} ready!`,
-              clickCallback: () => startGame(),
-              selected: false,
-            }}
-          />
-        </div>
-      {:else}
-        <CircularSpinner ship />
-      {/if}
+          </div>
+        {:else}
+          <CircularSpinner ship />
+        {/if}
+      </div>
+      <div class="right">
+        {#if joinedSession}
+          <Chat joinedSessionId={joinedSession?.id} />
+        {/if}
+      </div>
     </div>
-    <div class="right">
-      {#if joinedSession}
-        <Chat joinedSessionId={joinedSession?.id} />
-      {/if}
-    </div>
-  </div>
-</Page>
+  </Page>
+{/if}
 
 <style>
   .readyFlag {

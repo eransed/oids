@@ -35,7 +35,7 @@ export function createShipBundle(variant: ShipVariant = ShipVariant.Retro, svgUr
   }
 }
 
-export const Ships = {
+export const ShipBundles = {
   Retro: createShipBundle(ShipVariant.Retro, Retro),
   Ship: createShipBundle(ShipVariant.Ship, Ship),
   SpaceCraft: createShipBundle(ShipVariant.SpaceCraft, SpaceCraft),
@@ -43,10 +43,10 @@ export const Ships = {
 }
 
 export function getShipBundleCache(type: ShipVariant): ShipBundle {
-  const ships = Object.values(Ships)
+  const ships = Object.values(ShipBundles)
   for (let i = 0; i < ships.length; i++) {
     if (ships[i].type === type) return ships[i]
   }
   warn(`unknow ship type ${type}`)
-  return Ships.Retro
+  return ShipBundles.Retro
 }

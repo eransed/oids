@@ -121,6 +121,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     viewFramePosition: newVec2(),
     thrustFlames: [],
     shipVariant: 0,
+    chosenShip: undefined,
   }
 
   return spaceObject

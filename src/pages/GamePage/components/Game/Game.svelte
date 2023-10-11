@@ -14,7 +14,7 @@
   import InGameInfo from '../InGameInfo/inGameInfo.svelte'
   import HotKeys from '../Hotkeys/hotKeys.svelte'
   import ShipSettings from '../ShipSettings/ShipSettings.svelte'
-  import { Ships } from '../../../../style/ships'
+  import { ShipBundles } from '../../../../style/ships'
 
   //Websocket
   // import { disconnect } from "../../../../lib/websocket/webSocket"
@@ -64,7 +64,7 @@
     await getProfile()
       .then(() => {
         $localPlayer.name = $user ? $user.name : $guestUserName
-        $localPlayer.shipVariant = $user ? $user.ships[0].variant : Ships.Ship.type
+        $localPlayer.shipVariant = $user ? $user.ships[0].variant : ShipBundles.Ship.type
       })
       .catch((err) => {
         console.error(err)

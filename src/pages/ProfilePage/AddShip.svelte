@@ -7,8 +7,7 @@
   //Services
   import { createShipService } from '../../lib/services/ship/ship.services'
   import getProfile from '../../lib/services/user/profile'
-  import { Ships } from '../../style/ships'
-  import {} from 'os'
+  import { ShipBundles } from '../../style/ships'
   import type { Ship } from '@prisma/client'
   import { user } from '../../stores/stores'
   import { createShip } from '../../lib/factory'
@@ -71,7 +70,7 @@
       <h3 style="align-self: center">Choose your ship type</h3>
     </div>
 
-    {#each Object.values(Ships) as Ship, i}
+    {#each Object.values(ShipBundles) as Ship, i}
       <button
         class="imgCard"
         style="background: {Ship.type === newShip.variant ? 'var(--main-accent2-color)' : ''};

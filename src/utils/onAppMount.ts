@@ -11,9 +11,11 @@ export const onAppMount = async (): Promise<void> => {
 
   return new Promise<void>((resolve, reject) => {
     validateToken()
+      .then(() => {
+        resolve()
+      })
       .catch((err) => {
         reject(err)
       })
-    resolve()
   })
 }

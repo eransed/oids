@@ -7,7 +7,7 @@ import { screenScale } from '../constants'
 import { renderShot, setScaledFont } from './render2d'
 import { renderVec2 } from './renderUI'
 import { svg_element } from 'svelte/internal'
-import { getShipBundleCache, Ships } from '../../style/ships'
+import { getShipBundleCache, ShipBundles } from '../../style/ships'
 
 export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle, renderPos: Vec2 | null = null): void {
   const scale = setScaledFont(ctx)

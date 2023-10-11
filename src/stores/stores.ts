@@ -1,6 +1,6 @@
 import { writable, type Writable } from 'svelte/store'
 import { type User, Prisma } from '@prisma/client'
-import { rndi } from 'mathil'
+import { info, rndi } from 'mathil'
 import type { ChatMessage, SpaceObject } from '../lib/interface'
 import { createSpaceObject } from '../lib/factory'
 import { OidsSocket } from '../lib/websocket/ws'
@@ -8,6 +8,7 @@ import { getWsUrl } from '../lib/websocket/ws'
 import type { Settings } from '../style/styleInterfaces'
 import { cnvTheme, DeepMidnight } from '../style/defaultColors'
 import { gUser, createdGuestName } from '../utils/utils'
+import { validateToken } from '../lib/services/utils/Token'
 
 export const isLoggedIn: Writable<boolean> = writable()
 
@@ -18,7 +19,6 @@ export const userIncludes = Prisma.validator<Prisma.UserArgs>()({
 export const user: Writable<User & Prisma.UserGetPayload<typeof userIncludes>> = writable()
 
 export const userLoading: Writable<boolean> = writable()
-
 
 export const guestUserName: Writable<string> = writable(createdGuestName)
 

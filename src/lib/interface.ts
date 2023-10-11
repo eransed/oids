@@ -33,6 +33,16 @@ export interface Shapable {
   shipVariant: ShipVariant
 }
 
+export interface ChosenShip {
+  chosenShip:
+    | {
+        name: string
+        level: number
+        userId: string
+      }
+    | undefined
+}
+
 export interface Colorable {
   color: string
 }
@@ -179,7 +189,8 @@ export enum MessageType {
 }
 
 export interface SpaceObject
-  extends Shapable,
+  extends ChosenShip,
+    Shapable,
     Positionable,
     Motivated,
     Remote,

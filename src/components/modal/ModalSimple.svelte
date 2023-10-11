@@ -21,6 +21,18 @@
   export let steps: Step[] = []
   export let doneCallback: () => void = () => {}
 
+  /**
+   *
+   * @description If you want the modal to have a save button
+   */
+  export let saveButton: boolean = true
+
+  /**
+   *
+   * @description If you want the modal to have a save button
+   */
+  export let cancelButton: boolean = true
+
   $: if (steps) {
     checkProgress()
   }
@@ -72,36 +84,38 @@
         </ol>
         <br />
       {/if}
-
-      <Button90
-        minWidth={'0px'}
-        width={'45%'}
-        icon={Icons.Cancel}
-        mouseTracking={false}
-        buttonConfig={{
-          buttonText: 'Close',
-          clickCallback: async () => {
-            dialog.close()
-            closeBtn()
-          },
-          selected: false,
-        }}
-      />
-
-      <Button90
-        minWidth={'0px'}
-        width={'45%'}
-        {disabled}
-        icon={Icons.Save}
-        mouseTracking={false}
-        buttonConfig={{
-          buttonText: 'Save',
-          clickCallback: async () => {
-            await saveBtn()
-          },
-          selected: false,
-        }}
-      />
+      {#if cancelButton}
+        <Button90
+          minWidth={'0px'}
+          width={'45%'}
+          icon={Icons.Cancel}
+          mouseTracking={false}
+          buttonConfig={{
+            buttonText: 'Close',
+            clickCallback: async () => {
+              dialog.close()
+              closeBtn()
+            },
+            selected: false,
+          }}
+        />
+      {/if}
+      {#if saveButton}
+        <Button90
+          minWidth={'0px'}
+          width={'45%'}
+          {disabled}
+          icon={Icons.Save}
+          mouseTracking={false}
+          buttonConfig={{
+            buttonText: 'Save',
+            clickCallback: async () => {
+              await saveBtn()
+            },
+            selected: false,
+          }}
+        />
+      {/if}
     </div>
   </div>
 </dialog>
