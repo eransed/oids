@@ -1,6 +1,9 @@
 <script lang="ts">
+  //DB
+  import type { Ship } from '@prisma/client'
+
   //Stores
-  import { pageHasHeader, user, isLoggedIn } from '../../stores/stores'
+  import { pageHasHeader, user, isLoggedIn, settings } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -16,19 +19,21 @@
   import { formatDate } from '../../utils/utils'
   import getProfile from '../../lib/services/user/profile'
   import { onMount } from 'svelte'
-  import { fade } from 'svelte/transition'
-  import { createShipService, deleteShip } from '../../lib/services/ship/ship.services'
+  import { handleLogout } from '../../utils/utils'
 
   //Assets
   import { Icons } from '../../style/icons'
   import { Avatars } from '../../style/avatars'
 
+  //Services
   import { deleteMe } from '../../lib/services/user/delete'
-  import { handleLogout } from '../../utils/utils'
   import updateUser from '../../lib/services/user/updateUser'
+
+  //Component
   import type { AlertType } from '../../components/alert/AlertType'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
-  import type { Ship } from '@prisma/client'
+  import { getThemeNumber, themes } from '../../style/defaultColors'
+  import type { Theme } from '../../style/styleInterfaces'
 
   onMount(() => {
     if ($isLoggedIn && !$user) {
@@ -49,6 +54,9 @@
   let editSettings: boolean = false
   let avatarDialog: boolean = false
   let chosenAvatar: string
+  let chosenTheme: Theme
+
+  $: opacity = editSettings ? 1 : 0.5
 
   async function delUser() {
     const result = confirm(`Want to delete your account: ${$user.name}?`)
@@ -79,7 +87,10 @@
   async function handleSaveSettings() {
     loading = true
 
+    const theme = getThemeNumber(chosenTheme)
+
     $user.image = chosenAvatar
+    $user.theme = theme
 
     await updateUser($user)
       .then((d) => {
@@ -133,15 +144,6 @@
         {/each}
       </div>
       <div class="content" style="padding: 1em">
-        {#if $profileComponent === 'summary'}
-          <div>
-            <h3>{$user.name}</h3>
-            <p>Created: <i>{formatDate($user.createdAt)}</i></p>
-          </div>
-          <br />
-
-          <!-- <ProfileModal /> -->
-        {/if}
         {#if $profileComponent === 'shipStation'}
           <h3>Your ships</h3>
 
@@ -178,9 +180,15 @@
           {/if}
         {/if}
         {#if $profileComponent === 'settings'}
-          <button title="Change avatar" class="avatar" on:click={() => (avatarDialog = true)}
-            ><img class="chosenAvatar" src={$user.image} alt={Avatars.AstronautDog} /></button
-          >
+          <div class="userHeader">
+            <button title="Change avatar" class="avatar" on:click={() => (avatarDialog = true)}
+              ><img class="chosenAvatar" src={$user.image} alt={Avatars.AstronautDog} /></button
+            >
+            <div class="userInfo">
+              <h3>{$user.name}</h3>
+              <p>Created: <i>{formatDate($user.createdAt)}</i></p>
+            </div>
+          </div>
           {#if avatarDialog}
             <ModalSimple title="Choose an avatar!" disabled={loading} saveBtn={async () => await handleSaveAvatar()} closeBtn={() => (avatarDialog = false)}>
               {#each Object.values(Avatars) as Avatar, i}
@@ -198,14 +206,16 @@
             <tr>
               <th>
                 <p>Settings</p>
-                <div style="position: absolute; top: 8em; margin-left: 2.5em">
+              </th>
+              <th>
+                <div class="settingsButtons">
                   {#if !editSettings}
                     <Button90
                       disabled={loading}
                       icon={Icons.EditUser}
                       mouseTracking={false}
                       buttonConfig={{
-                        buttonText: 'Edit User',
+                        buttonText: 'Edit settings',
                         clickCallback: () => {
                           editSettings = true
                         },
@@ -214,6 +224,18 @@
                     />
                   {/if}
                   {#if editSettings}
+                    <Button90
+                      disabled={loading}
+                      icon={Icons.Cancel}
+                      mouseTracking={false}
+                      buttonConfig={{
+                        buttonText: 'Cancel',
+                        clickCallback: async () => {
+                          editSettings = false
+                        },
+                        selected: false,
+                      }}
+                    />
                     <Button90
                       disabled={loading}
                       icon={Icons.Save}
@@ -230,13 +252,52 @@
                 </div>
               </th>
             </tr>
-            <tr class="editable" style="opacity: 0.8;">
-              <td />
+
+            <!-- <td><input disabled={loading} on:keypress={onKeyPress} bind:value={email} /></td> -->
+            <tr style="opacity: {opacity};">
+              <td>Name</td>
+              <td><input disabled={!editSettings} bind:value={$user.name} /></td>
             </tr>
-            <hr style="border-color: var(--main-accent-color)" />
+            <tr style="opacity: {opacity};">
+              <td>Email</td>
+              <td><input disabled={!editSettings} bind:value={$user.email} /></td>
+            </tr>
+            <tr style="opacity: {opacity};">
+              <td>Theme</td>
+              <td>
+                <select disabled={!editSettings} bind:value={chosenTheme}>
+                  {#each themes as value}
+                    <option {value}>
+                      {value.name}
+                    </option>
+                  {/each}
+                </select>
+              </td>
+            </tr>
+
             <tr>
-              <td>Delete my account</td>
-              <td><button disabled={loading} on:click={() => delUser()}><i class="fa-regular fa-trash-can" /></button></td>
+              <td colspan="2">
+                <hr style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5" />
+              </td>
+            </tr>
+            <tr>
+              <td>Delete account</td>
+              <!-- <td><button disabled={loading} on:click={() => delUser()}><i class="fa-regular fa-trash-can" /></button></td>
+               -->
+              <td>
+                <Button90
+                  disabled={loading}
+                  icon={Icons.Delete}
+                  mouseTracking={false}
+                  buttonConfig={{
+                    buttonText: 'Delete User',
+                    clickCallback: () => {
+                      delUser()
+                    },
+                    selected: false,
+                  }}
+                />
+              </td>
             </tr>
           </table>
         {/if}
@@ -251,15 +312,39 @@
 </Page>
 
 <style>
+  .userHeader {
+    display: flex;
+    height: 8em;
+    margin-bottom: 1em;
+  }
+
+  .userInfo {
+    padding: 1em;
+    width: 50%;
+  }
+
   table {
     border-collapse: collapse;
-    width: 50%;
+    width: 100%;
+  }
+
+  :scope {
+    --opacity: 0.5;
   }
 
   td,
   th {
     text-align: left;
     padding: 8px;
+  }
+
+  .settingsButtons {
+    display: flex;
+    /* position: absolute; */
+    top: 8em;
+    /* margin-left: 2.5em; */
+    justify-content: flex-start;
+    width: 35%;
   }
 
   .profileWrapper {
@@ -294,7 +379,7 @@
     border: none;
     background: var(--main-accent2-color);
     border-radius: 1.5em;
-    width: 25%;
+    width: 28%;
   }
 
   .imgCard {
