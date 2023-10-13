@@ -1,7 +1,7 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import type { Session, SpaceObject } from '../../../../lib/interface'
+  import type { ChosenShip, Session, SpaceObject } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
@@ -22,7 +22,7 @@
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame } from '../../../../lib/gameModes/regular'
-  import { guestUserName, localPlayer, socket, user } from '../../../../stores/stores'
+  import { guestUserName, isLoggedIn, localPlayer, socket, user } from '../../../../stores/stores'
   import { saveGame } from '../../../../lib/services/game/saveGame'
   import type { GameHistory } from '../../../../interfaces/game'
   import { gameRef } from './Utils/mainGame'
@@ -30,6 +30,9 @@
   import type { AxiosResponse } from 'axios'
   import { info } from 'mathil'
   import getProfile from '../../../../lib/services/user/profile'
+  import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
+  import Ships from '../../../ProfilePage/Ships.svelte'
+  import type { Ship } from '@prisma/client'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -58,17 +61,26 @@
     return players
   }
 
+  function createChosenShip(ship: Ship): ChosenShip {
+    const chosenShip: ChosenShip = {
+      chosenShip: {
+        name: ship.name,
+        userId: ship.userId,
+        level: ship.level,
+        shipVariant: ship.variant,
+      },
+    }
+    return chosenShip
+  }
+
+  let chosenShip: ChosenShip
+  let shipModalOpen = false
+
   onMount(async () => {
     // cleanup = initSettingsControl()
-
-    await getProfile()
-      .then(() => {
-        $localPlayer.name = $user ? $user.name : $guestUserName
-        $localPlayer.shipVariant = $user ? $user.ships[0].variant : ShipBundles.Ship.type
-      })
-      .catch((err) => {
-        console.error(err)
-      })
+    if (!$isLoggedIn) {
+      $localPlayer.name = $guestUserName
+    }
 
     game = new Game(canvas, $localPlayer, $socket, getKeyMap(), showDeadMenu)
     gameRef(game)
@@ -81,7 +93,9 @@
         game.localPlayer.isHost = true
       }
     })
-    game.startGame(initRegularGame, renderFrame, nextFrame)
+    if (!$isLoggedIn || $localPlayer.chosenShip) {
+      game.startGame(initRegularGame, renderFrame, nextFrame)
+    }
   })
 
   const showDeadMenu = (): void => {
@@ -119,6 +133,27 @@
 
 <GameMenu currentGame={game} />
 
+{#if $isLoggedIn && !$localPlayer.chosenShip}
+  <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
+    <Ships
+      changeShipOnClick={false}
+      clickedShipCallback={(ship) => {
+        console.log('clickedshipcallback')
+        shipModalOpen = false
+        chosenShip = createChosenShip(ship)
+        $localPlayer.chosenShip = {
+          level: ship.level,
+          name: ship.name,
+          userId: ship.userId,
+          shipVariant: ship.variant,
+        }
+        $localPlayer.name = $user.name
+        game.startGame(initRegularGame, renderFrame, nextFrame)
+        console.log($localPlayer)
+      }}
+    />
+  </ModalSimple>
+{/if}
 <canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} />
 
 <style>

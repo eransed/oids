@@ -27,6 +27,7 @@
   import { ShipBundles } from '../../style/ships'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import type { Ship } from '@prisma/client'
+  import AddShip from '../ProfilePage/AddShip.svelte'
 
   /**
    * Reactive on changes to $user store.
@@ -106,7 +107,14 @@
   async function initLobbySocket() {
     return new Promise<void>((resolve, reject) => {
       $localPlayer.name = $user ? $user.name : $guestUserName
-      $localPlayer.shipVariant = $isLoggedIn ? $user.ships[0].variant : ShipBundles.Ship.type
+      if (!$isLoggedIn) {
+        $localPlayer.chosenShip = {
+          name: '',
+          shipVariant: 0,
+          level: 0,
+          userId: '',
+        }
+      }
 
       $socket.connect().then(() => {
         console.log(`Connected to websocket`)
@@ -273,24 +281,29 @@
 
 {#if $isLoggedIn}
   {#if shipModalOpen}
-    <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
-      <Ships
-        changeShipOnClick={false}
-        clickedShipCallback={(ship) => {
-          console.log('clickedshipcallback')
-          shipModalOpen = false
-          chosenShip = ship
-          $localPlayer.chosenShip = {
-            level: ship.level,
-            name: ship.name,
-            userId: ship.userId,
-          }
-          initLobbySocket().then(() => {
-            showLobby = true
-          })
-        }}
-      />
-    </ModalSimple>
+    {#if $user.ships.length === 0}
+      <AddShip openModal={!chosenShip} />
+    {:else}
+      <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
+        <Ships
+          changeShipOnClick={false}
+          clickedShipCallback={(ship) => {
+            console.log('clickedshipcallback')
+            shipModalOpen = false
+            chosenShip = ship
+            $localPlayer.chosenShip = {
+              level: ship.level,
+              name: ship.name,
+              userId: ship.userId,
+              shipVariant: ship.variant,
+            }
+            initLobbySocket().then(() => {
+              showLobby = true
+            })
+          }}
+        />
+      </ModalSimple>
+    {/if}
   {/if}
 {/if}
 {#if showLobby}

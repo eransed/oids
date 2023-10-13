@@ -1,6 +1,7 @@
 import { rndi } from 'mathil'
-import { isLoggedIn, user, userIncludes } from '../stores/stores'
+import { isLoggedIn, localPlayer, user, userIncludes } from '../stores/stores'
 import type { Prisma, User } from '@prisma/client'
+import { createSpaceObject } from '../lib/factory'
 
 export function createSessionId(): string {
   return `s-${rndi(1, 10000)}`
@@ -23,6 +24,7 @@ export const handleLogout = (): void => {
   localStorage.clear()
   isLoggedIn.set(false)
   user.set(gUser)
+  localPlayer.set(createSpaceObject(gUser.name))
 }
 
 export const createdGuestName = `p-${rndi(1, 900000)}`

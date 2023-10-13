@@ -30,7 +30,6 @@ export enum SpaceShape {
 
 export interface Shapable {
   shape: SpaceShape
-  shipVariant: ShipVariant
 }
 
 export interface ChosenShip {
@@ -39,6 +38,7 @@ export interface ChosenShip {
         name: string
         level: number
         userId: string
+        shipVariant: ShipVariant
       }
     | undefined
 }

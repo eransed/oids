@@ -40,7 +40,11 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   // ctx.closePath()
 
   // Draw ship image
-  ctx.drawImage(getShipBundleCache(so.shipVariant).img, -75, -75, 150, 150)
+  if (so.chosenShip) {
+    ctx.drawImage(getShipBundleCache(so.chosenShip.shipVariant).img, -75, -75, 150, 150)
+  } else {
+    ctx.drawImage(getShipBundleCache(0).img, -75, -75, 150, 150)
+  }
   // ctx.stroke()
 
   ctx.fillStyle = '#f00'
