@@ -28,6 +28,8 @@
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import type { Ship } from '@prisma/client'
   import AddShip from '../ProfilePage/AddShip.svelte'
+  import ShipCard from '../../components/ships/ShipCardInfo.svelte'
+  import ShipCardInfo from '../../components/ships/ShipCardInfo.svelte'
 
   /**
    * Reactive on changes to $user store.
@@ -36,9 +38,7 @@
     $localPlayer.name = $user.name
     $socket.send($localPlayer)
     console.log($localPlayer)
-    if (!localStorage.getItem('chosenShip')) {
-      shipModalOpen = true
-    }
+    shipModalOpen = true
     log('$: if ($user && $user.name !== $localPlayer.name)')
     updateSessions()
   }
@@ -110,7 +110,7 @@
     return new Promise<void>((resolve, reject) => {
       $localPlayer.name = $user ? $user.name : $guestUserName
       if (!$isLoggedIn) {
-        $localPlayer.chosenShip = {
+        $localPlayer.ship = {
           name: '',
           shipVariant: 0,
           level: 0,
@@ -177,18 +177,16 @@
 
   function createChosenShip(ship: Ship): ChosenShip {
     const chosenShip: ChosenShip = {
-      chosenShip: {
-        name: ship.name,
-        userId: ship.userId,
-        level: ship.level,
-        shipVariant: ship.variant,
-      },
+      name: ship.name,
+      userId: ship.userId,
+      level: ship.level,
+      shipVariant: ship.variant,
     }
     return chosenShip
   }
 
   onMount(() => {
-    if ($isLoggedIn && $user && !$localPlayer.chosenShip) {
+    if ($isLoggedIn && $user && !$localPlayer.ship) {
       shipModalOpen = true
     } else {
       initLobbySocket().then(() => {
@@ -291,6 +289,24 @@
     $socket.send($localPlayer)
     updateSessions()
   }
+
+  function handleChosenShip(ship: Ship) {
+    console.log('clickedshipcallback')
+    shipModalOpen = false
+    chosenShip = ship
+    $localPlayer.ship = {
+      level: ship.level,
+      name: ship.name,
+      userId: ship.userId,
+      shipVariant: ship.variant,
+    }
+    initLobbySocket().then(() => {
+      showLobby = true
+    })
+    localStorage.setItem('chosenShip', ship.id)
+    $socket.send($localPlayer)
+    updateSessions()
+  }
 </script>
 
 {#if $isLoggedIn}
@@ -302,19 +318,7 @@
         <Ships
           changeShipOnClick={false}
           clickedShipCallback={(ship) => {
-            console.log('clickedshipcallback')
-            shipModalOpen = false
-            chosenShip = ship
-            $localPlayer.chosenShip = {
-              level: ship.level,
-              name: ship.name,
-              userId: ship.userId,
-              shipVariant: ship.variant,
-            }
-            initLobbySocket().then(() => {
-              showLobby = true
-            })
-            localStorage.setItem('chosenShip', ship.id)
+            handleChosenShip(ship)
           }}
         />
       </ModalSimple>
@@ -338,21 +342,17 @@
                 </span>
               {/if}
             </p>
-            <br />
 
-            {#each joinedSession.players as player}
-              {#if !player.isHost}
-                <p style={$localPlayer.name === player.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
-                  {player.name}
-                  <!-- {getPlayerPing(player)} - -->
-                  {#if player.readyToPlay}
-                    <span style="filter: hue-rotate(72deg)">
-                      <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
-                    </span>
+            <div class="shipCards" style="display: flex; flex-wrap: wrap">
+              <ShipCardInfo shipOwner={joinedSession.host.name} chosenShip={joinedSession.host.ship} />
+              {#each joinedSession.players as player}
+                {#if !player.isHost}
+                  {#if player.ship}
+                    <ShipCardInfo shipOwner={player.name} chosenShip={player.ship} />
                   {/if}
-                </p>
-              {/if}
-            {/each}
+                {/if}
+              {/each}
+            </div>
           </div>
           <div class="buttonWrapper">
             <Button90 icon={Icons.Exit} buttonConfig={{ buttonText: 'Leave Session', clickCallback: () => leaveSession(), selected: false }} />

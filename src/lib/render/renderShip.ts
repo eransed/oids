@@ -40,8 +40,8 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   // ctx.closePath()
 
   // Draw ship image
-  if (so.chosenShip) {
-    ctx.drawImage(getShipBundleCache(so.chosenShip.shipVariant).img, -75, -75, 150, 150)
+  if (so.ship) {
+    ctx.drawImage(getShipBundleCache(so.ship.shipVariant).img, -75, -75, 150, 150)
   } else {
     ctx.drawImage(getShipBundleCache(0).img, -75, -75, 150, 150)
   }

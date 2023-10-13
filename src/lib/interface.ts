@@ -33,14 +33,10 @@ export interface Shapable {
 }
 
 export interface ChosenShip {
-  chosenShip:
-    | {
-        name: string
-        level: number
-        userId: string
-        shipVariant: ShipVariant
-      }
-    | undefined
+  name: string
+  level: number
+  userId: string
+  shipVariant: ShipVariant
 }
 
 export interface Colorable {
@@ -188,8 +184,12 @@ export enum MessageType {
   SERVER_GAME_UPDATE,
 }
 
+export interface PlayingShip {
+  ship: ChosenShip
+}
+
 export interface SpaceObject
-  extends ChosenShip,
+  extends PlayingShip,
     Shapable,
     Positionable,
     Motivated,

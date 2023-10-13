@@ -64,7 +64,7 @@
 
   function createChosenShip(ship: Ship): ChosenShip {
     const chosenShip: ChosenShip = {
-      chosenShip: {
+      ship: {
         name: ship.name,
         userId: ship.userId,
         level: ship.level,
@@ -91,7 +91,7 @@
       })
 
       if (shipFromStorage) {
-        $localPlayer.chosenShip = createChosenShip(shipFromStorage).chosenShip
+        $localPlayer.ship = createChosenShip(shipFromStorage).ship
         console.log('found ship in localstorage:', shipFromStorage)
       }
     }
@@ -107,7 +107,7 @@
         game.localPlayer.isHost = true
       }
     })
-    if (!$isLoggedIn || $localPlayer.chosenShip) {
+    if (!$isLoggedIn || $localPlayer.ship) {
       game.startGame(initRegularGame, renderFrame, nextFrame)
     }
   })
@@ -147,7 +147,7 @@
 
 <GameMenu currentGame={game} />
 
-{#if $isLoggedIn && !$localPlayer.chosenShip}
+{#if $isLoggedIn && !$localPlayer.ship}
   {#if $user.ships.length === 0}
     <AddShip openModal={!chosenShip} />
   {:else}
@@ -158,7 +158,7 @@
           console.log('clickedshipcallback')
           shipModalOpen = false
           chosenShip = createChosenShip(ship)
-          $localPlayer.chosenShip = {
+          $localPlayer.ship = {
             level: ship.level,
             name: ship.name,
             userId: ship.userId,

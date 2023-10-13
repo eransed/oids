@@ -120,7 +120,12 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     cameraPosition: newVec2(),
     viewFramePosition: newVec2(),
     thrustFlames: [],
-    chosenShip: undefined,
+    ship: {
+      name: '',
+      level: 0,
+      userId: '',
+      shipVariant: 0,
+    },
   }
 
   return spaceObject
