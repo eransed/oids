@@ -10,7 +10,7 @@
   import Ships from '../ProfilePage/Ships.svelte'
 
   //Services
-  import type { ChatMessage, Session } from '../../lib/interface'
+  import type { ChatMessage, ChosenShip, Session } from '../../lib/interface'
   import { createSessionId } from '../../utils/utils'
   import { activeSessions } from '../../lib/services/game/activeSessions'
   import SessionList from './components/SessionList/SessionList.svelte'
@@ -36,7 +36,9 @@
     $localPlayer.name = $user.name
     $socket.send($localPlayer)
     console.log($localPlayer)
-    shipModalOpen = true
+    if (!localStorage.getItem('chosenShip')) {
+      shipModalOpen = true
+    }
     log('$: if ($user && $user.name !== $localPlayer.name)')
     updateSessions()
   }
@@ -173,6 +175,18 @@
 
   let showLobby = false
 
+  function createChosenShip(ship: Ship): ChosenShip {
+    const chosenShip: ChosenShip = {
+      chosenShip: {
+        name: ship.name,
+        userId: ship.userId,
+        level: ship.level,
+        shipVariant: ship.variant,
+      },
+    }
+    return chosenShip
+  }
+
   onMount(() => {
     if ($isLoggedIn && $user && !$localPlayer.chosenShip) {
       shipModalOpen = true
@@ -300,6 +314,7 @@
             initLobbySocket().then(() => {
               showLobby = true
             })
+            localStorage.setItem('chosenShip', ship.id)
           }}
         />
       </ModalSimple>

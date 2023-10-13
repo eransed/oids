@@ -25,6 +25,7 @@ export const handleLogout = (): void => {
   isLoggedIn.set(false)
   user.set(gUser)
   localPlayer.set(createSpaceObject(gUser.name))
+  localStorage.clear()
 }
 
 export const createdGuestName = `p-${rndi(1, 900000)}`

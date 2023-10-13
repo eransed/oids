@@ -510,15 +510,17 @@ export function renderFrame(game: Game, dt: number): void {
   }
 
   // renderRect(game.ctx,game.localPlayer.worldSize, newVec2(), '#aaa', 50)
-  renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
-  renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
-  renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
-  renderVec2(
-    `world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
-    add(game.localPlayer.viewFramePosition, newVec2(0, 100)),
-    ctx,
-    game.style
-  )
+
+  //Position info for debugging
+  // renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
+  // renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
+  // renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
+  // renderVec2(
+  //   `world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
+  //   add(game.localPlayer.viewFramePosition, newVec2(0, 100)),
+  //   ctx,
+  //   game.style
+  // )
   // renderVec2(`v: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(100, 100)), ctx)
 
   const scrollPad = 500

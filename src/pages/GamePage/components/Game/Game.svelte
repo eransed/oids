@@ -33,6 +33,7 @@
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
   import Ships from '../../../ProfilePage/Ships.svelte'
   import type { Ship } from '@prisma/client'
+  import AddShip from '../../../ProfilePage/AddShip.svelte'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -80,6 +81,19 @@
     // cleanup = initSettingsControl()
     if (!$isLoggedIn) {
       $localPlayer.name = $guestUserName
+    }
+
+    const localStorageShip = localStorage.getItem('chosenShip')
+
+    if (localStorageShip && $isLoggedIn) {
+      const shipFromStorage = $user.ships.find((ship) => {
+        if (ship.id === localStorageShip) return ship
+      })
+
+      if (shipFromStorage) {
+        $localPlayer.chosenShip = createChosenShip(shipFromStorage).chosenShip
+        console.log('found ship in localstorage:', shipFromStorage)
+      }
     }
 
     game = new Game(canvas, $localPlayer, $socket, getKeyMap(), showDeadMenu)
@@ -134,25 +148,29 @@
 <GameMenu currentGame={game} />
 
 {#if $isLoggedIn && !$localPlayer.chosenShip}
-  <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
-    <Ships
-      changeShipOnClick={false}
-      clickedShipCallback={(ship) => {
-        console.log('clickedshipcallback')
-        shipModalOpen = false
-        chosenShip = createChosenShip(ship)
-        $localPlayer.chosenShip = {
-          level: ship.level,
-          name: ship.name,
-          userId: ship.userId,
-          shipVariant: ship.variant,
-        }
-        $localPlayer.name = $user.name
-        game.startGame(initRegularGame, renderFrame, nextFrame)
-        console.log($localPlayer)
-      }}
-    />
-  </ModalSimple>
+  {#if $user.ships.length === 0}
+    <AddShip openModal={!chosenShip} />
+  {:else}
+    <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
+      <Ships
+        changeShipOnClick={false}
+        clickedShipCallback={(ship) => {
+          console.log('clickedshipcallback')
+          shipModalOpen = false
+          chosenShip = createChosenShip(ship)
+          $localPlayer.chosenShip = {
+            level: ship.level,
+            name: ship.name,
+            userId: ship.userId,
+            shipVariant: ship.variant,
+          }
+          $localPlayer.name = $user.name
+          game.startGame(initRegularGame, renderFrame, nextFrame)
+          localStorage.setItem('chosenShip', ship.id)
+        }}
+      />
+    </ModalSimple>
+  {/if}
 {/if}
 <canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} />
 
