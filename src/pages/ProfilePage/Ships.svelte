@@ -3,7 +3,7 @@
   import { formatDate } from '../../utils/utils'
   import { deleteShip, getShips, updateShip } from '../../lib/services/ship/ship.services'
   import getProfile from '../../lib/services/user/profile'
-  import { user } from '../../stores/stores'
+  import { localPlayer, socket, user } from '../../stores/stores'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import { ShipVariant, ShipBundles, getShipBundleCache } from '../../style/ships'
   import { fade } from 'svelte/transition'

@@ -1,15 +1,23 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import type { ChosenShip, PlayingShip, SpaceObject } from '../../lib/interface'
+  import type { ChosenShip } from '../../lib/interface'
+  import { localPlayer } from '../../stores/stores'
   import { getShipBundleCache } from '../../style/ships'
-  import { slide } from 'svelte/transition'
 
   export let chosenShip: ChosenShip
   export let shipOwner: string
+  export let clickedShip: (ship: ChosenShip) => void = (ship) => {}
+
+  $: yourship = $localPlayer.ship.userId === chosenShip.userId
+
+  function handleClickShip() {
+    if (yourship) {
+      clickedShip(chosenShip)
+    }
+  }
 </script>
 
 <div class="shipWrapper">
-  <button class="imgCard">
+  <button on:click={() => handleClickShip()} class="imgCard" style="background-color: {yourship ? 'var(--main-accent2-color)' : 'var(--main-accent-color)'}">
     <p>{shipOwner}</p>
     <div class="level">{chosenShip.level}</div>
     <img draggable="false" src={getShipBundleCache(chosenShip.shipVariant).svgUrl} alt={chosenShip.name} />

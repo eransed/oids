@@ -125,6 +125,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
       level: 0,
       userId: '',
       shipVariant: 0,
+      id: '',
     },
   }
 

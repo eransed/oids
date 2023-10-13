@@ -64,12 +64,11 @@
 
   function createChosenShip(ship: Ship): ChosenShip {
     const chosenShip: ChosenShip = {
-      ship: {
-        name: ship.name,
-        userId: ship.userId,
-        level: ship.level,
-        shipVariant: ship.variant,
-      },
+      name: ship.name,
+      userId: ship.userId,
+      level: ship.level,
+      shipVariant: ship.variant,
+      id: ship.id,
     }
     return chosenShip
   }
@@ -91,7 +90,7 @@
       })
 
       if (shipFromStorage) {
-        $localPlayer.ship = createChosenShip(shipFromStorage).ship
+        $localPlayer.ship = createChosenShip(shipFromStorage)
         console.log('found ship in localstorage:', shipFromStorage)
       }
     }
@@ -163,6 +162,7 @@
             name: ship.name,
             userId: ship.userId,
             shipVariant: ship.variant,
+            id: ship.id,
           }
           $localPlayer.name = $user.name
           game.startGame(initRegularGame, renderFrame, nextFrame)

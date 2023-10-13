@@ -30,6 +30,7 @@
   import AddShip from '../ProfilePage/AddShip.svelte'
   import ShipCard from '../../components/ships/ShipCardInfo.svelte'
   import ShipCardInfo from '../../components/ships/ShipCardInfo.svelte'
+  import getProfile from '../../lib/services/user/profile'
 
   /**
    * Reactive on changes to $user store.
@@ -37,9 +38,6 @@
   $: if ($user && $user.name !== $localPlayer.name) {
     $localPlayer.name = $user.name
     $socket.send($localPlayer)
-    console.log($localPlayer)
-    shipModalOpen = true
-    log('$: if ($user && $user.name !== $localPlayer.name)')
     updateSessions()
   }
 
@@ -48,7 +46,6 @@
     $localPlayer.name = $guestUser.name
     $socket.send($localPlayer)
     log('$: if ($isLoggedIn === false)')
-
     updateSessions()
   }
 
@@ -115,6 +112,7 @@
           shipVariant: 0,
           level: 0,
           userId: '',
+          id: '',
         }
       }
 
@@ -181,16 +179,38 @@
       userId: ship.userId,
       level: ship.level,
       shipVariant: ship.variant,
+      id: ship.id,
     }
     return chosenShip
   }
 
   onMount(() => {
-    if ($isLoggedIn && $user && !$localPlayer.ship) {
+    const storedShipJson = localStorage.getItem('chosenShip')
+
+    if (storedShipJson) {
+      const storedShip = JSON.parse(storedShipJson)
+      if (storedShip) {
+        $user.ships.find((ship) => {
+          if (ship.id === storedShip.id) {
+            $localPlayer.ship = createChosenShip(ship)
+            return
+          }
+        })
+      }
+    }
+
+    console.log('localplayer:', $localPlayer)
+
+    if ($isLoggedIn && $user && !storedShipJson) {
       shipModalOpen = true
+      if ($user.ships.length > 0) {
+        $localPlayer.ship = createChosenShip($user.ships[0])
+      }
     } else {
+      console.log('else')
       initLobbySocket().then(() => {
         showLobby = true
+        updateSessions()
       })
     }
   })
@@ -299,11 +319,12 @@
       name: ship.name,
       userId: ship.userId,
       shipVariant: ship.variant,
+      id: ship.id,
     }
     initLobbySocket().then(() => {
       showLobby = true
     })
-    localStorage.setItem('chosenShip', ship.id)
+    localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
     $socket.send($localPlayer)
     updateSessions()
   }
@@ -325,7 +346,7 @@
     {/if}
   {/if}
 {/if}
-{#if showLobby}
+{#if showLobby && $localPlayer.ship}
   <Page>
     <div class="lobbyWrapper">
       <div class="left">
@@ -344,13 +365,9 @@
             </p>
 
             <div class="shipCards" style="display: flex; flex-wrap: wrap">
-              <ShipCardInfo shipOwner={joinedSession.host.name} chosenShip={joinedSession.host.ship} />
+              <!-- <ShipCardInfo shipOwner={joinedSession.host.name} chosenShip={joinedSession.host.ship} /> -->
               {#each joinedSession.players as player}
-                {#if !player.isHost}
-                  {#if player.ship}
-                    <ShipCardInfo shipOwner={player.name} chosenShip={player.ship} />
-                  {/if}
-                {/if}
+                <ShipCardInfo clickedShip={(ship) => (shipModalOpen = true)} shipOwner={player.name} chosenShip={player.ship} />
               {/each}
             </div>
           </div>
