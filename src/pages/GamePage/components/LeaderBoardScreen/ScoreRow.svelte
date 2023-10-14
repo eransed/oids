@@ -2,6 +2,7 @@
     import type { SpaceObject } from "../../../../lib/interface"
     import { add, rndfVec2, round2dec } from "mathil"
     import { localPlayer } from "../../../../stores/stores"
+  import { worldStartPosition } from "../../../../lib/constants"
 
     export let player: SpaceObject | null = null
     export let theLocalPlayer = false
@@ -10,6 +11,9 @@
 </script>
   
 <style>
+    :scope {
+        --transDelay: var(--transDelay);
+    }
     th, td {
       padding-right: 0.6rem;
     }
@@ -17,9 +21,15 @@
       padding-top: 0.6rem;
       font-weight: bold;
       font-size: 14px;
+      transition: all 500ms;
     }
     .clickable {
         cursor: pointer;
+    }
+
+    .clickable:hover {
+        transition: all var(--transDelay);
+        transform: scale(1.1);
     }
 </style>
 
@@ -36,7 +46,10 @@
 {:else if player}
 
     {#if theLocalPlayer}
-        <td title="Yes... this is you." style="color: {player.color}; font-weight: bold; font-style: italic">{player.name}</td>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <td class="clickable" title="Yes... this is you. Go home?" on:click={() => {
+            $localPlayer.cameraPosition = add(worldStartPosition, rndfVec2(50, 100))
+        }} style="color: {player.color}; font-weight: bold; font-style: italic">{player.name}</td>
     {:else}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <td title="Teleport to player" class="clickable" on:click={() => {
