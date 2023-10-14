@@ -1,4 +1,4 @@
-import { newVec2, type Vec2 } from 'mathil'
+import { newVec2, rndfVec2, type Vec2 } from 'mathil'
 
 export const frontVersion = '0.1.0'
 export const screenScale = 3
@@ -40,3 +40,7 @@ export function getGraphLineColor(): string {
 }
 
 export const worldSize = newVec2(1e308, 1e308)
+
+export const worldStartPosition = rndfVec2(1e6, 1e6)
+
+export const maxShotAge = 40000

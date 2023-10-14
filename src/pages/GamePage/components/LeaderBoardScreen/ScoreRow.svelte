@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { SpaceObject } from "../../../../lib/interface"
-    import { round2dec } from "mathil"
+    import { add, rndfVec2, round2dec } from "mathil"
+    import { localPlayer } from "../../../../stores/stores"
 
     export let player: SpaceObject | null = null
     export let theLocalPlayer = false
@@ -17,6 +18,9 @@
       font-weight: bold;
       font-size: 14px;
     }
+    .clickable {
+        cursor: pointer;
+    }
 </style>
 
 {#if header}
@@ -32,9 +36,14 @@
 {:else if player}
 
     {#if theLocalPlayer}
-        <td style="color: {player.color}; font-weight: bold; font-style: italic">{player.name}</td>
+        <td title="Yes... this is you." style="color: {player.color}; font-weight: bold; font-style: italic">{player.name}</td>
     {:else}
-        <td style="color: {player.color}">{player.name}</td>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <td title="Teleport to player" class="clickable" on:click={() => {
+            if (player) {
+                $localPlayer.cameraPosition = add(player.cameraPosition, rndfVec2(50, 100))
+            }
+        }} style="color: {player.color}">{player.name}</td>
     {/if}
     <td>{player.killCount}</td>
     <td>{player.health}</td>

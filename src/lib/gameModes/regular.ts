@@ -1,21 +1,21 @@
 import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
 import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
-import { add, direction, dist2, info, log, magnitude, newVec2, rndf, rndfVec2, rndi, round2dec, smul, sub, to_string2, wrap } from 'mathil'
+import { add, direction, dist2, info, log, magnitude, newVec2, rndf, rndfVec2, rndi, round2dec, siPretty, smul, sub, to_string2, wrap } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
 import { friction, gravity, gravityStars, handleCollisions, offScreen, offScreen_mm, vec2Bound, wrap_mm } from '../physics'
-import { loadingText, renderPoint } from '../render/render2d'
+import { loadingText, renderInfoText, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type NonPlayerCharacter } from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
-import { explosionDuration, screenScale, worldSize } from '../constants'
+import { explosionDuration, screenScale, worldSize, worldStartPosition } from '../constants'
 import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from '../stats'
 import { createNpc, newPhotonLaser } from '../factory'
 import { reduceShotSize, reduceSoSize } from '../websocket/util'
 import { renderMoon } from '../render/renderDebris'
 import { renderShip } from '../render/renderShip'
-import { renderVec2 } from '../render/renderUI'
+import { renderRoundIndicator, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
 
 //Stores
@@ -135,15 +135,15 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.angleDegree = -120
   game.localPlayer.health = 100
   game.localPlayer.batteryLevel = 50000
-  game.localPlayer.steeringPower = 1.4
-  game.localPlayer.enginePower = 0.1
+  game.localPlayer.steeringPower = 1.5
+  game.localPlayer.enginePower = 0.25
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
   game.localPlayer.hitRadius = 120
   game.localPlayer.color = '#db8'
   game.localPlayer.worldSize = worldSize // server sends size of world
-  game.localPlayer.cameraPosition = rndfVec2(1e6, 1e6)
+  game.localPlayer.cameraPosition = worldStartPosition
   game.localPlayer.viewFramePosition = rndfVec2(0, 0)
   game.localPlayer.position = rndfVec2(0, 0)
   // game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
@@ -305,8 +305,9 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
         }
         return
       } else {
-        // renderViewport(game.ctx, so)
-        // const renderPos = add(so.viewFramePosition, so.cameraPosition)
+        if (game.keyFuncMap.systemGraphs.keyStatus) {
+          renderViewport(game.ctx, so)
+        }
         const remotePos = sub(add(so.viewFramePosition, so.cameraPosition), smul(game.localPlayer.cameraPosition, 1))
 
         renderShip(so, game.ctx, false, game.style, remotePos)
@@ -338,66 +339,11 @@ const every = new Every(25)
 
 function moveView(game: Game) {
   // bound ship to viewframe
-  const pad = newVec2(250, 250)
-
   const center = getScreenCenterPosition(game.ctx)
-  const distanceToCenter = dist2(game.localPlayer.position, center)
-  const offsetCenter = 400
-
-  const camBound = sub(smul(game.localPlayer.worldSize, 0.5), getScreenRect(game.ctx))
-  // console.log (camBound)
-  game.localPlayer.cameraPosition = add(game.localPlayer.cameraPosition, game.localPlayer.velocity)
-  game.localPlayer.cameraPosition = vec2Bound(game.localPlayer.cameraPosition, camBound)
-
-  // game.localPlayer.viewFramePosition = smul(center, .1*dist2(game.localPlayer.velocity, newVec2(0, 0)))
-  game.localPlayer.viewFramePosition = add(center, smul(game.localPlayer.velocity, 10))
-  // game.localPlayer.viewFramePosition = center
-
-  // game.localPlayer.position = vec2Bound_mm(game.localPlayer.position, pad, sub(getScreenRect(game.ctx), pad), () => {
-  //   if (game.localPlayer.position.x + game.localPlayer.viewFramePosition.x > game.localPlayer.worldSize.x - 250) {
-  //     game.localPlayer.velocity.x = -game.localPlayer.velocity.x * 0.5
-  //   }
-  //   if (game.localPlayer.position.y + game.localPlayer.viewFramePosition.y > game.localPlayer.worldSize.y - 250) {
-  //     game.localPlayer.velocity.y = -game.localPlayer.velocity.y * 0.5
-  //   }
-  // })
-
-  // const padInner = newVec2(200, 200)
-  // game.localPlayer.position = vec2Bound_mm(game.localPlayer.position, padInner, sub(game.localPlayer.worldSize, padInner), () => {
-  //   game.localPlayer.velocity = newVec2()
-  // })
-
-  // const padNum = 0
-
-  // // move viewframe on x axis with ship velocity
-  // if (game.localPlayer.viewFramePosition.x >= padNum || game.localPlayer.viewFramePosition.x <= game.localPlayer.worldSize.x - getScreenRect(game.ctx).x) {
-  //   game.localPlayer.viewFramePosition = add(game.localPlayer.viewFramePosition, game.localPlayer.velocity)
-  // }
-
-  // // Bound left x to zero
-  // if (game.localPlayer.viewFramePosition.x < padNum) {
-  //   game.localPlayer.viewFramePosition.x = padNum
-  // }
-
-  // // Bound right x to world size - view rect
-  // if (game.localPlayer.viewFramePosition.x > game.localPlayer.worldSize.x - getScreenRect(game.ctx).x) {
-  //   game.localPlayer.viewFramePosition.x = game.localPlayer.worldSize.x - getScreenRect(game.ctx).x
-  // }
-
-  // // move viewframe on y axis with ship velocity
-  // if (game.localPlayer.viewFramePosition.y >= padNum || game.localPlayer.viewFramePosition.y <= game.localPlayer.worldSize.y - getScreenRect(game.ctx).y) {
-  //   game.localPlayer.viewFramePosition = add(game.localPlayer.viewFramePosition, game.localPlayer.velocity)
-  // }
-
-  // // Bound top y axis to world size - view rect
-  // if (game.localPlayer.viewFramePosition.y < padNum) {
-  //   game.localPlayer.viewFramePosition.y = padNum
-  // }
-
-  // // Bound bottom y axis to world size - view rect
-  // if (game.localPlayer.viewFramePosition.y > game.localPlayer.worldSize.y - getScreenRect(game.ctx).y) {
-  //   game.localPlayer.viewFramePosition.y = game.localPlayer.worldSize.y - getScreenRect(game.ctx).y
-  // }
+  // const camBound = sub(smul(game.localPlayer.worldSize, 0.5), getScreenRect(game.ctx))
+  // game.localPlayer.cameraPosition = add(game.localPlayer.cameraPosition, game.localPlayer.velocity)
+  // game.localPlayer.cameraPosition = vec2Bound(game.localPlayer.cameraPosition, camBound)
+  game.localPlayer.viewFramePosition = add(center, smul(game.localPlayer.velocity, 5))
 }
 
 export function renderFrame(game: Game, dt: number): void {
@@ -423,24 +369,18 @@ export function renderFrame(game: Game, dt: number): void {
 
   game.remotePlayers = handleRemotePlayers(game.remotePlayers, game)
 
-  // renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
 
   if (game.keyFuncMap.systemGraphs.keyStatus) {
     fpsCounter(ops, dt, game, ctx)
   }
 
-  // renderInfoText(`packets/sec: ${ops}`, 450, ctx)
-  // renderInfoText(`packet symbol count: ${dataLen}`, 500, ctx)
-  // renderInfoText(`object key count: ${dataKeys}`, 550, ctx)
-  // renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
-  // renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, ctx)
-  // renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
-  // renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
-
   let objCount = 0
   game.remotePlayers.forEach((p) => {
     objCount += getRenderableObjectCount(p)
   })
+
+  handleStarBackdrop(game)
+
 
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
   addDataPoint(ppsbuf, ops)
@@ -469,16 +409,49 @@ export function renderFrame(game: Game, dt: number): void {
       if (i < half) renderGraph(g, { x: 400, y: startx + i * space }, { x: w, y: h }, ctx)
       else renderGraph(g, { x: 1300, y: startx + (i - half) * space }, { x: w, y: h }, ctx)
     })
+
+    renderInfoText(`packets/sec: ${ops}`, 450, ctx)
+    renderInfoText(`packet symbol count: ${dataLen}`, 500, ctx)
+    renderInfoText(`object key count: ${dataKeys}`, 550, ctx)
+    renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
+    renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, ctx)
+    renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
+    renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
+
+    // renderRoundIndicator()
+
+    renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
+
+    // Position info for debugging
+    renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
+    renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
+    renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
+    renderVec2(
+      `world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
+      add(game.localPlayer.viewFramePosition, newVec2(0, 100)),
+      ctx,
+      game.style
+    )
+    renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(300, 200)), ctx, game.style)
+
   }
 
   game.bodies.forEach((body) => {
+
     if (body.health < 1) {
       handleDeathExplosion(body, explosionDuration)
       if (!body.obliterated) {
         renderExplosionFrame(body, ctx)
       }
     } else {
-      renderMoon(body, ctx)
+      // fix the body position in world relative to player...
+      const bodyPos = sub(add(body.viewFramePosition, body.cameraPosition), smul(game.localPlayer.cameraPosition, 1))
+
+      if (game.keyFuncMap.systemGraphs.keyStatus) {
+        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add(bodyPos, newVec2(-100, -100)), ctx, game.style)
+      }
+
+      renderMoon(body, ctx, bodyPos)
     }
   })
 
@@ -490,7 +463,6 @@ export function renderFrame(game: Game, dt: number): void {
     return !body.obliterated
   })
 
-  handleStarBackdrop(game)
 
   if (game.localPlayer.health <= 0) {
     //Local player is dead
@@ -509,29 +481,7 @@ export function renderFrame(game: Game, dt: number): void {
     renderShip(game.localPlayer, ctx, true, game.style)
   }
 
-  // renderRect(game.ctx,game.localPlayer.worldSize, newVec2(), '#aaa', 50)
 
-  //Position info for debugging
-  // renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
-  // renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
-  // renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
-  // renderVec2(
-  //   `world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
-  //   add(game.localPlayer.viewFramePosition, newVec2(0, 100)),
-  //   ctx,
-  //   game.style
-  // )
-  // renderVec2(`v: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(100, 100)), ctx)
-
-  const scrollPad = 500
-
-  // if (game.localPlayer.position.x > game.localPlayer.viewport.x - scrollPad ||
-  //     game.localPlayer.position.y > game.localPlayer.viewport.y - scrollPad ||
-  //     game.localPlayer.position.x < 0 + scrollPad ||
-  //     game.localPlayer.position.y < 0 + scrollPad) {
-  //     } else {
-  //       // game.localPlayer.viewFramePosition = newVec2()
-  //     }
   moveView(game)
 }
 
@@ -539,10 +489,6 @@ function handleStarBackdrop(game: Game): void {
   // move star ref with inverted view frame position and factor
   for (let i = 0; i < game.stars.length; i++) {
     if (offScreen_mm(game.stars[i], game.localPlayer.cameraPosition, add(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)))) {
-      // start bunch up behind the ship when using new random positions for stars:
-      // game.stars[i].x = rndi(game.localPlayer.cameraPosition.x, game.localPlayer.cameraPosition.x + getScreenFromCanvas(game.ctx).x)
-      // game.stars[i].y = rndi(game.localPlayer.cameraPosition.y, game.localPlayer.cameraPosition.y + getScreenFromCanvas(game.ctx).y)
-
       // just wrapping the stars looks better:
       // but this causes the stars to bunch up in a line or grid pattern after flying around some
       // so add some randomness when wrapping and regenerate them outside of the screen...
@@ -565,8 +511,7 @@ export function nextFrame(game: Game, dt: number): void {
     spaceObjectKeyController(game.localPlayer, dt)
     spaceTouchController(game.localPlayer, dt)
   }
-  // bounceSpaceObject(game.localPlayer, getScreenRect(game.ctx), bounceFactor, 0, 0)
-  // bounceSpaceObject(game.localPlayer, game.localPlayer.worldSize, bounceFactor, 0, 0)
+
   friction(game.localPlayer)
   game.testShapes.forEach((s) => {
     friction(s)
@@ -580,23 +525,6 @@ export function nextFrame(game: Game, dt: number): void {
     byteSpeed = 0
     bitSpeed = 0
   }
-
-  game.bodies.forEach((body) => {
-    // bounceSpaceObject(body, getScreenRect(game.ctx), 0.4, 0, 0)
-    // game.bodies.forEach((other) => {
-    //   if (body !== other) {
-    //     gravity(body, other)
-    //   }
-    // })
-    // game.localPlayer.shotsInFlight.forEach((shot) => {
-    //   gravity(body, shot)
-    // })e
-    // friction(body)
-  })
-
-  // game.remotePlayers.forEach((so) => {
-  //   gravity(so, game.localPlayer, 3)
-  // })
 
   game.remotePlayers = game.remotePlayers.filter((so) => {
     return so.online || so.isLocal

@@ -25,7 +25,7 @@ export function clearScreen(ctx: CanvasRenderingContext2D, style: UIStyle) {
 // }
 
 export function renderInfoText(text: string, ypos: number, ctx: CanvasRenderingContext2D): void {
-  const xpos = 26
+  const xpos = 3000
   setScaledFont(ctx)
   ctx.fillStyle = '#fff'
   ctx.fillText(`${text}`, xpos, ypos)

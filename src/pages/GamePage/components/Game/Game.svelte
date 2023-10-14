@@ -194,7 +194,7 @@
     top: 0;
     position: fixed;
     background-color: var(--main-bg-color);
-    cursor: none;
+    /* cursor: none; */
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE/Edge */

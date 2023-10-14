@@ -3,7 +3,7 @@ import { add, degToRad, info, limitv, magnitude, radToDeg, scalarMultiply, smul,
 import { getScreenCenterPosition, getScreenFromCanvas } from './canvas_util'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
-import { angularFriction, collisionFrameDamage, linearFriction, missileDamageVelocityTransferFactor, screenPaddingFactor, timeScale } from './constants'
+import { angularFriction, collisionFrameDamage, linearFriction, maxShotAge, missileDamageVelocityTransferFactor, screenPaddingFactor, timeScale } from './constants'
 import type { Shape } from './shapes/Shape'
 
 export function updateShape(shape: Shape, dt: number): void {
@@ -31,6 +31,7 @@ export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: num
   const a: Vec2 = scalarMultiply(npc.acceleration, deltaTime)
   npc.velocity = add(npc.velocity, a)
   npc.position = add(npc.position, v)
+  npc.cameraPosition = add(npc.cameraPosition, v)
   // npc.position = vec2Bound(npc.position, sub(smul(npc.worldSize, 0.5), getScreenRect(ctx)))
   npc.acceleration = { x: 0, y: 0 }
   npc.velocity = limitv(npc.velocity, { x: 250, y: 250 })
@@ -51,6 +52,7 @@ export function updateNonPlayerCharacter(npc: NonPlayerCharacter, dt: number): N
   const a: Vec2 = scalarMultiply(npc.acceleration, deltaTime)
   npc.velocity = add(npc.velocity, a)
   npc.position = add(npc.position, v)
+  npc.cameraPosition = add(npc.cameraPosition, v)
   npc.acceleration = { x: 0, y: 0 }
   npc.velocity = limitv(npc.velocity, { x: 250, y: 250 })
   npc.angleDegree += npc.angularVelocity * deltaTime
@@ -68,8 +70,9 @@ export function updateSpaceObjects(npcs: (SpaceObject | NonPlayerCharacter)[], f
 export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number, ctx: CanvasRenderingContext2D): void {
   if (isNaN(dts)) return
 
-  //  decayOffScreenShotsPadded(npc, getScreenFromCanvas(ctx), screenPaddingFactor)
-  decayOffScreenShots(npc, npc.worldSize)
+  // decayOffScreenShotsPadded(npc, getScreenFromCanvas(ctx), screenPaddingFactor)
+  // decayOffScreenShots(npc, npc.worldSize)
+  
   decayDeadShots(npc)
 
   coolDown(npc)
@@ -88,6 +91,10 @@ export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number, 
 
     shot.acceleration = { x: 0, y: 0 }
     shot.armedDelay--
+    shot.age+=Math.floor(dts * 100)
+    if (shot.age > maxShotAge) {
+      shot.health = -1
+    }
 
     // bounceSpaceObject(shot, screen, 1, 0, 0.7)
     //handleHittingShot(shot, ctx)

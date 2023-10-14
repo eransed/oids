@@ -1,11 +1,11 @@
-import { info, warn, usNow, EveryInterval, newVec2 } from 'mathil'
+import { info, warn, usNow, EveryInterval, newVec2, rndfVec2 } from 'mathil'
 import { MessageType, NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
 import { createNpc } from '../src/lib/factory'
 import { updateNonPlayerCharacter } from '../src/lib/physics'
 import { Client, getActivePlayersFromSession, getPlayersFromSessionId, globalConnectedClients } from './main'
 import { bounceSpaceObject } from '../src/lib/mechanics'
 import { saveGame } from './api/users/users.services'
-import { bounceFactor } from '../src/lib/constants'
+import { bounceFactor, worldStartPosition } from '../src/lib/constants'
 
 export class GameHandler {
   game_started = false
@@ -41,7 +41,7 @@ export class GameHandler {
       this.dt = performance.now() - this.lastTime
       for (let i = 0; i < this.asteroids.length; i++) {
         this.asteroids[i] = updateNonPlayerCharacter(this.asteroids[i], this.dt)
-        bounceSpaceObject(this.asteroids[i], this.asteroids[i].viewport, bounceFactor, 10, 0)
+        // bounceSpaceObject(this.asteroids[i], this.asteroids[i].viewport, bounceFactor, 10, 0)
         this.every.tick(() => {
           this.broadcaster(globalConnectedClients, this.asteroids[i], sessionId)
         })
@@ -71,10 +71,11 @@ export class GameHandler {
   }
 
   spawnAsteroids(): NonPlayerCharacter[] {
-    const num = 2
+    const num = 5
     for (let i = 0; i < num; i++) {
       const npc = createNpc()
-
+      npc.velocity = rndfVec2(1, 5)
+      npc.cameraPosition = worldStartPosition
       this.asteroids.push(npc)
     }
     return this.asteroids

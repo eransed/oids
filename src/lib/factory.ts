@@ -27,6 +27,7 @@ export function newPhotonLaser(): PhotonLaser {
     lastDamagedByName: '',
     killedByName: '',
     viewFramePosition: newVec2(),
+    age: 0
   }
 
   return shot
@@ -156,7 +157,7 @@ export function createNpc(): NonPlayerCharacter {
     obliterated: false,
     lastDamagedByName: '',
     killedByName: '',
-    position: rndfVec2(100, 2000),
+    position: rndfVec2(2000, 2500),
     color: randomBlue(),
     colliding: false,
     hitRadius: 100,
