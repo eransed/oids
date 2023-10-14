@@ -24,13 +24,10 @@
 
   //Assets
   import { Icons } from '../../style/icons'
-  import { ShipBundles } from '../../style/ships'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import type { Ship } from '@prisma/client'
   import AddShip from '../ProfilePage/AddShip.svelte'
-  import ShipCard from '../../components/ships/ShipCardInfo.svelte'
   import ShipCardInfo from '../../components/ships/ShipCardInfo.svelte'
-  import getProfile from '../../lib/services/user/profile'
 
   /**
    * Reactive on changes to $user store.
@@ -38,6 +35,13 @@
   $: if ($user && $user.name !== $localPlayer.name) {
     $localPlayer.name = $user.name
     $socket.send($localPlayer)
+    if ($user.ships.length === 1) {
+      $localPlayer.ship = createChosenShip($user.ships[0])
+      console.log($user.ships)
+      $socket.send($localPlayer)
+    } else {
+      shipModalOpen = true
+    }
     updateSessions()
   }
 
@@ -187,7 +191,8 @@
   onMount(() => {
     const storedShipJson = localStorage.getItem('chosenShip')
 
-    if (storedShipJson) {
+    if (storedShipJson && $user) {
+      console.log('storedShip', storedShipJson)
       const storedShip = JSON.parse(storedShipJson)
       if (storedShip) {
         $user.ships.find((ship) => {

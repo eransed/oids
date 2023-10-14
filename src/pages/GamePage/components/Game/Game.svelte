@@ -82,16 +82,23 @@
       $localPlayer.name = $guestUserName
     }
 
-    const localStorageShip = localStorage.getItem('chosenShip')
+    if ($isLoggedIn && $user.ships.length === 1) {
+      $localPlayer.ship = createChosenShip($user.ships[0])
+      chosenShip = $localPlayer.ship
+    } else {
+      const storedShipJson = localStorage.getItem('chosenShip')
 
-    if (localStorageShip && $isLoggedIn) {
-      const shipFromStorage = $user.ships.find((ship) => {
-        if (ship.id === localStorageShip) return ship
-      })
+      if (storedShipJson && $isLoggedIn) {
+        const localStorageShip = JSON.parse(storedShipJson)
+        const shipFromStorage = $user.ships.find((ship) => {
+          if (ship.id === localStorageShip.id) return ship
+        })
 
-      if (shipFromStorage) {
-        $localPlayer.ship = createChosenShip(shipFromStorage)
-        console.log('found ship in localstorage:', shipFromStorage)
+        if (shipFromStorage) {
+          $localPlayer.ship = createChosenShip(shipFromStorage)
+          console.log('found ship in localstorage:', shipFromStorage)
+          chosenShip = $localPlayer.ship
+        }
       }
     }
 
@@ -106,7 +113,7 @@
         game.localPlayer.isHost = true
       }
     })
-    if (!$isLoggedIn || $localPlayer.ship) {
+    if (!$isLoggedIn || chosenShip) {
       game.startGame(initRegularGame, renderFrame, nextFrame)
     }
   })
@@ -146,7 +153,7 @@
 
 <GameMenu currentGame={game} />
 
-{#if $isLoggedIn && !$localPlayer.ship}
+{#if $isLoggedIn && $user.ships.length > 1 && !chosenShip}
   {#if $user.ships.length === 0}
     <AddShip openModal={!chosenShip} />
   {:else}
@@ -166,7 +173,7 @@
           }
           $localPlayer.name = $user.name
           game.startGame(initRegularGame, renderFrame, nextFrame)
-          localStorage.setItem('chosenShip', ship.id)
+          localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
         }}
       />
     </ModalSimple>
