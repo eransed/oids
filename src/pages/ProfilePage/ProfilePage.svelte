@@ -380,6 +380,13 @@
     background: var(--main-accent2-color);
     border-radius: 1.5em;
     width: 28%;
+    transition: all 500ms;
+  }
+
+  .avatar:hover {
+    transform: scale(1.05) translateY(5px);
+    transition: all 500ms;
+    box-shadow: 0px 0px 1em var(--main-accent2-color);
   }
 
   .imgCard {
