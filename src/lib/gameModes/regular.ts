@@ -478,7 +478,11 @@ export function renderFrame(game: Game, dt: number): void {
 
     return
   } else {
-    renderShip(game.localPlayer, ctx, true, game.style)
+    if (game.keyFuncMap.systemGraphs.keyStatus) {
+      renderShip(game.localPlayer, ctx, true, game.style, null, true)
+    } else {
+      renderShip(game.localPlayer, ctx, true, game.style)
+    }
   }
 
 

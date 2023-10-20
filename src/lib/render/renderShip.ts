@@ -1,15 +1,15 @@
 import type { SpaceObject } from '../interface'
 import type { UIStyle } from '../../style/styleInterfaces'
 
-import { add, newVec2, round2dec, to_string2, type Vec2 } from 'mathil'
+import { add, direction, newVec2, round2dec, smul, to_string2, type Vec2 } from 'mathil'
 import { screenScale } from '../constants'
 // import * as ship from '../../assets/ship.svg'
-import { renderShot, setScaledFont } from './render2d'
+import { renderShot, renderVector, setScaledFont } from './render2d'
 import { renderVec2 } from './renderUI'
 import { svg_element } from 'svelte/internal'
 import { getShipBundleCache, ShipBundles } from '../../style/ships'
 
-export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle, renderPos: Vec2 | null = null): void {
+export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle, renderPos: Vec2 | null = null, showVectors = false): void {
   const scale = setScaledFont(ctx)
   const shipSize: Vec2 = { x: 60, y: 100 }
   so.size = shipSize
@@ -57,9 +57,20 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   // Restore drawing
   ctx.restore()
 
+  if (showVectors) {  
+    // Render vectors
+    renderVector(smul(so.velocity, 1.6), so.viewFramePosition, ctx, 50, '#fa3')
+    renderVector(smul(direction(so.angleDegree), 10), so.viewFramePosition, ctx, 50, '#fff')
+  }
+    
   // Draw shots
   renderShot(so, ctx, style)
 }
+
+
+
+
+
 
 export function renderShip_(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle, renderPos: Vec2 | null = null): void {
   const scale = setScaledFont(ctx)

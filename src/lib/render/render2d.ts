@@ -1,4 +1,4 @@
-import { round2dec, type Line, type Vec2, sub, add, smul } from 'mathil'
+import { round2dec, type Line, type Vec2, sub, add, smul, direction, angle, newVec2, rndi } from 'mathil'
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
 import type { SpaceObject } from '../interface'
@@ -46,17 +46,31 @@ export function getNamesAsString(sos: SpaceObject[], label = ''): string {
   return label + arr.join(', ')
 }
 
-export function renderVector(v: Vec2, origin: Vec2, ctx: CanvasRenderingContext2D, scale = 10000, color = '#fff', offset: Vec2 = { x: 0, y: 0 }) {
+export function renderVector(v: Vec2, origin: Vec2, ctx: CanvasRenderingContext2D, scale = 10000, color = '#fff', offset: Vec2 = { x: 0, y: 0 }, components = true) {
   ctx.save()
   ctx.translate(origin.x + offset.x, origin.y + offset.y)
   ctx.beginPath()
   ctx.strokeStyle = color
-  ctx.lineWidth = 5
+  ctx.lineWidth = 2
   ctx.moveTo(0, 0)
   ctx.lineTo(scale * v.x, scale * v.y)
+  const arrowAng = 150
+  const arrowScale = 0.8
+  const left = add(smul(v, scale), smul(direction(angle(v) + arrowAng), scale * arrowScale))
+  const right = add(smul(v, scale), smul(direction(angle(v) - arrowAng), scale * arrowScale))
+  ctx.lineTo(left.x, left.y)
+  ctx.moveTo(scale * v.x, scale * v.y)
+  ctx.lineTo(right.x, right.y)
+
   ctx.closePath()
   ctx.stroke()
   ctx.restore()
+
+  if (components) {
+    renderVector(newVec2(v.x, 0), origin, ctx, scale, '#f00', offset, false)
+    renderVector(newVec2(0, v.y), origin, ctx, scale, '#0f0', offset, false)
+  }
+
 }
 
 export function renderPoint(ctx: CanvasRenderingContext2D, v: Vec2, color: string, radius = 10): void {
