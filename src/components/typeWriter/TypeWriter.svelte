@@ -153,5 +153,6 @@
     flex-wrap: wrap;
     line-break: strict;
     line-height: 1.5;
+    z-index: 1;
   }
 </style>
