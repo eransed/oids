@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
+  import { rndfVec2, rndi, type Vec2 } from 'mathil'
   import { onMount } from 'svelte'
 
   export let stars = 1
   export let nrOfMoons = 5
 
   let orbitSpeed = 10
-  let scale = 5
-
   let starArr: Star[] = []
 
   interface Star {
@@ -46,7 +44,7 @@
 
       const newStar: Star = {
         pos: rndfVec2(1, window.innerWidth * 1),
-        size: rndi(12, 48),
+        size: rndi(24, 48),
         moons: moons,
       }
 
@@ -55,28 +53,36 @@
       starArr = [newStar, ...starArr]
     }
   })
+
+  let galaxyBlur = '75%'
 </script>
 
 <div class="starsWrap">
   {#if starArr.length > 0}
     {#each starArr as star, y}
-      <div class="star" style="  width: {star.size}px; height: {star.size}px">
+      <div
+        class="star"
+        style="background-image: radial-gradient(circle at center, var(--main-accent-color) 5%, transparent {galaxyBlur});  width: {star.size}px; height: {star.size}px"
+      >
         {#each star.moons as moon, i}
           {#if i > 0}
             <div
               class="moon"
-              style="background-color: rgba({rndi(0, 150).toString()}, {rndi(0, 100).toString()}, {rndi(0, 100).toString()}); top: {rndi(
-                -25,
-                25
-              )}px; left: {rndi(-25, 25)}px;  width: {moon.size}px; height: {moon.size}px;  animation-duration: {i * orbitSpeed}s; "
+              style="background-image: radial-gradient(circle at center, rgb({rndi(0, 150).toString()}, {rndi(0, 100).toString()}, {rndi(
+                0,
+                100
+              ).toString()}) 25%, transparent {galaxyBlur}); top: {rndi(-25, 25)}px; left: {rndi(-25, 25)}px;  width: {star.size / 4}px; height: {star.size /
+                4}px;  animation-duration: {i * orbitSpeed}s; "
             >
               {#each star.moons[i].asteroids as asteroid, x}
                 <div
                   class="asteroid"
-                  style="background-color: rgba({rndi(150, 255).toString()}, {rndi(150, 255).toString()}, {rndi(
-                    150,
-                    255
-                  ).toString()}); animation-duration: {((x + 1.5) * orbitSpeed) / 3}s; top: {rndi(-5, 5)}px; left: {rndi(-5, 5)}px;"
+                  style="width: {star.size / 12}px; height: {star.size / 12}px; background-image: radial-gradient(circle at center, rgb({rndi(
+                    0,
+                    150
+                  ).toString()}, {rndi(0, 100).toString()}, {rndi(0, 100).toString()}) 25%, transparent {galaxyBlur}); animation-duration: {((x + 1.5) *
+                    orbitSpeed) /
+                    3}s; top: {rndi(-10, 10)}px; left: {rndi(-10, 10)}px;"
                 />
               {/each}
             </div>
@@ -104,7 +110,7 @@
   .star {
     z-index: -1;
     position: fixed;
-    background-image: radial-gradient(circle, var(--main-accent-color) 5%, #4e0000 100%);
+    /* background: radial-gradient(circle at center, #f0e68c 10%, transparent 30%); */
     margin: auto;
     inset: 0;
     border-radius: 50%;
@@ -113,11 +119,13 @@
 
   .moon {
     position: absolute;
-    background-color: var(--main-accent-color);
+    /* background-image: radial-gradient(var(--main-accent-color), transparent 40%); */
+
     width: 10px;
     height: 10px;
     margin: auto;
     inset: 0;
+
     /* top: -14px;
     left: -14px; */
     border-radius: 50%;
@@ -126,9 +134,8 @@
 
   .asteroid {
     position: absolute;
-    background-color: var(--main-accent-color);
-    width: 2px;
-    height: 2px;
+    /* background-color: var(--main-accent-color); */
+
     margin: auto;
     inset: 0;
     /* top: -14px;
@@ -158,10 +165,10 @@
   @keyframes moveStar {
     0% {
       /* transform: translate(102vw, 0px); */
-      transform: rotate(0deg) translate(8vw) rotate(0deg);
+      transform: rotate(0deg) translate(4vw) rotate(0deg);
     }
     100% {
-      transform: rotate(360deg) translate(8vw) rotate(-360deg);
+      transform: rotate(360deg) translate(4vw) rotate(-360deg);
     }
   }
 </style>
