@@ -1,3 +1,10 @@
+<!-- 
+  @component
+  
+  A spinner to show when things need to load :)
+  
+ -->
+
 <script lang="ts">
   import Ship from '../../assets/ships/ship.svg'
 

@@ -9,7 +9,7 @@
   import Star from './components/animations/star.svelte'
 </script>
 
-<Star nrOfMoons={1} />
+<Star nrOfMoons={1} maxNrOfAsteroids={3} />
 {#await onAppMount()}
   <Page>
     <CircularSpinner ship />

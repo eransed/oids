@@ -1,3 +1,10 @@
+<!-- 
+  @component
+  
+  Want text to appear being typed? Use this one!
+  
+ -->
+
 <script lang="ts">
   import { fade } from 'svelte/transition'
 
