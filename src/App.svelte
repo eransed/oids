@@ -6,8 +6,10 @@
   import Page from './components/page/page.svelte'
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
   import Routes from './Routes.svelte'
+  import Star from './components/animations/star.svelte'
 </script>
 
+<Star nrOfMoons={1} />
 {#await onAppMount()}
   <Page>
     <CircularSpinner ship />

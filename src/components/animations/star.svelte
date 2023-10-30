@@ -1,22 +1,40 @@
 <script lang="ts">
   import { rndfVec2, rndi, type Vec2 } from 'mathil'
-  import { onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
 
   interface OrbitDirection {
     from: string
     to: string
   }
 
-  export let stars = 1
+  /**
+   * Number of mooons orbiting the star.
+   * @type {number}
+   *
+   */
   export let nrOfMoons = 5
-  export let orbitDirectionForward = true
+
+  /**
+   * Direction of orbit of the star system.
+   * Will effect star, moons and asteroids.
+   * @type {boolean}
+   */
+  export let clockwiseOrbit = true
+
+  /**
+   * Star system will follow mouse
+   * @type {boolean}
+   */
+  export let followMouse = false
+
   let orbitOffset = rndi(1, 1000) / 600
   let orbitStarSpeed = `${rndi(5, 100)}s`
 
-  let orbitDirection: OrbitDirection = { from: orbitDirectionForward ? '0deg' : '360deg', to: orbitDirectionForward ? '360deg' : '0deg' }
+  let orbitDirection: OrbitDirection = { from: clockwiseOrbit ? '0deg' : '360deg', to: clockwiseOrbit ? '360deg' : '0deg' }
 
   let orbitSpeed = 10
   let starArr: Star[] = []
+  let galaxyBlur = '75%'
 
   interface Star {
     pos: Vec2
@@ -44,59 +62,81 @@
   }
 
   onMount(() => {
-    for (let i = stars; i > 0; i--) {
-      let moons: Moon[] = []
-      let asteroids: Asteroid[] = []
+    let moons: Moon[] = []
 
-      for (let y = nrOfMoons; y > 0; y--) {
-        moons.push({ size: rndi(4, 12), asteroids: createAsteroids(rndi(1, 5)) })
-      }
+    for (let y = nrOfMoons; y > 0; y--) {
+      moons.push({ size: rndi(4, 12), asteroids: createAsteroids(rndi(1, 5)) })
+    }
 
-      const newStar: Star = {
-        pos: rndfVec2(1, window.innerWidth * 1),
-        size: rndi(24, 48),
-        moons: moons,
-      }
+    const newStar: Star = {
+      pos: rndfVec2(1, window.innerWidth * 1),
+      size: rndi(24, 48),
+      moons: moons,
+    }
 
-      moons = []
+    moons = []
 
-      starArr = [newStar, ...starArr]
+    starArr = [newStar, ...starArr]
+
+    if (followMouse) {
+      addEventListener('mousemove', (e: MouseEvent) => handleMouseMove(e))
     }
   })
 
-  let galaxyBlur = '75%'
+  let timeOut: number
+
+  function handleMouseMove(e: MouseEvent) {
+    clearTimeout(timeOut)
+    timeOut = setTimeout(() => {
+      setStarPos({ x: e.x, y: e.y })
+    }, 500)
+  }
+
+  function setStarPos(vec: Vec2) {
+    let star = document.getElementById('star')
+    if (star) {
+      star?.style.setProperty('top', `${(vec.y - window.innerHeight / 2).toString()}px`)
+      star?.style.setProperty('left', `${(vec.x - window.innerWidth / 2).toString()}px`)
+    }
+  }
+
+  onDestroy(() => {
+    if (followMouse) {
+      removeEventListener('mousemove', handleMouseMove)
+    }
+  })
 </script>
 
 <div class="starsWrap">
   {#if starArr.length > 0}
     {#each starArr as star, y}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div
+        id="star"
         class="star"
         style="--orbitStarSpeed: {orbitStarSpeed}; --orbitOffset: {orbitOffset}; --orbitFrom: {orbitDirection.from}; --orbitTo: {orbitDirection.to}; background-image: radial-gradient(circle at center, var(--main-accent-color) 5%, transparent {galaxyBlur});  width: {star.size}px; height: {star.size}px"
       >
         {#each star.moons as moon, i}
-          {#if i > 0}
-            <div
-              class="moon"
-              style="background-image: radial-gradient(circle at center, rgb({rndi(0, 150).toString()}, {rndi(0, 100).toString()}, {rndi(
-                0,
-                100
-              ).toString()}) 25%, transparent {galaxyBlur}); top: {rndi(-25, 25)}px; left: {rndi(-25, 25)}px;  width: {star.size / 4}px; height: {star.size /
-                4}px;  animation-duration: {i * orbitSpeed}s; "
-            >
-              {#each star.moons[i].asteroids as asteroid, x}
-                <div
-                  class="asteroid"
-                  style="width: {star.size / 12}px; height: {star.size / 12}px; background-image: radial-gradient(circle at center, rgb({rndi(
-                    0,
-                    150
-                  ).toString()}, {rndi(0, 100).toString()}, {rndi(0, 100).toString()}) 25%, transparent {galaxyBlur}); animation-duration: {((x + 1.5) *
-                    orbitSpeed) /
-                    3}s; top: {rndi(-10, 10)}px; left: {rndi(-10, 10)}px;"
-                />
-              {/each}
-            </div>
-          {/if}
+          <div
+            class="moon"
+            style="background-image: radial-gradient(circle at center, rgb({rndi(0, 150).toString()}, {rndi(0, 100).toString()}, {rndi(
+              0,
+              100
+            ).toString()}) 25%, transparent {galaxyBlur}); top: {rndi(-25, 25)}px; left: {rndi(-25, 25)}px;  width: {star.size / 4}px; height: {star.size /
+              4}px;  animation-duration: {i <= 0 ? rndi(10, 20) : i * orbitSpeed}s; "
+          >
+            {#each star.moons[i].asteroids as asteroid, x}
+              <div
+                class="asteroid"
+                style="width: {star.size / 12}px; height: {star.size / 12}px; background-image: radial-gradient(circle at center, rgb({rndi(
+                  0,
+                  150
+                ).toString()}, {rndi(0, 100).toString()}, {rndi(0, 100).toString()}) 25%, transparent {galaxyBlur}); animation-duration: {((x + 1.5) *
+                  orbitSpeed) /
+                  3}s; top: {rndi(-10, 10)}px; left: {rndi(-10, 10)}px;"
+              />
+            {/each}
+          </div>
         {/each}
       </div>
     {/each}
@@ -116,19 +156,20 @@
     height: 100vh;
     width: 2000vw;
     position: fixed;
-    z-index: -1;
+
     opacity: 1;
     zoom: 2.5;
   }
 
   .star {
-    z-index: -1;
     position: fixed;
     /* background: radial-gradient(circle at center, #f0e68c 10%, transparent 30%); */
     margin: auto;
     inset: 0;
     border-radius: 50%;
     animation: moveStar var(--orbitStarSpeed) linear infinite;
+    transition: all 4s ease-in-out;
+    /* transition-delay: 1s; */
   }
 
   .moon {
