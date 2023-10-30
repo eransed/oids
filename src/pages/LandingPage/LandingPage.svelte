@@ -34,6 +34,7 @@
   <br />
 </div>
 <Star />
+<Star orbitDirectionForward={false} />
 
 <style>
   .landingPage {

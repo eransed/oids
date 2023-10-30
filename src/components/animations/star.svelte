@@ -2,8 +2,18 @@
   import { rndfVec2, rndi, type Vec2 } from 'mathil'
   import { onMount } from 'svelte'
 
+  interface OrbitDirection {
+    from: string
+    to: string
+  }
+
   export let stars = 1
   export let nrOfMoons = 5
+  export let orbitDirectionForward = true
+  let orbitOffset = rndi(1, 1000) / 600
+  let orbitStarSpeed = `${rndi(5, 100)}s`
+
+  let orbitDirection: OrbitDirection = { from: orbitDirectionForward ? '0deg' : '360deg', to: orbitDirectionForward ? '360deg' : '0deg' }
 
   let orbitSpeed = 10
   let starArr: Star[] = []
@@ -62,7 +72,7 @@
     {#each starArr as star, y}
       <div
         class="star"
-        style="background-image: radial-gradient(circle at center, var(--main-accent-color) 5%, transparent {galaxyBlur});  width: {star.size}px; height: {star.size}px"
+        style="--orbitStarSpeed: {orbitStarSpeed}; --orbitOffset: {orbitOffset}; --orbitFrom: {orbitDirection.from}; --orbitTo: {orbitDirection.to}; background-image: radial-gradient(circle at center, var(--main-accent-color) 5%, transparent {galaxyBlur});  width: {star.size}px; height: {star.size}px"
       >
         {#each star.moons as moon, i}
           {#if i > 0}
@@ -96,6 +106,10 @@
 <style>
   :scope {
     --scale: 1;
+    --orbitFrom: 0;
+    --orbitTo: 0;
+    --orbitOffset: 0;
+    --orbitStarSpeed: 0;
   }
 
   .starsWrap {
@@ -114,7 +128,7 @@
     margin: auto;
     inset: 0;
     border-radius: 50%;
-    animation: moveStar 100s linear infinite;
+    animation: moveStar var(--orbitStarSpeed) linear infinite;
   }
 
   .moon {
@@ -146,29 +160,29 @@
 
   @keyframes rotateAsteroid {
     from {
-      transform: rotate(0deg) translate(10px) rotate(0deg);
+      transform: rotate(var(--orbitFrom)) translate(10px) rotate(var(--orbitFrom));
     }
     to {
-      transform: rotate(360deg) translate(10px) rotate(-360deg);
+      transform: rotate(var(--orbitTo)) translate(10px) rotate(var(--orbitTo));
     }
   }
 
   @keyframes rotateMoon {
     from {
-      transform: rotate(0deg) translate(50px) rotate(0deg);
+      transform: rotate(var(--orbitFrom)) translate(50px) rotate(var(--orbitFrom));
     }
     to {
-      transform: rotate(360deg) translate(50px) rotate(-360deg);
+      transform: rotate(var(--orbitTo)) translate(50px) rotate(var(--orbitTo));
     }
   }
 
   @keyframes moveStar {
     0% {
       /* transform: translate(102vw, 0px); */
-      transform: rotate(0deg) translate(4vw) rotate(0deg);
+      transform: rotate(var(--orbitFrom)) translate(calc(var(--orbitOffset) * 4vw)) rotate(var(--orbitFrom));
     }
     100% {
-      transform: rotate(360deg) translate(4vw) rotate(-360deg);
+      transform: rotate(var(--orbitTo)) translate(calc(var(--orbitOffset) * 4vw)) rotate(var(--orbitTo));
     }
   }
 </style>
