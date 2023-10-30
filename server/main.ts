@@ -7,7 +7,7 @@ import { getLocalIp, ipport } from './net'
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
 import { MessageType, NonPlayerCharacter, Session, SpaceObject } from '../src/lib/interface'
-import { error, info, log, warn } from 'mathil'
+import { dist2, error, info, log, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
 
@@ -51,6 +51,11 @@ const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter
   }
 })
 
+interface clientUpdated {
+  id: string
+  updated: Date
+}
+
 export class Client {
   ws: WebSocket
   req: IncomingMessage
@@ -58,6 +63,8 @@ export class Client {
   dateAdded: Date
   lastDataObject: SpaceObject | null = null
   sessionId: string | null = null
+  sendClientHistory: clientUpdated[] = []
+
   private nameHasBeenUpdated = false
 
   constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded: Date) {
@@ -113,6 +120,7 @@ export class Client {
         this.lastDataObject = so
         this.sessionId = so.sessionId
         so.serverVersion = name_ver
+
         if (!this.nameHasBeenUpdated) {
           if (globalConnectedClients.length > 0) {
             globalConnectedClients.forEach((client) => {
@@ -225,11 +233,24 @@ function broadcastToAllClients(skipSourceClient: Client, connectedClients: Clien
   }
 }
 
+//Checking distance between two players: sending client and recieving client.
+//If closer than given condition as a number the function returns true and data is sent.
+function proximityCheck(sendingClient: Client, recieveClient: Client): boolean {
+  if (sendingClient.lastDataObject && recieveClient.lastDataObject) {
+    const sendClientPos = sendingClient.lastDataObject.cameraPosition
+    const recieveClientPos = recieveClient.lastDataObject.cameraPosition
+
+    return dist2(sendClientPos, recieveClientPos) < 5000 ? true : false
+  } else return false
+}
+
 function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: SpaceObject): void {
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        client.ws.send(JSON.stringify(data))
+        if (proximityCheck(sendingClient, client)) {
+          client.ws.send(JSON.stringify(data))
+        }
         if (data.messageType === MessageType.PING) {
           info(`PING<${client.sessionId}>: ${sendingClient.name} -> ${client.name}`)
         } else {

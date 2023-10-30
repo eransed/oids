@@ -27,7 +27,7 @@ export function newPhotonLaser(): PhotonLaser {
     lastDamagedByName: '',
     killedByName: '',
     viewFramePosition: newVec2(),
-    age: 0
+    age: 0,
   }
 
   return shot
@@ -85,7 +85,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     motivationLevel: 100,
     motivatorBroken: false,
     name: name,
-    id: rndi(1, 500).toString(),
+    id: rndi(1, 500000).toString(),
     obliterated: false,
     online: false,
     photonColor: '#0f0',

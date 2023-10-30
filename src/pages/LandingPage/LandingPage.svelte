@@ -8,6 +8,7 @@
   //Components
   import TypeWriter from '../../components/typeWriter/TypeWriter.svelte'
   import Star from '../../components/animations/star.svelte'
+  import ModalSimple from '../../components/modal/ModalSimple.svelte'
 
   pageHasHeader.set(true)
 
