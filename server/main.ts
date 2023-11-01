@@ -244,11 +244,28 @@ function proximityCheck(sendingClient: Client, recieveClient: Client): boolean {
   } else return false
 }
 
+class Every {
+  private currentTick = 0
+  maxTicks = 1
+
+  constructor(maxTicks: number) {
+    this.maxTicks = maxTicks
+  }
+
+  tick(callback: () => void) {
+    this.currentTick++
+    if (this.currentTick >= this.maxTicks) {
+      callback()
+      this.currentTick = 0
+    }
+  }
+}
+
 function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: SpaceObject): void {
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        if (proximityCheck(sendingClient, client)) {
+        if (shouldSendToClient(sendingClient, client)) {
           client.ws.send(JSON.stringify(data))
         }
         if (data.messageType === MessageType.PING) {
@@ -259,6 +276,29 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
       }
     }
   }
+}
+
+const every20: Every = new Every(1200)
+
+// For every tick this function is returning true which leads to shouldSendToClient
+// function return true and that results in server broadcasting to other clients.
+function tickUpdate(): boolean {
+  let ticked = false
+
+  every20.tick(() => {
+    ticked = true
+  })
+
+  if (ticked) {
+    ticked = false
+    return true
+  } else return false
+}
+
+function shouldSendToClient(sendingClient: Client, recieveClient: Client): boolean {
+  if (proximityCheck(sendingClient, recieveClient) || tickUpdate()) {
+    return true
+  } else return false
 }
 
 function serverBroadcast<T extends SpaceObject | NonPlayerCharacter>(data: T, connectedClients: Client[], sessionId: string | null = null): number {
