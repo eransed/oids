@@ -2,6 +2,7 @@
   import type { ChosenShip } from '../../lib/interface'
   import { localPlayer } from '../../stores/stores'
   import { getShipBundleCache } from '../../style/ships'
+  import ShipCardImg from './ShipImg.svelte'
 
   export let chosenShip: ChosenShip
   export let shipOwner: string
@@ -20,7 +21,7 @@
   <button on:click={() => handleClickShip()} class="imgCard" style="background-color: {yourship ? 'var(--main-accent2-color)' : 'var(--main-accent-color)'}">
     <p>{shipOwner}</p>
     <div class="level">{chosenShip.level}</div>
-    <img draggable="false" src={getShipBundleCache(chosenShip.shipVariant).svgUrl} alt={chosenShip.name} />
+    <ShipCardImg ship={chosenShip} />
     <div class="shipDetails">
       <table>
         <tr>
@@ -81,12 +82,6 @@
   .imgCard:hover {
     transition: all 500ms;
     transform: scale(1.1);
-  }
-
-  .imgCard img {
-    width: 100%;
-    min-width: 60px;
-    margin: none;
   }
 
   .shipDetails {

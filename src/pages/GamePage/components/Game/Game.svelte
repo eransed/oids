@@ -34,10 +34,12 @@
   import Ships from '../../../ProfilePage/Ships.svelte'
   import type { Ship } from '@prisma/client'
   import AddShip from '../../../ProfilePage/AddShip.svelte'
+  import ShipDetails from '../ShipSettings/ShipDetails.svelte'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
   const shipSettings = getKeyMap().shipSettings.store
+  const showShipDetails = getKeyMap().shipDetails.store
 
   let game: Game
 
@@ -151,6 +153,12 @@
   </InGameInfo>
 </div>
 
+{#if $showShipDetails}
+  <ModalSimple closeBtn={() => ($showShipDetails = !$showShipDetails)}>
+    <ShipDetails ship={chosenShip} />
+  </ModalSimple>
+{/if}
+
 <GameMenu currentGame={game} />
 
 {#if $isLoggedIn && $user.ships.length > 1 && !chosenShip}
@@ -179,7 +187,9 @@
     </ModalSimple>
   {/if}
 {/if}
-<canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} />
+
+<!-- <canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} /> -->
+<canvas class="game_canvas" id="noContextMenu" bind:this={canvas} />
 
 <style>
   :root {

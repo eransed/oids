@@ -29,7 +29,7 @@
 
   /**
    *
-   * @description If you want the modal to have a save button
+   * @description If you want the modal to have a cancel button
    */
   export let cancelButton: boolean = true
 
@@ -43,7 +43,6 @@
   onMount(() => {
     console.log('showModal')
     dialog.showModal()
-
     dialog.addEventListener('keydown', (e: KeyboardEvent) => onEsc(e))
   })
 

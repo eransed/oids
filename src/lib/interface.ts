@@ -257,6 +257,7 @@ export interface KeyFunctionMap {
   leaderBoard: KeyFunctionStore
   hotKeys: KeyFunctionStore
   shipSettings: KeyFunctionStore
+  shipDetails: KeyFunctionStore
 }
 
 export interface TouchFunctionMap {

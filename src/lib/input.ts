@@ -25,6 +25,7 @@ const DefaultKeyMap: KeyFunctionMap = {
   leaderBoard: { activators: ['p'], keyStatus: false, store: writable<boolean>(false), toggle: true },
   hotKeys: { activators: ['o'], keyStatus: false, store: writable<boolean>(false), toggle: true },
   shipSettings: { activators: ['i'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  shipDetails: { activators: ['c'], keyStatus: false, store: writable<boolean>(false), toggle: true },
 }
 
 const DefaultTouchMap: TouchFunctionMap = {
