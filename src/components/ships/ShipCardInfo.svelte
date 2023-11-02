@@ -2,6 +2,7 @@
   import type { ChosenShip } from '../../lib/interface'
   import { localPlayer } from '../../stores/stores'
   import { getShipBundleCache } from '../../style/ships'
+  import Cursor from '../mouse/cursor.svelte'
   import ShipCardImg from './ShipImg.svelte'
 
   export let chosenShip: ChosenShip

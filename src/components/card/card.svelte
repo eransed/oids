@@ -4,7 +4,7 @@
    *
    * default, help, wait, crosshair, not-allowed, zoom-in, grab, pointer
    */
-  export let cursor = 'pointer'
+  export let cursor = 'none'
   export let clickedOnCard: () => void = () => {}
   export let hoverEffect: boolean = true
 

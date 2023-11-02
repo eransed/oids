@@ -35,6 +35,7 @@
   import type { Ship } from '@prisma/client'
   import AddShip from '../../../ProfilePage/AddShip.svelte'
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
+  import Cursor from '../../../../components/mouse/cursor.svelte'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -155,7 +156,7 @@
 
 {#if $showShipDetails}
   <ModalSimple closeBtn={() => ($showShipDetails = !$showShipDetails)}>
-    <ShipDetails ship={chosenShip} />
+    <ShipDetails ship={$localPlayer.ship} />
   </ModalSimple>
 {/if}
 
@@ -204,7 +205,7 @@
     top: 0;
     position: fixed;
     background-color: var(--main-bg-color);
-    cursor: none;
+
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE/Edge */

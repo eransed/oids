@@ -4,6 +4,7 @@ body {
   overflow-y: hidden;
   font-family: 'Courier New', Courier, monospace;
   height: 100vh;
+  /* cursor: none; */
 }
 
 * {
@@ -12,7 +13,7 @@ body {
 }
 
 button {
-  cursor: pointer;
+  cursor: none;
 }
 
 :root {
@@ -21,9 +22,11 @@ button {
   --main-card-color: #000022;
   --main-accent-color: #d2b48c;
   --main-accent2-color: #b9d3c2;
+  /* cursor: none; */
 }
 
-input, select {
+input,
+select {
   background-color: var(--main-bg-color);
   outline: none;
   border: none;
@@ -33,6 +36,7 @@ input, select {
   padding: 1em;
   color: var(--main-text-color);
   margin: 0.5em;
+  cursor: none;
 }
 
 /* Prepared to make all text lowercase */

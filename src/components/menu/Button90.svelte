@@ -105,7 +105,7 @@
     font-size: 15px;
     letter-spacing: calc(var(--top) * 1.05 - var(--top));
     text-transform: uppercase;
-    cursor: pointer;
+    cursor: none;
     font-size: 12px;
     font-weight: 900;
     /* border: 2px solid rgb(47, 167, 252, 0.5); */
