@@ -60,7 +60,7 @@ model Ship {
   name       String
   updatedAt  DateTime @updatedAt
   createdAt  DateTime @default(now())
-  experience Int?     @default(0)
+  experience Int      @default(0)
   owner      User     @relation(fields: [userId], references: [id])
   userId     String
   variant    Int      @default(0)

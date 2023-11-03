@@ -72,6 +72,7 @@
       level: ship.level,
       shipVariant: ship.variant,
       id: ship.id,
+      experience: ship.experience,
     }
     return chosenShip
   }
@@ -179,6 +180,7 @@
             userId: ship.userId,
             shipVariant: ship.variant,
             id: ship.id,
+            experience: ship.experience,
           }
           $localPlayer.name = $user.name
           game.startGame(initRegularGame, renderFrame, nextFrame)

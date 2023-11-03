@@ -117,6 +117,7 @@
           level: 0,
           userId: '',
           id: '',
+          experience: 0,
         }
       }
 
@@ -184,6 +185,7 @@
       level: ship.level,
       shipVariant: ship.variant,
       id: ship.id,
+      experience: ship.experience,
     }
     return chosenShip
   }
@@ -325,6 +327,7 @@
       userId: ship.userId,
       shipVariant: ship.variant,
       id: ship.id,
+      experience: ship.experience,
     }
     initLobbySocket().then(() => {
       showLobby = true

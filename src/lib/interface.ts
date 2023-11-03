@@ -38,6 +38,7 @@ export interface ChosenShip {
   userId: string
   shipVariant: ShipVariant
   id: string
+  experience: number
 }
 
 export interface Colorable {

@@ -15,7 +15,7 @@
     Lvl: {ship.level}
   </p>
   <p>
-    Experience: {'Add to ship interface...'}
+    XP: {ship.experience}
   </p>
 </div>
 
