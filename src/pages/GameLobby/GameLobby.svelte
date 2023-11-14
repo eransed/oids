@@ -17,7 +17,7 @@
 
   import { onDestroy, onMount } from 'svelte'
   import { navigate } from 'svelte-routing'
-  import { log, warn } from 'mathil'
+  import { info, log, warn } from 'mathil'
   import Chat from '../../components/chat/chat.svelte'
   import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
@@ -28,29 +28,40 @@
   import type { Ship } from '@prisma/client'
   import AddShip from '../ProfilePage/AddShip.svelte'
   import ShipCardInfo from '../../components/ships/ShipCardInfo.svelte'
+  import { worldStartPosition } from '../../lib/constants'
 
   /**
    * Reactive on changes to $user store.
    */
   $: if ($user && $user.name !== $localPlayer.name) {
     $localPlayer.name = $user.name
-    $socket.send($localPlayer)
+    info(`sending loc player`)
+    setTimeout(() => {
+      $socket.send($localPlayer)
+    }, 500)
     if ($user.ships.length === 1) {
       $localPlayer.ship = createChosenShip($user.ships[0])
       console.log($user.ships)
-      $socket.send($localPlayer)
+      setTimeout(() => {
+        $socket.send($localPlayer)
+      }, 600)
     } else {
       shipModalOpen = true
     }
-    updateSessions()
+
+    setTimeout(() => {
+      updateSessions()
+    }, 600)
   }
 
   $: if ($isLoggedIn === false) {
     console.log('User logged out - renaming to guest name')
     $localPlayer.name = $guestUser.name
-    $socket.send($localPlayer)
-    log('$: if ($isLoggedIn === false)')
-    updateSessions()
+    setTimeout(() => {
+      $socket.send($localPlayer)
+      log('$: if ($isLoggedIn === false)')
+      updateSessions()
+    }, 700)
   }
 
   $: allReady = false
@@ -137,6 +148,7 @@
               console.log(`Got an session update message from ${incomingUpdate.name}`)
               updateSessions()
             } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
+              console.log(incomingUpdate)
               const msg = incomingUpdate.lastMessage
               console.log(`${incomingUpdate.name} says: ${msg}`)
               const newMsg: ChatMessage = {
@@ -152,6 +164,8 @@
             } else if (incomingUpdate.messageType === MessageType.START_GAME) {
               const sess = incomingUpdate.sessionId
               $localPlayer.isPlaying = true
+              info(`Resetting local player position to world start position`)
+              $localPlayer.cameraPosition = worldStartPosition
               console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
               $socket.resetListeners()
               navigate(`/play/${sess}`)
@@ -329,9 +343,10 @@
       id: ship.id,
       experience: ship.experience,
     }
-    initLobbySocket().then(() => {
-      showLobby = true
-    })
+    // initLobbySocket().then(() => {
+    //   showLobby = true
+    // })
+    showLobby = true
     localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
     $socket.send($localPlayer)
     updateSessions()

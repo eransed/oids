@@ -1,7 +1,7 @@
 import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
 import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
-import { add2, direction2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPretty, smul2, sub2, to_string2, vec2Array, type Vec2, dist2 } from 'mathil'
+import { add2, direction2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPretty, smul2, sub2, to_string2, vec2Array, type Vec2, dist2, warn } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions, offScreen_mm, wrap_mm } from '../physics'
 import { loadingText, renderInfoText, renderPoint } from '../render/render2d'
@@ -105,6 +105,7 @@ batbuf.baseUnit = '%'
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
+    warn(`Game already running`)
     return
   }
 
@@ -113,6 +114,7 @@ export function initRegularGame(game: Game): void {
 
   game.type = GameType.MultiPlayer
   if (!test()) {
+    warn(`Test failed...`)
     return
   }
 
@@ -125,6 +127,7 @@ export function initRegularGame(game: Game): void {
   setCanvasSizeToClientViewFrame(game.ctx)
 
   //Local player init
+  warn(`Resets local player position`)
   game.reset()
   game.localPlayer.mass = 1
   game.localPlayer.missileDamage = 1
@@ -346,7 +349,7 @@ function last(arr: Vec2[]): Vec2 {
   return arr[arr.length - 1]
 }
 
-function moveView(game: Game) {
+export function moveView(game: Game) {
   // bound ship to viewframe
   const center = getScreenCenterPosition(game.ctx)
   // const camBound = sub2(smul2(game.localPlayer.worldSize, 0.5), getScreenRect(game.ctx))
@@ -373,7 +376,7 @@ export function renderFrame(game: Game, dt: number): void {
       remotePlayers.push(player)
     })
 
-    gameState.set({ scoreScreenData: { player: game.localPlayer, remotePlayers: remotePlayers } })
+    gameState.set({ scoreScreenData: { player: game.localPlayer, remotePlayers: remotePlayers, serverObjects: game.bodies } })
   })
 
   const ctx = game.ctx

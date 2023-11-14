@@ -15,7 +15,7 @@
   export let buttonConfig: Button90Config = {
     buttonText: '',
     clickCallback: () => {
-      console.error('Callback not implemented')
+      // console.error('Callback not implemented')
     },
     selected: false,
   }
@@ -105,7 +105,7 @@
     font-size: 15px;
     letter-spacing: calc(var(--top) * 1.05 - var(--top));
     text-transform: uppercase;
-    cursor: none;
+    cursor: pointer;
     font-size: 12px;
     font-weight: 900;
     /* border: 2px solid rgb(47, 167, 252, 0.5); */

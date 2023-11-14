@@ -10,6 +10,7 @@ import { MessageType, NonPlayerCharacter, Session, SpaceObject } from '../src/li
 import { dist2, error, getNameVersion, getVersionInfo, info, log, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
+import { game } from './api/game/game.routes'
 
 // start ApiServer
 apiServer()
@@ -30,30 +31,51 @@ const server: WebSocketServer = new WebSocketServer({
 
 export let globalConnectedClients: Client[] = []
 
-const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
-  // info(`Sending to session: ${sessionId}`)
-  const sendCount = serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
-  // info (`SendCount: ${sendCount}`)
-  if (sendCount > 0 && sessionId) {
-    const sessionClients = getClientsFromSessionId(sessionId)
-    // info(`Num: ${sessionClients.length}`)
-    let somePlays = false
-    for (let i = 0; i < sessionClients.length; i++) {
-      // info(`Playing ${sessionClients[i].lastDataObject?.isPlaying}`)
-      if (sessionClients[i].lastDataObject?.isPlaying) {
-        somePlays = true
+
+function createGame(sessionId: string) {
+
+  const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
+    // info(`Sending to session: ${sessionId}`)
+    const sendCount = serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
+    // info (`SendCount: ${sendCount}`)
+    if (sendCount > 0 && sessionId) {
+      const sessionClients = getClientsFromSessionId(sessionId)
+      // info(`Num: ${sessionClients.length}`)
+      let somePlays = false
+      for (let i = 0; i < sessionClients.length; i++) {
+        // info(`Playing ${sessionClients[i].lastDataObject?.isPlaying}`)
+        if (sessionClients[i].lastDataObject?.isPlaying) {
+          somePlays = true
+        }
+      }
+
+      if (somePlays === false) {
+        gameHandler.quit_game()
       }
     }
+  })
 
-    if (somePlays === false) {
-      gameHandler.quit_game()
-    }
-  }
-})
+  gameHandler.game_session_start(sessionId)
+
+  return gameHandler
+
+}
+
+const game_handlers: GameHandler[] = []
 
 interface clientUpdated {
   id: string
   updated: Date
+}
+
+function debugData(so: SpaceObject) {
+  const logdata = {
+    name: so.name,
+    session: so.sessionId,
+    messageType: MessageType[so.messageType],
+    lastMessage: so.lastMessage
+  }
+  console.log({ logdata })
 }
 
 export class Client {
@@ -117,6 +139,7 @@ export class Client {
 
       try {
         const so: SpaceObject = JSON.parse(event.data)
+        debugData(so)
         this.lastDataObject = so
         this.sessionId = so.sessionId
         so.serverVersion = name_ver
@@ -134,7 +157,20 @@ export class Client {
             info('No clients connected')
           }
         } else {
-          gameHandler.checkMessage(so)
+          if (so.messageType === MessageType.START_GAME) {
+            info(`calling create game with ${so.sessionId}`)
+            game_handlers.push(createGame(so.sessionId))
+          }
+          for (let i = 0; i < game_handlers.length; i++) {
+            if (game_handlers[i].game_started === false) {
+              const s = game_handlers.splice(i)
+              console.log(s)
+              console.log({ game_handlers })
+              if (s[0]) {
+                info(`Removed game ${s[0].tied_session_id}`)
+              }
+            }
+          }
 
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
             broadcastToAllClients(this, globalConnectedClients, so)
@@ -262,16 +298,17 @@ class Every {
 }
 
 function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: SpaceObject): void {
+  info(`Sending:`)
+  debugData(data)
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        if (shouldSendToClient(sendingClient, client)) {
-          client.ws.send(JSON.stringify(data))
-        }
-        if (data.messageType === MessageType.PING) {
-          info(`PING<${client.sessionId}>: ${sendingClient.name} -> ${client.name}`)
+        if (data.messageType === MessageType.GAME_UPDATE) {
+          if (shouldSendToClientInGame(sendingClient, client)) {
+            client.ws.send(JSON.stringify(data))
+          }
         } else {
-          //  info(`BROADCAST<${client.sessionId}>: '${data.lastMessage}' from ${sendingClient.name} to ${client.name}`)
+          client.ws.send(JSON.stringify(data))
         }
       }
     }
@@ -295,7 +332,7 @@ function tickUpdate(): boolean {
   } else return false
 }
 
-function shouldSendToClient(sendingClient: Client, recieveClient: Client): boolean {
+function shouldSendToClientInGame(sendingClient: Client, recieveClient: Client): boolean {
   if (proximityCheck(sendingClient, recieveClient) || tickUpdate()) {
     return true
   } else return false

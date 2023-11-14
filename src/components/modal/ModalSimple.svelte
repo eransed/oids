@@ -140,7 +140,7 @@
     animation: show 1s ease-in-out forwards;
     color: var(--main-text-color);
     align-content: flex-start;
-    cursor: none;
+
     z-index: 0;
   }
 
@@ -149,7 +149,6 @@
     animation: backdrop 300ms ease-in-out forwards;
     animation-delay: 500ms;
     background: rgba(210, 180, 140, 0.2);
-    cursor: none;
   }
 
   @keyframes show {

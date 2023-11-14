@@ -31,7 +31,9 @@ export class GameHandler {
   }
 
   game_session_start(sessionId: string) {
-    info(`Starting game and creating asteroids...`)
+    info(`Starting game ${sessionId} and creating asteroids...`)
+    this.tied_session_id = sessionId
+    this.game_started = true
     this.spawnAsteroids()
 
     this.game_interval = setInterval(() => {
@@ -55,21 +57,24 @@ export class GameHandler {
     // saveGame('011ef253-eae8-4da5-9eb1-6a0a3816c7e5', false, new Date(), sessionId)
   }
 
-  checkMessage(obj: SpaceObject) {
-    if (obj.messageType === MessageType.START_GAME) {
-      if (this.game_started) {
-        warn(`Game ${this.tied_session_id} already running`)
-      } else {
-        info(`Starting new game`)
-        this.game_session_start(obj.sessionId)
-        if (this.tied_session_id === null) this.tied_session_id = obj.sessionId
-        this.game_started = true
-      }
-    }
-  }
+  // checkMessage(obj: SpaceObject) {
+  //   if (obj.messageType === MessageType.START_GAME) {
+  //     if (this.game_started) {
+  //       warn(`Game ${this.tied_session_id} already running`)
+  //       return null
+  //     } else {
+  //       info(`Starting new game`)
+  //       this.game_session_start(obj.sessionId)
+  //       if (this.tied_session_id === null) this.tied_session_id = obj.sessionId
+  //       this.game_started = true
+  //       return this
+  //     }
+  //   }
+  // }
 
   spawnAsteroids(): NonPlayerCharacter[] {
     const num = 5
+    info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
       const npc = createNpc()
       npc.velocity = rndfVec2(1, 5)

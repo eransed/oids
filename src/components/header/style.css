@@ -44,7 +44,7 @@
   justify-content: center;
   flex-direction: row;
   align-content: center;
-  cursor: none;
+
   border-color: var(--borderColor);
   transition: var(--borderColor);
   transition-duration: 1s;
@@ -61,7 +61,6 @@
 }
 
 .navButton {
-  cursor: none;
   opacity: 1;
   padding: 1em;
   font-weight: bolder;
@@ -83,7 +82,7 @@
   width: 50px;
   top: 0.5em;
   left: 6em;
-  cursor: none;
+
   filter: saturate(2);
   border-radius: 100%;
   border-style: solid;
@@ -104,7 +103,7 @@
 
   transition-property: all;
   transition: 1s;
-  cursor: none;
+
   width: -moz-fit-content;
   width: fit-content;
 }
@@ -119,7 +118,6 @@
   justify-content: center;
   flex-wrap: wrap;
   align-content: center;
-  cursor: none;
 }
 
 .form input {
@@ -148,7 +146,7 @@ nav {
   position: absolute;
   top: 1em;
   z-index: 1;
-  cursor: none;
+
   transition-property: transform;
   transition-duration: 1s;
 }
@@ -177,7 +175,6 @@ nav {
     background-color: var(--main-bg-color);
     transition: all;
     transition-duration: 1s;
-    cursor: none;
   }
 
   .menuItem :first-child {
@@ -186,7 +183,7 @@ nav {
 
   .hamburger {
     display: block;
-    cursor: none;
+
     transition: rotate;
     transition-duration: 1s;
   }

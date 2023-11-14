@@ -11,13 +11,14 @@
 
   // used to disable game controllers while menu is open
   import { initKeyControllers, removeKeyControllers, removeTouchControls } from '../../lib/input'
+  import { info } from 'mathil'
 
   //Exports
   export let buttons: Button90Config[]
   export let menuHeader: string = 'Menu'
 
   $: if ($menuOpen) {
-    console.log($menuOpen)
+    info(`Menu open state: ${$menuOpen}`)
     removeKeyControllers()
     removeTouchControls()
   }

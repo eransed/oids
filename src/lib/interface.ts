@@ -299,6 +299,7 @@ export interface GameState {
 export interface ScoreScreenData {
   player: SpaceObject
   remotePlayers: SpaceObject[]
+  serverObjects: NonPlayerCharacter[]
 }
 
 export interface Nameable {

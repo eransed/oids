@@ -1,4 +1,5 @@
 // import { info, warn } from 'mathil'
+import { warn } from 'mathil'
 import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type NonPlayerCharacter, type ServerUpdate, type SpaceObject } from '../interface'
 
@@ -42,6 +43,7 @@ export class OidsSocket {
   private ws: WebSocket | null = null
   private prettyStatusString = 'Just created!'
   private sockMsgListener: SocketListener<'message'> | null = null
+  private connectInitialized = false
 
   constructor(url: URL) {
     console.log('New socket created')
@@ -55,6 +57,7 @@ export class OidsSocket {
   }
 
   private connectPromise(): Promise<WebSocket> {
+    this.connectInitialized = true
     return new Promise((resolve, reject) => {
       const wsUrl: URL = this.wsurl
 
@@ -98,6 +101,9 @@ export class OidsSocket {
 
   send(messageObject: object): void {
     if (!this.ws) {
+      if (this.connectInitialized) {
+        warn(`connectPromise already started!`)
+      }
       console.log('Connecting websocket...')
       this.connectPromise()
         .then((ws) => {

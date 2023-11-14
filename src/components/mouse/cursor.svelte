@@ -41,7 +41,6 @@
 
 <style>
   :global(body) {
-    cursor: none;
   }
 
   .w-full {

@@ -262,8 +262,11 @@ export function isWithinRadius(p0: Physical, p1: Physical & Bounded, radius: num
   return false
 }
 
-export function getWorldCoordinates(e: Physical & Bounded): Vec2 {
-  return add2(e.viewFramePosition, e.cameraPosition)
+export function getWorldCoordinates(e: Physical & Bounded | null): Vec2 {
+  if (e) {
+    return add2(e.viewFramePosition, e.cameraPosition)
+  }
+  return newVec2()
 }
 
 export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
