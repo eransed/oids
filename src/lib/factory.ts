@@ -119,6 +119,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     rtt: 0,
     worldSize: newVec2(),
     cameraPosition: newVec2(),
+    cameraVelocity: newVec2(),
     viewFramePosition: newVec2(),
     thrustFlames: [],
     ship: {
@@ -198,6 +199,7 @@ export function createNpc(): NonPlayerCharacter {
     shotsFiredThisFrame: false,
     worldSize: newVec2(),
     cameraPosition: newVec2(),
+    cameraVelocity: newVec2(),
     viewFramePosition: newVec2(),
   }
   return npc

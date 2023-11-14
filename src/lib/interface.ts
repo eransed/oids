@@ -59,6 +59,7 @@ export interface Bounded {
   viewportScale: number
   worldSize: Vec2
   cameraPosition: Vec2
+  cameraVelocity: Vec2
 }
 
 export function boundVec2(): Vec2 {
@@ -109,7 +110,7 @@ export interface Collidable extends Positionable {
   collidingWith: Collidable[]
 }
 
-export interface ThrustFlameAtom extends Positionable, Physical {}
+export interface ThrustFlameAtom extends Positionable, Physical { }
 
 export interface Thrustable extends Positionable, Physical {
   batteryLevel: number
@@ -192,28 +193,28 @@ export interface PlayingShip {
 
 export interface SpaceObject
   extends PlayingShip,
-    Shapable,
-    Positionable,
-    Motivated,
-    Remote,
-    Local,
-    Physical,
-    Thrustable,
-    Steerable,
-    Damager,
-    Damageable,
-    Fireable,
-    Collidable,
-    Bounceable,
-    Boostable,
-    Colorable,
-    Nameable,
-    Unique,
-    Chatable,
-    LobbyWaiter,
-    Hoster,
-    Typable,
-    Bounded {}
+  Shapable,
+  Positionable,
+  Motivated,
+  Remote,
+  Local,
+  Physical,
+  Thrustable,
+  Steerable,
+  Damager,
+  Damageable,
+  Fireable,
+  Collidable,
+  Bounceable,
+  Boostable,
+  Colorable,
+  Nameable,
+  Unique,
+  Chatable,
+  LobbyWaiter,
+  Hoster,
+  Typable,
+  Bounded { }
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number
@@ -226,7 +227,7 @@ export interface Ageable {
   age: number
 }
 
-export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable, Ageable {}
+export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable, Ageable { }
 
 export function getRenderableObjectCount(so: SpaceObject): number {
   return 1 + so.shotsInFlight.length + so.collidingWith.length + so.shotsInFlightNew.length
@@ -328,7 +329,7 @@ export interface ChatMessage {
   serviceMsg?: boolean
 }
 
-export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable, Bounded {}
+export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable, Bounded { }
 
 export interface ShipUpgrades {
   hyperdrive: boolean

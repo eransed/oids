@@ -1,4 +1,4 @@
-import { round2dec, type Line, type Vec2, sub, add, smul, direction, angle, newVec2, rndi } from 'mathil'
+import { round2dec, type Line, type Vec2, sub2, add2, smul2, direction2, angle2, newVec2, rndi } from 'mathil'
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
 import type { SpaceObject } from '../interface'
@@ -56,8 +56,8 @@ export function renderVector(v: Vec2, origin: Vec2, ctx: CanvasRenderingContext2
   ctx.lineTo(scale * v.x, scale * v.y)
   const arrowAng = 150
   const arrowScale = 0.8
-  const left = add(smul(v, scale), smul(direction(angle(v) + arrowAng), scale * arrowScale))
-  const right = add(smul(v, scale), smul(direction(angle(v) - arrowAng), scale * arrowScale))
+  const left = add2(smul2(v, scale), smul2(direction2(angle2(v) + arrowAng), scale * arrowScale))
+  const right = add2(smul2(v, scale), smul2(direction2(angle2(v) - arrowAng), scale * arrowScale))
   ctx.lineTo(left.x, left.y)
   ctx.moveTo(scale * v.x, scale * v.y)
   ctx.lineTo(right.x, right.y)
@@ -134,8 +134,8 @@ export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D, style
     }
     ctx.save()
     // ctx.translate(shot.position.x, shot.position.y)
-    // const relative = sub(add(so.viewFramePosition, so.cameraPosition), smul(game.localPlayer.cameraPosition, 1))
-    const relative = sub(shot.position, smul(game.localPlayer.cameraPosition, 1))
+    // const relative = sub2(add2(so.viewFramePosition, so.cameraPosition), smul2(game.localPlayer.cameraPosition, 1))
+    const relative = sub2(shot.position, smul2(game.localPlayer.cameraPosition, 1))
     ctx.translate(relative.x, relative.y)
     ctx.rotate(((90 + shot.angleDegree) * Math.PI) / 180)
     ctx.fillRect(-shot.size.x / 2, -shot.size.y / 2, shot.size.x, shot.size.y)

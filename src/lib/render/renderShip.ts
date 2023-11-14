@@ -1,7 +1,7 @@
 import type { SpaceObject } from '../interface'
 import type { UIStyle } from '../../style/styleInterfaces'
 
-import { add, direction, newVec2, round2dec, smul, to_string2, type Vec2 } from 'mathil'
+import { add2, direction2, newVec2, round2dec, smul2, to_string2, type Vec2 } from 'mathil'
 import { screenScale } from '../constants'
 // import * as ship from '../../assets/ship.svg'
 import { renderShot, renderVector, setScaledFont } from './render2d'
@@ -57,12 +57,12 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
   // Restore drawing
   ctx.restore()
 
-  if (showVectors) {  
+  if (showVectors) {
     // Render vectors
-    renderVector(smul(so.velocity, 1.6), so.viewFramePosition, ctx, 50, '#fa3')
-    renderVector(smul(direction(so.angleDegree), 10), so.viewFramePosition, ctx, 50, '#fff')
+    renderVector(smul2(so.velocity, 1.6), so.viewFramePosition, ctx, 50, '#fa3')
+    renderVector(smul2(direction2(so.angleDegree), 10), so.viewFramePosition, ctx, 50, '#fff')
   }
-    
+
   // Draw shots
   renderShot(so, ctx, style)
 }

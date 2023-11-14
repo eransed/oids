@@ -1,9 +1,9 @@
 import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
 import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
-import { add, direction, dist2, info, log, magnitude, newVec2, rndf, rndfVec2, rndi, round2dec, siPretty, smul, sub, to_string2, wrap } from 'mathil'
+import { add2, direction2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPretty, smul2, sub2, to_string2, vec2Array, type Vec2, dist2 } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
-import { friction, gravity, gravityStars, handleCollisions, offScreen, offScreen_mm, vec2Bound, wrap_mm } from '../physics'
+import { friction, handleCollisions, offScreen_mm, wrap_mm } from '../physics'
 import { loadingText, renderInfoText, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type NonPlayerCharacter } from '../interface'
@@ -11,11 +11,11 @@ import { randomAnyColor } from '../color'
 import { test } from '../test'
 import { explosionDuration, screenScale, worldSize, worldStartPosition } from '../constants'
 import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from '../stats'
-import { createNpc, newPhotonLaser } from '../factory'
+import { newPhotonLaser } from '../factory'
 import { reduceShotSize, reduceSoSize } from '../websocket/util'
 import { renderMoon } from '../render/renderDebris'
 import { renderShip } from '../render/renderShip'
-import { renderRoundIndicator, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
+import { renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
 
 //Stores
@@ -146,7 +146,7 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.cameraPosition = worldStartPosition
   game.localPlayer.viewFramePosition = rndfVec2(0, 0)
   game.localPlayer.position = rndfVec2(0, 0)
-  // game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
+  // game.localPlayer.position = add2(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
 
   for (let i = 0; i < 400; i++) {
     // create starts
@@ -157,7 +157,7 @@ export function initRegularGame(game: Game): void {
   }
 
   // game.stars.push(newVec2())
-  // game.stars.push(smul(worldSize, 0.5))
+  // game.stars.push(smul2(worldSize, 0.5))
 
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
@@ -308,7 +308,7 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
         if (game.keyFuncMap.systemGraphs.keyStatus) {
           renderViewport(game.ctx, so)
         }
-        const remotePos = sub(add(so.viewFramePosition, so.cameraPosition), smul(game.localPlayer.cameraPosition, 1))
+        const remotePos = sub2(add2(so.viewFramePosition, so.cameraPosition), smul2(game.localPlayer.cameraPosition, 1))
 
         renderShip(so, game.ctx, false, game.style, remotePos)
       }
@@ -336,14 +336,31 @@ export class Every {
 }
 
 const every = new Every(25)
+const every30 = new Every(60)
+
+
+const cameraLagSize = 1
+const cameraLag = vec2Array(cameraLagSize, 0, 0)
+
+function last(arr: Vec2[]): Vec2 {
+  return arr[arr.length - 1]
+}
 
 function moveView(game: Game) {
   // bound ship to viewframe
   const center = getScreenCenterPosition(game.ctx)
-  // const camBound = sub(smul(game.localPlayer.worldSize, 0.5), getScreenRect(game.ctx))
-  // game.localPlayer.cameraPosition = add(game.localPlayer.cameraPosition, game.localPlayer.velocity)
+  // const camBound = sub2(smul2(game.localPlayer.worldSize, 0.5), getScreenRect(game.ctx))
+  // game.localPlayer.cameraPosition = add2(game.localPlayer.cameraPosition, game.localPlayer.velocity)
   // game.localPlayer.cameraPosition = vec2Bound(game.localPlayer.cameraPosition, camBound)
-  game.localPlayer.viewFramePosition = add(center, smul(game.localPlayer.velocity, 5))
+  const d = dist2(center, game.localPlayer.position)
+  cameraLag.push(game.localPlayer.velocity)
+  if (cameraLag.length > cameraLagSize) {
+    game.localPlayer.viewFramePosition = add2(center, smul2(cameraLag[0], 5))
+  }
+  cameraLag.shift()
+  // every30.tick(() => {
+  //   console.log({ cameraLag, d })
+  // })
 }
 
 export function renderFrame(game: Game, dt: number): void {
@@ -361,7 +378,7 @@ export function renderFrame(game: Game, dt: number): void {
 
   const ctx = game.ctx
   game.lightSource.position = game.localPlayer.position
-  game.lightSource.direction = direction(game.localPlayer.angleDegree)
+  game.lightSource.direction = direction2(game.localPlayer.angleDegree)
 
   game.testShapes.forEach((s) => {
     s.render(ctx)
@@ -385,7 +402,7 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
   addDataPoint(ppsbuf, ops)
   addDataPoint(rxByteDataBuf, rxDataBytes)
-  addDataPoint(speedbuf, 100 * magnitude(game.localPlayer.velocity))
+  addDataPoint(speedbuf, 100 * magnitude2(game.localPlayer.velocity))
   addDataPoint(hpbuf, game.localPlayer.health)
   addDataPoint(packetSizeBuf, dataLen)
   addDataPoint(batbuf, game.localPlayer.batteryLevel)
@@ -423,16 +440,16 @@ export function renderFrame(game: Game, dt: number): void {
     renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
 
     // Position info for debugging
-    renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
-    renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
-    renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
+    renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
+    renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
+    renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add2(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
     renderVec2(
-      `world: ${to_string2(add(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
-      add(game.localPlayer.viewFramePosition, newVec2(0, 100)),
+      `world: ${to_string2(add2(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
+      add2(game.localPlayer.viewFramePosition, newVec2(0, 100)),
       ctx,
       game.style
     )
-    renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add(game.localPlayer.viewFramePosition, newVec2(300, 200)), ctx, game.style)
+    renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), ctx, game.style)
 
   }
 
@@ -445,10 +462,10 @@ export function renderFrame(game: Game, dt: number): void {
       }
     } else {
       // fix the body position in world relative to player...
-      const bodyPos = sub(add(body.viewFramePosition, body.cameraPosition), smul(game.localPlayer.cameraPosition, 1))
+      const bodyPos = sub2(add2(body.viewFramePosition, body.cameraPosition), smul2(game.localPlayer.cameraPosition, 1))
 
       if (game.keyFuncMap.systemGraphs.keyStatus) {
-        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add(bodyPos, newVec2(-100, -100)), ctx, game.style)
+        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), ctx, game.style)
       }
 
       renderMoon(body, ctx, bodyPos)
@@ -492,7 +509,7 @@ export function renderFrame(game: Game, dt: number): void {
 function handleStarBackdrop(game: Game): void {
   // move star ref with inverted view frame position and factor
   for (let i = 0; i < game.stars.length; i++) {
-    if (offScreen_mm(game.stars[i], game.localPlayer.cameraPosition, add(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)))) {
+    if (offScreen_mm(game.stars[i], game.localPlayer.cameraPosition, add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)))) {
       // just wrapping the stars looks better:
       // but this causes the stars to bunch up in a line or grid pattern after flying around some
       // so add some randomness when wrapping and regenerate them outside of the screen...
@@ -500,12 +517,12 @@ function handleStarBackdrop(game: Game): void {
       const maxRand = 500
       wrap_mm(
         game.stars[i],
-        sub(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)),
-        add(add(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand))
+        sub2(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)),
+        add2(add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand))
       )
     }
 
-    const starpos = sub(game.stars[i], smul(game.localPlayer.cameraPosition, 1))
+    const starpos = sub2(game.stars[i], smul2(game.localPlayer.cameraPosition, 1))
     renderPoint(game.ctx, starpos, game.style.starColor, screenScale * 1.5)
   }
 }

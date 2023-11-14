@@ -1,7 +1,7 @@
 import type { Boostable, Damageable, NonPlayerCharacter, PhotonLaser, Positionable, SpaceObject, Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
-import { scalarMultiply, wrap, rndf, add, rndi, copy, degToRad, type Vec2, sub, smul } from 'mathil'
+import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2 } from 'mathil'
 import { maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
@@ -35,8 +35,8 @@ export function getThrustVector(so: Thrustable & Steerable & Boostable, dirAng: 
 }
 
 export function applyEngineThrust(so: Thrustable & Steerable & Boostable, directionDeg: number, boost = false): void {
-  so.velocity = add(so.velocity, getThrustVector(so, directionDeg, boost))
-  // so.acceleration = add(so.acceleration, getThrustVector(so, directionDeg))
+  so.velocity = add2(so.velocity, getThrustVector(so, directionDeg, boost))
+  // so.acceleration = add2(so.acceleration, getThrustVector(so, directionDeg))
 }
 
 export function wrapSpaceObject(so: Positionable, screen: Vec2): void {
@@ -71,21 +71,21 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   shot.size = { x: rndi(4, 6), y: rndi(20, 30) }
   // shot.color = randomLightGreen()
   shot.color = so.photonColor
-  let head: Vec2 = copy(add(so.cameraPosition, so.viewFramePosition))
+  let head: Vec2 = copy2(add2(so.cameraPosition, so.viewFramePosition))
   const aimError = 8 // 8
   const headError = 0.34 // 0.019
   const speedError = 3 // 1.8
 
-  head = add(head, scalarMultiply(getHeading(so), 0))
+  head = add2(head, scalarMultiply2(getHeading(so), 0))
 
-  head = add(head, {
+  head = add2(head, {
     x: rndi(-aimError, aimError),
     y: rndi(-aimError, aimError),
   })
 
-  shot.velocity = scalarMultiply(getHeading(so), 0.6 * so.missileSpeed + rndf(0, speedError))
+  shot.velocity = scalarMultiply2(getHeading(so), 0.6 * so.missileSpeed + rndf(0, speedError))
 
-  shot.velocity = add(shot.velocity, {
+  shot.velocity = add2(shot.velocity, {
     x: rndf(-headError, headError),
     y: rndf(-headError, headError),
   })
@@ -127,8 +127,8 @@ export function fire(so: SpaceObject): void {
 export function handleHittingShot(cameraPosition: Vec2, shot: PhotonLaser, ctx: CanvasRenderingContext2D): void {
   if (shot.didHit) {
     shot.shotBlowFrame--
-    shot.velocity = scalarMultiply(shot.velocity, shotHitReversFactor)
-    const relative = sub(shot.position, smul(cameraPosition, 1))
+    shot.velocity = scalarMultiply2(shot.velocity, shotHitReversFactor)
+    const relative = sub2(shot.position, smul2(cameraPosition, 1))
     renderHitExplosion(relative, ctx)
     if (shot.shotBlowFrame < 0) {
       shot.health = 0

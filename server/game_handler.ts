@@ -1,11 +1,9 @@
 import { info, warn, usNow, EveryInterval, newVec2, rndfVec2 } from 'mathil'
 import { MessageType, NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
 import { createNpc } from '../src/lib/factory'
-import { updateNonPlayerCharacter } from '../src/lib/physics'
-import { Client, getActivePlayersFromSession, getPlayersFromSessionId, globalConnectedClients } from './main'
-import { bounceSpaceObject } from '../src/lib/mechanics'
-import { saveGame } from './api/users/users.services'
-import { bounceFactor, worldStartPosition } from '../src/lib/constants'
+import { updateSpaceObject } from '../src/lib/physics'
+import { Client, globalConnectedClients } from './main'
+import { worldStartPosition } from '../src/lib/constants'
 
 export class GameHandler {
   game_started = false
@@ -40,7 +38,7 @@ export class GameHandler {
       // info(`Game tick ${this.dt}`)
       this.dt = performance.now() - this.lastTime
       for (let i = 0; i < this.asteroids.length; i++) {
-        this.asteroids[i] = updateNonPlayerCharacter(this.asteroids[i], this.dt)
+        this.asteroids[i] = updateSpaceObject(this.asteroids[i], this.dt)
         // bounceSpaceObject(this.asteroids[i], this.asteroids[i].viewport, bounceFactor, 10, 0)
         this.every.tick(() => {
           this.broadcaster(globalConnectedClients, this.asteroids[i], sessionId)

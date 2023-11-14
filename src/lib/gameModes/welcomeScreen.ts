@@ -69,7 +69,7 @@
 //  // initKeyControllers()
 
 //  const offset = 4000
-//  game.localPlayer.position = add(getScreenCenterPosition(game.ctx), rndfVec2(-1000, 1000))
+//  game.localPlayer.position = add2(getScreenCenterPosition(game.ctx), rndfVec2(-1000, 1000))
 
 //  const screenCenter = getScreenCenterPositionFromClient()
 
@@ -102,7 +102,7 @@
 //   s.acceleration.x = 0
 //   s.acceleration.y = 0
 //   s.health = 0
-//   s.position = add(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
+//   s.position = add2(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
 //   game.bodies.push(s)
 //  }
 
@@ -117,7 +117,7 @@
 //   s.acceleration.x = 0
 //   s.acceleration.y = 0
 //   s.health = 0
-//   s.position = add(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
+//   s.position = add2(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
 //   game.bodies.push(s)
 //  }
 

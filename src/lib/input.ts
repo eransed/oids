@@ -1,7 +1,7 @@
 import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject, TouchFunctionMap } from './interface'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
-import { dist2, newVec2, round, round2dec, type Vec2 } from 'mathil'
+import { dist2, newVec2, round2, round2dec, type Vec2 } from 'mathil'
 import { writable, type Writable } from 'svelte/store'
 import { menuOpen } from '../components/menu/MenuStore'
 import { game } from '../pages/GamePage/components/Game/Utils/mainGame'

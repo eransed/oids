@@ -24,7 +24,7 @@
       class="clickable"
       title="Yes... this is you. Go home?"
       on:click={() => {
-        $localPlayer.cameraPosition = add(worldStartPosition, rndfVec2(50, 100))
+        $localPlayer.cameraPosition = add2(worldStartPosition, rndfVec2(50, 100))
       }}
       style="color: {player.color}; font-weight: bold; font-style: italic">{player.name}</td
     >
@@ -35,7 +35,7 @@
       class="clickable"
       on:click={() => {
         if (player) {
-          $localPlayer.cameraPosition = add(player.cameraPosition, rndfVec2(50, 100))
+          $localPlayer.cameraPosition = add2(player.cameraPosition, rndfVec2(50, 100))
         }
       }}
       style="color: {player.color}">{player.name}</td

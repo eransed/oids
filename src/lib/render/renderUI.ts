@@ -1,5 +1,5 @@
 import type { Bounded, Remote, SpaceObject } from '../interface'
-import { degToRad, linearTransform, magnitude, round2dec, scalarMultiply, to_string2, type Vec2 } from 'mathil'
+import { degToRad, linearTransform, magnitude2, round2dec, scalarMultiply2, to_string2, type Vec2 } from 'mathil'
 import { getScreenFromCanvas, getScreenRect } from '../canvas_util'
 import { getNamesAsString, setScaledFont } from './render2d'
 // import { getConnInfo, getReadyStateText } from '../websocket/webSocket'
@@ -15,7 +15,7 @@ export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remo
   ctx.strokeRect(0, 0, viewport.x, viewport.y)
 }
 
-export function renderRect(ctx: CanvasRenderingContext2D, size: Vec2, pos: Vec2, color='#ccc', lineWidth=10): void {
+export function renderRect(ctx: CanvasRenderingContext2D, size: Vec2, pos: Vec2, color = '#ccc', lineWidth = 10): void {
   ctx.strokeStyle = color
   ctx.lineWidth = lineWidth
   ctx.strokeRect(pos.x, pos.y, size.x, size.y)
@@ -49,20 +49,20 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   ctx.fillText('SIF: ' + so.shotsInFlight.length, xpos + 360, yrow1)
   // ctx.fillText(so.health + 'hp', xpos + offset * 0.5, yrow1)
   // ctx.fillText('Ammo: ' + so.ammo, xpos + offset * 0.9, yrow1)
-  // ctx.fillText(round2dec(magnitude(so.velocity), 1) + ' pix/fra', xpos + offset * 1.5, ypos)
+  // ctx.fillText(round2dec(magnitue2(so.velocity), 1) + ' pix/fra', xpos + offset * 1.5, ypos)
   ctx.fillText('P' + to_string2(so.position, 0), xpos + 600, yrow1)
   ctx.fillText('V' + to_string2(so.velocity, 1), xpos + 1000, yrow1)
-  ctx.fillText('A' + to_string2(scalarMultiply(so.acceleration, 1000), 1), xpos + 1400, yrow1)
+  ctx.fillText('A' + to_string2(scalarMultiply2(so.acceleration, 1000), 1), xpos + 1400, yrow1)
   const firstBar = 170
   const barDiff = 80
   renderProgressBar({ x: xposBar, y: yrow1 - firstBar }, 'hp', so.health, 250, ctx, 75)
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 1) }, 'Bat', so.batteryLevel, 500, ctx, 250)
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 2) }, 'Amm', so.ammo, 1000, ctx, 200)
-  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, 'Speed', magnitude(so.velocity), 20, ctx, -15)
+  renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 3) }, 'Speed', magnitude2(so.velocity), 20, ctx, -15)
   const cstate: string = so.canonOverHeat ? 'Overheat' : 'Heat'
   renderProgressBar({ x: xposBar, y: yrow1 - (firstBar + barDiff * 4) }, cstate, so.canonCoolDown, 100, ctx, -50, so.canonOverHeat, '#d44')
   // renderProgressBar({ x: xpos, y: yrow1 - 500 }, 'SIF', so.shotsInFlight.length, 4000, ctx, -2800)
-  // renderProgressBar({ x: xpos, y: yrow1 - 700 }, 'Acc.', magnitude(so.acceleration), 0.1, ctx, -0.05)
+  // renderProgressBar({ x: xpos, y: yrow1 - 700 }, 'Acc.', magnitude2(so.acceleration), 0.1, ctx, -0.05)
   ctx.restore()
 }
 

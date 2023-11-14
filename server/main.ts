@@ -7,7 +7,7 @@ import { getLocalIp, ipport } from './net'
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
 import { MessageType, NonPlayerCharacter, Session, SpaceObject } from '../src/lib/interface'
-import { dist2, error, info, log, warn } from 'mathil'
+import { dist2, error, getNameVersion, getVersionInfo, info, log, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
 
@@ -415,5 +415,7 @@ server.on('connection', function connection(clientConnection: WebSocket, req: In
   })
 })
 
+// console.log(getVersionInfo())
+info(getNameVersion())
 info(`Starting ${name_ver}`)
 info(`Listening on ws://localhost:${WS_PORT} and ws://${getLocalIp()}:${WS_PORT}\n`)
