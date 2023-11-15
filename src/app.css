@@ -12,6 +12,10 @@ body {
   padding: 0;
 }
 
+button{
+  cursor: pointer;
+}
+
 :root {
   --main-bg-color: #000033;
   --main-text-color: #fff;

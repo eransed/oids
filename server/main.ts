@@ -31,9 +31,7 @@ const server: WebSocketServer = new WebSocketServer({
 
 export let globalConnectedClients: Client[] = []
 
-
 function createGame(sessionId: string) {
-
   const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
     // info(`Sending to session: ${sessionId}`)
     const sendCount = serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
@@ -58,7 +56,6 @@ function createGame(sessionId: string) {
   gameHandler.game_session_start(sessionId)
 
   return gameHandler
-
 }
 
 const game_handlers: GameHandler[] = []
@@ -73,7 +70,7 @@ function debugData(so: SpaceObject) {
     name: so.name,
     session: so.sessionId,
     messageType: MessageType[so.messageType],
-    lastMessage: so.lastMessage
+    lastMessage: so.lastMessage,
   }
   console.log({ logdata })
 }
@@ -139,7 +136,7 @@ export class Client {
 
       try {
         const so: SpaceObject = JSON.parse(event.data)
-        debugData(so)
+        // debugData(so)
         this.lastDataObject = so
         this.sessionId = so.sessionId
         so.serverVersion = name_ver
@@ -298,8 +295,8 @@ class Every {
 }
 
 function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: SpaceObject): void {
-  info(`Sending:`)
-  debugData(data)
+  // info(`Sending:`)
+  // debugData(data)
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {

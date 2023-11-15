@@ -100,10 +100,9 @@
 .modalProfile:hover {
   filter: saturate(5);
   opacity: 1;
-
   transition-property: all;
   transition: 1s;
-
+  cursor: pointer;
   width: -moz-fit-content;
   width: fit-content;
 }
