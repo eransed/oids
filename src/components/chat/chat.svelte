@@ -13,7 +13,6 @@
   import { Icons } from '../../style/icons'
   import Button90 from '../menu/Button90.svelte'
   import { initKeyControllers, initTouchControls, removeKeyControllers, removeTouchControls } from '../../lib/input'
-  import { initRegularGame } from '../../lib/gameModes/regular'
 
   let chatMsg: string
 
@@ -46,7 +45,6 @@
     $localPlayer.messageType = MessageType.CHAT_MESSAGE
     $localPlayer.lastMessage = msgStr
     $localPlayer.online = true
-    console.log($localPlayer)
     $socket.send($localPlayer)
     chatMsg = ''
     scrollToBottom()

@@ -25,7 +25,7 @@ const DefaultKeyMap: KeyFunctionMap = {
   hotKeys: { activators: ['o'], keyStatus: false, store: writable<boolean>(false), toggle: true },
   shipSettings: { activators: ['i'], keyStatus: false, store: writable<boolean>(false), toggle: true },
   shipDetails: { activators: ['y'], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  chat: { activators: ['c'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  chat: { activators: ['c'], keyStatus: false, store: writable<boolean>(true), toggle: true },
   menu: { activators: ['Escape'], keyStatus: false, store: writable<boolean>(false), toggle: true },
 }
 

@@ -131,11 +131,6 @@
     removeTouchControls()
     game.stopGame()
   })
-
-  $: if ($showChat) {
-    removeKeyControllers()
-    removeTouchControls()
-  }
 </script>
 
 <div class="gameInfo">
@@ -158,9 +153,11 @@
   </InGameInfo>
 </div>
 
-<div class="chat" style="position: absolute; z-index: 1; bottom: 0; left: 0">
-  <Chat joinedSessionId={sessionId} inGameChat />
-</div>
+{#if $showChat}
+  <div class="chat" style="position: absolute; z-index: 1; bottom: 0; left: 0">
+    <Chat joinedSessionId={sessionId} inGameChat />
+  </div>
+{/if}
 
 {#if $showShipDetails}
   <ModalSimple closeBtn={() => ($showShipDetails = !$showShipDetails)} saveButton={false}>
