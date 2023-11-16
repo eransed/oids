@@ -9,7 +9,7 @@
   import type { Game } from '../../../../lib/game'
   import { settings } from '../../../../stores/stores'
   import { toggleAndGetTheme } from '../../../../style/defaultColors'
-  import { initKeyControllers, initTouchControls } from '../../../../lib/input'
+  import { getKeyMap } from '../../../../lib/input'
 
   export let currentGame: Game
 
@@ -24,10 +24,7 @@
   const continueGame: Button90Config = {
     buttonText: 'Continue',
     clickCallback() {
-      $menuOpen = false
-
-      initKeyControllers()
-      initTouchControls()
+      getKeyMap().menu.store.set(false)
     },
     selected: false,
   }
@@ -35,7 +32,7 @@
   const exit: Button90Config = {
     buttonText: 'Exit game',
     clickCallback() {
-      $menuOpen = false
+      getKeyMap().menu.store.set(false)
       stopGame(currentGame)
       navigate('/play')
     },

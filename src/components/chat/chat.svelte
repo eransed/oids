@@ -12,8 +12,12 @@
   //Assets
   import { Icons } from '../../style/icons'
   import Button90 from '../menu/Button90.svelte'
+  import { initKeyControllers, initTouchControls, removeKeyControllers, removeTouchControls } from '../../lib/input'
+  import { initRegularGame } from '../../lib/gameModes/regular'
 
   let chatMsg: string
+
+  export let inGameChat: boolean = false
   export let joinedSessionId: string
 
   function dateTimeFormat(d: Date): string {
@@ -41,6 +45,8 @@
 
     $localPlayer.messageType = MessageType.CHAT_MESSAGE
     $localPlayer.lastMessage = msgStr
+    $localPlayer.online = true
+    console.log($localPlayer)
     $socket.send($localPlayer)
     chatMsg = ''
     scrollToBottom()
@@ -63,6 +69,18 @@
       if (uniqueMsg.length === 1 && uniqueMsg[0] === ' ') {
         return
       } else sendRawChatMessage(chatMsg)
+    }
+  }
+
+  function handleFocus(state: boolean) {
+    if (inGameChat) {
+      if (state) {
+        removeKeyControllers()
+        removeTouchControls()
+      } else {
+        initKeyControllers()
+        initTouchControls()
+      }
     }
   }
 </script>
@@ -91,7 +109,7 @@
 </div>
 <div class="msgInput">
   <form on:submit|preventDefault={sendChatMessage}>
-    <input bind:value={chatMsg} placeholder={`Aa`} type="text" />
+    <input on:focus={() => handleFocus(true)} on:blur={() => handleFocus(false)} bind:value={chatMsg} placeholder={`Aa`} type="text" />
     <!-- <button type="submit">Send</button> -->
 
     <Button90 minWidth="2em" borderBottom buttonType="submit" icon={Icons.Send} />

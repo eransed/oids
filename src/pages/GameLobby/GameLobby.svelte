@@ -8,6 +8,7 @@
   //Components
   import Page from '../../components/page/page.svelte'
   import Ships from '../ProfilePage/Ships.svelte'
+  import Chat from '../../components/chat/chat.svelte'
 
   //Services
   import type { ChatMessage, ChosenShip, Session } from '../../lib/interface'
@@ -18,7 +19,6 @@
   import { onDestroy, onMount } from 'svelte'
   import { navigate } from 'svelte-routing'
   import { info, log, warn } from 'mathil'
-  import Chat from '../../components/chat/chat.svelte'
   import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
 

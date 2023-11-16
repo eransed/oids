@@ -1,10 +1,9 @@
 import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject, TouchFunctionMap } from './interface'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
-import { dist2, newVec2, round2, round2dec, type Vec2 } from 'mathil'
+import { dist2, newVec2, type Vec2 } from 'mathil'
 import { writable, type Writable } from 'svelte/store'
 import { menuOpen } from '../components/menu/MenuStore'
-import { game } from '../pages/GamePage/components/Game/Utils/mainGame'
 
 export const activeKeyStates: Writable<KeyFunction[]> = writable()
 export const gameState: Writable<GameState> = writable()
@@ -25,7 +24,9 @@ const DefaultKeyMap: KeyFunctionMap = {
   leaderBoard: { activators: ['p'], keyStatus: false, store: writable<boolean>(false), toggle: true },
   hotKeys: { activators: ['o'], keyStatus: false, store: writable<boolean>(false), toggle: true },
   shipSettings: { activators: ['i'], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  shipDetails: { activators: ['c'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  shipDetails: { activators: ['y'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  chat: { activators: ['c'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  menu: { activators: ['Escape'], keyStatus: false, store: writable<boolean>(false), toggle: true },
 }
 
 const DefaultTouchMap: TouchFunctionMap = {
@@ -84,7 +85,8 @@ function arrowControl(e: KeyboardEvent, keyUseState: boolean) {
   Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunctionStore) => {
     keyFunction.activators.map((activator: string) => {
       if (activator === e.key) {
-        if (keyFunction.toggle && keyUseState) {
+        if (keyFunction.toggle && keyUseState && e.type === 'keydown') {
+          console.log(keyFunction.keyStatus)
           keyFunction.keyStatus = !keyFunction.keyStatus
         } else if (!keyFunction.toggle) {
           keyFunction.keyStatus = keyUseState

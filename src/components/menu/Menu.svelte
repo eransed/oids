@@ -3,44 +3,10 @@
   import Button90 from './Button90.svelte'
   import type { Button90Config } from '../../interfaces/menu'
   import MenuWrapper from './MenuWrapper.svelte'
-  import { onDestroy } from 'svelte'
-  import { addKeyDownListener } from '../../stores/eventListenerStore'
-  import { menuOpen } from './MenuStore'
-
-  import { writable } from 'svelte/store'
-
-  // used to disable game controllers while menu is open
-  import { initKeyControllers, removeKeyControllers, removeTouchControls } from '../../lib/input'
-  import { info } from 'mathil'
 
   //Exports
   export let buttons: Button90Config[]
   export let menuHeader: string = 'Menu'
-
-  $: if ($menuOpen) {
-    info(`Menu open state: ${$menuOpen}`)
-    removeKeyControllers()
-    removeTouchControls()
-  }
-
-  const toggleMenu = (): void => {
-    $menuOpen = !$menuOpen
-  }
-
-  const handleKeyDown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape') {
-      toggleMenu()
-    }
-  }
-
-  //Add the event listener using the reusable function
-  const cleanup = addKeyDownListener(handleKeyDown)
-
-  onDestroy(() => {
-    //Call the cleanup function
-    cleanup()
-    document.removeEventListener('keydown', handleMenuSelection)
-  })
 
   const rotate = (index: number, size: number): number => {
     if (index < 0) return (size + (index % size)) % size
@@ -74,26 +40,18 @@
     buttons[selectedIndex].selected = true
     // console.log('code =', event.code, ', key =',event.key)
   }
-
-  $: if ($menuOpen) {
-    document.addEventListener('keydown', handleMenuSelection)
-  } else {
-    document.removeEventListener('keydown', handleMenuSelection)
-  }
 </script>
 
-{#if $menuOpen}
-  <MenuWrapper>
-    <ul class="buttonList">
-      <h3 class="menuHeader">{menuHeader}</h3>
-      {#each buttons as button}
-        <li class="button">
-          <Button90 borderBottom buttonConfig={button} />
-        </li>
-      {/each}
-    </ul>
-  </MenuWrapper>
-{/if}
+<MenuWrapper>
+  <ul class="buttonList">
+    <h3 class="menuHeader">{menuHeader}</h3>
+    {#each buttons as button}
+      <li class="button">
+        <Button90 borderBottom buttonConfig={button} />
+      </li>
+    {/each}
+  </ul>
+</MenuWrapper>
 
 <style>
   :root {

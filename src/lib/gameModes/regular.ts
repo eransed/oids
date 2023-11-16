@@ -1,7 +1,25 @@
 import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
 import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
-import { add2, direction2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPretty, smul2, sub2, to_string2, vec2Array, type Vec2, dist2, warn } from 'mathil'
+import {
+  add2,
+  direction2,
+  info,
+  log,
+  magnitude2,
+  newVec2,
+  rndfVec2,
+  rndi,
+  round2dec,
+  siPretty,
+  smul2,
+  sub2,
+  to_string2,
+  vec2Array,
+  type Vec2,
+  dist2,
+  warn,
+} from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions, offScreen_mm, wrap_mm } from '../physics'
 import { loadingText, renderInfoText, renderPoint } from '../render/render2d'
@@ -17,6 +35,7 @@ import { renderMoon } from '../render/renderDebris'
 import { renderShip } from '../render/renderShip'
 import { renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
+import { chatMessageHistory } from '../../stores/stores'
 
 //Stores
 
@@ -194,6 +213,12 @@ export function initRegularGame(game: Game): void {
         game.serverVersion = su.dataObject.serverVersion
         info(`Service message: server version: ${su.dataObject.serverVersion}`)
         return
+      } else if (su.dataObject.messageType === MessageType.CHAT_MESSAGE) {
+        chatMessageHistory.update((previousMessages) => [
+          ...previousMessages,
+          { message: su.dataObject.lastMessage, timeDate: new Date(), user: su.dataObject },
+        ])
+        return
       } else if (su.dataObject) {
         const so: SpaceObject = su.dataObject
         dataLen = su.unparsedDataLength
@@ -341,7 +366,6 @@ export class Every {
 const every = new Every(25)
 const every30 = new Every(60)
 
-
 const cameraLagSize = 1
 const cameraLag = vec2Array(cameraLagSize, 0, 0)
 
@@ -389,7 +413,6 @@ export function renderFrame(game: Game, dt: number): void {
 
   game.remotePlayers = handleRemotePlayers(game.remotePlayers, game)
 
-
   if (game.keyFuncMap.systemGraphs.keyStatus) {
     fpsCounter(ops, dt, game, ctx)
   }
@@ -400,7 +423,6 @@ export function renderFrame(game: Game, dt: number): void {
   })
 
   handleStarBackdrop(game)
-
 
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
   addDataPoint(ppsbuf, ops)
@@ -453,11 +475,9 @@ export function renderFrame(game: Game, dt: number): void {
       game.style
     )
     renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), ctx, game.style)
-
   }
 
   game.bodies.forEach((body) => {
-
     if (body.health < 1) {
       handleDeathExplosion(body, explosionDuration)
       if (!body.obliterated) {
@@ -483,7 +503,6 @@ export function renderFrame(game: Game, dt: number): void {
     return !body.obliterated
   })
 
-
   if (game.localPlayer.health <= 0) {
     //Local player is dead
 
@@ -504,7 +523,6 @@ export function renderFrame(game: Game, dt: number): void {
       renderShip(game.localPlayer, ctx, true, game.style)
     }
   }
-
 
   moveView(game)
 }

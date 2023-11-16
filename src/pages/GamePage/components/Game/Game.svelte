@@ -5,16 +5,14 @@
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
-  import { createSpaceObject, currentTimeDate } from '../../../../lib/factory'
   import { Game } from '../../../../lib/game'
-  import { getKeyMap, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
+  import { getKeyMap, initKeyControllers, initTouchControls, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
 
   //Components
   import GameMenu from '../Menu/GameMenu.svelte'
   import InGameInfo from '../InGameInfo/inGameInfo.svelte'
   import HotKeys from '../Hotkeys/hotKeys.svelte'
   import ShipSettings from '../ShipSettings/ShipSettings.svelte'
-  import { ShipBundles } from '../../../../style/ships'
 
   //Websocket
   // import { disconnect } from "../../../../lib/websocket/webSocket"
@@ -23,24 +21,22 @@
   // Game variants
   import { initRegularGame, nextFrame, renderFrame } from '../../../../lib/gameModes/regular'
   import { guestUserName, isLoggedIn, localPlayer, socket, user } from '../../../../stores/stores'
-  import { saveGame } from '../../../../lib/services/game/saveGame'
-  import type { GameHistory } from '../../../../interfaces/game'
   import { gameRef } from './Utils/mainGame'
   import { playersInSession } from '../../../../lib/services/game/playersInSession'
-  import type { AxiosResponse } from 'axios'
   import { info } from 'mathil'
-  import getProfile from '../../../../lib/services/user/profile'
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
   import Ships from '../../../ProfilePage/Ships.svelte'
   import type { Ship } from '@prisma/client'
   import AddShip from '../../../ProfilePage/AddShip.svelte'
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
-  import Cursor from '../../../../components/mouse/cursor.svelte'
+  import Chat from '../../../../components/chat/chat.svelte'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
   const shipSettings = getKeyMap().shipSettings.store
   const showShipDetails = getKeyMap().shipDetails.store
+  const showChat = getKeyMap().chat.store
+  const showMenu = getKeyMap().menu.store
 
   let game: Game
 
@@ -131,8 +127,15 @@
   }
 
   onDestroy(() => {
+    removeKeyControllers()
+    removeTouchControls()
     game.stopGame()
   })
+
+  $: if ($showChat) {
+    removeKeyControllers()
+    removeTouchControls()
+  }
 </script>
 
 <div class="gameInfo">
@@ -155,13 +158,19 @@
   </InGameInfo>
 </div>
 
+<div class="chat" style="position: absolute; z-index: 1; bottom: 0; left: 0">
+  <Chat joinedSessionId={sessionId} inGameChat />
+</div>
+
 {#if $showShipDetails}
-  <ModalSimple closeBtn={() => ($showShipDetails = !$showShipDetails)}>
+  <ModalSimple closeBtn={() => ($showShipDetails = !$showShipDetails)} saveButton={false}>
     <ShipDetails ship={$localPlayer.ship} />
   </ModalSimple>
 {/if}
 
-<GameMenu currentGame={game} />
+{#if $showMenu}
+  <GameMenu currentGame={game} />
+{/if}
 
 {#if $isLoggedIn && $user.ships.length > 1 && !chosenShip}
   {#if $user.ships.length === 0}
