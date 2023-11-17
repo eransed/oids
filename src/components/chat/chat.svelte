@@ -18,6 +18,7 @@
 
   export let inGameChat: boolean = false
   export let joinedSessionId: string
+  export let chatTitle: boolean = true
 
   function dateTimeFormat(d: Date): string {
     const ms = ('' + d.getMilliseconds()).padStart(3, '0')
@@ -83,7 +84,9 @@
   }
 </script>
 
-<p style="margin-left: 0.5em">Chat - {joinedSessionId}</p>
+{#if chatTitle}
+  <p style="margin-left: 0.5em">Chat - {joinedSessionId}</p>
+{/if}
 
 <div class="messages" id="messagesDiv">
   {#each $chatMessageHistory as msg}

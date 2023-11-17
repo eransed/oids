@@ -155,7 +155,7 @@
 
 {#if $showChat}
   <div class="chat" style="position: absolute; z-index: 1; bottom: 0; left: 0">
-    <Chat joinedSessionId={sessionId} inGameChat />
+    <Chat chatTitle={false} joinedSessionId={sessionId} inGameChat />
   </div>
 {/if}
 
