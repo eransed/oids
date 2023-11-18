@@ -17,12 +17,16 @@ export function renderHitExplosion(pos: Vec2, ctx: CanvasRenderingContext2D) {
   ctx.restore()
 }
 
-export function renderExplosionFrame(so: NonPlayerCharacter, ctx: CanvasRenderingContext2D) {
+export function renderExplosionFrame(so: NonPlayerCharacter, ctx: CanvasRenderingContext2D, pos: Vec2 | null = null) {
   const offset = 80
   const minSize = 1
   const maxSize = 36 * so.deadFrameCount * 0.03
   ctx.save()
-  ctx.translate(so.position.x - so.size.x / 2, so.position.y - so.size.y / 2)
+  if (pos !== null) {
+    ctx.translate(pos.x - so.size.x / 2, pos.y - so.size.y / 2)
+  } else {
+    ctx.translate(so.viewFramePosition.x - so.size.x / 2, so.viewFramePosition.y - so.size.y / 2)
+  }
   const colors = ['#ff0', '#f00', '#ee0', '#e00', '#dd0', '#d00', '#008', '#000', '#444', '#fee', '#f66,', '#f99', '#fbb']
 
   if (so.deadFrameCount < explosionDuration * 1) {

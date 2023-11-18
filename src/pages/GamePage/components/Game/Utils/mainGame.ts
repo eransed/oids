@@ -5,6 +5,11 @@ export let game: Game
 export function gameRef(g: Game): void {
   game = g
 }
+export function getGame(): Game | null {
+  if (game) return game
+  warn('Game not set')
+  return null
+}
 
 export function setGameSettings(settings: Settings): void {
   if (game) {

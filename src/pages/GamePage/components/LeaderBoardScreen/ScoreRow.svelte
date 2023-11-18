@@ -4,6 +4,8 @@
   import { localPlayer } from '../../../../stores/stores'
   import { worldStartPosition } from '../../../../lib/constants'
   import { getWorldCoordinates } from '../../../../lib/physics'
+  import { resetStars } from '../../../../lib/gameModes/regular'
+  import { getGame } from '../Game/Utils/mainGame'
   function getCameraPos(n: NonPlayerCharacter | null) {
     if (n) {
       return n.cameraPosition
@@ -24,7 +26,7 @@
   <th colspan="1">Name</th>
   <th colspan="1">Kills</th>
   <th colspan="1">Hp</th>
-  <th colspan="1">Bounces</th>
+  <!-- <th colspan="1">Bounces</th> -->
   <th colspan="1">X</th>
   <th colspan="1">Y</th>
   <th colspan="1">Battery</th>
@@ -35,16 +37,17 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <td
       class="clickable"
-      title="Yes... this is you. Go home?"
+      title="Teleport to world start position"
       on:click={() => {
         $localPlayer.cameraPosition = add2(worldStartPosition, rndfVec2(-teleOffset, teleOffset))
+        resetStars(getGame())
       }}
       style="color: {theObj.color}; font-weight: bold; font-style: italic">{theObj.name}</td
     >
   {:else}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <td
-      title="Teleport to player"
+      title="Teleport to {theObj?.name}"
       class="clickable"
       on:click={() => {
         if (player) {
@@ -52,13 +55,14 @@
         } else if (serverObj) {
           $localPlayer.cameraPosition = sub2(add2(serverObj.cameraPosition, rndfVec2(-teleOffset, teleOffset)), $localPlayer.viewFramePosition)
         }
+        resetStars(getGame())
       }}
       style="color: {theObj.color}">{theObj.name}</td
     >
   {/if}
   <td>{theObj.killCount}</td>
   <td>{theObj.health}</td>
-  <td>{theObj.bounceCount}</td>
+  <!-- <td>{theObj.bounceCount}</td> -->
   <td>{pos.x}</td>
   <td>{pos.y}</td>
   {#if player}

@@ -86,7 +86,6 @@ function arrowControl(e: KeyboardEvent, keyUseState: boolean) {
     keyFunction.activators.map((activator: string) => {
       if (activator === e.key) {
         if (keyFunction.toggle && keyUseState && e.type === 'keydown') {
-          console.log(keyFunction.keyStatus)
           keyFunction.keyStatus = !keyFunction.keyStatus
         } else if (!keyFunction.toggle) {
           keyFunction.keyStatus = keyUseState

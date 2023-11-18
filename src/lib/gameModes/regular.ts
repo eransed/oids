@@ -19,6 +19,7 @@ import {
   type Vec2,
   dist2,
   warn,
+  error,
 } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
 import { friction, handleCollisions, offScreen_mm, wrap_mm } from '../physics'
@@ -122,6 +123,26 @@ batbuf.baseUnit = '%'
 // packetSize.maxSize = 1000
 // packetSize.baseUnit = 'B'
 
+function randomPositionInCurrentViewFrame(so: SpaceObject, screenSize: Vec2): Vec2 {
+  return {
+    x: rndi(so.cameraPosition.x, so.cameraPosition.x + screenSize.x),
+    y: rndi(so.cameraPosition.y, so.cameraPosition.y + screenSize.y)
+  }
+}
+
+export function resetStars(game: Game | null) {
+  if (!game) {
+    error('game is null')
+    return
+  }
+  game.stars.forEach((s) => {
+    const r = randomPositionInCurrentViewFrame(game.localPlayer, getScreenFromCanvas(game.ctx))
+    s.x = r.x
+    s.y = r.y
+  })
+  info('reset stars')
+}
+
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
     warn(`Game already running`)
@@ -173,10 +194,18 @@ export function initRegularGame(game: Game): void {
   for (let i = 0; i < 400; i++) {
     // create starts
     const star = rndfVec2(0, 0)
-    star.x = rndi(game.localPlayer.cameraPosition.x, game.localPlayer.cameraPosition.x + getScreenFromCanvas(game.ctx).x)
-    star.y = rndi(game.localPlayer.cameraPosition.y, game.localPlayer.cameraPosition.y + getScreenFromCanvas(game.ctx).y)
     game.stars.push(star)
   }
+
+  resetStars(game)
+
+  function handleResize() {
+    resetStars(game)
+  }
+
+  info(`sets up event listener for window resize`)
+  removeEventListener("resize", handleResize);
+  addEventListener("resize", handleResize);
 
   // game.stars.push(newVec2())
   // game.stars.push(smul2(worldSize, 0.5))
@@ -323,20 +352,20 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
   }
 
   stillPlaying.forEach((so) => {
+    const remotePos = sub2(add2(so.viewFramePosition, so.cameraPosition), game.localPlayer.cameraPosition)
     if (so.shape === SpaceShape.Moon) {
       renderMoon(so, game.ctx)
     } else {
       if (so.health <= 0) {
         handleDeathExplosion(so, explosionDuration)
         if (!so.obliterated) {
-          renderExplosionFrame(so, game.ctx)
+          renderExplosionFrame(so, game.ctx, remotePos)
         }
         return
       } else {
         if (game.keyFuncMap.systemGraphs.keyStatus) {
           renderViewport(game.ctx, so)
         }
-        const remotePos = sub2(add2(so.viewFramePosition, so.cameraPosition), smul2(game.localPlayer.cameraPosition, 1))
 
         renderShip(so, game.ctx, false, game.style, remotePos)
       }
@@ -478,14 +507,14 @@ export function renderFrame(game: Game, dt: number): void {
   }
 
   game.bodies.forEach((body) => {
+    const bodyPos = sub2(add2(body.viewFramePosition, body.cameraPosition), smul2(game.localPlayer.cameraPosition, 1))
     if (body.health < 1) {
       handleDeathExplosion(body, explosionDuration)
       if (!body.obliterated) {
-        renderExplosionFrame(body, ctx)
+        renderExplosionFrame(body, ctx, bodyPos)
       }
     } else {
       // fix the body position in world relative to player...
-      const bodyPos = sub2(add2(body.viewFramePosition, body.cameraPosition), smul2(game.localPlayer.cameraPosition, 1))
 
       if (game.keyFuncMap.systemGraphs.keyStatus) {
         renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), ctx, game.style)
