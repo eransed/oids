@@ -1,9 +1,8 @@
 import type { Bounceable, Bounded, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
-import { add2, degToRad, info, limit, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, warn, type Vec2, getScreenRect, newVec2, limitVec2, copy2 } from 'mathil'
-import { getScreenCenterPosition, getScreenFromCanvas } from './canvas_util'
+import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, warn, good, bad, error } from 'mathil'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
-import { angularFriction, collisionFrameDamage, linearFriction, maxShotAge, missileDamageVelocityTransferFactor, screenPaddingFactor, timeScale } from './constants'
+import { angularFriction, linearFriction, maxShotAge, missileDamageVelocityTransferFactor, timeScale } from './constants'
 import type { Shape } from './shapes/Shape'
 
 export function updateShape(shape: Shape, dt: number): void {
@@ -23,7 +22,7 @@ export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
   })
 }
 
-export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: number, ctx: CanvasRenderingContext2D | null = null): SpaceObject | NonPlayerCharacter {
+export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: number): SpaceObject | NonPlayerCharacter {
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) return npc
   const deltaTime: number = dt * timeScale
@@ -33,49 +32,26 @@ export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: num
   npc.position = add2(npc.position, v)
   npc.cameraVelocity = smul2(v, 1)
   npc.cameraPosition = add2(npc.cameraPosition, npc.cameraVelocity)
-  // npc.position = vec2Bound(npc.position, sub2(smul2(npc.worldSize, 0.5), getScreenRect(ctx)))
+  // npc.position = vec2Bound(npc.position, sub2(smul2(npc.worldSize, 0.5), npc.viewport))
   npc.acceleration = { x: 0, y: 0 }
   npc.velocity = limitVec2(npc.velocity, { x: 250, y: 250 })
   npc.angleDegree += npc.angularVelocity * deltaTime
   if (npc.angleDegree < 0) npc.angleDegree = 360
   if (npc.angleDegree > 360) npc.angleDegree = 0
-  if (npc.shotsInFlight && ctx) {
-    updateShots(npc, deltaTime, ctx)
+  if (npc.shotsInFlight) {
+    updateShots(npc, deltaTime)
   }
   return npc
 }
 
-// export function updateNonPlayerCharacter(npc: NonPlayerCharacter, dt: number): NonPlayerCharacter {
-//   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
-//   if (isNaN(dt)) {
-//     console.log(`nan!`)
-//     return npc
-//   }
-//   const deltaTime: number = dt * timeScale
-//   const v: Vec2 = scalarMultiply2(npc.velocity, deltaTime)
-//   const a: Vec2 = scalarMultiply2(npc.acceleration, deltaTime)
-//   npc.velocity = add2(npc.velocity, a)
-//   npc.position = add2(npc.position, v)
-//   npc.cameraPosition = add2(npc.cameraPosition, v)
-//   npc.acceleration = { x: 0, y: 0 }
-//   npc.velocity = limitVec2(npc.velocity, { x: 250, y: 250 })
-//   npc.angleDegree += npc.angularVelocity * deltaTime
-//   if (npc.angleDegree < 0) npc.angleDegree = 360
-//   if (npc.angleDegree > 360) npc.angleDegree = 0
-//   return npc
-// }
-
-export function updateSpaceObjects(npcs: (SpaceObject | NonPlayerCharacter)[], frameTimeMs: number, ctx: CanvasRenderingContext2D): void {
-  npcs.forEach((npc) => {
-    updateSpaceObject(npc, frameTimeMs, ctx)
-  })
+export function updateSpaceObjects(npcs: (SpaceObject | NonPlayerCharacter)[], frameTimeMs: number): void {
+  for (let i = 0; i < npcs.length; i++) {
+    updateSpaceObject(npcs[i], frameTimeMs)
+  }
 }
 
-export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number, ctx: CanvasRenderingContext2D): void {
+export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number): void {
   if (isNaN(dts)) return
-
-  // decayOffScreenShotsPadded(npc, getScreenFromCanvas(ctx), screenPaddingFactor)
-  // decayOffScreenShots(npc, npc.worldSize)
 
   decayDeadShots(npc)
 
@@ -100,10 +76,7 @@ export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number, 
       shot.health = -1
     }
 
-    // bounceSpaceObject(shot, screen, 1, 0, 0.7)
-    //handleHittingShot(shot, ctx)
   }
-  // removeShotsAfterBounces(npc, 2)
 }
 
 export function decayOffScreenShots(npc: SpaceObject | NonPlayerCharacter, screen: Vec2) {
@@ -296,15 +269,16 @@ export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen
   }
 }
 
-export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCharacter[], ctx: CanvasRenderingContext2D): void {
+export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCharacter[], ctx: CanvasRenderingContext2D | null = null): void {
   resetCollisions(spaceObjects)
   for (const npc0 of spaceObjects) {
     if (npc0.isDead) continue
 
     for (const npc1 of spaceObjects) {
       if (npc1.isDead) continue
-      //  if (isColliding(npc0, npc1) && npc0.name !== npc1.name) {
+
       if (isWithinRadiusWorld(npc0, npc1, npc1.hitRadius) && npc0.name !== npc1.name) {
+        // good(`collision!`)
         npc0.colliding = true
         npc1.colliding = true
         npc0.collidingWith.push(npc1)
@@ -312,20 +286,28 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCh
         // npc0.health -= collisionFrameDamage
         // npc1.health -= collisionFrameDamage
 
-        const relative0 = sub2(getWorldCoordinates(npc0), smul2(cameraPosition, 1))
-        const relative1 = sub2(getWorldCoordinates(npc1), smul2(cameraPosition, 1))
-        renderHitExplosion(relative0, ctx)
-        renderHitExplosion(relative1, ctx)
+        if (ctx) {
+          const relative0 = sub2(getWorldCoordinates(npc0), cameraPosition)
+          const relative1 = sub2(getWorldCoordinates(npc1), cameraPosition)
+          renderHitExplosion(relative0, ctx)
+          renderHitExplosion(relative1, ctx)
+        }
 
-        const f = -0.005
+        // const f = -0.005
         // npc0.velocity = smul2(npc0.velocity, f * npc1.mass)
         // npc1.velocity = smul2(npc0.velocity, -f * npc0.mass)
       }
+
+
       for (const shot of npc0.shotsInFlight) {
         if (shot.armedDelay < 0) {
           const heading: Vec2 = scalarMultiply2(headingFromangle2(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
 
+          // no self fire
+          if (shot.ownerName === npc1.name) continue
+
           if (isWithinRadius(shot, npc1, npc1.hitRadius) && shot.didHit === false) {
+            bad(`${shot.ownerName} did hit ${npc1.name}, hp: ${npc1.health}`)
             npc1.health -= shot.damage
             npc1.velocity = add2(npc1.velocity, heading)
             npc1.lastDamagedByName = shot.ownerName
@@ -339,10 +321,16 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCh
                 npc1.health = 0
               }
             }
+          } else {
+            // warn(`${shot.ownerName} missed ${npc1.name}, hp: ${npc1.health}`)
           }
+        } else {
+          // error(`${shot.ownerName} unarmed shot... ${npc1.name}, hp: ${npc1.health}`)
         }
 
-        handleHittingShot(cameraPosition, shot, ctx)
+        if (ctx) {
+          handleHittingShot(cameraPosition, shot, ctx)
+        }
       }
     }
   }

@@ -96,3 +96,4 @@ export function soShotsInFlightValueArray(so: SpaceObject): any[] {
 
   return shotList
 }
+

@@ -37,6 +37,7 @@ import { renderShip } from '../render/renderShip'
 import { renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
 import { chatMessageHistory } from '../../stores/stores'
+import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 
 //Stores
 
@@ -278,21 +279,17 @@ export function initRegularGame(game: Game): void {
               continue
             }
 
-            // Store every previously shots fired
-            const cachePhotonLasers = game.remotePlayers[i].shotsInFlight
+            // // Store every previously shots fired
+            // const cachePhotonLasers = game.remotePlayers[i].shotsInFlight
 
-            const newShotsThisUpdate = so.shotsInFlight
+            // const newShotsThisUpdate = so.shotsInFlight
 
-            // update the remote player data object
-            game.remotePlayers[i] = so
+            // // update the remote player data object
+            // game.remotePlayers[i] = so
 
-            // if (so.shotsFiredThisFrame) {
-            game.remotePlayers[i].shotsInFlight = [...cachePhotonLasers, ...newShotsThisUpdate]
-            // }
+            // game.remotePlayers[i].shotsInFlight = [...cachePhotonLasers, ...newShotsThisUpdate]
 
-            // Makes sure to return the previously shots fired on the copy of remote player
-            // game.remotePlayers[i].shotsInFlight = game.remotePlayers[i].shotsInFlight.concat(cachePhotonLasers)
-            // console.log (`Remote player: ${i}: ` +  game.remotePlayers[i].shotsInFlight.length)
+            game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
 
             return
           }
@@ -307,6 +304,8 @@ export function initRegularGame(game: Game): void {
       // console.log (su.dataObject)
       // info(`Number of server obj: ${game.bodies.length}`)
       // console.log(su.dataObject)
+
+      // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
       if (!exists(su.dataObject, game.bodies)) {
         // info(`Adding ${su.dataObject.name}`)
         game.bodies.push(su.dataObject)
@@ -320,6 +319,8 @@ export function initRegularGame(game: Game): void {
     }
   )
 }
+
+
 
 function exists(entity: NonPlayerCharacter, entities: NonPlayerCharacter[]): boolean {
   for (let i = 0; i < entities.length; i++) {
@@ -601,7 +602,7 @@ export function nextFrame(game: Game, dt: number): void {
     return so.online || so.isLocal
   })
 
-  const currentSpaceObjects = game.all.concat(game.remotePlayers)
+  const currentSpaceObjects = game.all.concat(game.remotePlayers).concat(game.bodies)
 
   handleCollisions(game.localPlayer.cameraPosition, currentSpaceObjects, game.ctx)
 }

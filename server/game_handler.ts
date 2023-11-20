@@ -1,22 +1,24 @@
-import { info, warn, usNow, EveryInterval, newVec2, rndfVec2 } from 'mathil'
-import { MessageType, NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
+import { info, usNow, EveryInterval, rndfVec2, good, newVec2 } from 'mathil'
+import { NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
 import { createNpc } from '../src/lib/factory'
-import { updateSpaceObject } from '../src/lib/physics'
+import { handleCollisions, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics'
 import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
+import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 
 export class GameHandler {
+
   game_started = false
   asteroids: NonPlayerCharacter[] = []
   game_interval: NodeJS.Timer | undefined = undefined
   start_time_us: number = usNow()
   tied_session_id: string | null = null
 
+  private remoteSpaceObjects: SpaceObject[] = []
   private lastTime = performance.now()
   private dt = performance.now()
   private minTickTimeMs = 1 / 60
   private every = new EveryInterval(2)
-  private screenSize = newVec2(1200, 720)
   broadcaster: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void
 
   constructor(bc: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void) {
@@ -37,50 +39,61 @@ export class GameHandler {
     this.spawnAsteroids()
 
     this.game_interval = setInterval(() => {
-      // info(`Game tick ${this.dt}`)
+
       this.dt = performance.now() - this.lastTime
+
+      updateSpaceObjects(this.remoteSpaceObjects, this.dt)
+      this.checkHittingShots()
+
       for (let i = 0; i < this.asteroids.length; i++) {
         this.asteroids[i] = updateSpaceObject(this.asteroids[i], this.dt)
-        // bounceSpaceObject(this.asteroids[i], this.asteroids[i].viewport, bounceFactor, 10, 0)
+
         this.every.tick(() => {
+          // warn(`Playing clients: ${this.remoteSpaceObjects.length}`)
+          this.asteroids[i].collidingWith = []
           this.broadcaster(globalConnectedClients, this.asteroids[i], sessionId)
         })
       }
       this.lastTime = performance.now()
-      // if (getActivePlayersFromSession(sessionId).length === 0) {
-      //   this.quit_game()
-      // }
+
     }, this.minTickTimeMs)
-    /**
-     * ToDo: Save the game when finished to all clients.
-     */
-    // saveGame('011ef253-eae8-4da5-9eb1-6a0a3816c7e5', false, new Date(), sessionId)
+
   }
 
-  // checkMessage(obj: SpaceObject) {
-  //   if (obj.messageType === MessageType.START_GAME) {
-  //     if (this.game_started) {
-  //       warn(`Game ${this.tied_session_id} already running`)
-  //       return null
-  //     } else {
-  //       info(`Starting new game`)
-  //       this.game_session_start(obj.sessionId)
-  //       if (this.tied_session_id === null) this.tied_session_id = obj.sessionId
-  //       this.game_started = true
-  //       return this
-  //     }
-  //   }
-  // }
-
   spawnAsteroids(): NonPlayerCharacter[] {
-    const num = 5
+    const num = 10
     info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
       const npc = createNpc()
-      npc.velocity = rndfVec2(1, 5)
+      npc.velocity = rndfVec2(0.1, 3)
       npc.cameraPosition = worldStartPosition
       this.asteroids.push(npc)
     }
     return this.asteroids
   }
+
+  addNewSpaceObjects(so: SpaceObject) {
+    for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
+      if (this.remoteSpaceObjects[i].name === so.name) {
+        return
+      }
+    }
+    good(`Adding ${so.name} in remote list`)
+    this.remoteSpaceObjects.push(so)
+  }
+
+
+  handleSpaceObjectUpdate(so: SpaceObject) {
+    for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
+      this.remoteSpaceObjects[i] = spaceObjectUpdateAndShotReciverOptimizer(so, this.remoteSpaceObjects[i])
+    }
+    this.addNewSpaceObjects(so)
+  }
+
+  // never called this method... gah.
+  checkHittingShots() {
+    const spaceObjects = [...this.asteroids, ...this.remoteSpaceObjects]
+    handleCollisions(newVec2(), spaceObjects)
+  }
+
 }

@@ -100,8 +100,8 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx, game.style)
     renderFrame(game, dt)
-    updateSpaceObjects(game.remotePlayers, dt, game.ctx)
-    updateSpaceObjects(game.all, dt, game.ctx)
+    updateSpaceObjects(game.remotePlayers, dt)
+    updateSpaceObjects(game.all, dt)
     updateShapes(game.testShapes, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
       game.websocket.send(getSendableSpaceObject(game.localPlayer))

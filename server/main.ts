@@ -7,10 +7,9 @@ import { getLocalIp, ipport } from './net'
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
 import { MessageType, NonPlayerCharacter, Session, SpaceObject } from '../src/lib/interface'
-import { dist2, error, info, log, warn } from 'mathil'
+import { dist2, error, info, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
-import { game } from './api/game/game.routes'
 
 // start ApiServer
 apiServer()
@@ -154,20 +153,10 @@ export class Client {
             info('No clients connected')
           }
         } else {
-          if (so.messageType === MessageType.START_GAME) {
-            info(`calling create game with ${so.sessionId}`)
-            game_handlers.push(createGame(so.sessionId))
-          }
-          for (let i = 0; i < game_handlers.length; i++) {
-            if (game_handlers[i].game_started === false) {
-              const s = game_handlers.splice(i)
-              console.log(s)
-              console.log({ game_handlers })
-              if (s[0]) {
-                info(`Removed game ${s[0].tied_session_id}`)
-              }
-            }
-          }
+
+          handleGameLogic(so)
+          startGameOnRequest(so)
+          removeStoppedGames()
 
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
             broadcastToAllClients(this, globalConnectedClients, so)
@@ -184,6 +173,38 @@ export class Client {
 
   toString(): string {
     return `${this.name} (${ipport(this.req)}, ${getReadyStateText(this.ws)}, added: ${this.dateAdded.toLocaleTimeString()})`
+  }
+}
+
+function handleGameLogic(so: SpaceObject) {
+  if (so.messageType === MessageType.GAME_UPDATE) {
+    for (let i = 0; i < game_handlers.length; i++) {
+      if (game_handlers[i].tied_session_id === so.sessionId) {
+        // info(`handle game logic for ${so.sessionId}`)
+        // do logic for the correct game...
+        game_handlers[i].handleSpaceObjectUpdate(so)
+      }
+    }
+  }
+}
+
+function startGameOnRequest(so: SpaceObject) {
+  if (so.messageType === MessageType.START_GAME) {
+    info(`Calling create game with ${so.sessionId}`)
+    game_handlers.push(createGame(so.sessionId))
+  }
+}
+
+function removeStoppedGames() {
+  for (let i = 0; i < game_handlers.length; i++) {
+    if (game_handlers[i].game_started === false) {
+      const s = game_handlers.splice(i)
+      console.log(s)
+      console.log({ game_handlers })
+      if (s[0]) {
+        info(`Removed game ${s[0].tied_session_id}`)
+      }
+    }
   }
 }
 

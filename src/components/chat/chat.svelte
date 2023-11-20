@@ -16,8 +16,8 @@
 
   let chatMsg: string
 
-  export let inGameChat: boolean = false
   export let joinedSessionId: string
+  export let inGameChat: boolean = false
   export let chatTitle: boolean = true
 
   function dateTimeFormat(d: Date): string {

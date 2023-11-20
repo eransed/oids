@@ -4,7 +4,7 @@ import { LightSource, LineSegment } from './shapes'
 import { renderLoop } from './time'
 // import * as WelcomeScreen from './gameModes/welcomeScreen'
 import type { Shape } from './shapes/Shape'
-import { initRegularGame, nextFrame, renderFrame, resetStars } from './gameModes/regular'
+import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
 import type { Vec2 } from 'mathil'
 import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
@@ -70,11 +70,6 @@ export class Game {
 
   startSingleplayer(): void {
     console.log('starts single')
-  }
-
-  startWelcomeScreen(): void {
-    // WelcomeScreen.initWelcomeScreen(this)
-    // this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
   }
 
   clearBodies(): void {
