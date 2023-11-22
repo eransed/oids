@@ -7,39 +7,6 @@
   //Exports
   export let buttons: Button90Config[]
   export let menuHeader: string = 'Menu'
-
-  const rotate = (index: number, size: number): number => {
-    if (index < 0) return (size + (index % size)) % size
-    return index % size
-  }
-
-  function handleMenuSelection(event: KeyboardEvent): void {
-    let selectedIndex = 0
-
-    buttons.forEach((b, index) => {
-      if (b.selected) {
-        selectedIndex = index
-        return
-      }
-      // No selected button, default to the first one
-      buttons[0].selected = true
-    })
-
-    buttons.forEach((b) => {
-      b.selected = false
-    })
-
-    if (event.code === 'ArrowUp') {
-      selectedIndex--
-    } else if (event.code === 'ArrowDown') {
-      selectedIndex++
-    } else if (event.code === 'Enter') {
-      buttons[selectedIndex].clickCallback()
-    }
-    selectedIndex = rotate(selectedIndex, buttons.length)
-    buttons[selectedIndex].selected = true
-    // console.log('code =', event.code, ', key =',event.key)
-  }
 </script>
 
 <MenuWrapper>
