@@ -7,7 +7,6 @@ import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 
 export class GameHandler {
-
   game_started = false
   asteroids: NonPlayerCharacter[] = []
   game_interval: NodeJS.Timer | undefined = undefined
@@ -39,7 +38,6 @@ export class GameHandler {
     this.spawnAsteroids()
 
     this.game_interval = setInterval(() => {
-
       this.dt = performance.now() - this.lastTime
 
       updateSpaceObjects(this.remoteSpaceObjects, this.dt)
@@ -55,9 +53,7 @@ export class GameHandler {
         })
       }
       this.lastTime = performance.now()
-
     }, this.minTickTimeMs)
-
   }
 
   spawnAsteroids(): NonPlayerCharacter[] {
@@ -82,7 +78,6 @@ export class GameHandler {
     this.remoteSpaceObjects.push(so)
   }
 
-
   handleSpaceObjectUpdate(so: SpaceObject) {
     for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
       this.remoteSpaceObjects[i] = spaceObjectUpdateAndShotReciverOptimizer(so, this.remoteSpaceObjects[i])
@@ -95,5 +90,4 @@ export class GameHandler {
     const spaceObjects = [...this.asteroids, ...this.remoteSpaceObjects]
     handleCollisions(newVec2(), spaceObjects)
   }
-
 }

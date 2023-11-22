@@ -153,7 +153,6 @@ export class Client {
             info('No clients connected')
           }
         } else {
-
           handleGameLogic(so)
           startGameOnRequest(so)
           removeStoppedGames()
@@ -180,9 +179,14 @@ function handleGameLogic(so: SpaceObject) {
   if (so.messageType === MessageType.GAME_UPDATE) {
     for (let i = 0; i < game_handlers.length; i++) {
       if (game_handlers[i].tied_session_id === so.sessionId) {
+        // Making a copy of so because:
+        //Gamehandler need its own reference for handling shots etc,
+        //but dont need to update the original.
+        const soCopy = { ...so }
+
         // info(`handle game logic for ${so.sessionId}`)
         // do logic for the correct game...
-        game_handlers[i].handleSpaceObjectUpdate(so)
+        game_handlers[i].handleSpaceObjectUpdate(soCopy)
       }
     }
   }

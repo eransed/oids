@@ -1,17 +1,12 @@
-import { warn } from "mathil"
-import type { SpaceObject } from "../interface"
+import type { SpaceObject } from '../interface'
 
 export function spaceObjectUpdateAndShotReciverOptimizer(possibleNewShots: SpaceObject, storedSpaceObject: SpaceObject): SpaceObject {
   if (possibleNewShots.name === storedSpaceObject.name) {
-
     // Store every previously shots fired
     const cachePhotonLasers = storedSpaceObject.shotsInFlight
 
-    // the new shots 
+    // the new shots
     const newShotsThisUpdate = possibleNewShots.shotsInFlight
-    if (newShotsThisUpdate.length > 0) {
-      warn(`${possibleNewShots.name} did shot ${newShotsThisUpdate.length} lasers`)
-    }
 
     // update the remote player data object
     storedSpaceObject = possibleNewShots

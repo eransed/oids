@@ -75,7 +75,6 @@ export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number):
     if (shot.age > maxShotAge) {
       shot.health = -1
     }
-
   }
 }
 
@@ -235,7 +234,7 @@ export function isWithinRadius(p0: Physical, p1: Physical & Bounded, radius: num
   return false
 }
 
-export function getWorldCoordinates(e: Physical & Bounded | null): Vec2 {
+export function getWorldCoordinates(e: (Physical & Bounded) | null): Vec2 {
   if (e) {
     return add2(e.viewFramePosition, e.cameraPosition)
   }
@@ -297,7 +296,6 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCh
         // npc0.velocity = smul2(npc0.velocity, f * npc1.mass)
         // npc1.velocity = smul2(npc0.velocity, -f * npc0.mass)
       }
-
 
       for (const shot of npc0.shotsInFlight) {
         if (shot.armedDelay < 0) {

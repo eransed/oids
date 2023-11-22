@@ -127,7 +127,7 @@ batbuf.baseUnit = '%'
 function randomPositionInCurrentViewFrame(so: SpaceObject, screenSize: Vec2): Vec2 {
   return {
     x: rndi(so.cameraPosition.x, so.cameraPosition.x + screenSize.x),
-    y: rndi(so.cameraPosition.y, so.cameraPosition.y + screenSize.y)
+    y: rndi(so.cameraPosition.y, so.cameraPosition.y + screenSize.y),
   }
 }
 
@@ -205,8 +205,8 @@ export function initRegularGame(game: Game): void {
   }
 
   info(`sets up event listener for window resize`)
-  removeEventListener("resize", handleResize);
-  addEventListener("resize", handleResize);
+  removeEventListener('resize', handleResize)
+  addEventListener('resize', handleResize)
 
   // game.stars.push(newVec2())
   // game.stars.push(smul2(worldSize, 0.5))
@@ -319,8 +319,6 @@ export function initRegularGame(game: Game): void {
     }
   )
 }
-
-
 
 function exists(entity: NonPlayerCharacter, entities: NonPlayerCharacter[]): boolean {
   for (let i = 0; i < entities.length; i++) {
