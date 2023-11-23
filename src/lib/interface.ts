@@ -28,6 +28,10 @@ export enum SpaceShape {
   SpaceStation,
 }
 
+export interface MoonType {
+  moonType: number
+}
+
 export interface Shapable {
   shape: SpaceShape
 }
@@ -214,7 +218,8 @@ export interface SpaceObject
     LobbyWaiter,
     Hoster,
     Typable,
-    Bounded {}
+    Bounded,
+    MoonType {}
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number
@@ -332,7 +337,19 @@ export interface ChatMessage {
   serviceMsg?: boolean
 }
 
-export interface NonPlayerCharacter extends Damageable, Colorable, Collidable, Physical, Typable, Rotatable, Bounceable, Damager, Nameable, Fireable, Bounded {}
+export interface NonPlayerCharacter
+  extends Damageable,
+    Colorable,
+    Collidable,
+    Physical,
+    Typable,
+    Rotatable,
+    Bounceable,
+    Damager,
+    Nameable,
+    Fireable,
+    Bounded,
+    MoonType {}
 
 export interface ShipUpgrades {
   hyperdrive: boolean
@@ -346,4 +363,11 @@ export interface ShipUpgrades {
 
 export interface CoreProps {
   energyLevel: number // boost engine, shields and cannons. can be
+}
+
+export interface Crater {
+  x: number
+  y: number
+  radius: number
+  color: string
 }

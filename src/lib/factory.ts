@@ -130,6 +130,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
       id: '',
       experience: 0,
     },
+    moonType: 0,
   }
 
   spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)
@@ -203,6 +204,7 @@ export function createNpc(): NonPlayerCharacter {
     cameraPosition: newVec2(),
     cameraVelocity: newVec2(),
     viewFramePosition: newVec2(),
+    moonType: rndi(0, 3),
   }
 
   npc.hitRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)

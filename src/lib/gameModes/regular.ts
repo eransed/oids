@@ -32,7 +32,7 @@ import { explosionDuration, screenScale, worldSize, worldStartPosition } from '.
 import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from '../stats'
 import { newPhotonLaser } from '../factory'
 import { reduceShotSize, reduceSoSize } from '../websocket/util'
-import { renderMoon } from '../render/renderDebris'
+import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMoon'
 import { renderShip } from '../render/renderShip'
 import { renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
@@ -359,12 +359,11 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
       }
       return
     } else {
+      renderShip(so, game.ctx, false, game.style, remotePos)
       if (game.keyFuncMap.systemGraphs.keyStatus) {
         renderViewport(game.ctx, so)
+        renderHitRadius(so, game.ctx)
       }
-
-      renderShip(so, game.ctx, false, game.style, remotePos)
-      renderHitRadius(so, game.ctx)
     }
   })
 
@@ -380,12 +379,11 @@ function handleGameBodies(game: Game): (SpaceObject | NonPlayerCharacter)[] {
         renderExplosionFrame(body, game.ctx, bodyPos)
       }
     } else {
+      renderMoon(body.size, bodyPos, game.ctx, body.moonType)
       if (game.keyFuncMap.systemGraphs.keyStatus) {
         renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
+        renderHitRadius(body, game.ctx)
       }
-
-      renderMoon(body, game.ctx, bodyPos)
-      renderHitRadius(body, game.ctx)
     }
   })
 
