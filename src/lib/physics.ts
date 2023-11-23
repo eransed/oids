@@ -1,8 +1,8 @@
 import type { Bounceable, Bounded, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
 import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, warn, good, bad, error } from 'mathil'
 import { renderHitExplosion } from './render/renderFx'
-import { coolDown, decayDeadShots, handleHittingShot } from './mechanics'
-import { angularFriction, linearFriction, maxShotAge, missileDamageVelocityTransferFactor, timeScale } from './constants'
+import { coolDown, decayDeadShots, handleDeathExplosion, handleHittingShot } from './mechanics'
+import { angularFriction, explosionDuration, linearFriction, maxShotAge, missileDamageVelocityTransferFactor, timeScale } from './constants'
 import type { Shape } from './shapes/Shape'
 
 export function updateShape(shape: Shape, dt: number): void {
@@ -36,6 +36,9 @@ export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: num
   npc.acceleration = { x: 0, y: 0 }
   npc.velocity = limitVec2(npc.velocity, { x: 250, y: 250 })
   npc.angleDegree += npc.angularVelocity * deltaTime
+  if (npc.health <= 0) {
+    handleDeathExplosion(npc, explosionDuration)
+  }
   if (npc.angleDegree < 0) npc.angleDegree = 360
   if (npc.angleDegree > 360) npc.angleDegree = 0
   if (npc.shotsInFlight) {
@@ -241,6 +244,12 @@ export function getWorldCoordinates(e: (Physical & Bounded) | null): Vec2 {
   return newVec2()
 }
 
+export function getRemotePosition(remoteObject: SpaceObject | NonPlayerCharacter, localObject: SpaceObject) {
+  const position = sub2(add2(remoteObject.viewFramePosition, remoteObject.cameraPosition), localObject.cameraPosition)
+
+  return position
+}
+
 export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen: Vec2, energyFactor = 1, gap = 1, damageDeltaFactor: number) {
   if (p.position.x < gap) {
     p.velocity.x = -p.velocity.x * energyFactor
@@ -305,7 +314,7 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCh
           if (shot.ownerName === npc1.name) continue
 
           if (isWithinRadius(shot, npc1, npc1.hitRadius) && shot.didHit === false) {
-            bad(`${shot.ownerName} did hit ${npc1.name}, hp: ${npc1.health}`)
+            // bad(`${shot.ownerName} did hit ${npc1.name}, hp: ${npc1.health}`)
             npc1.health -= shot.damage
             npc1.velocity = add2(npc1.velocity, heading)
             npc1.lastDamagedByName = shot.ownerName

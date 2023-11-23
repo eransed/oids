@@ -153,6 +153,7 @@ export function handleDeathExplosion(so: NonPlayerCharacter, maximumIncrement: n
     so.obliterated = true
     return
   }
+
   so.deadFrameCount++
 }
 

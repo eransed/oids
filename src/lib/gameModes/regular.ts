@@ -22,8 +22,8 @@ import {
   error,
 } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
-import { friction, handleCollisions, offScreen_mm, wrap_mm } from '../physics'
-import { loadingText, renderInfoText, renderPoint } from '../render/render2d'
+import { friction, getRemotePosition, handleCollisions, offScreen_mm, wrap_mm } from '../physics'
+import { loadingText, renderHitRadius, renderInfoText, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type NonPlayerCharacter } from '../interface'
 import { randomAnyColor } from '../color'
@@ -351,27 +351,54 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
   }
 
   stillPlaying.forEach((so) => {
-    const remotePos = sub2(add2(so.viewFramePosition, so.cameraPosition), game.localPlayer.cameraPosition)
-    if (so.shape === SpaceShape.Moon) {
-      renderMoon(so, game.ctx)
-    } else {
-      if (so.health <= 0) {
-        handleDeathExplosion(so, explosionDuration)
-        if (!so.obliterated) {
-          renderExplosionFrame(so, game.ctx, remotePos)
-        }
-        return
-      } else {
-        if (game.keyFuncMap.systemGraphs.keyStatus) {
-          renderViewport(game.ctx, so)
-        }
+    const remotePos = getRemotePosition(so, game.localPlayer)
 
-        renderShip(so, game.ctx, false, game.style, remotePos)
+    if (so.health <= 0) {
+      handleDeathExplosion(so, explosionDuration)
+      if (!so.obliterated) {
+        renderExplosionFrame(so, game.ctx, remotePos)
       }
+      return
+    } else {
+      if (game.keyFuncMap.systemGraphs.keyStatus) {
+        renderViewport(game.ctx, so)
+      }
+
+      renderShip(so, game.ctx, false, game.style, remotePos)
+      renderHitRadius(so, game.ctx)
     }
   })
 
   return stillPlaying
+}
+
+function handleGameBodies(game: Game): (SpaceObject | NonPlayerCharacter)[] {
+  game.bodies.forEach((body) => {
+    const bodyPos = getRemotePosition(body, game.localPlayer)
+    if (body.health <= 0) {
+      handleDeathExplosion(body, explosionDuration)
+      if (!body.obliterated) {
+        renderExplosionFrame(body, game.ctx, bodyPos)
+      }
+    } else {
+      if (game.keyFuncMap.systemGraphs.keyStatus) {
+        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
+      }
+
+      renderMoon(body, game.ctx, bodyPos)
+      renderHitRadius(body, game.ctx)
+    }
+  })
+
+  game.bodies = game.bodies.filter((body) => {
+    return !body.obliterated
+  })
+
+  game.all = game.all.filter((body) => {
+    return !body.obliterated
+  })
+
+  return game.bodies
 }
 
 export class Every {
@@ -439,8 +466,6 @@ export function renderFrame(game: Game, dt: number): void {
     s.render(ctx)
   })
 
-  game.remotePlayers = handleRemotePlayers(game.remotePlayers, game)
-
   if (game.keyFuncMap.systemGraphs.keyStatus) {
     fpsCounter(ops, dt, game, ctx)
   }
@@ -451,6 +476,8 @@ export function renderFrame(game: Game, dt: number): void {
   })
 
   handleStarBackdrop(game)
+  game.remotePlayers = handleRemotePlayers(game.remotePlayers, game)
+  handleGameBodies(game)
 
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
   addDataPoint(ppsbuf, ops)
@@ -504,32 +531,6 @@ export function renderFrame(game: Game, dt: number): void {
     )
     renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), ctx, game.style)
   }
-
-  game.bodies.forEach((body) => {
-    const bodyPos = sub2(add2(body.viewFramePosition, body.cameraPosition), smul2(game.localPlayer.cameraPosition, 1))
-    if (body.health < 1) {
-      handleDeathExplosion(body, explosionDuration)
-      if (!body.obliterated) {
-        renderExplosionFrame(body, ctx, bodyPos)
-      }
-    } else {
-      // fix the body position in world relative to player...
-
-      if (game.keyFuncMap.systemGraphs.keyStatus) {
-        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), ctx, game.style)
-      }
-
-      renderMoon(body, ctx, bodyPos)
-    }
-  })
-
-  game.bodies = game.bodies.filter((body) => {
-    return !body.obliterated
-  })
-
-  game.all = game.all.filter((body) => {
-    return !body.obliterated
-  })
 
   if (game.localPlayer.health <= 0) {
     //Local player is dead

@@ -46,6 +46,10 @@ export class GameHandler {
       for (let i = 0; i < this.asteroids.length; i++) {
         this.asteroids[i] = updateSpaceObject(this.asteroids[i], this.dt)
 
+        this.asteroids.filter((asteroid) => {
+          return !asteroid.isDead
+        })
+
         this.every.tick(() => {
           // warn(`Playing clients: ${this.remoteSpaceObjects.length}`)
           this.asteroids[i].collidingWith = []

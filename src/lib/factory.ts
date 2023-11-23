@@ -202,6 +202,6 @@ export function createNpc(): NonPlayerCharacter {
     cameraVelocity: newVec2(),
     viewFramePosition: newVec2(),
   }
+
   return npc
 }
-undefined

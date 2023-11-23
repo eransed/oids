@@ -1,28 +1,16 @@
 import { round2dec, type Line, type Vec2, sub2, add2, smul2, direction2, angle2, newVec2, rndi } from 'mathil'
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
-import type { SpaceObject } from '../interface'
+import type { NonPlayerCharacter, SpaceObject } from '../interface'
 import type { UIStyle } from '../../style/styleInterfaces'
 import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
+import { getRemotePosition } from '../physics'
 
 export function clearScreen(ctx: CanvasRenderingContext2D, style: UIStyle) {
   // ctx.fillStyle = document.documentElement.style.getPropertyValue('--main-bg-color')
   ctx.fillStyle = style.spaceColor
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 }
-
-// export function render(s: SpaceObject, ctx: CanvasRenderingContext2D): void {
-//   switch (s.shape) {
-//     case SpaceShape.Moon:
-//       renderMoon(s, ctx)
-//       break
-//     case SpaceShape.SmallShip:
-//       renderShip(s, ctx, st)
-//       break
-//     default:
-//       console.error(`Unknown shape: ${s.shape}`)
-//   }
-// }
 
 export function renderInfoText(text: string, ypos: number, ctx: CanvasRenderingContext2D): void {
   const xpos = 3000
@@ -46,7 +34,15 @@ export function getNamesAsString(sos: SpaceObject[], label = ''): string {
   return label + arr.join(', ')
 }
 
-export function renderVector(v: Vec2, origin: Vec2, ctx: CanvasRenderingContext2D, scale = 10000, color = '#fff', offset: Vec2 = { x: 0, y: 0 }, components = true) {
+export function renderVector(
+  v: Vec2,
+  origin: Vec2,
+  ctx: CanvasRenderingContext2D,
+  scale = 10000,
+  color = '#fff',
+  offset: Vec2 = { x: 0, y: 0 },
+  components = true
+) {
   ctx.save()
   ctx.translate(origin.x + offset.x, origin.y + offset.y)
   ctx.beginPath()
@@ -70,7 +66,6 @@ export function renderVector(v: Vec2, origin: Vec2, ctx: CanvasRenderingContext2
     renderVector(newVec2(v.x, 0), origin, ctx, scale, '#f00', offset, false)
     renderVector(newVec2(0, v.y), origin, ctx, scale, '#0f0', offset, false)
   }
-
 }
 
 export function renderPoint(ctx: CanvasRenderingContext2D, v: Vec2, color: string, radius = 10): void {
@@ -107,9 +102,12 @@ export function renderHitBox(so: SpaceObject, ctx: CanvasRenderingContext2D): vo
   ctx.restore()
 }
 
-export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+export function renderHitRadius(so: SpaceObject | NonPlayerCharacter, ctx: CanvasRenderingContext2D): void {
   ctx.save()
-  ctx.translate(so.position.x, so.position.y)
+
+  const renderPos = getRemotePosition(so, game.localPlayer)
+
+  ctx.translate(renderPos.x, renderPos.y)
   ctx.strokeStyle = '#447'
   ctx.lineWidth = 3
   ctx.beginPath()
