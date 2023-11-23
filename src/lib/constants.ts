@@ -14,7 +14,7 @@ export const purple1 = '#90d'
 export const purple2 = '#b0e'
 
 // number of frames that so expolosion will be rendered
-export const explosionDuration = 60
+export const explosionDuration = 120
 
 // shots will decay dirctly at screen edge if 1
 export const screenPaddingFactor = 1
@@ -32,11 +32,11 @@ export const bounceFactor = 0.8
 export let graphLineColor = '#fff'
 
 export function setGraphLineColor(color: string): void {
-    graphLineColor = color
+  graphLineColor = color
 }
 
 export function getGraphLineColor(): string {
-    return graphLineColor
+  return graphLineColor
 }
 
 export const worldSize = newVec2(1e308, 1e308)
