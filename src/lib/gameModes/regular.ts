@@ -184,7 +184,6 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.color = randomAnyColor()
   game.localPlayer.photonColor = '#f0f'
   game.localPlayer.isLocal = true
-  game.localPlayer.hitRadius = 120
   game.localPlayer.color = '#db8'
   game.localPlayer.worldSize = worldSize // server sends size of world
   game.localPlayer.cameraPosition = worldStartPosition

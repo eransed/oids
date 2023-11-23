@@ -231,7 +231,7 @@ export function isWithinRadiusWorld(p0: Physical & Bounded, p1: Physical & Bound
 
 export function isWithinRadius(p0: Physical, p1: Physical & Bounded, radius: number): boolean {
   const d: number = magnitude2(sub2(p0.position, getWorldCoordinates(p1)))
-  if (d < radius) {
+  if (d <= radius) {
     return true
   }
   return false

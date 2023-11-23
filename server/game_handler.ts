@@ -1,4 +1,4 @@
-import { info, usNow, EveryInterval, rndfVec2, good, newVec2 } from 'mathil'
+import { info, usNow, EveryInterval, rndfVec2, good, newVec2, rndi } from 'mathil'
 import { NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
 import { createNpc } from '../src/lib/factory'
 import { handleCollisions, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics'
@@ -65,8 +65,8 @@ export class GameHandler {
     info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
       const npc = createNpc()
-      npc.velocity = rndfVec2(0.1, 3)
-      npc.cameraPosition = worldStartPosition
+      npc.velocity = rndfVec2(-0.5, 1)
+      npc.cameraPosition = rndfVec2(worldStartPosition.x, worldStartPosition.y + 1000)
       this.asteroids.push(npc)
     }
     return this.asteroids

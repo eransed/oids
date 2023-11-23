@@ -1,6 +1,6 @@
 import type { NonPlayerCharacter, PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceShape } from './interface'
-import { newVec2, rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
+import { mag2, magnitude2, newVec2, rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 import { randomBlue } from './color'
 import type { Ship } from '@prisma/client'
@@ -97,7 +97,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     shotsInFlightNew: [],
     shotsFiredThisFrame: false,
     shotsPerFrame: 1,
-    size: { x: 100, y: 100 },
+    size: { x: 50, y: 50 },
     // steer: function (direction: number, deltaTime: number): void {
     //  throw new Error('Steer not implemented.')
     // },
@@ -131,6 +131,8 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
       experience: 0,
     },
   }
+
+  spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)
 
   return spaceObject
 }
@@ -202,6 +204,8 @@ export function createNpc(): NonPlayerCharacter {
     cameraVelocity: newVec2(),
     viewFramePosition: newVec2(),
   }
+
+  npc.hitRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
 
   return npc
 }
