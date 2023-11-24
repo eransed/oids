@@ -1,7 +1,7 @@
 import axios, { type AxiosResponse } from 'axios'
 
 //Svelte store
-import { isLoggedIn, user, userIncludes } from '../../../stores/stores'
+import { isLoggedIn, localPlayer, user, userIncludes } from '../../../stores/stores'
 
 //Interface
 // import type { User } from '../../../interfaces/user'
@@ -19,6 +19,10 @@ const getProfile = async (): Promise<User & Prisma.UserGetPayload<typeof userInc
     .get(`http://${location.hostname}:6060/api/v1/users/profile`, config)
     .then((response: AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>>) => {
       user.set(response.data)
+
+      const id = response.data.id
+
+      localPlayer.update((v) => ({ ...v, id: id }))
       isLoggedIn.set(true)
       console.log('Welcome: ', response.data, response.data)
       setCssFromSettings(response.data.theme)

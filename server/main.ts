@@ -10,6 +10,9 @@ import { MessageType, NonPlayerCharacter, Session, SpaceObject } from '../src/li
 import { dist2, error, info, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
+import { findUserById } from './api/users/users.services'
+
+import { findShip, updateShipExperience } from './api/ship/ship.services'
 
 // start ApiServer
 apiServer()
@@ -82,15 +85,17 @@ export class Client {
   lastDataObject: SpaceObject | null = null
   sessionId: string | null = null
   sendClientHistory: clientUpdated[] = []
+  userId: string
 
   private nameHasBeenUpdated = false
 
-  constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded: Date) {
+  constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded: Date, _userId: string) {
     this.ws = _ws
     this.req = _req
     this.name = _name
     this.dateAdded = _dateAdded
     this.addEventListeners()
+    this.userId = _userId
   }
 
   setSessionId(id: string) {
@@ -106,6 +111,12 @@ export class Client {
     } else {
       console.error(`Multiple name updates for ${this.toString()}: newName="${newName}"`)
     }
+  }
+
+  updateIdOnce(newId: string) {
+    const oldId: string = this.userId
+    this.userId = newId
+    info(`Updated userId: ${oldId} -> ${this.userId}`)
   }
 
   addEventListeners(): void {
@@ -139,6 +150,10 @@ export class Client {
         this.lastDataObject = so
         this.sessionId = so.sessionId
         so.serverVersion = name_ver
+
+        if (so.id !== this.userId) {
+          this.updateIdOnce(so.id)
+        }
 
         if (!this.nameHasBeenUpdated) {
           if (globalConnectedClients.length > 0) {
@@ -175,8 +190,34 @@ export class Client {
   }
 }
 
+//ToDo: Make so guestships also gets experience which can be saved to localstorage.
+//This makes it possible to create a user at a later time and save the guestship progress in db
+async function incrementExperience(so: SpaceObject) {
+  const newXp = so.ship.experience + 1
+
+  const existingShip = await findShip(so.ship.id)
+
+  if (existingShip) {
+    updateShipExperience(so.ship.id, newXp).then(() => {
+      so.ship.experience = newXp
+
+      const client = globalConnectedClients.find((c) => c.userId === so.id)
+
+      so.messageType = MessageType.SHIP_UPDATE
+
+      if (client) {
+        broadcastToOneClient(so, client)
+      }
+    })
+  }
+}
+
 function handleGameLogic(so: SpaceObject) {
   if (so.messageType === MessageType.GAME_UPDATE) {
+    every20.tick(() => {
+      incrementExperience(so)
+    })
+
     for (let i = 0; i < game_handlers.length; i++) {
       if (game_handlers[i].tied_session_id === so.sessionId) {
         // Making a copy of so because:
@@ -291,6 +332,11 @@ function broadcastToAllClients(skipSourceClient: Client, connectedClients: Clien
   }
 }
 
+function broadcastToOneClient(data: SpaceObject, client: Client): void {
+  console.log('broadcasting to one client')
+  client.ws.send(JSON.stringify(data))
+}
+
 //Checking distance between two players: sending client and recieving client.
 //If closer than given condition as a number the function returns true and data is sent.
 function proximityCheck(sendingClient: Client, recieveClient: Client): boolean {
@@ -318,6 +364,7 @@ class Every {
     }
   }
 }
+broadcastToAllClients
 
 function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: SpaceObject): void {
   // info(`Sending:`)
@@ -463,7 +510,7 @@ server.on('connection', function connection(clientConnection: WebSocket, req: In
 
   globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
 
-  const newClient: Client = new Client(clientConnection, req, `Client-${globalConnectedClients.length}`, new Date())
+  const newClient: Client = new Client(clientConnection, req, `Client-${globalConnectedClients.length}`, new Date(), soService.id)
   if (addNewClientIfNotExisting(globalConnectedClients, newClient)) {
     info(`Storing new client ${newClient.toString()} in broadcast list`)
   }

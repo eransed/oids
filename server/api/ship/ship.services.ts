@@ -19,6 +19,42 @@ export async function updateShip(ship: Ship) {
   })
 }
 
+export async function findShip(shipId: string): Promise<Ship | null> {
+  return await new Promise((resolve, reject) => {
+    const ship: Promise<Ship | null> = db.ship
+      .findUnique({
+        where: {
+          id: shipId,
+        },
+      })
+      .then((d) => d)
+
+    if (ship !== null) {
+      resolve(ship)
+    } else {
+      reject('No ship found')
+    }
+  })
+}
+
+export async function updateShipExperience(shipId: string, xp: number) {
+  return await db.ship
+    .update({
+      where: {
+        id: shipId,
+      },
+      data: {
+        experience: xp,
+      },
+    })
+    .then((ship) => {
+      return ship
+    })
+    .catch((err) => {
+      throw new Error(err)
+    })
+}
+
 export async function getShips(id: string) {
   return await db.ship.findMany({
     where: {

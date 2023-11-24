@@ -189,6 +189,7 @@ export enum MessageType {
   START_GAME,
   SERVICE,
   SERVER_GAME_UPDATE,
+  SHIP_UPDATE,
 }
 
 export interface PlayingShip {

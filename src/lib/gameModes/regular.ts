@@ -36,7 +36,7 @@ import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMo
 import { renderShip } from '../render/renderShip'
 import { renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
-import { chatMessageHistory } from '../../stores/stores'
+import { chatMessageHistory, localPlayer } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 
 //Stores
@@ -238,6 +238,11 @@ export function initRegularGame(game: Game): void {
     (su) => {
       // console.log(su)
       //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
+      if (su.dataObject.messageType === MessageType.SHIP_UPDATE) {
+        console.log('Ship update: ', su.dataObject.ship)
+        game.localPlayer.ship.experience = su.dataObject.ship.experience
+      }
+
       if (su.dataObject.messageType === MessageType.SERVICE) {
         game.serverVersion = su.dataObject.serverVersion
         info(`Service message: server version: ${su.dataObject.serverVersion}`)
@@ -451,6 +456,8 @@ export function renderFrame(game: Game, dt: number): void {
     game.remotePlayers.forEach((player) => {
       remotePlayers.push(player)
     })
+
+    localPlayer.update((s) => ({ ...s, ship: s.ship }))
 
     gameState.set({ scoreScreenData: { player: game.localPlayer, remotePlayers: remotePlayers, serverObjects: game.bodies } })
   })
