@@ -30,7 +30,6 @@
   import AddShip from '../../../ProfilePage/AddShip.svelte'
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
-  import Alert from '../../../../components/alert/Alert.svelte'
   import ProgressBar from '../../../../components/progress/progressBar.svelte'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
