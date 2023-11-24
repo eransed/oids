@@ -10,7 +10,9 @@
   <p>
     {ship.name}
   </p>
-  <ShipImg {ship} />
+  <span style="display: flex; width: 60%; height: 60%;">
+    <ShipImg {ship} />
+  </span>
   <p>
     Lvl: {ship.level}
   </p>
@@ -25,6 +27,7 @@
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
+    align-content: center;
   }
 
   .ship > * {

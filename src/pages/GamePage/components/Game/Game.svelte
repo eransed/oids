@@ -30,6 +30,8 @@
   import AddShip from '../../../ProfilePage/AddShip.svelte'
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
+  import Alert from '../../../../components/alert/Alert.svelte'
+  import ProgressBar from '../../../../components/progress/progressBar.svelte'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -153,11 +155,16 @@
   </InGameInfo>
 </div>
 
-{#if $showChat}
-  <div class="chat" style="position: absolute; z-index: 1; bottom: 0; left: 0">
-    <Chat chatTitle={false} joinedSessionId={sessionId} inGameChat />
-  </div>
-{/if}
+<div class="bottomInterface">
+  {#if $showChat}
+    <div class="chat">
+      <Chat chatTitle={false} joinedSessionId={sessionId} inGameChat />
+    </div>
+    <div class="xp">
+      <ProgressBar progress={$localPlayer.ship.experience} max={500} />
+    </div>
+  {/if}
+</div>
 
 {#if $showShipDetails}
   <ModalSimple closeBtn={() => ($showShipDetails = !$showShipDetails)} saveButton={false}>
@@ -234,5 +241,18 @@
 
   .gameInfo:has(.scoreScreen):has(.hotKeys) {
     grid-template-rows: 50% auto;
+  }
+
+  .bottomInterface {
+    z-index: 1;
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* background-color: red; */
+    flex-wrap: wrap;
+    /* align-content: center; */
+    justify-content: flex-start;
+    align-content: center;
   }
 </style>
