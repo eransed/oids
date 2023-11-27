@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { NonPlayerCharacter, SpaceObject } from '../../../../lib/interface'
-  import { add2, newVec2, rndfVec2, round2, round2dec, smul2, sub2 } from 'mathil'
+  import { add2, info, newVec2, rndfVec2, round2, round2dec, smul2, sub2, toStr, to_string2 } from 'mathil'
   import { localPlayer } from '../../../../stores/stores'
   import { worldStartPosition } from '../../../../lib/constants'
   import { getWorldCoordinates } from '../../../../lib/physics'
@@ -53,7 +53,10 @@
         if (player) {
           $localPlayer.cameraPosition = player.cameraPosition
         } else if (serverObj) {
-          $localPlayer.cameraPosition = sub2(add2(serverObj.cameraPosition, rndfVec2(-teleOffset, teleOffset)), $localPlayer.viewFramePosition)
+          const currentPos = $localPlayer.cameraPosition
+          const newPos = sub2(add2(serverObj.cameraPosition, rndfVec2(-teleOffset, teleOffset)), $localPlayer.viewFramePosition)
+          $localPlayer.cameraPosition = newPos
+          info(`moved from ${to_string2(currentPos)} to ${to_string2(newPos)}`)
         }
         resetStars(getGame())
       }}
