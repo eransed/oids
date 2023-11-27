@@ -308,13 +308,12 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCh
 
       for (const shot of npc0.shotsInFlight) {
         if (shot.armedDelay < 0) {
-          const heading: Vec2 = scalarMultiply2(headingFromangle2(shot.angleDegree), shot.damage * missileDamageVelocityTransferFactor)
-
           // no self fire
           if (shot.ownerName === npc1.name) continue
 
           if (isWithinRadius(shot, npc1, npc1.hitRadius) && shot.didHit === false) {
             // bad(`${shot.ownerName} did hit ${npc1.name}, hp: ${npc1.health}`)
+            const heading: Vec2 = scalarMultiply2(headingFromangle2(shot.angleDegree), (1 / npc1.mass) * shot.damage * missileDamageVelocityTransferFactor)
             npc1.health -= shot.damage
             npc1.velocity = add2(npc1.velocity, heading)
             npc1.lastDamagedByName = shot.ownerName

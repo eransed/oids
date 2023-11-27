@@ -1,18 +1,20 @@
-import type { Vec2 } from 'mathil'
-import type { Crater } from '../interface'
+import { round2dec, type Vec2 } from 'mathil'
+import type { Crater, NonPlayerCharacter } from '../interface'
 
-export function renderMoon(size: Vec2, pos: Vec2, ctx: CanvasRenderingContext2D, moonType: number): void {
-  const moon = getMoon(moonType)
+export function renderMoon(npc: NonPlayerCharacter, pos: Vec2, ctx: CanvasRenderingContext2D): void {
+  const moon = getMoon(npc.moonType)
   const craterDetails = moon.craters
 
   ctx.save()
   ctx.translate(pos.x, pos.y)
+  ctx.rotate((round2dec(90 + npc.angleDegree, 1) * Math.PI) / 180)
 
   // Draw main moon circle
-  const moonRadius = Math.sqrt(size.x ** 2 + size.y ** 2)
+  const moonRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
   ctx.beginPath()
   ctx.arc(0, 0, moonRadius, 0, Math.PI * 2)
   ctx.fillStyle = moon.color
+  // ctx.fillRect(0, 0, npc.size.x, npc.size.y)
   ctx.fill()
   ctx.closePath()
 

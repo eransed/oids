@@ -384,7 +384,7 @@ function handleGameBodies(game: Game): (SpaceObject | NonPlayerCharacter)[] {
         renderExplosionFrame(body, game.ctx, bodyPos)
       }
     } else {
-      renderMoon(body.size, bodyPos, game.ctx, body.moonType)
+      renderMoon(body, bodyPos, game.ctx)
       if (game.keyFuncMap.systemGraphs.keyStatus) {
         renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
         renderHitRadius(body, game.ctx)

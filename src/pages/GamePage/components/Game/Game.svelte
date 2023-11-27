@@ -31,6 +31,8 @@
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
   import ProgressBar from '../../../../components/progress/progressBar.svelte'
+  import { getRemotePosition } from '../../../../lib/physics'
+  import { screenScale } from '../../../../lib/constants'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -203,6 +205,13 @@
   {/if}
 {/if}
 
+{#if $localPlayerStore.health < 100}
+  <div
+    style="s top: {$localPlayerStore.viewFramePosition.y / screenScale}px; left: {$localPlayerStore.viewFramePosition.x / screenScale}px; position: absolute"
+  >
+    <ProgressBar max={100} progress={$localPlayerStore.health} />
+  </div>
+{/if}
 <!-- <canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} /> -->
 <canvas class="game_canvas" id="noContextMenu" bind:this={canvas} />
 
