@@ -3,7 +3,7 @@
   import type { Ship } from '@prisma/client'
 
   //Stores
-  import { pageHasHeader, user, isLoggedIn, settings } from '../../stores/stores'
+  import { pageHasHeaderStore, userStore, isLoggedInStore, settingsStore } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -36,16 +36,16 @@
   import type { Theme } from '../../style/styleInterfaces'
 
   onMount(() => {
-    if ($isLoggedIn && !$user) {
+    if ($isLoggedInStore && !$userStore) {
       getProfile()
     }
   })
 
-  $: if ($user) {
-    chosenAvatar = $user.image
+  $: if ($userStore) {
+    chosenAvatar = $userStore.image
   }
 
-  pageHasHeader.set(true)
+  pageHasHeaderStore.set(true)
 
   let openModal: boolean = false
   let alert: AlertType | undefined = undefined
@@ -59,10 +59,10 @@
   $: opacity = editSettings ? 1 : 0.5
 
   async function delUser() {
-    const result = confirm(`Want to delete your account: ${$user.name}?`)
+    const result = confirm(`Want to delete your account: ${$userStore.name}?`)
     if (result) {
-      const prompt = window.prompt(`Write ${$user.name} in the box to delete user.`)
-      if (prompt === $user.name) {
+      const prompt = window.prompt(`Write ${$userStore.name} in the box to delete user.`)
+      if (prompt === $userStore.name) {
         loading = true
 
         await deleteMe()
@@ -89,10 +89,10 @@
 
     const theme = getThemeNumber(chosenTheme)
 
-    $user.image = chosenAvatar
-    $user.theme = theme
+    $userStore.image = chosenAvatar
+    $userStore.theme = theme
 
-    await updateUser($user)
+    await updateUser($userStore)
       .then((d) => {
         if (d.status === 200) {
           editSettings = false
@@ -135,7 +135,7 @@
 {/if}
 <Page>
   <div class="profileWrapper">
-    {#if $isLoggedIn && $user}
+    {#if $isLoggedInStore && $userStore}
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
           <div>
@@ -169,8 +169,8 @@
 
         {#if $profileComponent === 'matchHistory'}
           <h3>Match History</h3>
-          {#if $user.gameHistory}
-            {#each Object.values($user.gameHistory) as game}
+          {#if $userStore.gameHistory}
+            {#each Object.values($userStore.gameHistory) as game}
               <br />
               <p>Game Name: {game.sessionId}</p>
               <p><i>{formatDate(game.played)}</i></p>
@@ -182,11 +182,11 @@
         {#if $profileComponent === 'settings'}
           <div class="userHeader">
             <button title="Change avatar" class="avatar" on:click={() => (avatarDialog = true)}
-              ><img class="chosenAvatar" src={$user.image} alt={Avatars.AstronautDog} /></button
+              ><img class="chosenAvatar" src={$userStore.image} alt={Avatars.AstronautDog} /></button
             >
             <div class="userInfo">
-              <h3>{$user.name}</h3>
-              <p>Created: <i>{formatDate($user.createdAt)}</i></p>
+              <h3>{$userStore.name}</h3>
+              <p>Created: <i>{formatDate($userStore.createdAt)}</i></p>
             </div>
           </div>
           {#if avatarDialog}
@@ -256,11 +256,11 @@
             <!-- <td><input disabled={loading} on:keypress={onKeyPress} bind:value={email} /></td> -->
             <tr style="opacity: {opacity};">
               <td>Name</td>
-              <td><input disabled={!editSettings} bind:value={$user.name} /></td>
+              <td><input disabled={!editSettings} bind:value={$userStore.name} /></td>
             </tr>
             <tr style="opacity: {opacity};">
               <td>Email</td>
-              <td><input disabled={!editSettings} bind:value={$user.email} /></td>
+              <td><input disabled={!editSettings} bind:value={$userStore.email} /></td>
             </tr>
             <tr style="opacity: {opacity};">
               <td>Theme</td>

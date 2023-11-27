@@ -1,6 +1,16 @@
 <script lang="ts">
   //Stores
-  import { guestUserName, user, localPlayer, pageHasHeader, isLoggedIn, guestUser, socket, chatMessageHistory, gameSessionId } from '../../stores/stores'
+  import {
+    guestUserNameStore,
+    userStore,
+    localPlayerStore,
+    pageHasHeaderStore,
+    isLoggedInStore,
+    guestUserStore,
+    socketStore,
+    chatMsgHistoryStore,
+    gameSessionIdStore,
+  } from '../../stores/stores'
 
   //Interfaces
   import { MessageType, type SpaceObject } from '../../lib/interface'
@@ -33,17 +43,17 @@
   /**
    * Reactive on changes to $user store.
    */
-  $: if ($user && $user.name !== $localPlayer.name) {
-    $localPlayer.name = $user.name
+  $: if ($userStore && $userStore.name !== $localPlayerStore.name) {
+    $localPlayerStore.name = $userStore.name
     info(`sending loc player`)
     setTimeout(() => {
-      $socket.send($localPlayer)
+      $socketStore.send($localPlayerStore)
     }, 500)
-    if ($user.ships.length === 1) {
-      $localPlayer.ship = createChosenShip($user.ships[0])
-      console.log($user.ships)
+    if ($userStore.ships.length === 1) {
+      $localPlayerStore.ship = createChosenShip($userStore.ships[0])
+      console.log($userStore.ships)
       setTimeout(() => {
-        $socket.send($localPlayer)
+        $socketStore.send($localPlayerStore)
       }, 600)
     } else {
       shipModalOpen = true
@@ -54,11 +64,11 @@
     }, 600)
   }
 
-  $: if ($isLoggedIn === false) {
+  $: if ($isLoggedInStore === false) {
     console.log('User logged out - renaming to guest name')
-    $localPlayer.name = $guestUser.name
+    $localPlayerStore.name = $guestUserStore.name
     setTimeout(() => {
-      $socket.send($localPlayer)
+      $socketStore.send($localPlayerStore)
       log('$: if ($isLoggedIn === false)')
       updateSessions()
     }, 700)
@@ -67,19 +77,19 @@
   $: allReady = false
   let readyPlayers = []
 
-  pageHasHeader.set(true)
+  pageHasHeaderStore.set(true)
 
   let sessions: Session[] = []
 
   function hostSession(forceNewSessionId = false) {
-    if ($localPlayer.sessionId.length === 0 || forceNewSessionId === true) {
-      $localPlayer.sessionId = $gameSessionId ? $gameSessionId : createSessionId()
-      $localPlayer.messageType = MessageType.SESSION_UPDATE
-      $localPlayer.isHost = true
-      console.log(`Says hello to online players, new session ${$localPlayer.sessionId}`)
-      $socket.send($localPlayer)
+    if ($localPlayerStore.sessionId.length === 0 || forceNewSessionId === true) {
+      $localPlayerStore.sessionId = $gameSessionIdStore ? $gameSessionIdStore : createSessionId()
+      $localPlayerStore.messageType = MessageType.SESSION_UPDATE
+      $localPlayerStore.isHost = true
+      console.log(`Says hello to online players, new session ${$localPlayerStore.sessionId}`)
+      $socketStore.send($localPlayerStore)
     } else {
-      console.log(`Reusing old session ${$gameSessionId}`)
+      console.log(`Reusing old session ${$gameSessionIdStore}`)
     }
   }
 
@@ -107,7 +117,7 @@
     const msg: ChatMessage = {
       message: `Joined ${session}`,
       timeDate: new Date(),
-      user: $localPlayer,
+      user: $localPlayerStore,
       serviceMsg: true,
     }
 
@@ -120,9 +130,9 @@
 
   async function initLobbySocket() {
     return new Promise<void>((resolve, reject) => {
-      $localPlayer.name = $user ? $user.name : $guestUserName
-      if (!$isLoggedIn) {
-        $localPlayer.ship = {
+      $localPlayerStore.name = $userStore ? $userStore.name : $guestUserNameStore
+      if (!$isLoggedInStore) {
+        $localPlayerStore.ship = {
           name: '',
           shipVariant: 0,
           level: 0,
@@ -132,14 +142,14 @@
         }
       }
 
-      $socket.connect().then(() => {
+      $socketStore.connect().then(() => {
         console.log(`Connected to websocket`)
         hostSession()
       })
 
       console.log('Adding lobby websocket listener...')
 
-      $socket
+      $socketStore
         .addListener(
           (su) => {
             const incomingUpdate = su.dataObject
@@ -156,22 +166,22 @@
                 timeDate: new Date(),
                 user: incomingUpdate,
               }
-              $chatMessageHistory = [...$chatMessageHistory, newMsg]
+              $chatMsgHistoryStore = [...$chatMsgHistoryStore, newMsg]
             } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
               console.log(`${incomingUpdate.name} left the lobby`)
             } else if (incomingUpdate.messageType === MessageType.PING) {
               // handlePing(incomingUpdate, $socket)
             } else if (incomingUpdate.messageType === MessageType.START_GAME) {
               const sess = incomingUpdate.sessionId
-              $localPlayer.isPlaying = true
+              $localPlayerStore.isPlaying = true
               info(`Resetting local player position to world start position`)
-              $localPlayer.cameraPosition = worldStartPosition
+              $localPlayerStore.cameraPosition = worldStartPosition
               console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
-              $socket.resetListeners()
+              $socketStore.resetListeners()
               navigate(`/play/${sess}`)
             } else if (incomingUpdate.messageType === MessageType.SERVICE) {
               log(`Service message: server version: ${incomingUpdate.serverVersion}`)
-              $localPlayer.serverVersion = incomingUpdate.serverVersion
+              $localPlayerStore.serverVersion = incomingUpdate.serverVersion
             } else {
               if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
                 warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
@@ -207,25 +217,25 @@
   onMount(() => {
     const storedShipJson = localStorage.getItem('chosenShip')
 
-    if (storedShipJson && $user) {
+    if (storedShipJson && $userStore) {
       console.log('storedShip', storedShipJson)
       const storedShip = JSON.parse(storedShipJson)
       if (storedShip) {
-        $user.ships.find((ship) => {
+        $userStore.ships.find((ship) => {
           if (ship.id === storedShip.id) {
-            $localPlayer.ship = createChosenShip(ship)
+            $localPlayerStore.ship = createChosenShip(ship)
             return
           }
         })
       }
     }
 
-    console.log('localplayer:', $localPlayer)
+    console.log('localplayer:', $localPlayerStore)
 
-    if ($isLoggedIn && $user && !storedShipJson) {
+    if ($isLoggedInStore && $userStore && !storedShipJson) {
       shipModalOpen = true
-      if ($user.ships.length > 0) {
-        $localPlayer.ship = createChosenShip($user.ships[0])
+      if ($userStore.ships.length > 0) {
+        $localPlayerStore.ship = createChosenShip($userStore.ships[0])
       }
     } else {
       console.log('else')
@@ -238,7 +248,7 @@
 
   onDestroy(() => {
     // setReadyToPlay(false)
-    $socket.resetListeners()
+    $socketStore.resetListeners()
 
     if (pingTimer) {
       console.log(`Clears ping timer ${pingTimer}`)
@@ -252,7 +262,7 @@
   function checkJoinedSession(): void {
     for (let i = 0; i < sessions.length; i++) {
       const s = sessions[i]
-      if (s.id === $localPlayer.sessionId) {
+      if (s.id === $localPlayerStore.sessionId) {
         joinedSession = s
         checkReady()
         // log(`Joined session ${s.id}`)
@@ -285,14 +295,14 @@
 
   function joinSession_(otherPlayerWithSession: SpaceObject | null) {
     if (otherPlayerWithSession) {
-      console.log(`${$localPlayer.name}: joining session ${otherPlayerWithSession.sessionId} hosted by ${otherPlayerWithSession.name}`)
-      $localPlayer.sessionId = otherPlayerWithSession.sessionId
+      console.log(`${$localPlayerStore.name}: joining session ${otherPlayerWithSession.sessionId} hosted by ${otherPlayerWithSession.name}`)
+      $localPlayerStore.sessionId = otherPlayerWithSession.sessionId
       // send some update that localPlayer joined a/the session
-      $localPlayer.messageType = MessageType.SESSION_UPDATE
-      $localPlayer.isHost = false
-      $chatMessageHistory = []
-      $chatMessageHistory = [...$chatMessageHistory, createJoinMsg(otherPlayerWithSession.sessionId)]
-      $socket.send($localPlayer)
+      $localPlayerStore.messageType = MessageType.SESSION_UPDATE
+      $localPlayerStore.isHost = false
+      $chatMsgHistoryStore = []
+      $chatMsgHistoryStore = [...$chatMsgHistoryStore, createJoinMsg(otherPlayerWithSession.sessionId)]
+      $socketStore.send($localPlayerStore)
       setTimeout(() => {
         updateSessions()
       }, 400)
@@ -302,7 +312,7 @@
   }
 
   function leaveSession() {
-    $chatMessageHistory = []
+    $chatMsgHistoryStore = []
     console.log(`Leaving session`)
     joinedSession = null
     hostSession(true)
@@ -313,21 +323,21 @@
   }
 
   function startGame() {
-    $localPlayer.messageType = MessageType.START_GAME
-    $localPlayer.isPlaying = true
-    $socket.send($localPlayer)
-    navigate(`/play/${$localPlayer.sessionId}`)
+    $localPlayerStore.messageType = MessageType.START_GAME
+    $localPlayerStore.isPlaying = true
+    $socketStore.send($localPlayerStore)
+    navigate(`/play/${$localPlayerStore.sessionId}`)
   }
 
   function toggleReadyToPlay() {
-    setReadyToPlay(!$localPlayer.readyToPlay)
+    setReadyToPlay(!$localPlayerStore.readyToPlay)
   }
 
   function setReadyToPlay(ready: boolean) {
     console.log(`Sending ${ready ? 'ready' : 'not ready'} to play to session peers`)
-    $localPlayer.readyToPlay = ready
-    $localPlayer.messageType = MessageType.SESSION_UPDATE
-    $socket.send($localPlayer)
+    $localPlayerStore.readyToPlay = ready
+    $localPlayerStore.messageType = MessageType.SESSION_UPDATE
+    $socketStore.send($localPlayerStore)
     updateSessions()
   }
 
@@ -335,7 +345,7 @@
     console.log('clickedshipcallback')
     shipModalOpen = false
     chosenShip = ship
-    $localPlayer.ship = {
+    $localPlayerStore.ship = {
       level: ship.level,
       name: ship.name,
       userId: ship.userId,
@@ -348,14 +358,14 @@
     // })
     showLobby = true
     localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
-    $socket.send($localPlayer)
+    $socketStore.send($localPlayerStore)
     updateSessions()
   }
 </script>
 
-{#if $isLoggedIn}
+{#if $isLoggedInStore}
   {#if shipModalOpen}
-    {#if $user.ships.length === 0}
+    {#if $userStore.ships.length === 0}
       <AddShip openModal={!chosenShip} />
     {:else}
       <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
@@ -369,16 +379,16 @@
     {/if}
   {/if}
 {/if}
-{#if showLobby && $localPlayer.ship}
+{#if showLobby && $localPlayerStore.ship}
   <Page>
     <div class="lobbyWrapper">
       <div class="left">
-        <SessionList joinSession={joinSession_} localPlayer={$localPlayer} {sessions} />
+        <SessionList joinSession={joinSession_} localPlayer={$localPlayerStore} {sessions} />
       </div>
       <div class="center">
         {#if joinedSession}
           <div class="sessionInfo">
-            <p style={$localPlayer.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
+            <p style={$localPlayerStore.name === joinedSession.host.name ? 'color: #c89' : 'color: var(--main-text-color)'}>
               Host: {joinedSession.host.name}
               {#if joinedSession.host.readyToPlay}
                 <span style="filter: hue-rotate(72deg)">
@@ -396,10 +406,10 @@
           </div>
           <div class="buttonWrapper">
             <Button90 icon={Icons.Exit} buttonConfig={{ buttonText: 'Leave Session', clickCallback: () => leaveSession(), selected: false }} />
-            <span style="filter: {$localPlayer.readyToPlay ? 'hue-rotate(72deg)' : ''}">
+            <span style="filter: {$localPlayerStore.readyToPlay ? 'hue-rotate(72deg)' : ''}">
               <Button90
                 icon={Icons.Done}
-                buttonConfig={{ buttonText: 'Toggle ready!', clickCallback: () => toggleReadyToPlay(), selected: $localPlayer.readyToPlay }}
+                buttonConfig={{ buttonText: 'Toggle ready!', clickCallback: () => toggleReadyToPlay(), selected: $localPlayerStore.readyToPlay }}
               />
             </span>
 

@@ -7,7 +7,7 @@
   import ProfileModal from '../profile/ProfileModal.svelte'
 
   //Stores
-  import { user, settings, isLoggedIn } from '../../stores/stores'
+  import { userStore, settingsStore, isLoggedInStore } from '../../stores/stores'
 
   //css
   import './style.css'
@@ -23,7 +23,7 @@
     showLogin = !showLogin
   }
 
-  $: borderColor = $isLoggedIn && $user ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
+  $: borderColor = $isLoggedInStore && $userStore ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
 
   $: pathname = location.pathname
 
@@ -34,7 +34,7 @@
 
   function themeToggler() {
     const t = toggleAndGetTheme()
-    $settings = t
+    $settingsStore = t
   }
 </script>
 
@@ -47,7 +47,7 @@
     <div in:fade={{ duration: 500, delay: 0 }} out:fade={{ duration: 500, delay: 500 }} class="menuItem" style="--display: {display};">
       {#each Object.values(routes) as route}
         {#if route.inHeader}
-          {#if route.path === '/admin' && $user && $user.role === 'admin'}
+          {#if route.path === '/admin' && $userStore && $userStore.role === 'admin'}
             <div in:slide={{ duration: 500, delay: 500 }} out:slide={{ duration: 500, delay: 0 }} class="navButton">
               <Button90
                 icon={route.icon}
@@ -90,7 +90,7 @@
 
     <div class="theme">
       <button class="themeToggle" on:click={() => themeToggler()}>
-        {#if $settings.theme === DeepMidnight}
+        {#if $settingsStore.theme === DeepMidnight}
           <i in:fade={{ duration: 500, delay: 500 }} out:fly={{ duration: 250, delay: 0 }} class="fa-solid fa-moon fa-2xl" />
         {:else}
           <i in:fade={{ duration: 500, delay: 500 }} out:fly={{ duration: 250, delay: 0 }} class="fa-solid fa-sun fa-2xl" />
@@ -98,13 +98,13 @@
       </button>
     </div>
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-      <img draggable="false" class="avatar" src={$isLoggedIn && $user ? $user.image : Avatars.AstronautMale} alt="Avatar" />
+      <img draggable="false" class="avatar" src={$isLoggedInStore && $userStore ? $userStore.image : Avatars.AstronautMale} alt="Avatar" />
     </div>
 
     {#if showLogin}
       <Modal
         backDrop={false}
-        title={$user ? 'Profile' : 'Log in'}
+        title={$userStore ? 'Profile' : 'Log in'}
         showModal={showLogin}
         closedCallback={() => {
           showLogin = false

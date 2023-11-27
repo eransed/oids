@@ -20,7 +20,7 @@
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame } from '../../../../lib/gameModes/regular'
-  import { guestUserName, isLoggedIn, localPlayer, socket, user } from '../../../../stores/stores'
+  import { guestUserNameStore, isLoggedInStore, localPlayerStore, socketStore, userStore } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { playersInSession } from '../../../../lib/services/game/playersInSession'
   import { info } from 'mathil'
@@ -80,31 +80,31 @@
 
   onMount(async () => {
     // cleanup = initSettingsControl()
-    if (!$isLoggedIn) {
-      $localPlayer.name = $guestUserName
+    if (!$isLoggedInStore) {
+      $localPlayerStore.name = $guestUserNameStore
     }
 
-    if ($isLoggedIn && $user.ships.length === 1) {
-      $localPlayer.ship = createChosenShip($user.ships[0])
-      chosenShip = $localPlayer.ship
+    if ($isLoggedInStore && $userStore.ships.length === 1) {
+      $localPlayerStore.ship = createChosenShip($userStore.ships[0])
+      chosenShip = $localPlayerStore.ship
     } else {
       const storedShipJson = localStorage.getItem('chosenShip')
 
-      if (storedShipJson && $isLoggedIn) {
+      if (storedShipJson && $isLoggedInStore) {
         const localStorageShip = JSON.parse(storedShipJson)
-        const shipFromStorage = $user.ships.find((ship) => {
+        const shipFromStorage = $userStore.ships.find((ship) => {
           if (ship.id === localStorageShip.id) return ship
         })
 
         if (shipFromStorage) {
-          $localPlayer.ship = createChosenShip(shipFromStorage)
+          $localPlayerStore.ship = createChosenShip(shipFromStorage)
           console.log('found ship in localstorage:', shipFromStorage)
-          chosenShip = $localPlayer.ship
+          chosenShip = $localPlayerStore.ship
         }
       }
     }
 
-    game = new Game(canvas, $localPlayer, $socket, getKeyMap(), showDeadMenu)
+    game = new Game(canvas, $localPlayerStore, $socketStore, getKeyMap(), showDeadMenu)
     gameRef(game)
     game.localPlayer.sessionId = sessionId
     players().then((d) => {
@@ -115,7 +115,7 @@
         game.localPlayer.isHost = true
       }
     })
-    if (!$isLoggedIn || chosenShip) {
+    if (!$isLoggedInStore || chosenShip) {
       game.startGame(initRegularGame, renderFrame, nextFrame)
     }
   })
@@ -144,7 +144,7 @@
 
   <InGameInfo title={'Key Map'} showModal={$showHotKeys}>
     <div class="hotKeys">
-      <HotKeys activeColor={$localPlayer.color} />
+      <HotKeys activeColor={$localPlayerStore.color} />
     </div>
   </InGameInfo>
 
@@ -161,14 +161,14 @@
       <Chat chatTitle={false} joinedSessionId={sessionId} inGameChat />
     </div>
     <div class="xp">
-      <ProgressBar progress={$localPlayer.ship.experience} max={500} />
+      <ProgressBar progress={$localPlayerStore.ship.experience} max={500} />
     </div>
   {/if}
 </div>
 
 {#if $showShipDetails}
   <ModalSimple closeBtn={() => ($showShipDetails = !$showShipDetails)} saveButton={false}>
-    <ShipDetails ship={$localPlayer.ship} />
+    <ShipDetails ship={$localPlayerStore.ship} />
   </ModalSimple>
 {/if}
 
@@ -176,8 +176,8 @@
   <GameMenu currentGame={game} />
 {/if}
 
-{#if $isLoggedIn && $user.ships.length > 1 && !chosenShip}
-  {#if $user.ships.length === 0}
+{#if $isLoggedInStore && $userStore.ships.length > 1 && !chosenShip}
+  {#if $userStore.ships.length === 0}
     <AddShip openModal={!chosenShip} />
   {:else}
     <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
@@ -187,7 +187,7 @@
           console.log('clickedshipcallback')
           shipModalOpen = false
           chosenShip = createChosenShip(ship)
-          $localPlayer.ship = {
+          $localPlayerStore.ship = {
             level: ship.level,
             name: ship.name,
             userId: ship.userId,
@@ -195,7 +195,7 @@
             id: ship.id,
             experience: ship.experience,
           }
-          $localPlayer.name = $user.name
+          $localPlayerStore.name = $userStore.name
           game.startGame(initRegularGame, renderFrame, nextFrame)
           localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
         }}

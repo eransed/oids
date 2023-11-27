@@ -3,7 +3,7 @@
   import { formatDate } from '../../utils/utils'
   import { deleteShip, getShips, updateShip } from '../../lib/services/ship/ship.services'
   import getProfile from '../../lib/services/user/profile'
-  import { localPlayer, socket, user } from '../../stores/stores'
+  import { localPlayerStore, socketStore, userStore } from '../../stores/stores'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import { ShipVariant, ShipBundles, getShipBundleCache } from '../../style/ships'
   import { fade } from 'svelte/transition'
@@ -63,7 +63,7 @@
   }
 </script>
 
-{#each $user.ships as ship, i}
+{#each $userStore.ships as ship, i}
   <div class="ship" style="animation-delay: {150 * i}ms;">
     <!-- svelte-ignore a11y-missing-attribute -->
     <button class="avatar" style="animation-delay: {150 * i}ms;" title="Edit Ship" on:click={() => clickedShip(ship)}>

@@ -5,7 +5,7 @@ import { clearScreen } from './render/render2d'
 import { addDataPoint, newDataStats } from './stats'
 import { renderFrameInfo } from './render/renderUI'
 import { Every } from './gameModes/regular'
-import { localPlayerStore } from '../pages/GamePage/components/Game/Utils/gameUtils'
+import { localPlayerStore } from '../stores/stores'
 import { MessageType, type SpaceObject } from './interface'
 import { reduceSoSize } from './websocket/util'
 

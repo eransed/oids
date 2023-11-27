@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ChosenShip } from '../../lib/interface'
-  import { localPlayer } from '../../stores/stores'
+  import { localPlayerStore } from '../../stores/stores'
   import { getShipBundleCache } from '../../style/ships'
   import Cursor from '../mouse/cursor.svelte'
   import ShipCardImg from './ShipImg.svelte'
@@ -9,7 +9,7 @@
   export let shipOwner: string
   export let clickedShip: (ship: ChosenShip) => void = (ship) => {}
 
-  $: yourship = $localPlayer.ship.userId === chosenShip.userId
+  $: yourship = $localPlayerStore.ship.userId === chosenShip.userId
 
   function handleClickShip() {
     if (yourship) {

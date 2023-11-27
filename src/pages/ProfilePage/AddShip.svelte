@@ -9,7 +9,7 @@
   import getProfile from '../../lib/services/user/profile'
   import { ShipBundles } from '../../style/ships'
   import type { Ship } from '@prisma/client'
-  import { user } from '../../stores/stores'
+  import { userStore } from '../../stores/stores'
   import { createShip } from '../../lib/factory'
 
   //Props
@@ -19,7 +19,7 @@
 
   let newShipDone: boolean = false
 
-  let newShip: Ship = createShip($user.id)
+  let newShip: Ship = createShip($userStore.id)
 
   async function handleNewShip(): Promise<void> {
     loading = true

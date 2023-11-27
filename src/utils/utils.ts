@@ -1,5 +1,5 @@
 import { rndi } from 'mathil'
-import { isLoggedIn, localPlayer, user, userIncludes } from '../stores/stores'
+import { isLoggedInStore, localPlayerStore, userStore, userIncludes } from '../stores/stores'
 import type { Prisma, User } from '@prisma/client'
 import { createSpaceObject } from '../lib/factory'
 
@@ -22,9 +22,9 @@ export function formatDate(date: Date | string) {
 
 export const handleLogout = (): void => {
   localStorage.clear()
-  isLoggedIn.set(false)
-  user.set(gUser)
-  localPlayer.set(createSpaceObject(gUser.name))
+  isLoggedInStore.set(false)
+  userStore.set(gUser)
+  localPlayerStore.set(createSpaceObject(gUser.name))
   localStorage.clear()
 }
 

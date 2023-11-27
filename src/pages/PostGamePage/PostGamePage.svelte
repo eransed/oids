@@ -1,24 +1,24 @@
 <script lang="ts">
   // Svelte
-  import { fade } from "svelte/transition"
+  import { fade } from 'svelte/transition'
 
   // Components
-  import TypeWriter from "../../components/typeWriter/TypeWriter.svelte"
+  import TypeWriter from '../../components/typeWriter/TypeWriter.svelte'
 
   // Stores
-  import { pageHasHeader, user } from "../../stores/stores"
+  import { pageHasHeaderStore, userStore } from '../../stores/stores'
 
   // Interface
-  import type { User } from "../../interfaces/user"
 
   // Utils
-  import { rndi } from "mathil"
+  import { rndi } from 'mathil'
+  import type { User } from '@prisma/client'
 
-  pageHasHeader.set(true)
+  pageHasHeaderStore.set(true)
 
   let userData: User | undefined
 
-  user.subscribe((value) => {
+  userStore.subscribe((value) => {
     userData = value
   })
 

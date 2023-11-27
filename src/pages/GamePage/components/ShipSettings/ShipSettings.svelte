@@ -1,6 +1,6 @@
 <script lang="ts">
   import { MessageType } from '../../../../lib/interface'
-  import { localPlayerStore } from '../Game/Utils/gameUtils'
+  import { localPlayerStore } from '../../../../stores/stores'
 
   function prettySpaceObjectValue(value: unknown, key = ''): string {
     // let out: string = ':' + (typeof value) + ' = '

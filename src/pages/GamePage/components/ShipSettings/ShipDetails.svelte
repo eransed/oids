@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { ChosenShip } from '../../../../lib/interface'
   import ShipImg from '../../../../components/ships/ShipImg.svelte'
-  import { localPlayerStore } from '../Game/Utils/gameUtils'
-
   export let ship: ChosenShip
 </script>
 

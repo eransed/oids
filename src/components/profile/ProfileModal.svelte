@@ -6,7 +6,7 @@
   import { logOutButton, loginButton } from './profileButtons'
 
   //Stores
-  import { isLoggedIn, user } from '../../stores/stores'
+  import { isLoggedInStore, userStore } from '../../stores/stores'
 
   //Svelte
   import { fade } from 'svelte/transition'
@@ -44,10 +44,10 @@
   }
 
   //Color of border color around profile portrait
-  $: borderColor = $isLoggedIn ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
+  $: borderColor = $isLoggedInStore ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
 </script>
 
-{#if !$isLoggedIn}
+{#if !$isLoggedInStore}
   <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <form on:submit|preventDefault={handleSubmit} on:formdata class="form">
       <input placeholder="Email" name="email" type="email" autocomplete="email" />
@@ -60,28 +60,28 @@
     <Alert severity={alert.severity} text={alert.text} />
   </div>
 {/if}
-{#if $user && $isLoggedIn}
+{#if $userStore && $isLoggedInStore}
   <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <div class="row1">
       <div class="column" style={'flex: 0.5;'}>
         <div class="modalProfile" style="--borderColor: {borderColor};">
           <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <img on:click={() => navigate('/profile')} draggable="false" class="avatar" src={$user.image} alt="Rocket Ship" />
+          <img on:click={() => navigate('/profile')} draggable="false" class="avatar" src={$userStore.image} alt="Rocket Ship" />
         </div>
       </div>
       <div class="column">
         <div class="profileName">
-          {$user?.name}
+          {$userStore?.name}
         </div>
       </div>
     </div>
     <div class="row2">
       <div class="column">
         <div>
-          <p style="margin-top: 0.5em;">Email: {$user?.email}</p>
+          <p style="margin-top: 0.5em;">Email: {$userStore?.email}</p>
 
           <p>
-            Created: {$user && new Intl.DateTimeFormat('en-SE').format(new Date($user.createdAt))}
+            Created: {$userStore && new Intl.DateTimeFormat('en-SE').format(new Date($userStore.createdAt))}
           </p>
         </div>
       </div>

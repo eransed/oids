@@ -4,7 +4,7 @@
   import { routes } from './routes'
 
   //Stores
-  import { pageHasHeader } from './stores/stores'
+  import { pageHasHeaderStore } from './stores/stores'
 
   //Pages
   import LandingPage from './pages/LandingPage/LandingPage.svelte'
@@ -18,7 +18,7 @@
 </script>
 
 <Router>
-  {#if $pageHasHeader}
+  {#if $pageHasHeaderStore}
     <Header />
   {/if}
   <Route path={routes.home.path}>

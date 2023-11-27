@@ -1,16 +1,11 @@
 <script lang="ts">
   import { navigate } from 'svelte-routing'
-  import { menuOpen } from '../../../../components/menu/MenuStore'
-
-  //Components
-  import Menu from '../../../../components/menu/Menu.svelte'
   import type { Button90Config } from '../../../../interfaces/menu'
-  import { stopGame } from '../Game/Utils/gameUtils'
   import type { Game } from '../../../../lib/game'
-  import { settings } from '../../../../stores/stores'
+  import { settingsStore } from '../../../../stores/stores'
   import { toggleAndGetTheme } from '../../../../style/defaultColors'
   import { getKeyMap, initKeyControllers, removeKeyControllers } from '../../../../lib/input'
-  import { onDestroy, onMount } from 'svelte'
+  import { onMount } from 'svelte'
   import MenuWrapper from '../../../../components/menu/MenuWrapper.svelte'
   import Button90 from '../../../../components/menu/Button90.svelte'
 
@@ -28,7 +23,7 @@
 
   function handleKeyEvents(e: KeyboardEvent) {
     if (e.key === 't') {
-      $settings = toggleAndGetTheme()
+      $settingsStore = toggleAndGetTheme()
     }
 
     if (e.key === 'e' || e.key === 'Escape') {
@@ -39,7 +34,7 @@
 
     if (e.key === 'q') {
       getKeyMap().menu.store.set(false)
-      stopGame(currentGame)
+      currentGame.stopGame()
       navigate('/play')
       deleteEventListener()
     }
@@ -48,7 +43,7 @@
   const theme: Button90Config = {
     buttonText: 'Theme (T)',
     clickCallback() {
-      $settings = toggleAndGetTheme()
+      $settingsStore = toggleAndGetTheme()
     },
     selected: false,
   }
@@ -67,7 +62,8 @@
     buttonText: 'Quit Game (Q)',
     clickCallback() {
       getKeyMap().menu.store.set(false)
-      stopGame(currentGame)
+      currentGame.stopGame()
+
       navigate('/play')
       deleteEventListener()
     },
