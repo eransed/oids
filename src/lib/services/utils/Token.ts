@@ -4,7 +4,7 @@ import axios from 'axios'
 import type { AxiosResponse } from 'axios'
 import getProfile from '../user/profile'
 
-import { isLoggedIn, userLoading } from '../../../stores/stores'
+import { isLoggedInStore, userLoadingStore } from '../../../stores/stores'
 
 import type { Tokens } from '../../../interfaces/user'
 import { setCssFromSettings, syncThemeWithCss, themes } from '../../../style/defaultColors'
@@ -25,7 +25,7 @@ export const validateToken = async () => {
     refreshToken: storedRefreshToken,
   }
 
-  userLoading.set(true)
+  userLoadingStore.set(true)
 
   return await axios
     .post(`http://${location.hostname}:6060/api/v1/auth/refreshToken`, body)
@@ -38,8 +38,8 @@ export const validateToken = async () => {
 
         return await getProfile()
           .then((user) => {
-            isLoggedIn.set(true)
-            userLoading.set(false)
+            isLoggedInStore.set(true)
+            userLoadingStore.set(false)
             setCssFromSettings(user.theme)
 
             return user

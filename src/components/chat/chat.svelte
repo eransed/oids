@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition'
 
   //Stores
-  import { chatMessageHistory, localPlayer, socket } from '../../stores/stores'
+  import { chatMsgHistoryStore, localPlayerStore, socketStore } from '../../stores/stores'
 
   //Components
   import TypeWriter from '../typeWriter/TypeWriter.svelte'
@@ -37,16 +37,16 @@
   function sendRawChatMessage(msgStr: string) {
     const chatMessage: ChatMessage = {
       message: msgStr,
-      user: $localPlayer,
+      user: $localPlayerStore,
       timeDate: new Date(),
     }
-    $chatMessageHistory.push(chatMessage)
-    $chatMessageHistory = $chatMessageHistory
+    $chatMsgHistoryStore.push(chatMessage)
+    $chatMsgHistoryStore = $chatMsgHistoryStore
 
-    $localPlayer.messageType = MessageType.CHAT_MESSAGE
-    $localPlayer.lastMessage = msgStr
-    $localPlayer.online = true
-    $socket.send($localPlayer)
+    $localPlayerStore.messageType = MessageType.CHAT_MESSAGE
+    $localPlayerStore.lastMessage = msgStr
+    $localPlayerStore.online = true
+    $socketStore.send($localPlayerStore)
     chatMsg = ''
     scrollToBottom()
   }
@@ -89,7 +89,7 @@
 {/if}
 
 <div class="messages" id="messagesDiv">
-  {#each $chatMessageHistory as msg}
+  {#each $chatMsgHistoryStore as msg}
     {#if msg.serviceMsg}
       <span style="font-size: 0.8rem; font-style: italic; opacity: 0.5;">{msg.message}</span>
     {:else}

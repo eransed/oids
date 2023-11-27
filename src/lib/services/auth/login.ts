@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from 'axios'
 
-import { isLoggedIn } from '../../../stores/stores'
+import { isLoggedInStore } from '../../../stores/stores'
 
 import type { Tokens } from '../../../interfaces/user'
 
@@ -18,7 +18,7 @@ const login = async (req: FormData) => {
       if (status === 200) {
         localStorage.setItem('accessToken', response.data.accessToken)
         localStorage.setItem('refreshToken', response.data.refreshToken)
-        isLoggedIn.set(true)
+        isLoggedInStore.set(true)
       }
     })
     .catch((err) => {

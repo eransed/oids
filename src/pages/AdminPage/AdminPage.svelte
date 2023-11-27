@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { user, userIncludes } from '../../stores/stores'
+  import { userStore, userIncludes } from '../../stores/stores'
 
   //Components
   import Page from '../../components/page/page.svelte'
@@ -91,7 +91,7 @@
             }
             editingUser = undefined
             edit = false
-            if ($user.id === editedUser.id) {
+            if ($userStore.id === editedUser.id) {
               getProfile()
             }
           } else {
@@ -200,8 +200,8 @@
   <Alert severity={alert.severity} text={alert.text} />
 {/if}
 
-{#if $user}
-  {#if $user.role === 'admin'}
+{#if $userStore}
+  {#if $userStore.role === 'admin'}
     <Page>
       <div class="pageWrapper">
         <div class="actions">
