@@ -365,6 +365,22 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
         renderViewport(game.ctx, so)
         renderHitRadius(so, game.ctx)
       }
+      if (so.health < so.startHealth) {
+        const theme = getCurrentTheme()
+        renderProgressBar(
+          add2(remotePos, newVec2(-so.hitRadius / 1, -so.hitRadius / 0.65)),
+          'Hp',
+          so.health,
+          so.startHealth,
+          game.ctx,
+          0,
+          false,
+          '#fff',
+          theme.accent,
+          theme.text,
+          so.hitRadius / 200
+        )
+      }
     }
   })
 
