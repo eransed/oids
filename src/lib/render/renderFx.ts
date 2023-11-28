@@ -1,6 +1,6 @@
 import { explosionDuration } from '../constants'
 import { add2, rndi, degToRad, type Vec2 } from 'mathil'
-import type { NonPlayerCharacter, SpaceObject } from '../interface'
+import type { SpaceObject } from '../interface'
 
 export function renderHitExplosion(pos: Vec2, ctx: CanvasRenderingContext2D) {
   const offset = 20
@@ -17,7 +17,7 @@ export function renderHitExplosion(pos: Vec2, ctx: CanvasRenderingContext2D) {
   ctx.restore()
 }
 
-export function renderExplosionFrame(so: NonPlayerCharacter, ctx: CanvasRenderingContext2D, pos: Vec2 | null = null) {
+export function renderExplosionFrame(so: SpaceObject, ctx: CanvasRenderingContext2D, pos: Vec2 | null = null) {
   const offset = 80
   const minSize = 1
   const maxSize = 36 * so.deadFrameCount * 0.03

@@ -25,7 +25,7 @@ import { handleDeathExplosion } from '../mechanics'
 import { friction, getRemotePosition, handleCollisions, offScreen_mm, wrap_mm } from '../physics'
 import { loadingText, renderHitRadius, renderInfoText, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type NonPlayerCharacter } from '../interface'
+import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType } from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
 import { explosionDuration, screenScale, worldSize, worldStartPosition } from '../constants'
@@ -34,11 +34,11 @@ import { newPhotonLaser } from '../factory'
 import { reduceShotSize, reduceSoSize } from '../websocket/util'
 import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMoon'
 import { renderShip } from '../render/renderShip'
-import { renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
+import { renderProgressBar, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
 import { chatMsgHistoryStore, localPlayerStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
-
+import { getCurrentTheme } from '../../style/defaultColors'
 //Stores
 
 let numberOfServerObjects = 0
@@ -324,7 +324,7 @@ export function initRegularGame(game: Game): void {
   )
 }
 
-function exists(entity: NonPlayerCharacter, entities: NonPlayerCharacter[]): boolean {
+function exists(entity: SpaceObject, entities: SpaceObject[]): boolean {
   for (let i = 0; i < entities.length; i++) {
     const b = entities[i]
     // info(`bname: ${b.name}, ename ${entity.name} equal: ${b.name === entity.name}`)
@@ -375,9 +375,10 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
   return stillPlaying
 }
 
-function handleGameBodies(game: Game): (SpaceObject | NonPlayerCharacter)[] {
+function handleGameBodies(game: Game): SpaceObject[] {
   game.bodies.forEach((body) => {
     const bodyPos = getRemotePosition(body, game.localPlayer)
+
     if (body.health <= 0) {
       handleDeathExplosion(body, explosionDuration)
       if (!body.obliterated) {
@@ -388,6 +389,23 @@ function handleGameBodies(game: Game): (SpaceObject | NonPlayerCharacter)[] {
       if (game.keyFuncMap.systemGraphs.keyStatus) {
         renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
         renderHitRadius(body, game.ctx)
+      }
+
+      if (body.health < body.startHealth) {
+        const theme = getCurrentTheme()
+        renderProgressBar(
+          add2(bodyPos, newVec2(-body.hitRadius / 1.5, -body.hitRadius / 0.8)),
+          'Hp',
+          body.health,
+          body.startHealth,
+          game.ctx,
+          0,
+          false,
+          '#fff',
+          theme.accent,
+          theme.text,
+          body.hitRadius / 350
+        )
       }
     }
   })

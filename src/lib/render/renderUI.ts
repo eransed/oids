@@ -91,17 +91,20 @@ export function renderProgressBar(
   ctx: CanvasRenderingContext2D,
   redLevel = 60,
   warn = false,
-  textWarnColor = '#7b7b7b'
+  textWarnColor = '#7b7b7b',
+  lineColor = '#fff',
+  textColor = '#000',
+  scale = 1
 ): void {
   ctx.save()
   ctx.translate(pos.x, pos.y)
   const linew = 8
-  const w = 500
-  const h = 50
+  const w = 500 * scale
+  const h = 50 * scale
 
   ctx.lineWidth = linew
-  ctx.strokeStyle = '#fff'
-  ctx.fillStyle = '#fff'
+  ctx.strokeStyle = lineColor
+  ctx.fillStyle = lineColor
 
   if (amount < redLevel || (redLevel < 0 && amount > Math.abs(redLevel))) {
     // ctx.fillStyle = '#ffa500'
@@ -131,9 +134,9 @@ export function renderProgressBar(
   ctx.strokeRect(Math.floor(linew / 2), Math.floor(linew / 2) + 1, 1, h - Math.floor(linew / 2) - 1)
 
   setScaledFont(ctx)
-  ctx.fillStyle = '#7b7b7b'
+  ctx.fillStyle = textColor
   if (percent_n > 56) {
-    // ctx.fillStyle = '#000'
+    // ctx.fillStyle = '#000'qwq
   }
   if (warn) {
     ctx.fillStyle = textWarnColor
@@ -154,7 +157,6 @@ export function renderNumber(num: number, pos: Vec2, ctx: CanvasRenderingContext
   ctx.fillText(`${num}`, 0, 0)
   ctx.restore()
 }
-
 
 export function renderVec2(str: string, pos: Vec2, ctx: CanvasRenderingContext2D, style: UIStyle, angleAdjDeg = 0) {
   ctx.save()

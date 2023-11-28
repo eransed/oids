@@ -1,19 +1,19 @@
 <script lang="ts">
-  import type { NonPlayerCharacter, SpaceObject } from '../../../../lib/interface'
+  import type { SpaceObject } from '../../../../lib/interface'
   import { add2, newVec2, rndfVec2, round2, round2dec, smul2, sub2 } from 'mathil'
   import { localPlayerStore } from '../../../../stores/stores'
   import { worldStartPosition } from '../../../../lib/constants'
   import { getWorldCoordinates } from '../../../../lib/physics'
   import { resetStars } from '../../../../lib/gameModes/regular'
   import { getGame } from '../Game/Utils/mainGame'
-  function getCameraPos(n: NonPlayerCharacter | null) {
+  function getCameraPos(n: SpaceObject | null) {
     if (n) {
       return n.cameraPosition
     }
     return newVec2()
   }
   export let player: SpaceObject | null = null
-  export let serverObj: NonPlayerCharacter | null = null
+  export let serverObj: SpaceObject | null = null
   $: theObj = player ? player : serverObj
   // $: pos = round2(getWorldCoordinates(theObj), 0)
   $: pos = round2(getCameraPos(theObj), 0)

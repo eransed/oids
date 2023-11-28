@@ -1,14 +1,14 @@
 import { info, usNow, EveryInterval, rndfVec2, good, newVec2, rndi, smul2 } from 'mathil'
-import { NonPlayerCharacter, SpaceObject } from '../src/lib/interface'
-import { createNpc } from '../src/lib/factory'
+import { MessageType, SpaceObject } from '../src/lib/interface'
 import { handleCollisions, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics'
 import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
+import { createSpaceObject } from '../src/lib/factory'
 
 export class GameHandler {
   game_started = false
-  asteroids: NonPlayerCharacter[] = []
+  asteroids: SpaceObject[] = []
   game_interval: NodeJS.Timer | undefined = undefined
   start_time_us: number = usNow()
   tied_session_id: string | null = null
@@ -18,9 +18,9 @@ export class GameHandler {
   private dt = performance.now()
   private minTickTimeMs = 1 / 60
   private every = new EveryInterval(2)
-  broadcaster: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void
+  broadcaster: (clients: Client[], data: SpaceObject, sessionId: string | null) => void
 
-  constructor(bc: (clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => void) {
+  constructor(bc: (clients: Client[], data: SpaceObject, sessionId: string | null) => void) {
     this.broadcaster = bc
   }
 
@@ -60,11 +60,11 @@ export class GameHandler {
     }, this.minTickTimeMs)
   }
 
-  spawnAsteroids(): NonPlayerCharacter[] {
+  spawnAsteroids(): SpaceObject[] {
     const num = 10
     info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
-      const npc = createNpc()
+      const npc = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
       npc.velocity = rndfVec2(-0.5, 1)
       npc.cameraPosition = rndfVec2(worldStartPosition.x - 2000, worldStartPosition.y + 5000)
       npc.size = smul2(npc.size, 4)
@@ -72,6 +72,7 @@ export class GameHandler {
       npc.hitRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
       npc.mass = 50
       npc.health = 2500
+      npc.startHealth = 2500
       this.asteroids.push(npc)
     }
     return this.asteroids

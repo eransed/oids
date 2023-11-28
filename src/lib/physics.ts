@@ -1,4 +1,4 @@
-import type { Bounceable, Bounded, Collidable, Damager, NonPlayerCharacter, Physical, Rotatable, SpaceObject } from './interface'
+import type { Bounceable, Bounded, Collidable, Damager, Physical, Rotatable, SpaceObject } from './interface'
 import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, warn, good, bad, error } from 'mathil'
 import { renderHitExplosion } from './render/renderFx'
 import { coolDown, decayDeadShots, handleDeathExplosion, handleHittingShot } from './mechanics'
@@ -22,7 +22,7 @@ export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
   })
 }
 
-export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: number): SpaceObject | NonPlayerCharacter {
+export function updateSpaceObject(npc: SpaceObject, dt: number): SpaceObject {
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) return npc
   const deltaTime: number = dt * timeScale
@@ -47,13 +47,13 @@ export function updateSpaceObject(npc: SpaceObject | NonPlayerCharacter, dt: num
   return npc
 }
 
-export function updateSpaceObjects(npcs: (SpaceObject | NonPlayerCharacter)[], frameTimeMs: number): void {
+export function updateSpaceObjects(npcs: SpaceObject[], frameTimeMs: number): void {
   for (let i = 0; i < npcs.length; i++) {
     updateSpaceObject(npcs[i], frameTimeMs)
   }
 }
 
-export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number): void {
+export function updateShots(npc: SpaceObject, dts: number): void {
   if (isNaN(dts)) return
 
   decayDeadShots(npc)
@@ -81,13 +81,13 @@ export function updateShots(npc: SpaceObject | NonPlayerCharacter, dts: number):
   }
 }
 
-export function decayOffScreenShots(npc: SpaceObject | NonPlayerCharacter, screen: Vec2) {
+export function decayOffScreenShots(npc: SpaceObject, screen: Vec2) {
   npc.shotsInFlight = npc.shotsInFlight.filter(function (e) {
     return !offScreen(e.position, screen)
   })
 }
 
-export function decayOffScreenShotsPadded(npc: SpaceObject | NonPlayerCharacter, screen: Vec2, padFac = 1) {
+export function decayOffScreenShotsPadded(npc: SpaceObject, screen: Vec2, padFac = 1) {
   npc.shotsInFlight = npc.shotsInFlight.filter(function (e) {
     return !offScreen_mm(e.position, scalarMultiply2(screen, -padFac), scalarMultiply2(screen, padFac))
   })
@@ -151,7 +151,7 @@ export function wrap_mm(v: Vec2, min: Vec2, max: Vec2): void {
   if (v.y < min.y) v.y = max.y
 }
 
-export function gravity(from: SpaceObject | NonPlayerCharacter, to: SpaceObject | NonPlayerCharacter, G = 1): void {
+export function gravity(from: SpaceObject, to: SpaceObject, G = 1): void {
   // F = G((m0 * m1)/r^2)
   const m0: number = from.mass
   const m1: number = to.mass
@@ -163,7 +163,7 @@ export function gravity(from: SpaceObject | NonPlayerCharacter, to: SpaceObject 
   to.acceleration = add2(to.acceleration, gvec)
 }
 
-export function gravityStars(from: NonPlayerCharacter, to: NonPlayerCharacter, G = 1): void {
+export function gravityStars(from: SpaceObject, to: SpaceObject, G = 1): void {
   // F = G((m0 * m1)/r^2)
 
   const m0 = from.mass
@@ -244,7 +244,7 @@ export function getWorldCoordinates(e: (Physical & Bounded) | null): Vec2 {
   return newVec2()
 }
 
-export function getRemotePosition(remoteObject: SpaceObject | NonPlayerCharacter, localObject: SpaceObject) {
+export function getRemotePosition(remoteObject: SpaceObject, localObject: SpaceObject) {
   const position = sub2(add2(remoteObject.viewFramePosition, remoteObject.cameraPosition), localObject.cameraPosition)
 
   return position
@@ -277,7 +277,7 @@ export function edgeBounceSpaceObject(p: Physical & Damager & Bounceable, screen
   }
 }
 
-export function handleCollisions(cameraPosition: Vec2, spaceObjects: NonPlayerCharacter[], ctx: CanvasRenderingContext2D | null = null): void {
+export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D | null = null): void {
   resetCollisions(spaceObjects)
   for (const npc0 of spaceObjects) {
     if (npc0.isDead) continue

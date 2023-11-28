@@ -1,7 +1,7 @@
 // import { info, warn } from 'mathil'
 import { warn } from 'mathil'
 import { OIDS_WS_PORT } from '../../../server/pub_config'
-import { MessageType, type NonPlayerCharacter, type ServerUpdate, type SpaceObject } from '../interface'
+import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
   return new URL(`ws://${new URL(window.location.href).hostname}:${port}`)
@@ -136,7 +136,7 @@ export class OidsSocket {
     return this.prettyStatusString
   }
 
-  addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<NonPlayerCharacter>) => void): Promise<void> {
+  addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<SpaceObject>) => void): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!this.ws) {
         console.log('trying to connect')
@@ -153,7 +153,7 @@ export class OidsSocket {
           //   throw new Error('Unvalid json')
           // }
 
-          function serverUpdateObject<T extends SpaceObject | NonPlayerCharacter>(data: T): ServerUpdate<T> {
+          function serverUpdateObject<T extends SpaceObject>(data: T): ServerUpdate<T> {
             const serverUpdate: ServerUpdate<T> = {
               spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(data)).length,
               unparsedDataLength: event.data.length,
@@ -165,7 +165,7 @@ export class OidsSocket {
           }
 
           if (data.messageType === MessageType.SERVER_GAME_UPDATE) {
-            const su = serverUpdateObject<NonPlayerCharacter>(data)
+            const su = serverUpdateObject<SpaceObject>(data)
             callbackNpc(su)
           } else {
             const su = serverUpdateObject<SpaceObject>(data)

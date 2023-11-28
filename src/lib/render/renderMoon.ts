@@ -1,7 +1,7 @@
 import { round2dec, type Vec2 } from 'mathil'
-import type { Crater, NonPlayerCharacter } from '../interface'
+import type { Crater, SpaceObject } from '../interface'
 
-export function renderMoon(npc: NonPlayerCharacter, pos: Vec2, ctx: CanvasRenderingContext2D): void {
+export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingContext2D): void {
   const moon = getMoon(npc.moonType)
   const craterDetails = moon.craters
 

@@ -1,4 +1,4 @@
-import type { NonPlayerCharacter, PhotonLaser, SpaceObject } from './interface'
+import type { PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceShape } from './interface'
 import { mag2, magnitude2, newVec2, rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
@@ -16,6 +16,7 @@ export function newPhotonLaser(): PhotonLaser {
     deadFrameCount: 0,
     didHit: false,
     health: 100,
+    startHealth: 100,
     isDead: false,
     mass: 1,
     obliterated: false,
@@ -37,7 +38,7 @@ export function currentTimeDate(): string {
   return new Date().toLocaleString('sv-SE')
 }
 
-export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
+export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GAME_UPDATE): SpaceObject {
   const initVel: Vec2 = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2 = {
     x: rndi(0, 100),
@@ -45,7 +46,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
   }
 
   const spaceObject: SpaceObject = {
-    messageType: MessageType.GAME_UPDATE,
+    messageType: msgType,
     viewport: { x: 0, y: 0 },
     viewportScale: 1,
     sessionId: '',
@@ -71,6 +72,7 @@ export function createSpaceObject(name = 'SpaceObject'): SpaceObject {
     framesSinceLastServerUpdate: 0,
     framesSinceLastShot: 0,
     health: 100,
+    startHealth: 100,
     hitRadius: 60,
     inverseFireRate: 6,
     isDead: false,
@@ -152,62 +154,4 @@ export function createShip(userId: string): Ship {
   }
 
   return ship
-}
-
-export function createNpc(): NonPlayerCharacter {
-  const npc: NonPlayerCharacter = {
-    health: 100,
-    isDead: false,
-    deadFrameCount: 0,
-    obliterated: false,
-    lastDamagedByName: '',
-    killedByName: '',
-    position: rndfVec2(5000, 5000),
-    color: randomBlue(),
-    colliding: false,
-    hitRadius: 100,
-    mass: 1,
-    size: rndfVec2(50, 100),
-    velocity: rndfVec2(0.5, 1),
-    acceleration: newVec2(),
-    viewport: newVec2(1200, 720),
-    viewportScale: 1,
-    messageType: MessageType.SERVER_GAME_UPDATE,
-    angleDegree: 0,
-    angularVelocity: rndf(-0.1, 0.1),
-    collidingWith: [],
-    bounceCount: 0,
-    damage: 0,
-    armedDelay: 0,
-    didHit: false,
-    shotBlowFrame: 0,
-    ownerName: '',
-    name: `A-${rndi(10000, 100000000)}`,
-    // name: `A-${rndi(100000, 100000000)}`,
-    kills: [],
-    killCount: 0,
-    ammo: 0,
-    missileSpeed: 0,
-    missileDamage: 0,
-    canonCoolDown: 0,
-    canonOverHeat: false,
-    canonHeatAddedPerShot: 0,
-    canonCoolDownSpeed: 0,
-    inverseFireRate: 0,
-    framesSinceLastShot: 0,
-    shotsPerFrame: 0,
-    photonColor: '',
-    shotsInFlight: [],
-    shotsInFlightNew: [],
-    shotsFiredThisFrame: false,
-    worldSize: newVec2(),
-    cameraPosition: newVec2(),
-    cameraVelocity: newVec2(),
-    viewFramePosition: newVec2(),
-    moonType: rndi(0, 3),
-  }
-
-  npc.hitRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
-
-  return npc
 }

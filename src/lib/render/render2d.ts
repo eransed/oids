@@ -1,7 +1,7 @@
 import { round2dec, type Line, type Vec2, sub2, add2, smul2, direction2, angle2, newVec2, rndi } from 'mathil'
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
-import type { NonPlayerCharacter, SpaceObject } from '../interface'
+import type { SpaceObject } from '../interface'
 import type { UIStyle } from '../../style/styleInterfaces'
 import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
 import { getRemotePosition } from '../physics'
@@ -102,7 +102,7 @@ export function renderHitBox(so: SpaceObject, ctx: CanvasRenderingContext2D): vo
   ctx.restore()
 }
 
-export function renderHitRadius(so: SpaceObject | NonPlayerCharacter, ctx: CanvasRenderingContext2D): void {
+export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
   ctx.save()
 
   const renderPos = getRemotePosition(so, game.localPlayer)

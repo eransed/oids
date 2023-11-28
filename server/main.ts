@@ -6,7 +6,7 @@ import { getLocalIp, ipport } from './net'
 
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
-import { MessageType, NonPlayerCharacter, Session, SpaceObject } from '../src/lib/interface'
+import { MessageType, Session, SpaceObject } from '../src/lib/interface'
 import { dist2, error, info, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
@@ -34,9 +34,9 @@ const server: WebSocketServer = new WebSocketServer({
 export let globalConnectedClients: Client[] = []
 
 function createGame(sessionId: string) {
-  const gameHandler = new GameHandler((clients: Client[], data: NonPlayerCharacter, sessionId: string | null) => {
+  const gameHandler = new GameHandler((clients: Client[], data: SpaceObject, sessionId: string | null) => {
     // info(`Sending to session: ${sessionId}`)
-    const sendCount = serverBroadcast<NonPlayerCharacter>(data, clients, sessionId)
+    const sendCount = serverBroadcast<SpaceObject>(data, clients, sessionId)
     // info (`SendCount: ${sendCount}`)
     if (sendCount > 0 && sessionId) {
       const sessionClients = getClientsFromSessionId(sessionId)
@@ -407,7 +407,7 @@ function shouldSendToClientInGame(sendingClient: Client, recieveClient: Client):
   } else return false
 }
 
-function serverBroadcast<T extends SpaceObject | NonPlayerCharacter>(data: T, connectedClients: Client[], sessionId: string | null = null): number {
+function serverBroadcast<T extends SpaceObject>(data: T, connectedClients: Client[], sessionId: string | null = null): number {
   let sendCount = 0
   if (sessionId === null) {
     for (const client of connectedClients) {

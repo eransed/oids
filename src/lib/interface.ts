@@ -155,6 +155,7 @@ export interface Damager extends Positionable {
 
 export interface Damageable extends Positionable {
   health: number
+  startHealth: number
   isDead: boolean
   deadFrameCount: number
   obliterated: boolean
@@ -307,7 +308,7 @@ export interface GameState {
 export interface ScoreScreenData {
   player: SpaceObject
   remotePlayers: SpaceObject[]
-  serverObjects: NonPlayerCharacter[]
+  serverObjects: SpaceObject[]
 }
 
 export interface Nameable {
@@ -337,20 +338,6 @@ export interface ChatMessage {
   user: SpaceObject
   serviceMsg?: boolean
 }
-
-export interface NonPlayerCharacter
-  extends Damageable,
-    Colorable,
-    Collidable,
-    Physical,
-    Typable,
-    Rotatable,
-    Bounceable,
-    Damager,
-    Nameable,
-    Fireable,
-    Bounded,
-    MoonType {}
 
 export interface ShipUpgrades {
   hyperdrive: boolean
