@@ -136,11 +136,15 @@ export function resetStars(game: Game | null) {
     error('game is null')
     return
   }
-  game.stars.forEach((s) => {
-    const r = randomPositionInCurrentViewFrame(game.localPlayer, getScreenFromCanvas(game.ctx))
-    s.x = r.x
-    s.y = r.y
-  })
+
+  setTimeout(() => {
+    game.stars.forEach((s, i) => {
+      const r = randomPositionInCurrentViewFrame(game.localPlayer, getScreenFromCanvas(game.ctx))
+
+      s.x = r.x
+      s.y = r.y
+    })
+  }, 250)
   info('reset stars')
 }
 
@@ -198,14 +202,6 @@ export function initRegularGame(game: Game): void {
   }
 
   resetStars(game)
-
-  function handleResize() {
-    resetStars(game)
-  }
-
-  info(`sets up event listener for window resize`)
-  removeEventListener('resize', handleResize)
-  addEventListener('resize', handleResize)
 
   // game.stars.push(newVec2())
   // game.stars.push(smul2(worldSize, 0.5))

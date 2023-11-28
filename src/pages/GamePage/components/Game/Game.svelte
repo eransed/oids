@@ -19,7 +19,7 @@
   import ScoreScreen from '../LeaderBoardScreen/ScoreScreen.svelte'
 
   // Game variants
-  import { initRegularGame, nextFrame, renderFrame } from '../../../../lib/gameModes/regular'
+  import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
   import { guestUserNameStore, isLoggedInStore, localPlayerStore, socketStore, userStore } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { playersInSession } from '../../../../lib/services/game/playersInSession'
@@ -118,8 +118,15 @@
     })
     if (!$isLoggedInStore || chosenShip) {
       game.startGame(initRegularGame, renderFrame, nextFrame)
+      resetStars(game)
     }
+
+    window.addEventListener('resize', handleResize)
   })
+
+  function handleResize() {
+    resetStars(game)
+  }
 
   const showDeadMenu = (): void => {
     removeKeyControllers()
@@ -133,6 +140,7 @@
     removeKeyControllers()
     removeTouchControls()
     game.stopGame()
+    window.removeEventListener('resize', handleResize)
   })
 </script>
 
@@ -198,6 +206,7 @@
           }
           $localPlayerStore.name = $userStore.name
           game.startGame(initRegularGame, renderFrame, nextFrame)
+          resetStars(game)
           localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
         }}
       />

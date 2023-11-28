@@ -238,7 +238,6 @@
         $localPlayerStore.ship = createChosenShip($userStore.ships[0])
       }
     } else {
-      console.log('else')
       initLobbySocket().then(() => {
         showLobby = true
         updateSessions()
