@@ -37,22 +37,26 @@ export async function findShip(shipId: string): Promise<Ship | null> {
   })
 }
 
-export async function updateShipExperience(shipId: string, xp: number) {
-  return await db.ship
-    .update({
-      where: {
-        id: shipId,
-      },
-      data: {
-        experience: xp,
-      },
-    })
-    .then((ship) => {
-      return ship
-    })
-    .catch((err) => {
-      throw new Error(err)
-    })
+export async function updateShipExperience(shipId: string): Promise<Ship | undefined> {
+  return await findShip(shipId).then((ship) => {
+    if (ship) {
+      return db.ship
+        .update({
+          where: {
+            id: shipId,
+          },
+          data: {
+            experience: ship.experience + 1,
+          },
+        })
+        .then((ship) => {
+          return ship
+        })
+        .catch((err) => {
+          throw new Error(err)
+        })
+    }
+  })
 }
 
 export async function getShips(id: string) {

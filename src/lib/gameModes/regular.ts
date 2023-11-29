@@ -36,7 +36,7 @@ import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMo
 import { renderShip } from '../render/renderShip'
 import { renderProgressBar, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
-import { chatMsgHistoryStore, localPlayerStore } from '../../stores/stores'
+import { chatMsgHistoryStore, localPlayerStore, userStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 import { getCurrentTheme } from '../../style/defaultColors'
 //Stores
@@ -235,8 +235,13 @@ export function initRegularGame(game: Game): void {
       // console.log(su)
       //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
       if (su.dataObject.messageType === MessageType.SHIP_UPDATE) {
-        console.log('Ship update: ', su.dataObject.ship)
         game.localPlayer.ship.experience = su.dataObject.ship.experience
+        userStore.update((user) => {
+          const chosenShip = user.ships.findIndex((ship) => ship.id === su.dataObject.ship.id)
+          user.ships[chosenShip].experience = su.dataObject.ship.experience
+
+          return user
+        })
       }
 
       if (su.dataObject.messageType === MessageType.SERVICE) {

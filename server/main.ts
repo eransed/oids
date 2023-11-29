@@ -10,7 +10,6 @@ import { MessageType, Session, SpaceObject } from '../src/lib/interface'
 import { dist2, error, info, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
-import { findUserById } from './api/users/users.services'
 
 import { findShip, updateShipExperience } from './api/ship/ship.services'
 
@@ -193,20 +192,21 @@ export class Client {
 //ToDo: Make so guestships also gets experience which can be saved to localstorage.
 //This makes it possible to create a user at a later time and save the guestship progress in db
 async function incrementExperience(so: SpaceObject) {
-  const newXp = so.ship.experience + 1
-
   const existingShip = await findShip(so.ship.id)
 
   if (existingShip) {
-    updateShipExperience(so.ship.id, newXp).then(() => {
-      so.ship.experience = newXp
+    updateShipExperience(so.ship.id).then((ship) => {
+      if (ship) {
+        const client = globalConnectedClients.find((c) => c.userId === so.id)
 
-      const client = globalConnectedClients.find((c) => c.userId === so.id)
+        so.messageType = MessageType.SHIP_UPDATE
+        so.ship.experience = ship.experience
 
-      so.messageType = MessageType.SHIP_UPDATE
-
-      if (client) {
-        broadcastToOneClient(so, client)
+        if (client) {
+          broadcastToOneClient(so, client)
+        }
+      } else {
+        throw new Error('No ship found, could not update.')
       }
     })
   }

@@ -223,14 +223,15 @@
       if (storedShip) {
         $userStore.ships.find((ship) => {
           if (ship.id === storedShip.id) {
+            chosenShip = ship
             $localPlayerStore.ship = createChosenShip(ship)
+            console.log('ship:', $localPlayerStore.ship)
+
             return
           }
         })
       }
     }
-
-    console.log('localplayer:', $localPlayerStore)
 
     if ($isLoggedInStore && $userStore && !storedShipJson) {
       shipModalOpen = true
