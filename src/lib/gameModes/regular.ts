@@ -236,9 +236,12 @@ export function initRegularGame(game: Game): void {
       //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
       if (su.dataObject.messageType === MessageType.SHIP_UPDATE) {
         game.localPlayer.ship.experience = su.dataObject.ship.experience
+        game.localPlayer.ship.level = su.dataObject.ship.level
+
         userStore.update((user) => {
           const chosenShip = user.ships.findIndex((ship) => ship.id === su.dataObject.ship.id)
           user.ships[chosenShip].experience = su.dataObject.ship.experience
+          user.ships[chosenShip].level = su.dataObject.ship.level
 
           return user
         })

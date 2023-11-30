@@ -8,5 +8,5 @@
     "outDir": "build",
     "esModuleInterop": true
   },
-  "include": ["./**/*.ts", "main.ts"]
+  "include": ["./**/*.ts", "main.ts", "../src/lib/services/utils/shipLevels.ts"]
 }

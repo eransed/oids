@@ -44,3 +44,40 @@ export const worldSize = newVec2(1e308, 1e308)
 export const worldStartPosition = rndfVec2(1e6, 1e6)
 
 export const maxShotAge = 40000
+
+interface xpRequirements {
+  [level: number]: number
+}
+
+export const xpRequirements: xpRequirements = {
+  1: 100,
+  2: 150,
+  3: 225,
+  4: 340,
+  5: 510,
+  6: 765,
+  7: 1150,
+  8: 1725,
+  9: 2590,
+  10: 3885,
+  11: 5830,
+  12: 8745,
+  13: 13120,
+  14: 19680,
+  15: 29520,
+  16: 44280,
+  17: 66420,
+  18: 99630,
+  19: 149445,
+  20: 224170,
+  21: 336255,
+  22: 504385,
+  23: 756580,
+  24: 1134870,
+  25: 1702305,
+  26: 2553455,
+  27: 3830180,
+  28: 5745270,
+  29: 8617905,
+  30: 12926960,
+}

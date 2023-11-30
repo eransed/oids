@@ -1,3 +1,4 @@
+import { getShipXpRequirement } from '../../../src/lib/services/utils/shipLevels'
 import db from '../utils/db'
 import { Ship } from '@prisma/client'
 
@@ -37,16 +38,29 @@ export async function findShip(shipId: string): Promise<Ship | null> {
   })
 }
 
-export async function updateShipExperience(shipId: string): Promise<Ship | undefined> {
+export async function updateShipExperienceAndLevel(shipId: string): Promise<Ship | undefined> {
+  const xpIncrementValue = 50
+
   return await findShip(shipId).then((ship) => {
     if (ship) {
+      let level = ship.level
+      let xp = ship.experience
+      const maxXp = getShipXpRequirement(ship.level)
+      xp += xpIncrementValue
+      if (xp >= maxXp) {
+        console.log(`Ship ${ship.name} reached lvl ${level + 1}`)
+        level = ship.level + 1
+        xp = xp - maxXp
+      }
+
       return db.ship
         .update({
           where: {
             id: shipId,
           },
           data: {
-            experience: ship.experience + 1,
+            level: level,
+            experience: xp,
           },
         })
         .then((ship) => {

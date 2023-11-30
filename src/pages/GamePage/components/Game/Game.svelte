@@ -33,6 +33,7 @@
   import ProgressBar from '../../../../components/progress/progressBar.svelte'
   import { getRemotePosition } from '../../../../lib/physics'
   import { screenScale } from '../../../../lib/constants'
+  import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -170,7 +171,7 @@
       <Chat chatTitle={false} joinedSessionId={sessionId} inGameChat />
     </div>
     <div class="xp">
-      <ProgressBar progress={$localPlayerStore.ship.experience} max={500} />
+      <ProgressBar progress={$localPlayerStore.ship.experience} max={getShipXpRequirement($localPlayerStore.ship.level)} />
     </div>
   {/if}
 </div>

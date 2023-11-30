@@ -11,7 +11,8 @@ import { dist2, error, info, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
 
-import { findShip, updateShipExperience } from './api/ship/ship.services'
+import { findShip, updateShipExperienceAndLevel } from './api/ship/ship.services'
+import { getShipXpRequirement } from '../src/lib/services/utils/shipLevels'
 
 // start ApiServer
 apiServer()
@@ -195,12 +196,13 @@ async function incrementExperience(so: SpaceObject) {
   const existingShip = await findShip(so.ship.id)
 
   if (existingShip) {
-    updateShipExperience(so.ship.id).then((ship) => {
+    updateShipExperienceAndLevel(so.ship.id).then((ship) => {
       if (ship) {
         const client = globalConnectedClients.find((c) => c.userId === so.id)
 
         so.messageType = MessageType.SHIP_UPDATE
         so.ship.experience = ship.experience
+        so.ship.level = ship.level
 
         if (client) {
           broadcastToOneClient(so, client)
@@ -333,7 +335,6 @@ function broadcastToAllClients(skipSourceClient: Client, connectedClients: Clien
 }
 
 function broadcastToOneClient(data: SpaceObject, client: Client): void {
-  console.log('broadcasting to one client')
   client.ws.send(JSON.stringify(data))
 }
 
@@ -384,7 +385,7 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
   }
 }
 
-const every20: Every = new Every(1200)
+const every20: Every = new Every(300)
 
 // For every tick this function is returning true which leads to shouldSendToClient
 // function return true and that results in server broadcasting to other clients.

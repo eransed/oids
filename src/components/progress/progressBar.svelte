@@ -29,6 +29,7 @@
     z-index: 1;
     content: '';
     display: block;
+    transition: all 0.7s;
   }
 
   .title {

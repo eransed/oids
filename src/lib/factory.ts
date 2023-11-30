@@ -148,8 +148,8 @@ export function createShip(userId: string): Ship {
     variant: 0,
     name: '',
     userId: userId,
-    level: 0,
-    experience: 0,
+    level: 1,
+    experience: 1,
     played: 0,
   }
 
