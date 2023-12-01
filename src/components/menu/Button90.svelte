@@ -49,7 +49,6 @@
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
-    <p class="addInfo">{addInfo}</p>
     {#if loading}
       <CircularSpinner />
     {:else if icon}
@@ -59,6 +58,7 @@
     {:else}
       {buttonConfig.buttonText}
     {/if}
+    <p class="addInfo">{addInfo}</p>
   </button>
 </div>
 
@@ -71,9 +71,9 @@
   .addInfo {
     font-size: 0.7em;
     position: absolute;
-    display: flex;
+    /* display: flex; */
     bottom: 0;
-    margin-bottom: -2em;
+    margin-bottom: -0.5em;
   }
 
   .icon img {
@@ -87,6 +87,7 @@
     display: flex;
     justify-content: center;
     min-width: 0px;
+    position: relative;
     /* align-content: center; */
   }
 
@@ -109,6 +110,7 @@
     cursor: pointer;
     font-size: 12px;
     font-weight: 900;
+    position: relative;
     /* border: 2px solid rgb(47, 167, 252, 0.5); */
 
     /* transition-duration: 1.8s; */

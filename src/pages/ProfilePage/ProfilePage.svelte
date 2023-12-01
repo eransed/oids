@@ -461,7 +461,7 @@
     justify-self: end;
     position: absolute;
     top: 0px;
-    right: 0.5em;
+    right: 0.8em;
     width: 20px;
   }
 
