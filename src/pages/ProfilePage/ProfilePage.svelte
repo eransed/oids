@@ -143,28 +143,30 @@
           </div>
         {/each}
       </div>
-      <div class="content" style="padding: 1em">
+      <div class="content" style="padding: 1em; position: relative">
         {#if $profileComponent === 'shipStation'}
           <h3>Your ships</h3>
 
           <div class="newShip">
             <Button90
+              addInfo={'Add ship'}
               disabled={loading}
-              icon={Icons.AddUser}
+              icon={Icons.Add}
               mouseTracking={false}
               buttonConfig={{
-                buttonText: 'Save',
+                buttonText: 'Add Ship',
                 clickCallback: async () => {
                   openModal = true
                 },
                 selected: false,
               }}
             />
-
-            <button on:click={() => (openModal = true)} title="Add ship">+</button>
           </div>
+          {#if openModal}
+            <AddShip {openModal} closeModal={() => (openModal = false)} />
+          {/if}
+
           <Ships />
-          <AddShip {openModal} closeModal={() => (openModal = false)} />
         {/if}
 
         {#if $profileComponent === 'matchHistory'}
@@ -458,7 +460,8 @@
     display: grid;
     justify-self: end;
     position: absolute;
-    top: 50px;
+    top: 0px;
+    right: 0.5em;
     width: 20px;
   }
 

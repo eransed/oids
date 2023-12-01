@@ -58,11 +58,7 @@
     saveBtn={async () => handleNewShip()}
     doneCallback={() => (newShipDone = true)}
   >
-    <div
-      style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%"
-      in:fade={{ duration: 250, delay: 50 }}
-      out:fade={{ duration: 250 }}
-    >
+    <div style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%" in:fade={{ duration: 250, delay: 50 }}>
       <h3 style="align-self: center">Name your new ship 🚀:</h3>
       <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
     </div>

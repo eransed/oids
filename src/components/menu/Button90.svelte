@@ -41,7 +41,6 @@
 </script>
 
 <div class="wrapper" on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
-  <p class="addInfo">{addInfo}</p>
   <button
     type={buttonType}
     title={buttonConfig.buttonText}
@@ -50,6 +49,7 @@
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
+    <p class="addInfo">{addInfo}</p>
     {#if loading}
       <CircularSpinner />
     {:else if icon}
@@ -72,7 +72,8 @@
     font-size: 0.7em;
     position: absolute;
     display: flex;
-    margin-top: -0.5em;
+    bottom: 0;
+    margin-bottom: -2em;
   }
 
   .icon img {
