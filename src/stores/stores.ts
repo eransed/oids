@@ -33,3 +33,5 @@ export const socketStore: Writable<OidsSocket> = writable(new OidsSocket(getWsUr
 export const chatMsgHistoryStore: Writable<ChatMessage[]> = writable([])
 
 export const settingsStore: Writable<Settings> = writable({ uiStyle: cnvTheme(DeepMidnight), theme: DeepMidnight })
+
+export const shouldCelebrateLevelUp: Writable<boolean> = writable(false)

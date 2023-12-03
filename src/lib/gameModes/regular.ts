@@ -36,7 +36,7 @@ import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMo
 import { renderShip } from '../render/renderShip'
 import { renderProgressBar, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
-import { chatMsgHistoryStore, localPlayerStore, userStore } from '../../stores/stores'
+import { chatMsgHistoryStore, localPlayerStore, shouldCelebrateLevelUp, userStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 import { getCurrentTheme } from '../../style/defaultColors'
 //Stores
@@ -235,11 +235,20 @@ export function initRegularGame(game: Game): void {
       // console.log(su)
       //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
       if (su.dataObject.messageType === MessageType.SHIP_UPDATE) {
+        const oldLvl = game.localPlayer.ship.level
+        const newLvl = su.dataObject.ship.level
+
+        if (oldLvl < newLvl) {
+          console.log('new lvl!')
+          shouldCelebrateLevelUp.set(true)
+        }
+
         game.localPlayer.ship.experience = su.dataObject.ship.experience
         game.localPlayer.ship.level = su.dataObject.ship.level
 
         userStore.update((user) => {
           const chosenShip = user.ships.findIndex((ship) => ship.id === su.dataObject.ship.id)
+
           user.ships[chosenShip].experience = su.dataObject.ship.experience
           user.ships[chosenShip].level = su.dataObject.ship.level
 

@@ -20,7 +20,7 @@
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
-  import { guestUserNameStore, isLoggedInStore, localPlayerStore, socketStore, userStore } from '../../../../stores/stores'
+  import { guestUserNameStore, isLoggedInStore, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { playersInSession } from '../../../../lib/services/game/playersInSession'
   import { info } from 'mathil'
@@ -34,6 +34,7 @@
   import { getRemotePosition } from '../../../../lib/physics'
   import { screenScale } from '../../../../lib/constants'
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
+  import Celebration from '../../../../components/celebration/celebration.svelte'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -184,6 +185,10 @@
 
 {#if $showMenu}
   <GameMenu currentGame={game} />
+{/if}
+
+{#if $shouldCelebrateLevelUp}
+  <Celebration celebrationText={`You've reached level ${$localPlayerStore.ship.level}`} celebrationTimeoutCallback={() => ($shouldCelebrateLevelUp = false)} />
 {/if}
 
 {#if $isLoggedInStore && $userStore.ships.length > 1 && !chosenShip}
