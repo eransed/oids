@@ -296,15 +296,6 @@ export function initRegularGame(game: Game): void {
               continue
             }
 
-            // // Store every previously shots fired
-            // const cachePhotonLasers = game.remotePlayers[i].shotsInFlight
-
-            // const newShotsThisUpdate = so.shotsInFlight
-
-            // // update the remote player data object
-            // game.remotePlayers[i] = so
-
-            // game.remotePlayers[i].shotsInFlight = [...cachePhotonLasers, ...newShotsThisUpdate]
 
             game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
 
@@ -414,7 +405,7 @@ function handleGameBodies(game: Game): SpaceObject[] {
         renderExplosionFrame(body, game.ctx, bodyPos)
       }
     } else {
-      renderMoon(body, bodyPos, game.ctx)
+      renderMoon(body, bodyPos, game.ctx, game.style)
       if (game.keyFuncMap.systemGraphs.keyStatus) {
         renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
         renderHitRadius(body, game.ctx)

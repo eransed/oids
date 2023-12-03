@@ -246,7 +246,6 @@ export function getWorldCoordinates(e: (Physical & Bounded) | null): Vec2 {
 
 export function getRemotePosition(remoteObject: SpaceObject, localObject: SpaceObject) {
   const position = sub2(add2(remoteObject.viewFramePosition, remoteObject.cameraPosition), localObject.cameraPosition)
-
   return position
 }
 

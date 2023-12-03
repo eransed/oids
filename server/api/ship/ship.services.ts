@@ -38,8 +38,7 @@ export async function findShip(shipId: string): Promise<Ship | null> {
   })
 }
 
-export async function updateShipExperienceAndLevel(shipId: string): Promise<Ship | undefined> {
-  const xpIncrementValue = 50
+export async function updateShipExperienceAndLevel(shipId: string, xpIncrementValue = 50): Promise<Ship | undefined> {
 
   return await findShip(shipId).then((ship) => {
     if (ship) {

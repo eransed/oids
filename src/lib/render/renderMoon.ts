@@ -1,13 +1,19 @@
 import { round2dec, type Vec2 } from 'mathil'
 import type { Crater, SpaceObject } from '../interface'
+import { renderShot } from './render2d'
+import type { UIStyle } from '../../style/styleInterfaces'
 
-export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingContext2D): void {
+export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingContext2D, style: UIStyle): void {
   const moon = getMoon(npc.moonType)
   const craterDetails = moon.craters
 
   ctx.save()
   ctx.translate(pos.x, pos.y)
   ctx.rotate((round2dec(90 + npc.angleDegree, 1) * Math.PI) / 180)
+
+  
+
+  ctx.fillText(`${npc.shotsInFlightNew.length}`, 0, 0)
 
   // Draw main moon circle
   const moonRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
@@ -37,6 +43,9 @@ export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingCont
   ctx.closePath()
 
   ctx.restore()
+
+  // Draw shots
+  renderShot(npc, ctx, style)
 
   //   // Label the moon
   //   ctx.font = 'bold 20px Arial'

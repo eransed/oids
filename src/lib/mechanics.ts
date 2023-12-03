@@ -1,8 +1,8 @@
 import type { Boostable, Damageable, PhotonLaser, Positionable, SpaceObject, Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
-import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2 } from 'mathil'
-import { maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
+import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2, mag2, newVec2 } from 'mathil'
+import { basicPhotonLaserSpeedScaleFactor, maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
 import { getHeading } from './physics'
@@ -71,26 +71,25 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   shot.size = { x: rndi(4, 6), y: rndi(20, 30) }
   // shot.color = randomLightGreen()
   shot.color = so.photonColor
-  let head: Vec2 = copy2(add2(so.cameraPosition, so.viewFramePosition))
+  let canonPosition: Vec2 = copy2(add2(so.cameraPosition, so.viewFramePosition))
   const aimError = 8 // 8
   const headError = 0.34 // 0.019
-  const speedError = 3 // 1.8
+  const speedMaxRandomnessError = 3 // 1.8
 
-  head = add2(head, scalarMultiply2(getHeading(so), 0))
-
-  head = add2(head, {
+  canonPosition = add2(canonPosition, {
     x: rndi(-aimError, aimError),
     y: rndi(-aimError, aimError),
   })
 
-  shot.velocity = scalarMultiply2(getHeading(so), 0.6 * so.missileSpeed + rndf(0, speedError))
+  shot.velocity = scalarMultiply2(getHeading(so), mag2(so.velocity) + basicPhotonLaserSpeedScaleFactor * so.missileSpeed + rndf(0, speedMaxRandomnessError))
+  
 
   shot.velocity = add2(shot.velocity, {
     x: rndf(-headError, headError),
     y: rndf(-headError, headError),
   })
 
-  shot.position = head
+  shot.position = canonPosition
   shot.angleDegree = so.angleDegree
   shot.ownerName = so.name
 

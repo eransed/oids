@@ -118,7 +118,7 @@ export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D):
 }
 
 export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D, style: UIStyle) {
-  ctx.save()
+  // ctx.save()
   for (const shot of so.shotsInFlight) {
     if (shot.didHit) continue
     if (Math.random() > 0.99) {
@@ -133,13 +133,13 @@ export function renderShot(so: SpaceObject, ctx: CanvasRenderingContext2D, style
     ctx.save()
     // ctx.translate(shot.position.x, shot.position.y)
     // const relative = sub2(add2(so.viewFramePosition, so.cameraPosition), smul2(game.localPlayer.cameraPosition, 1))
-    const relative = sub2(shot.position, smul2(game.localPlayer.cameraPosition, 1))
+    const relative = sub2(shot.position, game.localPlayer.cameraPosition)
     ctx.translate(relative.x, relative.y)
     ctx.rotate(((90 + shot.angleDegree) * Math.PI) / 180)
     ctx.fillRect(-shot.size.x / 2, -shot.size.y / 2, shot.size.x, shot.size.y)
     ctx.restore()
   }
-  ctx.restore()
+  // ctx.restore()
 }
 
 export function setScaledFont(ctx: CanvasRenderingContext2D): number {

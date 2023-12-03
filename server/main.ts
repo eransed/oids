@@ -121,9 +121,15 @@ export class Client {
 
   addEventListeners(): void {
     // info(`Adding event-listeners for ${this.toString()}`)
+
+    this.ws.addEventListener('error', (e) => {
+      warn(`Error on socket:`)
+      console.log (e)
+    })
+
     this.ws.addEventListener('close', () => {
       // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
-      info(`${this.toString()} has been disconnected, sending goodbye message`)
+      info(`${this.toString()} has been disconnected, sending goodbye message to ${globalConnectedClients.length} other players...`)
       const offlineMessage: SpaceObject | null = this.lastDataObject
       if (offlineMessage) {
         offlineMessage.online = false
@@ -516,10 +522,27 @@ server.on('connection', function connection(clientConnection: WebSocket, req: In
     info(`Storing new client ${newClient.toString()} in broadcast list`)
   }
 
+  clientConnection.addEventListener("close", (ev) => {
+    info(`Closed: ${newClient.toString()}, reason: ${ev.reason}`);
+  });
+
+  clientConnection.addEventListener("error", (err) => {
+    info(`Error on socket connection: ${newClient.toString()}:`);
+    console.log (err)
+  });
+
   info(`${globalConnectedClients.length} connected clients:`)
   globalConnectedClients.forEach((c) => {
     info(`   ${c.toString()}`)
   })
+})
+
+server.on('error', (e) => {
+  error(`Server end WS error: ${e.message}\n${e.stack}`)
+})
+
+server.on('close', () => {
+  warn(`Server closed a WS connection`)
 })
 
 // console.log(getVersionInfo())

@@ -43,7 +43,9 @@ export const worldSize = newVec2(1e308, 1e308)
 
 export const worldStartPosition = rndfVec2(1e6, 1e6)
 
-export const maxShotAge = 40000
+export const maxShotAge = 50000
+
+export const basicPhotonLaserSpeedScaleFactor = .6
 
 interface xpRequirements {
   [level: number]: number

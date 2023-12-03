@@ -1,10 +1,11 @@
-import { info, usNow, EveryInterval, rndfVec2, good, newVec2, rndi, smul2 } from 'mathil'
+import { info, usNow, EveryInterval, rndfVec2, good, newVec2, rndi, smul2, dist2 } from 'mathil'
 import { MessageType, SpaceObject } from '../src/lib/interface'
-import { handleCollisions, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics'
+import { getWorldCoordinates, handleCollisions, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics'
 import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 import { createSpaceObject } from '../src/lib/factory'
+import { fire } from '../src/lib/mechanics'
 
 export class GameHandler {
   game_started = false
@@ -18,6 +19,7 @@ export class GameHandler {
   private dt = performance.now()
   private minTickTimeMs = 1 / 60
   private every = new EveryInterval(2)
+  private asteroidTicker = new EveryInterval(20)
   broadcaster: (clients: Client[], data: SpaceObject, sessionId: string | null) => void
 
   constructor(bc: (clients: Client[], data: SpaceObject, sessionId: string | null) => void) {
@@ -37,12 +39,16 @@ export class GameHandler {
     this.game_started = true
     this.spawnAsteroids()
 
+
+    // Server main loop:
     this.game_interval = setInterval(() => {
       this.dt = performance.now() - this.lastTime
 
       updateSpaceObjects(this.remoteSpaceObjects, this.dt)
       this.checkHittingShots()
 
+
+      // Game logic for asteroids:
       for (let i = 0; i < this.asteroids.length; i++) {
         this.asteroids[i] = updateSpaceObject(this.asteroids[i], this.dt)
 
@@ -50,8 +56,18 @@ export class GameHandler {
           return !asteroid.isDead
         })
 
+        this.asteroidTicker.tick(() => {
+          for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
+            if (dist2(getWorldCoordinates(this.asteroids[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1000) {
+              // this.asteroids[i].angleDegree =
+              info(`Aster ${this.asteroids[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
+              fire(this.asteroids[i])
+            }
+          }
+        })
+
+
         this.every.tick(() => {
-          // warn(`Playing clients: ${this.remoteSpaceObjects.length}`)
           this.asteroids[i].collidingWith = []
           this.broadcaster(globalConnectedClients, this.asteroids[i], sessionId)
         })
@@ -59,12 +75,15 @@ export class GameHandler {
       this.lastTime = performance.now()
     }, this.minTickTimeMs)
   }
+  // server main loop end
+
 
   spawnAsteroids(): SpaceObject[] {
     const num = 10
     info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
       const npc = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
+      npc.ammo = 1000
       npc.velocity = rndfVec2(-0.5, 1)
       npc.cameraPosition = rndfVec2(worldStartPosition.x - 2000, worldStartPosition.y + 5000)
       npc.size = smul2(npc.size, 4)
