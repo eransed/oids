@@ -1,4 +1,4 @@
-import type { Boostable, Damageable, PhotonLaser, Positionable, SpaceObject, Thrustable } from './interface'
+import { MessageType, type Boostable, type Damageable, type PhotonLaser, type Positionable, type SpaceObject, type Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
 import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2, mag2, newVec2 } from 'mathil'
@@ -69,6 +69,9 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
   shot.size = { x: rndi(4, 6), y: rndi(20, 30) }
+  if (so.messageType === MessageType.SERVER_GAME_UPDATE) {
+    shot.size = newVec2(so.size.x / 10, so.size.y / 10)
+  }
   // shot.color = randomLightGreen()
   shot.color = so.photonColor
   let canonPosition: Vec2 = copy2(add2(so.cameraPosition, so.viewFramePosition))
@@ -82,7 +85,6 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   })
 
   shot.velocity = scalarMultiply2(getHeading(so), mag2(so.velocity) + basicPhotonLaserSpeedScaleFactor * so.missileSpeed + rndf(0, speedMaxRandomnessError))
-  
 
   shot.velocity = add2(shot.velocity, {
     x: rndf(-headError, headError),

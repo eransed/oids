@@ -19,7 +19,7 @@ export class GameHandler {
   private dt = performance.now()
   private minTickTimeMs = 1 / 60
   private every = new EveryInterval(2)
-  private asteroidTicker = new EveryInterval(20)
+  private asteroidTicker = new EveryInterval(100)
   broadcaster: (clients: Client[], data: SpaceObject, sessionId: string | null) => void
 
   constructor(bc: (clients: Client[], data: SpaceObject, sessionId: string | null) => void) {
@@ -39,7 +39,6 @@ export class GameHandler {
     this.game_started = true
     this.spawnAsteroids()
 
-
     // Server main loop:
     this.game_interval = setInterval(() => {
       this.dt = performance.now() - this.lastTime
@@ -47,36 +46,46 @@ export class GameHandler {
       updateSpaceObjects(this.remoteSpaceObjects, this.dt)
       this.checkHittingShots()
 
-
       // Game logic for asteroids:
       for (let i = 0; i < this.asteroids.length; i++) {
         this.asteroids[i] = updateSpaceObject(this.asteroids[i], this.dt)
+      }
 
-        this.asteroids.filter((asteroid) => {
-          return !asteroid.isDead
-        })
-
-        this.asteroidTicker.tick(() => {
+      this.asteroidTicker.tick(() => {
+        for (let i = 0; i < this.asteroids.length; i++) {
           for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
             if (dist2(getWorldCoordinates(this.asteroids[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1000) {
-              // this.asteroids[i].angleDegree =
-              info(`Aster ${this.asteroids[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
+              // info(`Aster ${this.asteroids[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
+              this.asteroids[i].armedDelay = 0
+
               fire(this.asteroids[i])
             }
           }
-        })
+        }
+      })
 
-
-        this.every.tick(() => {
+      this.every.tick(() => {
+        for (let i = 0; i < this.asteroids.length; i++) {
+          this.asteroids[i] = this.shotHandler(this.asteroids[i])
           this.asteroids[i].collidingWith = []
           this.broadcaster(globalConnectedClients, this.asteroids[i], sessionId)
-        })
-      }
+        }
+      })
+
       this.lastTime = performance.now()
     }, this.minTickTimeMs)
   }
   // server main loop end
 
+  shotHandler(so: SpaceObject): SpaceObject {
+    so.shotsFiredThisFrame = false
+    so.shotsInFlight = []
+    if (so.shotsInFlightNew.length > 0) {
+      so.shotsInFlight = so.shotsInFlightNew
+    }
+    so.shotsInFlightNew = []
+    return so
+  }
 
   spawnAsteroids(): SpaceObject[] {
     const num = 10

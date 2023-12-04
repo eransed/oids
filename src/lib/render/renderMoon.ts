@@ -11,8 +11,6 @@ export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingCont
   ctx.translate(pos.x, pos.y)
   ctx.rotate((round2dec(90 + npc.angleDegree, 1) * Math.PI) / 180)
 
-  
-
   ctx.fillText(`${npc.shotsInFlightNew.length}`, 0, 0)
 
   // Draw main moon circle

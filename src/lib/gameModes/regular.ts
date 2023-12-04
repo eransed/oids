@@ -296,7 +296,6 @@ export function initRegularGame(game: Game): void {
               continue
             }
 
-
             game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
 
             return
@@ -319,9 +318,7 @@ export function initRegularGame(game: Game): void {
         game.bodies.push(su.dataObject)
       } else {
         game.bodies.forEach((b, i) => {
-          if (b.name === su.dataObject.name) {
-            game.bodies[i] = su.dataObject
-          }
+          game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(su.dataObject, game.bodies[i])
         })
       }
     }

@@ -1,6 +1,6 @@
 import type { Game } from './game'
 import { round2dec } from 'mathil'
-import { updateShapes, updateSpaceObjects } from './physics'
+import { updateShapes, updateSpaceObject, updateSpaceObjects } from './physics'
 import { clearScreen } from './render/render2d'
 import { addDataPoint, newDataStats } from './stats'
 import { renderFrameInfo } from './render/renderUI'
@@ -90,6 +90,7 @@ function getSendableSpaceObject(so: SpaceObject): SpaceObject {
 }
 
 const every20: Every = new Every(20)
+const every200: Every = new Every(200)
 
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
@@ -97,11 +98,13 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   function update(timestamp: number): void {
     frameCount++
     every20.tick(() => localPlayerStore.set(game.localPlayer))
+    every200.tick(() => console.log(game.all))
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx, game.style)
     renderFrame(game, dt)
     updateSpaceObjects(game.remotePlayers, dt)
-    updateSpaceObjects(game.all, dt)
+    updateSpaceObject(game.localPlayer, dt)
+    updateSpaceObjects(game.bodies, dt)
     updateShapes(game.testShapes, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
       game.websocket.send(getSendableSpaceObject(game.localPlayer))

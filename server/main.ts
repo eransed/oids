@@ -124,7 +124,7 @@ export class Client {
 
     this.ws.addEventListener('error', (e) => {
       warn(`Error on socket:`)
-      console.log (e)
+      console.log(e)
     })
 
     this.ws.addEventListener('close', () => {
@@ -252,8 +252,6 @@ function removeStoppedGames() {
   for (let i = 0; i < game_handlers.length; i++) {
     if (game_handlers[i].game_started === false) {
       const s = game_handlers.splice(i)
-      console.log(s)
-      console.log({ game_handlers })
       if (s[0]) {
         info(`Removed game ${s[0].tied_session_id}`)
       }
@@ -522,14 +520,14 @@ server.on('connection', function connection(clientConnection: WebSocket, req: In
     info(`Storing new client ${newClient.toString()} in broadcast list`)
   }
 
-  clientConnection.addEventListener("close", (ev) => {
-    info(`Closed: ${newClient.toString()}, reason: ${ev.reason}`);
-  });
+  clientConnection.addEventListener('close', (ev) => {
+    info(`Closed: ${newClient.toString()}, reason: ${ev.reason}`)
+  })
 
-  clientConnection.addEventListener("error", (err) => {
-    info(`Error on socket connection: ${newClient.toString()}:`);
-    console.log (err)
-  });
+  clientConnection.addEventListener('error', (err) => {
+    info(`Error on socket connection: ${newClient.toString()}:`)
+    console.log(err)
+  })
 
   info(`${globalConnectedClients.length} connected clients:`)
   globalConnectedClients.forEach((c) => {
