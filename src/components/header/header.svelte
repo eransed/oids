@@ -50,6 +50,7 @@
           {#if route.path === '/admin' && $userStore && $userStore.role === 'admin'}
             <div in:slide={{ duration: 500, delay: 500 }} out:slide={{ duration: 500, delay: 0 }} class="navButton">
               <Button90
+                addInfo={route.displayText}
                 icon={route.icon}
                 mouseTracking={false}
                 buttonConfig={{
@@ -68,6 +69,7 @@
           {:else if route.path !== '/admin'}
             <div in:slide={{ duration: 500, delay: 500 }} out:slide={{ duration: 500, delay: 0 }} class="navButton">
               <Button90
+                addInfo={route.displayText}
                 icon={route.icon}
                 mouseTracking={false}
                 buttonConfig={{

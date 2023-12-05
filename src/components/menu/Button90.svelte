@@ -73,7 +73,7 @@
     position: absolute;
     /* display: flex; */
     bottom: 0;
-    margin-bottom: -0.5em;
+    margin-bottom: -1em;
   }
 
   .icon img {
@@ -118,8 +118,8 @@
 
   button:hover img {
     filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
-    transform: scale(1.5);
-    transition: all 0.3s;
+    transform: scale(1.1);
+    transition: all 0.3s ease-out;
   }
 
   button img {
@@ -134,6 +134,7 @@
     /* transition-duration: 0.5s; */
     background: none;
   }
+
   .selected {
     border: none;
     background-color: transparent;
