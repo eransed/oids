@@ -139,7 +139,12 @@
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
           <div>
-            <Button90 icon={button.icon} buttonConfig={button.config} selected={$profileComponent === button.config.routeParam} />
+            <Button90
+              addInfo={button.config.buttonText}
+              icon={button.icon}
+              buttonConfig={button.config}
+              selected={$profileComponent === button.config.routeParam}
+            />
           </div>
         {/each}
       </div>
@@ -213,6 +218,7 @@
                 <div class="settingsButtons">
                   {#if !editSettings}
                     <Button90
+                      addInfo="Edit settings"
                       disabled={loading}
                       icon={Icons.EditUser}
                       mouseTracking={false}
@@ -239,6 +245,7 @@
                       }}
                     />
                     <Button90
+                      addInfo="Save changes"
                       disabled={loading}
                       icon={Icons.Save}
                       mouseTracking={false}

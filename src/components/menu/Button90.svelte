@@ -73,7 +73,7 @@
     position: absolute;
     /* display: flex; */
     bottom: 0;
-    margin-bottom: -1em;
+    margin-bottom: -1.3em;
   }
 
   .icon img {

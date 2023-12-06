@@ -206,6 +206,7 @@
       <div class="pageWrapper">
         <div class="actions">
           <Button90
+            addInfo="Add User"
             disabled={loading}
             icon={Icons.AddUser}
             mouseTracking={false}
@@ -280,6 +281,7 @@
                     </td>
                     <td>
                       <Button90
+                        addInfo="Cancel"
                         disabled={loading}
                         icon={Icons.Cancel}
                         mouseTracking={false}
@@ -295,6 +297,7 @@
                     </td>
                     <td>
                       <Button90
+                        addInfo="Save changes"
                         disabled={loading}
                         icon={Icons.Save}
                         mouseTracking={false}
@@ -311,6 +314,7 @@
                     </td>
                     <td>
                       <Button90
+                        addInfo="Delete User"
                         disabled={loading}
                         icon={Icons.Delete}
                         mouseTracking={false}
@@ -333,6 +337,7 @@
 
                     <td>
                       <Button90
+                        addInfo="Edit user"
                         disabled={loading}
                         icon={Icons.EditUser}
                         mouseTracking={false}

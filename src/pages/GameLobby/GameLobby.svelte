@@ -405,16 +405,21 @@
             </div>
           </div>
           <div class="buttonWrapper">
-            <Button90 icon={Icons.Exit} buttonConfig={{ buttonText: 'Leave Session', clickCallback: () => leaveSession(), selected: false }} />
+            <Button90
+              addInfo="Exit Lobby"
+              icon={Icons.Exit}
+              buttonConfig={{ buttonText: 'Leave Session', clickCallback: () => leaveSession(), selected: false }}
+            />
             <span style="filter: {$localPlayerStore.readyToPlay ? 'hue-rotate(72deg)' : ''}">
               <Button90
+                addInfo={$localPlayerStore.readyToPlay ? 'Ready' : 'Not Ready'}
                 icon={Icons.Done}
                 buttonConfig={{ buttonText: 'Toggle ready!', clickCallback: () => toggleReadyToPlay(), selected: $localPlayerStore.readyToPlay }}
               />
             </span>
 
             <Button90
-              addInfo={allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length}`}
+              addInfo={allReady ? 'Start game!' : `${readyPlayers.length} / ${joinedSession?.players.length} ready`}
               icon={Icons.StartGame}
               disabled={!allReady}
               buttonConfig={{
