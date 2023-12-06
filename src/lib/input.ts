@@ -108,14 +108,15 @@ function resetState() {
 
 function reloadSpaceObject(so: SpaceObject) {
   // so.canonCoolDown = 0
-  so.ammo = 500
-  so.health = 500
+  so.ammo = 5000
+  so.health = 10000
   so.batteryLevel = 1000
   so.booster = 5
-  so.missileDamage = 10
-  so.missileSpeed = 25
-  so.inverseFireRate = 6
+  so.missileDamage = 20
+  so.missileSpeed = 20
+  so.inverseFireRate = 2
   so.shotsPerFrame = 2
+  so.armedDelay = 0
 }
 
 export function spaceObjectKeyController(so: SpaceObject, dt = 1) {

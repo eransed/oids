@@ -1,6 +1,6 @@
-import { info, usNow, EveryInterval, rndfVec2, good, newVec2, rndi, smul2, dist2 } from 'mathil'
+import { info, usNow, EveryInterval, rndfVec2, good, newVec2, rndi, smul2, dist2, radToDeg, angle2, sub2, rndf } from 'mathil'
 import { MessageType, SpaceObject } from '../src/lib/interface'
-import { getWorldCoordinates, handleCollisions, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics'
+import { getHeading, getWorldCoordinates, handleCollisions, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics'
 import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
@@ -54,10 +54,12 @@ export class GameHandler {
       this.asteroidTicker.tick(() => {
         for (let i = 0; i < this.asteroids.length; i++) {
           for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
-            if (dist2(getWorldCoordinates(this.asteroids[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1000) {
+            const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.asteroids[i])))
+            this.asteroids[i].angleDegree = rndf(-6, 6) + angleToShip
+            if (dist2(getWorldCoordinates(this.asteroids[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
               // info(`Aster ${this.asteroids[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
+              // info(`ATS: ${angleToShip} deg`)
               this.asteroids[i].armedDelay = 0
-
               fire(this.asteroids[i])
             }
           }
@@ -88,19 +90,21 @@ export class GameHandler {
   }
 
   spawnAsteroids(): SpaceObject[] {
-    const num = 10
+    const num = 15
     info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
       const npc = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
-      npc.ammo = 1000
-      npc.velocity = rndfVec2(-0.5, 1)
+      npc.ammo = 5000
       npc.cameraPosition = rndfVec2(worldStartPosition.x - 2000, worldStartPosition.y + 5000)
-      npc.size = smul2(npc.size, 4)
+      npc.size = smul2(npc.size, 3)
       npc.velocity = rndfVec2(0.1, 0.3)
       npc.hitRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
       npc.mass = 50
-      npc.health = 2500
-      npc.startHealth = 2500
+      npc.health = 500
+      npc.startHealth = 500
+      npc.inverseFireRate = 30
+      npc.angularVelocity = .001
+      npc.angleDegree = 90
       this.asteroids.push(npc)
     }
     return this.asteroids

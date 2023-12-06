@@ -39,8 +39,8 @@ export function updateSpaceObject(npc: SpaceObject, dt: number): SpaceObject {
   if (npc.health <= 0) {
     handleDeathExplosion(npc, explosionDuration)
   }
-  if (npc.angleDegree < 0) npc.angleDegree = 360
-  if (npc.angleDegree > 360) npc.angleDegree = 0
+  // if (npc.angleDegree < 0) npc.angleDegree = 360
+  // if (npc.angleDegree > 360) npc.angleDegree = 0
   if (npc.shotsInFlight) {
     updateShots(npc, deltaTime)
   }

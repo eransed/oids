@@ -9,7 +9,7 @@ export const timeScale = 0.15 // 0.09
 export const maxHeat = 100
 export const shotHitReversFactor = 0.6
 export const collisionFrameDamage = 1
-export const missileDamageVelocityTransferFactor = 0.1
+export const missileDamageVelocityTransferFactor = 0.005
 export const purple1 = '#90d'
 export const purple2 = '#b0e'
 
@@ -23,7 +23,7 @@ export const screenPaddingFactor = 1
 export const thrustSteer = true
 
 // factor of thrust when using thrust steering
-export const thrustSteerPowerFactor = 0.05
+export const thrustSteerPowerFactor = 0.06
 
 export const angularFriction = 0.945
 
@@ -43,7 +43,7 @@ export const worldSize = newVec2(1e308, 1e308)
 
 export const worldStartPosition = rndfVec2(1e6, 1e6)
 
-export const maxShotAge = 50000
+export const maxShotAge = 70000
 
 export const basicPhotonLaserSpeedScaleFactor = .6
 
