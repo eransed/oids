@@ -56,6 +56,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     angularVelocity: 0,
     armedDelay: 500,
     batteryLevel: 500,
+    batteryCapacity: 500,
     booster: 2,
     bounceCount: 0,
     canonCoolDown: 0,

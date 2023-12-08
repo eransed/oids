@@ -118,6 +118,7 @@ export interface ThrustFlameAtom extends Positionable, Physical {}
 
 export interface Thrustable extends Positionable, Physical {
   batteryLevel: number
+  batteryCapacity: number
   enginePower: number
   thrustFlames: ThrustFlameAtom[]
 }

@@ -110,7 +110,9 @@ function reloadSpaceObject(so: SpaceObject) {
   // so.canonCoolDown = 0
   so.ammo = 5000
   so.health = 10000
+  so.startHealth = so.health
   so.batteryLevel = 1000
+  so.batteryCapacity = 1000
   so.booster = 5
   so.missileDamage = 20
   so.missileSpeed = 20

@@ -1,31 +1,25 @@
 <script lang="ts">
-  export let title = 'Progress'
+  export let title = ''
   export let progress = 0
   export let max = 100
+  export let bgColor = ''
+  export let progressColor = 'var(--main-accent2-color)'
 </script>
 
-<div class="wrapper">
-  <!-- <p class="title">{title}</p> -->
-  <div class="bar" style="width: {(progress / max) * 100}%" />
-</div>
+<!-- <p class="title">{title}</p> -->
+<div class="bar" style="background-color: {progressColor}; width: {(progress / max) * 100}%" />
 
 <style>
-  .wrapper {
+  .bar::before {
+    content: '';
+    width: 100%;
+    background-color: color-mix(in srgb, var(--main-accent-color) 10%, var(--main-text-color) 10%);
     position: absolute;
-    width: 20em;
-    height: 1em;
-    background-color: var(--main-card-color);
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    bottom: 30%;
-    margin-left: 5%;
+    height: 100%;
     border-radius: 0.5em;
   }
-
   .bar {
     border-radius: 0.5em;
-    background-color: var(--main-accent2-color);
     z-index: 1;
     content: '';
     display: block;
@@ -35,7 +29,7 @@
   .title {
     position: absolute;
     inset: 0;
-    margin: auto;
+    margin: 33%;
     color: var(--main-card-color);
     z-index: 2;
   }

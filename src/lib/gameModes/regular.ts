@@ -181,8 +181,10 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.shotsPerFrame = 1
   game.localPlayer.ammo = 1000000
   game.localPlayer.angleDegree = -120
-  game.localPlayer.health = 100
-  game.localPlayer.batteryLevel = 50000
+  game.localPlayer.health = 350
+  game.localPlayer.startHealth = game.localPlayer.health
+  game.localPlayer.batteryLevel = 5000
+  game.localPlayer.batteryCapacity = 5000
   game.localPlayer.steeringPower = 1.5
   game.localPlayer.enginePower = 0.25
   game.localPlayer.color = randomAnyColor()
@@ -334,6 +336,48 @@ function exists(entity: SpaceObject, entities: SpaceObject[]): boolean {
     }
   }
   return false
+}
+
+function handleLocalPlayer(game: Game) {
+  const localPlayer = game.localPlayer
+
+  if (localPlayer.health <= 0) {
+    //Local player is dead
+
+    handleDeathExplosion(localPlayer, explosionDuration)
+    if (!localPlayer.obliterated) {
+      renderExplosionFrame(localPlayer, game.ctx)
+    } else {
+      setTimeout(() => {
+        game.callBackWrapper()
+      }, 1000)
+    }
+
+    return
+  } else {
+    //Take away comment to activate health bar floating with ship
+    // if (localPlayer.health < localPlayer.startHealth) {
+    //   const theme = getCurrentTheme()
+    //   renderProgressBar(
+    //     add2(localPlayer.viewFramePosition, newVec2(-localPlayer.hitRadius / 0.5, localPlayer.hitRadius / 0.65)),
+    //     'Hp',
+    //     localPlayer.health,
+    //     localPlayer.startHealth,
+    //     game.ctx,
+    //     0,
+    //     false,
+    //     '#fff',
+    //     theme.accent,
+    //     theme.text,
+    //     localPlayer.hitRadius / 100
+    //   )
+    // }
+    if (game.keyFuncMap.systemGraphs.keyStatus) {
+      renderShip(localPlayer, game.ctx, true, game.style, null, true)
+    } else {
+      renderShip(localPlayer, game.ctx, true, game.style)
+    }
+  }
 }
 
 function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] {
@@ -571,26 +615,9 @@ export function renderFrame(game: Game, dt: number): void {
     renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), ctx, game.style)
   }
 
-  if (game.localPlayer.health <= 0) {
-    //Local player is dead
+  //HandleLocalPlayer
 
-    handleDeathExplosion(game.localPlayer, explosionDuration)
-    if (!game.localPlayer.obliterated) {
-      renderExplosionFrame(game.localPlayer, ctx)
-    } else {
-      setTimeout(() => {
-        game.callBackWrapper()
-      }, 1000)
-    }
-
-    return
-  } else {
-    if (game.keyFuncMap.systemGraphs.keyStatus) {
-      renderShip(game.localPlayer, ctx, true, game.style, null, true)
-    } else {
-      renderShip(game.localPlayer, ctx, true, game.style)
-    }
-  }
+  handleLocalPlayer(game)
 
   moveView(game)
 }

@@ -35,6 +35,9 @@
   import { screenScale } from '../../../../lib/constants'
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
   import Celebration from '../../../../components/celebration/celebration.svelte'
+  import ProfileModal from '../../../../components/profile/ProfileModal.svelte'
+  import ShipCardInfo from '../../../../components/ships/ShipCardInfo.svelte'
+  import { getShipBundleCache } from '../../../../style/ships'
 
   const showScoreScreen = getKeyMap().leaderBoard.store
   const showHotKeys = getKeyMap().hotKeys.store
@@ -146,6 +149,24 @@
   })
 </script>
 
+<div class="shipWrapper" style="z-index: 1;">
+  <div class="shipAvatar">
+    <img style="width: 80%;" draggable="false" src={getShipBundleCache($localPlayerStore.ship.shipVariant).svgUrl} alt={$localPlayerStore.ship.name} />
+    <div class="shipLevel">{$localPlayerStore.ship.level}</div>
+  </div>
+  <div class="shipInfo">
+    <div class="shipName">
+      {$localPlayerStore.ship.name}
+    </div>
+    <div class="shipHealth">
+      <ProgressBar progressColor="#50aa50" progress={$localPlayerStore.health} max={$localPlayerStore.startHealth} />
+    </div>
+    <div class="shipEnergy">
+      <ProgressBar progressColor="#4040ff" progress={$localPlayerStore.batteryLevel} max={$localPlayerStore.batteryCapacity} />
+    </div>
+  </div>
+</div>
+
 <div class="gameInfo">
   <InGameInfo title={'Leaderboard'} showModal={$showScoreScreen}>
     <div class="scoreScreen">
@@ -228,6 +249,91 @@
     --height: '';
   }
 
+  .shipWrapper {
+    position: absolute;
+    top: 1%;
+    left: 1%;
+    display: flex;
+  }
+
+  .shipAvatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--main-card-color);
+    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
+
+    z-index: 1;
+    /* margin-right: -0.4em; */
+    align-content: center;
+    justify-content: center;
+    display: flex;
+  }
+
+  .shipInfo {
+    width: 150px;
+    height: 50px;
+    border-radius: 0.5em;
+    background-color: var(--main-card-color);
+    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
+
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    gap: 0.3em;
+  }
+
+  .shipLevel {
+    position: absolute;
+    background-color: var(--main-card-color);
+    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
+    border-radius: 50%;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    height: 25px;
+    width: 25px;
+    bottom: -15%;
+    left: -2%;
+  }
+
+  .shipName {
+    height: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .shipHealth,
+  .shipEnergy {
+    position: relative;
+    width: 96%;
+    height: 0.5em;
+    background-color: var(--main-card-color);
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    /* bottom: 30%; */
+    margin-left: 2%;
+    border-radius: 0.5em;
+  }
+
+  .xp {
+    position: relative;
+    width: 25%;
+    height: 0.5em;
+    background-color: var(--main-card-color);
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    /* bottom: 30%; */
+    margin-left: 1%;
+    border-radius: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
   .game_canvas {
     max-width: 4000px;
     max-height: 3000px;
@@ -269,6 +375,6 @@
     flex-wrap: wrap;
     /* align-content: center; */
     justify-content: flex-start;
-    align-content: center;
+    align-items: flex-end;
   }
 </style>

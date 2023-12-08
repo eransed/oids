@@ -101,9 +101,9 @@ export class GameHandler {
       npc.hitRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
       npc.mass = 50
       npc.health = 500
-      npc.startHealth = 500
+      npc.startHealth = npc.health
       npc.inverseFireRate = 30
-      npc.angularVelocity = .001
+      npc.angularVelocity = 0.001
       npc.angleDegree = 90
       this.asteroids.push(npc)
     }
