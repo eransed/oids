@@ -16,6 +16,14 @@ export enum MenuEnum {
   GameOver,
 }
 
+//ToDo: Primary and secondary weapon for SpaceObject
+// and available weapons from inventory
+export enum Weapon {
+  FortyWattPlasmaCannon,
+  IonCannon,
+  SuperLaserArray,
+}
+
 export enum SpaceShape {
   Comet,
   Moon,

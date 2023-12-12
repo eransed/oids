@@ -2,6 +2,7 @@ import { round2dec, type Vec2 } from 'mathil'
 import type { Crater, SpaceObject } from '../interface'
 import { renderShot } from './render2d'
 import type { UIStyle } from '../../style/styleInterfaces'
+import { randomRed } from '../color'
 
 export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingContext2D, style: UIStyle): void {
   const moon = getMoon(npc.moonType)
@@ -18,6 +19,9 @@ export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingCont
   ctx.beginPath()
   ctx.arc(0, 0, moonRadius, 0, Math.PI * 2)
   ctx.fillStyle = moon.color
+  if (npc.lastDamagedByName.length > 0) {
+    ctx.fillStyle = '#FFCCCC'
+  }
   // ctx.fillRect(0, 0, npc.size.x, npc.size.y)
   ctx.fill()
   ctx.closePath()

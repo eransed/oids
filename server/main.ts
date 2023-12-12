@@ -24,7 +24,7 @@ start_host_server()
 // const pack = require("../package.json")
 // const name_ver: string = pack.name + " " + pack.version
 const name_ver = 'oids-0.4.0'
-
+const serverGameEnabled = true
 const WS_PORT = OIDS_WS_PORT
 
 const server: WebSocketServer = new WebSocketServer({
@@ -174,9 +174,12 @@ export class Client {
             info('No clients connected')
           }
         } else {
-          handleGameLogic(so)
-          startGameOnRequest(so)
-          removeStoppedGames()
+          if (serverGameEnabled) {
+            handleGameLogic(so)
+
+            startGameOnRequest(so)
+            removeStoppedGames()
+          }
 
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
             broadcastToAllClients(this, globalConnectedClients, so)
@@ -243,6 +246,12 @@ function handleGameLogic(so: SpaceObject) {
 
 function startGameOnRequest(so: SpaceObject) {
   if (so.messageType === MessageType.START_GAME) {
+    for (let i = 0; i < game_handlers.length; i++) {
+      if (game_handlers[i].tied_session_id === so.sessionId) {
+        warn(`Game with session ${so.sessionId} is already created!`)
+        return
+      }
+    }
     info(`Calling create game with ${so.sessionId}`)
     game_handlers.push(createGame(so.sessionId))
   }

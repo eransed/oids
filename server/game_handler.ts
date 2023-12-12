@@ -5,7 +5,7 @@ import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 import { createSpaceObject } from '../src/lib/factory'
-import { fire } from '../src/lib/mechanics'
+import { fire, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
 
 export class GameHandler {
   game_started = false
@@ -14,12 +14,16 @@ export class GameHandler {
   start_time_us: number = usNow()
   tied_session_id: string | null = null
 
+  // private readonly tickRate = 30
+  private readonly fps = 30
   private remoteSpaceObjects: SpaceObject[] = []
   private lastTime = performance.now()
   private dt = performance.now()
-  private minTickTimeMs = 1 / 60
-  private every = new EveryInterval(2)
-  private asteroidTicker = new EveryInterval(100)
+  private minTickTimeMs = 1 / this.fps
+  // private every = new EveryInterval(this.tickRate)
+  // private asteroidTicker = new EveryInterval(this.tickRate)
+  private nextAsteroidToSendIndex = 0
+
   broadcaster: (clients: Client[], data: SpaceObject, sessionId: string | null) => void
 
   constructor(bc: (clients: Client[], data: SpaceObject, sessionId: string | null) => void) {
@@ -43,7 +47,10 @@ export class GameHandler {
     this.game_interval = setInterval(() => {
       this.dt = performance.now() - this.lastTime
 
+      this.asteroids = removeOblitiratedSpaceObjects(this.asteroids)
+      this.remoteSpaceObjects = removeOblitiratedSpaceObjects(this.remoteSpaceObjects)
       updateSpaceObjects(this.remoteSpaceObjects, this.dt)
+
       this.checkHittingShots()
 
       // Game logic for asteroids:
@@ -51,35 +58,37 @@ export class GameHandler {
         this.asteroids[i] = updateSpaceObject(this.asteroids[i], this.dt)
       }
 
-      this.asteroidTicker.tick(() => {
-        for (let i = 0; i < this.asteroids.length; i++) {
-          for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
+      for (let i = 0; i < this.asteroids.length; i++) {
+        for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
+          if (this.asteroids[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
             const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.asteroids[i])))
-            this.asteroids[i].angleDegree = rndf(-6, 6) + angleToShip
+            this.asteroids[i].angleDegree = rndf(0, 0) + angleToShip
             if (dist2(getWorldCoordinates(this.asteroids[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
               // info(`Aster ${this.asteroids[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
               // info(`ATS: ${angleToShip} deg`)
               this.asteroids[i].armedDelay = 0
               fire(this.asteroids[i])
+            } else {
+              this.asteroids[i].lastDamagedByName = ''
             }
           }
         }
-      })
+      }
 
-      this.every.tick(() => {
-        for (let i = 0; i < this.asteroids.length; i++) {
-          this.asteroids[i] = this.shotHandler(this.asteroids[i])
-          this.asteroids[i].collidingWith = []
-          this.broadcaster(globalConnectedClients, this.asteroids[i], sessionId)
-        }
-      })
+      this.asteroids[this.nextAsteroidToSendIndex] = this.prepareSoToSend(this.asteroids[this.nextAsteroidToSendIndex])
+      this.asteroids[this.nextAsteroidToSendIndex].collidingWith = []
+      this.broadcaster(globalConnectedClients, this.asteroids[this.nextAsteroidToSendIndex], sessionId)
+      this.nextAsteroidToSendIndex++
+      if (this.nextAsteroidToSendIndex >= this.asteroids.length) {
+        this.nextAsteroidToSendIndex = 0
+      }
 
       this.lastTime = performance.now()
     }, this.minTickTimeMs)
   }
   // server main loop end
 
-  shotHandler(so: SpaceObject): SpaceObject {
+  prepareSoToSend(so: SpaceObject): SpaceObject {
     so.shotsFiredThisFrame = false
     so.shotsInFlight = []
     if (so.shotsInFlightNew.length > 0) {
@@ -90,7 +99,7 @@ export class GameHandler {
   }
 
   spawnAsteroids(): SpaceObject[] {
-    const num = 15
+    const num = 30
     info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
       const npc = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
@@ -102,7 +111,8 @@ export class GameHandler {
       npc.mass = 50
       npc.health = 500
       npc.startHealth = npc.health
-      npc.inverseFireRate = 30
+      npc.photonColor = '#f00'
+      npc.inverseFireRate = 15
       npc.angularVelocity = 0.001
       npc.angleDegree = 90
       this.asteroids.push(npc)
@@ -110,7 +120,18 @@ export class GameHandler {
     return this.asteroids
   }
 
+  handleSpaceObjectUpdate(so: SpaceObject) {
+    for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
+      this.remoteSpaceObjects[i] = spaceObjectUpdateAndShotReciverOptimizer(so, this.remoteSpaceObjects[i])
+    }
+    this.addNewSpaceObjects(so)
+  }
+
   addNewSpaceObjects(so: SpaceObject) {
+    if (so.isDead) {
+      return
+    }
+
     for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
       if (this.remoteSpaceObjects[i].name === so.name) {
         return
@@ -118,13 +139,6 @@ export class GameHandler {
     }
     good(`Adding ${so.name} in remote list`)
     this.remoteSpaceObjects.push(so)
-  }
-
-  handleSpaceObjectUpdate(so: SpaceObject) {
-    for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
-      this.remoteSpaceObjects[i] = spaceObjectUpdateAndShotReciverOptimizer(so, this.remoteSpaceObjects[i])
-    }
-    this.addNewSpaceObjects(so)
   }
 
   // never called this method... gah.

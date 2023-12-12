@@ -172,6 +172,7 @@
             } else if (incomingUpdate.messageType === MessageType.PING) {
               // handlePing(incomingUpdate, $socket)
             } else if (incomingUpdate.messageType === MessageType.START_GAME) {
+              //Game init started by other player
               const sess = incomingUpdate.sessionId
               $localPlayerStore.isPlaying = true
               info(`Resetting local player position to world start position`)
@@ -323,6 +324,7 @@
   }
 
   function startGame() {
+    //Init game if localplayer started it
     $localPlayerStore.messageType = MessageType.START_GAME
     $localPlayerStore.isPlaying = true
     $socketStore.send($localPlayerStore)

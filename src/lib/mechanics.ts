@@ -1,4 +1,4 @@
-import { MessageType, type Boostable, type Damageable, type PhotonLaser, type Positionable, type SpaceObject, type Thrustable } from './interface'
+import type { Boostable, Damageable, PhotonLaser, Positionable, SpaceObject, Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
 import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2, mag2, newVec2 } from 'mathil'
@@ -69,9 +69,7 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   // shot.angularVelocity = rndi(-70, 70)
   shot.damage = so.missileDamage
   shot.size = { x: rndi(4, 6), y: rndi(20, 30) }
-  if (so.messageType === MessageType.SERVER_GAME_UPDATE) {
-    shot.size = newVec2(so.size.x / 10, so.size.y / 10)
-  }
+
   // shot.color = randomLightGreen()
   shot.color = so.photonColor
   let canonPosition: Vec2 = copy2(add2(so.cameraPosition, so.viewFramePosition))
@@ -156,6 +154,17 @@ export function handleDeathExplosion(so: SpaceObject, maximumIncrement: number):
   }
 
   so.deadFrameCount++
+}
+
+export function removeOblitiratedSpaceObjects(spaceObjects: SpaceObject[]) {
+  spaceObjects = spaceObjects.filter((so) => {
+    if (so.obliterated) {
+      console.log(`Player ${so.name} is removed due to dead`)
+    }
+    return !so.obliterated
+  })
+
+  return spaceObjects
 }
 
 export function bounceSpaceObject(so: SpaceObject, screen: Vec2, energyFactor = 1, gap = 1, damageDeltaFactor: number) {

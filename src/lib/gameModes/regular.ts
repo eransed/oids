@@ -188,7 +188,7 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.steeringPower = 1.5
   game.localPlayer.enginePower = 0.25
   game.localPlayer.color = randomAnyColor()
-  game.localPlayer.photonColor = '#f0f'
+  game.localPlayer.photonColor = '#f00'
   game.localPlayer.isLocal = true
   game.localPlayer.color = '#db8'
   game.localPlayer.worldSize = worldSize // server sends size of world

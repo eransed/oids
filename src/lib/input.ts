@@ -114,10 +114,10 @@ function reloadSpaceObject(so: SpaceObject) {
   so.batteryLevel = 1000
   so.batteryCapacity = 1000
   so.booster = 5
-  so.missileDamage = 20
-  so.missileSpeed = 20
-  so.inverseFireRate = 2
-  so.shotsPerFrame = 2
+  // so.missileDamage = 20
+  // so.missileSpeed = 20
+  // so.inverseFireRate = 2
+  // so.shotsPerFrame = 2
   so.armedDelay = 0
 }
 
@@ -170,6 +170,7 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
   if (ActiveKeyMap.selfDestroy.keyStatus) {
     so.health = 0
+    so.isDead = true
   }
 }
 
