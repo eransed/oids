@@ -12,7 +12,7 @@ export const auth = express.Router()
 
 import { createUser, findUserByEmail } from '../users/users.services'
 
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload, VerifyCallback } from 'jsonwebtoken'
 import { createNewUser } from '../utils/factory'
 //Register endpoint
 auth.post('/register', async (req, res, next) => {
@@ -85,6 +85,13 @@ auth.post('/login', async (req, res, next) => {
   }
 })
 
+interface DecodedJwt extends jwt.Jwt {
+  payload: {
+    jti: string
+    userId: string
+  }
+}
+
 //Refreshtoken
 auth.post('/refreshToken', async (req, res, next) => {
   try {
@@ -94,18 +101,28 @@ auth.post('/refreshToken', async (req, res, next) => {
       throw new Error('Missing refresh token.')
     }
 
-    const payload: any = jwt.verify(refreshToken, JWT_REFRESH_SECRET, (err: any, decoded: any) => {
-      if (err) {
-        res.status(401)
-        warn('Refreshtoken is not valid')
+    const getPayLoad = async (): Promise<DecodedJwt | undefined> => {
+      let p: DecodedJwt | undefined
 
-        throw new Error('Refreshtoken is not valid')
-      } else if (decoded) return decoded
-    })
+      return new Promise((resolve, reject) => {
+        jwt.verify(refreshToken, JWT_REFRESH_SECRET, { complete: true }, (error, decoded) => {
+          if (error) {
+            res.status(401).send('Refreshtoken not valid')
+            warn('RefreshToken not valid')
+            reject(error)
+          } else if (decoded) {
+            p = decoded as DecodedJwt
+            resolve(p)
+          }
+        })
+      })
+    }
 
-    if (!payload) return
+    const verifiedJwt = await getPayLoad()
 
-    const savedRefreshToken = await findRefreshTokenById(payload.jti)
+    if (!verifiedJwt) return
+
+    const savedRefreshToken = await findRefreshTokenById(verifiedJwt.payload.jti)
 
     if (!savedRefreshToken || savedRefreshToken.revoked === true) {
       res.status(401)
@@ -118,7 +135,7 @@ auth.post('/refreshToken', async (req, res, next) => {
       throw new Error('Unauthorized')
     }
 
-    const user = await findUserById(payload.userId)
+    const user = await findUserById(verifiedJwt.payload.userId)
     if (!user) {
       res.status(401)
       throw new Error('Unauthorized')

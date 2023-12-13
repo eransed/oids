@@ -1,7 +1,7 @@
 //On mount -> validate refreshtoken and make a new auth token.
 
 import axios from 'axios'
-import type { AxiosResponse } from 'axios'
+import type { AxiosError, AxiosResponse } from 'axios'
 import getProfile from '../user/profile'
 
 import { isLoggedInStore, userLoadingStore } from '../../../stores/stores'
@@ -51,7 +51,10 @@ export const validateToken = async () => {
         throw new Error()
       }
     })
-    .catch((err) => {
-      console.log(err)
+    .catch((err: AxiosError) => {
+      console.log(err.response?.data)
+      console.log('Removing tokens')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('accessToken')
     })
 }
