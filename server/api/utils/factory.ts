@@ -14,7 +14,7 @@ export function createNewUser(email: string, name: string, password: string): Us
     updatedAt: new Date(),
     role: 'player',
     theme: 0,
-    image: '',
+    image: '/src/assets/avatars/astronautHelmet.svg',
     played: 0,
   }
 

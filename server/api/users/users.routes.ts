@@ -2,14 +2,12 @@ import { Request, Response, NextFunction } from 'express'
 import express from 'express'
 import { isAuthenticated } from '../middleware'
 import { deleteUser, findUserByEmail, findUserById, getUsers, saveGame, updateUser } from './users.services'
-import jwt from 'jsonwebtoken'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 
 import { Game } from '../types/user'
 
 import { Prisma, User } from '@prisma/client'
-import type { AxiosRequestConfig } from 'axios'
-import { IncomingHttpHeaders } from 'http'
+import { getPayLoadFromJwT } from '../utils/jwt'
 
 export const users = express.Router()
 
@@ -20,9 +18,13 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
     if (authorization) {
       const token = authorization.split(' ')[1]
 
-      const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
+      const payLoadFromJWt = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+        res.status(401).send('Token not valid')
+      })
 
-      const user: User | null = await findUserById(payload.userId)
+      if (!payLoadFromJWt) return
+
+      const user: User | null = await findUserById(payLoadFromJWt.payload.userId)
 
       if (user) {
         user.password = ''
@@ -56,8 +58,12 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
     }
 
     const token = authorization.split(' ')[1]
-    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
-    const caller: User | null = await findUserById(payload.userId)
+    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+      res.status(401).send('Error on getting payload from JwT')
+    })
+
+    if (!payloadFromJwT) return
+    const caller: User | null = await findUserById(payloadFromJwT.payload.userId)
 
     // if (!caller || caller.role !== 'admin') {
     //   res.status(403).send('Forbidden, you are not admin')
@@ -99,8 +105,12 @@ users.post('/savegame', isAuthenticated, async (req: Request, res: Response, nex
     }
 
     const token = authorization.split(' ')[1]
-    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
-    const user: User | null = await findUserById(payload.userId)
+    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+      res.status(401).send('Error on getting payload from JwT')
+    })
+
+    if (!payloadFromJwT) return
+    const user: User | null = await findUserById(payloadFromJwT.payload.userId)
 
     if (!user) {
       res.status(404)
@@ -127,8 +137,12 @@ users.get('/list', isAuthenticated, async (req: Request, res: Response, next: Ne
     }
 
     const token = authorization.split(' ')[1]
-    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
-    const user: User | null = await findUserById(payload.userId)
+    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+      res.status(401).send('Error on getting payload from JwT')
+    })
+
+    if (!payloadFromJwT) return
+    const user: User | null = await findUserById(payloadFromJwT.payload.userId)
 
     if (!user || user.role !== 'admin') {
       res.status(403)
@@ -164,8 +178,14 @@ users.post('/deleteUser', isAuthenticated, async (req: Request, res: Response, n
     }
 
     const token = authorization.split(' ')[1]
-    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
-    const user: User | null = await findUserById(payload.userId)
+
+    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+      res.status(401).send('Error on getting payload from JwT')
+    })
+
+    if (!payloadFromJwT) return
+
+    const user: User | null = await findUserById(payloadFromJwT.payload.userId)
 
     if (!user || user.role !== 'admin') {
       res.status(403)
@@ -196,8 +216,14 @@ users.post('/deleteMe', isAuthenticated, async (req: Request, res: Response, nex
     }
 
     const token = authorization.split(' ')[1]
-    const payload: any = jwt.verify(token, JWT_ACCESS_SECRET)
-    const user: User | null = await findUserById(payload.userId)
+
+    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+      res.status(401).send('Error on getting payload from JwT')
+    })
+
+    if (!payloadFromJwT) return
+
+    const user: User | null = await findUserById(payloadFromJwT.payload.userId)
 
     if (!user) {
       res.status(404)

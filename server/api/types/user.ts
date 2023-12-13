@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken'
+
 export interface User {
   name: string
   id: string
@@ -28,4 +30,11 @@ export interface newUser {
   name: string
   email: string
   password: string
+}
+
+export interface DecodedJwt extends jwt.Jwt {
+  payload: {
+    jti: string
+    userId: string
+  }
 }
