@@ -5,10 +5,17 @@ import { Prisma, User } from '@prisma/client'
 import { randomUUID } from 'crypto'
 
 // Exclude keys from user
-function exclude(user: any, keys: any) {
-  return Object.fromEntries(Object.entries(user).filter(([key]) => !keys.includes(key)))
-}
+function exclude(user: User, keys: string[]): UserNoPassword {
+  const userNoPw: UserNoPassword = {} as UserNoPassword
 
+  Object.entries(user).forEach(([key, value]) => {
+    if (!keys.includes(key)) {
+      userNoPw[key as keyof UserNoPassword] = value as never
+    }
+  })
+
+  return userNoPw
+}
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({
     where: {
@@ -72,9 +79,11 @@ export const updateUser = async (user: User): Promise<User> => {
     })
 }
 
+type UserNoPassword = Omit<User, 'password'>
+
 export const getUsers = async () => {
   const users = await db.user.findMany({})
-  const filtered: any[] = []
+  const filtered: UserNoPassword[] = []
   users.forEach((u) => {
     filtered.push(exclude(u, ['password']))
   })

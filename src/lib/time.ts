@@ -71,7 +71,7 @@ function shotHandler(so: SpaceObject): SpaceObject {
   return so
 }
 
-export function copyObject(obj: any): unknown {
+export function copyObject(obj: SpaceObject): SpaceObject {
   if (obj.collidingWith) {
     const so = <SpaceObject>obj
     so.collidingWith = []

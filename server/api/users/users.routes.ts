@@ -149,9 +149,7 @@ users.get('/list', isAuthenticated, async (req: Request, res: Response, next: Ne
       throw new Error('Forbidden, you are not admin.')
     }
 
-    const users: User[] = await getUsers()
-
-    users.forEach((user) => (user.password = ':)'))
+    const users: Omit<User, 'password'>[] = await getUsers()
 
     if (users) {
       res.json(users)
