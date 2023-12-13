@@ -37,8 +37,12 @@
 
   onMount(() => {
     if ($isLoggedInStore && !$userStore) {
-      getProfile()
+      getProfile().then(() => {
+        chosenTheme = themes[$userStore.theme]
+      })
     }
+
+    chosenTheme = themes[$userStore.theme]
   })
 
   $: if ($userStore) {
