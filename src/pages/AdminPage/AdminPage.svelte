@@ -13,7 +13,7 @@
   import register from '../../lib/services/auth/register'
   import getProfile from '../../lib/services/user/profile'
   import axios from 'axios'
-  import type { AxiosError, AxiosResponse } from 'axios'
+  import type { AxiosError } from 'axios'
 
   //Svelte
   import { onMount } from 'svelte'
@@ -29,7 +29,7 @@
 
   //Themes
   import { getThemeNumber, themes } from '../../style/defaultColors'
-  import type { Theme } from '../../style/styleInterfaces'
+  import type { Theme } from '../../lib/interface'
 
   async function getUsers(): Promise<User & Prisma.UserGetPayload<typeof userIncludes>[]> {
     loading = true

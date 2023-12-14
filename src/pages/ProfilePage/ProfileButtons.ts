@@ -1,5 +1,5 @@
 import { writable, type Writable } from 'svelte/store'
-import type { Button90Config } from '../../interfaces/menu'
+import type { Button90Config } from '../../lib/interface'
 
 //Stores
 export const profileComponent: Writable<string> = writable('settings')
@@ -36,7 +36,6 @@ const matchHistory: ProfileButton = {
 }
 
 const settings: ProfileButton = {
-
   icon: Icons.Settings,
   config: {
     buttonText: 'User & Settings',
@@ -48,6 +47,6 @@ const settings: ProfileButton = {
   },
 }
 
-const ProfileButtons = { settings,  shipStation, matchHistory  }
+const ProfileButtons = { settings, shipStation, matchHistory }
 
 export { ProfileButtons }

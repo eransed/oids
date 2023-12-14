@@ -1,7 +1,9 @@
 <script lang="ts">
+  import type { Button90Config } from '../../lib/interface'
+
   //Imports
   import Button90 from './Button90.svelte'
-  import type { Button90Config } from '../../interfaces/menu'
+
   import MenuWrapper from './MenuWrapper.svelte'
 
   //Exports

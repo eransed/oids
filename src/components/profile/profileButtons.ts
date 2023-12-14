@@ -1,5 +1,5 @@
 //Interfaces
-import type { Button90Config } from '../../interfaces/menu'
+import type { Button90Config } from '../../lib/interface'
 
 //Utils
 import { handleLogout } from '../../utils/utils'

@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken'
 
-import type { DecodedJwt, User } from '../types/user'
+import { DecodedJwt } from '../../interfaces'
 
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from '../../pub_config'
 import { warn } from 'mathil'
+import { User } from '@prisma/client'
 
 //Token valid time
 export const generateAccessToken = (user: User) => {

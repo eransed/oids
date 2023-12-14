@@ -18,7 +18,7 @@
     return out + value
   }
 
-  function getObjectPropCountIfAny(obj: unknown): string {
+  function getObjectPropCountIfAny(obj: Record<string, object>): string {
     if (typeof obj === 'object') {
       const propCount = Object.keys(<Object>obj).length
       if (propCount > 0) return `[${propCount}]`

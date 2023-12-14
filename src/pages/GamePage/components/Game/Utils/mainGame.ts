@@ -1,6 +1,7 @@
 import { info, warn } from 'mathil'
 import type { Game } from '../../../../../lib/game'
-import type { Settings } from '../../../../../style/styleInterfaces'
+import type { Settings } from '../../../../../lib/interface'
+
 export let game: Game
 export function gameRef(g: Game): void {
   game = g

@@ -1,7 +1,7 @@
+import type { Game } from '@prisma/client'
 import axios, { type AxiosResponse } from 'axios'
-import type { GameHistory } from '../../../interfaces/game'
 
-export const saveGame = async (game: GameHistory) => {
+export const saveGame = async (game: Game) => {
   const token = localStorage.getItem('accessToken')
 
   const config = {
@@ -12,7 +12,7 @@ export const saveGame = async (game: GameHistory) => {
 
   const response: AxiosResponse = await axios
     .post(`http://${location.hostname}:6060/api/v1/users/savegame`, game, config)
-    .then((response: AxiosResponse<GameHistory>) => {
+    .then((response: AxiosResponse<Game>) => {
       return response
     })
     .catch((err) => {

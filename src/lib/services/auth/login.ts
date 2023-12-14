@@ -1,8 +1,7 @@
 import axios, { type AxiosResponse } from 'axios'
 
 import { isLoggedInStore } from '../../../stores/stores'
-
-import type { Tokens } from '../../../interfaces/user'
+import type { Tokens } from '../../interface'
 
 const login = async (req: FormData) => {
   let status

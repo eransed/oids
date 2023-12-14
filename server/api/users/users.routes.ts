@@ -3,10 +3,7 @@ import express from 'express'
 import { isAuthenticated } from '../middleware'
 import { deleteUser, findUserByEmail, findUserById, getUsers, saveGame, updateUser } from './users.services'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
-
-import { Game } from '../types/user'
-
-import { Prisma, User } from '@prisma/client'
+import { Game, Prisma, User } from '@prisma/client'
 import { getPayLoadFromJwT } from '../utils/jwt'
 
 export const users = express.Router()

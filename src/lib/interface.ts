@@ -368,3 +368,36 @@ export interface Crater {
   radius: number
   color: string
 }
+
+export interface Settings {
+  uiStyle: UIStyle
+  theme: Theme
+}
+
+export interface UIStyle {
+  unarmedShotColor: string
+  armedShotColor: string
+  shipColor: string
+  spaceColor: string
+  starColor: string
+}
+
+export interface Theme {
+  name: string
+  bg: string
+  card: string
+  text: string
+  accent: string
+}
+
+export interface Tokens {
+  accessToken: string
+  refreshToken: string
+}
+
+export interface Button90Config {
+  buttonText: string
+  clickCallback: () => void
+  selected: boolean
+  routeParam?: string
+}

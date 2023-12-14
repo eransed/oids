@@ -4,7 +4,7 @@ import type { ChatMessage, SpaceObject } from '../lib/interface'
 import { createSpaceObject } from '../lib/factory'
 import { OidsSocket } from '../lib/websocket/ws'
 import { getWsUrl } from '../lib/websocket/ws'
-import type { Settings } from '../style/styleInterfaces'
+import type { Settings } from '../lib/interface'
 import { cnvTheme, DeepMidnight } from '../style/defaultColors'
 import { gUser, createdGuestName } from '../utils/utils'
 

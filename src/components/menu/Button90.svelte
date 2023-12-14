@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Button90Config } from '../../interfaces/menu'
+  import type { Button90Config } from '../../lib/interface'
+
   import CircularSpinner from '../loaders/circularSpinner.svelte'
 
   export let addInfo: string = ''

@@ -4,9 +4,8 @@ import { isAuthenticated } from '../middleware'
 import { createShip, getShips, deleteShip, updateShip } from './ship.services'
 import { JWT_ACCESS_SECRET } from '../../pub_config'
 import { findUserById } from '../users/users.services'
-import { User } from '../types/user'
 import { createNewShip } from '../utils/factory'
-import { Ship } from '@prisma/client'
+import { Ship, User } from '@prisma/client'
 import { getPayLoadFromJwT } from '../utils/jwt'
 
 export const ship = express.Router()

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigate } from 'svelte-routing'
-  import type { Button90Config } from '../../../../interfaces/menu'
+  import type { Button90Config } from '../../../../lib/interface'
   import type { Game } from '../../../../lib/game'
   import { settingsStore } from '../../../../stores/stores'
   import { toggleAndGetTheme } from '../../../../style/defaultColors'
