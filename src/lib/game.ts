@@ -8,7 +8,7 @@ import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
 import type { Vec2 } from 'mathil'
 import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
-import type { UIStyle } from '../style/styleInterfaces'
+import type { UIStyle } from './interface'
 
 export class Game {
   websocket: OidsSocket

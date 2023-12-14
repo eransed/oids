@@ -1,5 +1,5 @@
 import type { SpaceObject } from '../interface'
-import type { UIStyle } from '../../style/styleInterfaces'
+import type { UIStyle } from '../interface'
 
 import { direction2, round2dec, smul2, type Vec2 } from 'mathil'
 import { screenScale } from '../constants'

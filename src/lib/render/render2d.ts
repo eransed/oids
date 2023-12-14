@@ -2,7 +2,7 @@ import { round2dec, type Line, type Vec2, sub2, add2, smul2, direction2, angle2,
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
 import type { SpaceObject } from '../interface'
-import type { UIStyle } from '../../style/styleInterfaces'
+import type { UIStyle } from '../interface'
 import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
 import { getRemotePosition } from '../physics'
 

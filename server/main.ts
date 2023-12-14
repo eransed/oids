@@ -12,7 +12,6 @@ import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
 
 import { findShip, updateShipExperienceAndLevel } from './api/ship/ship.services'
-import { getShipXpRequirement } from '../src/lib/services/utils/shipLevels'
 
 // start ApiServer
 apiServer()
@@ -292,22 +291,6 @@ function addNewClientIfNotExisting(clients: Client[], clientConnection: Client):
   }
   clients.push(clientConnection)
   return true
-}
-
-// This function concept is not working, issues when updating with only one user.
-// Always one closed client left in clients...
-function removeClientIfExisting(clients: Client[], clientConnection: Client): Client[] {
-  const lengthBefore: number = clients.length
-  clients = clients.filter((c: Client) => {
-    return c === clientConnection
-  })
-  const removedCount: number = lengthBefore - clients.length
-  if (removedCount === 1) {
-    info(`Removed client: ${clientConnection.toString()}`)
-  } else if (removedCount > 1) {
-    error(`Removed ${removedCount} equal clients in list`)
-  }
-  return clients
 }
 
 function removeDisconnectedClients(clients: Client[]): Client[] {

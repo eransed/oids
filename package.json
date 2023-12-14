@@ -12,7 +12,8 @@
     "server": "npx prisma migrate dev && npm run build-server && node server/build/server/main.js",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "all": "npm run build && npm run server"
+    "all": "npm run build && npm run server",
+    "test": "vitest"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^7.0.0-beta.43",
@@ -40,7 +41,8 @@
     "svelte-check": "^2.10.0",
     "tslib": "^2.4.1",
     "typescript": "^4.9.5",
-    "vite": "^4.0.0"
+    "vite": "^4.0.0",
+    "vitest": "^1.0.4"
   },
   "dependencies": {
     "@prisma/client": "^4.10.1",
