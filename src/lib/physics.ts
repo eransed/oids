@@ -22,29 +22,30 @@ export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
   })
 }
 
-export function updateSpaceObject(npc: SpaceObject, dt: number): SpaceObject {
+export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
-  if (isNaN(dt)) return npc
+  if (isNaN(dt)) return so
   const deltaTime: number = dt * timeScale
-  const v: Vec2 = scalarMultiply2(npc.velocity, deltaTime)
-  const a: Vec2 = scalarMultiply2(npc.acceleration, deltaTime)
-  npc.velocity = add2(npc.velocity, a)
-  npc.position = add2(npc.position, v)
-  npc.cameraVelocity = smul2(v, 1)
-  npc.cameraPosition = add2(npc.cameraPosition, npc.cameraVelocity)
+  const v: Vec2 = scalarMultiply2(so.velocity, deltaTime)
+  const a: Vec2 = scalarMultiply2(so.acceleration, deltaTime)
+  so.velocity = add2(so.velocity, a)
+  so.position = add2(so.position, v)
+  so.cameraVelocity = smul2(v, 1)
+  so.cameraPosition = add2(so.cameraPosition, so.cameraVelocity)
   // npc.position = vec2Bound(npc.position, sub2(smul2(npc.worldSize, 0.5), npc.viewport))
-  npc.acceleration = { x: 0, y: 0 }
-  npc.velocity = limitVec2(npc.velocity, { x: 250, y: 250 })
-  npc.angleDegree += npc.angularVelocity * deltaTime
-  if (npc.health <= 0) {
-    handleDeathExplosion(npc, explosionDuration)
+  so.acceleration = { x: 0, y: 0 }
+  so.velocity = limitVec2(so.velocity, { x: 250, y: 250 })
+  so.angleDegree += so.angularVelocity * deltaTime
+  if (so.health <= 0) {
+    handleDeathExplosion(so, explosionDuration)
   }
   // if (npc.angleDegree < 0) npc.angleDegree = 360
   // if (npc.angleDegree > 360) npc.angleDegree = 0
-  if (npc.shotsInFlight) {
-    updateShots(npc, deltaTime)
+  if (so.shotsInFlight) {
+    console.log('updateShots please')
+    updateShots(so, deltaTime)
   }
-  return npc
+  return so
 }
 
 export function updateSpaceObjects(npcs: SpaceObject[], frameTimeMs: number): void {
