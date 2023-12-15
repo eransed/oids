@@ -13,7 +13,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "all": "npm run build && npm run server",
-    "test": "vitest"
+    "test": "vitest --ui"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^7.0.0-beta.43",
@@ -33,6 +33,7 @@
     "@types/ws": "^8.5.4",
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "@typescript-eslint/parser": "^5.48.0",
+    "@vitest/ui": "^1.0.4",
     "eslint": "^8.31.0",
     "eslint-plugin-storybook": "^0.6.10",
     "prettier": "^2.8.3",
