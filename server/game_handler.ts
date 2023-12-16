@@ -1,11 +1,13 @@
 import { info, usNow, EveryInterval, rndfVec2, good, newVec2, rndi, smul2, dist2, radToDeg, angle2, sub2, rndf } from 'mathil'
 import { MessageType, SpaceObject } from '../src/lib/interface'
-import { getHeading, getWorldCoordinates, handleCollisions, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics'
+
 import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 import { createSpaceObject } from '../src/lib/factory'
 import { fire, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
+import { getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
+import { handleCollisions } from '../src/lib/physics/handleCollisions'
 
 export class GameHandler {
   game_started = false

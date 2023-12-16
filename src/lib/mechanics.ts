@@ -5,7 +5,7 @@ import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, su
 import { basicPhotonLaserSpeedScaleFactor, maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
-import { getHeading } from './physics'
+import { getHeading } from './physics/physics'
 
 export function applyEngine(so: Thrustable & Boostable, boost = false): number {
   const consumption: number = so.enginePower * (boost ? so.booster : 1)

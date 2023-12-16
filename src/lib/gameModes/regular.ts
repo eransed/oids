@@ -22,7 +22,7 @@ import {
   error,
 } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
-import { friction, getRemotePosition, handleCollisions, offScreen_mm, wrap_mm } from '../physics'
+import { friction, getRemotePosition, offScreen_mm, wrap_mm } from '../physics/physics'
 import { loadingText, renderHitRadius, renderInfoText, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType } from '../interface'
@@ -39,6 +39,7 @@ import { renderExplosionFrame } from '../render/renderFx'
 import { chatMsgHistoryStore, localPlayerStore, shouldCelebrateLevelUp, userStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 import { getCurrentTheme } from '../../style/defaultColors'
+import { handleCollisions } from '../physics/handleCollisions'
 //Stores
 
 let numberOfServerObjects = 0
@@ -512,9 +513,7 @@ function last(arr: Vec2[]): Vec2 {
 export function moveView(game: Game) {
   // bound ship to viewframe
   const center = getScreenCenterPosition(game.ctx)
-  // const camBound = sub2(smul2(game.localPlayer.worldSize, 0.5), getScreenRect(game.ctx))
-  // game.localPlayer.cameraPosition = add2(game.localPlayer.cameraPosition, game.localPlayer.velocity)
-  // game.localPlayer.cameraPosition = vec2Bound(game.localPlayer.cameraPosition, camBound)
+
   const d = dist2(center, game.localPlayer.position)
   cameraLag.push(game.localPlayer.velocity)
   if (cameraLag.length > cameraLagSize) {

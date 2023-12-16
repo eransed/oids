@@ -1,6 +1,6 @@
 import type { Game } from './game'
 import { round2dec } from 'mathil'
-import { updateShapes, updateSpaceObject, updateSpaceObjects } from './physics'
+import { updateShapes, updateSpaceObject, updateSpaceObjects } from './physics/physics'
 import { clearScreen } from './render/render2d'
 import { addDataPoint, newDataStats } from './stats'
 import { renderFrameInfo } from './render/renderUI'
@@ -98,7 +98,6 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   function update(timestamp: number): void {
     frameCount++
     every20.tick(() => localPlayerStore.set(game.localPlayer))
-    every200.tick(() => console.log(game.all))
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx, game.style)
     renderFrame(game, dt)

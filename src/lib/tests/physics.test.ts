@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { SpaceObject } from '../interface'
+import type { PhotonLaser, SpaceObject } from '../interface'
 import { createSpaceObject, newPhotonLaser } from '../factory'
-import * as physics from '../physics'
+import * as physics from '../physics/physics'
+import * as updateShots from '../physics/updateShots'
 import * as mechanics from '../mechanics'
+import { handleCollisions } from '../physics/handleCollisions'
 
 //First time trying a vitest
 describe('Physics tests', () => {
@@ -10,16 +12,19 @@ describe('Physics tests', () => {
 
   //Creating a spaceObject to test
   const so: SpaceObject = createSpaceObject('TestObject')
+  const so1 = createSpaceObject('so1')
+  const so2 = createSpaceObject('so2')
   const dt = 60
 
   //Setting values that updateSpaceObject is using
   so.acceleration = { x: 0.1, y: 0.1 }
   so.angularVelocity = 0.5
   so.cameraVelocity = { x: 0.1, y: 0.1 }
-  so.shotsInFlight = [newPhotonLaser()]
 
   //Getting spaceObject back from updateSpaceObject
   const result = physics.updateSpaceObject(JSON.parse(JSON.stringify(so)), dt)
+
+  const updateShotsSpy = vi.spyOn(updateShots, 'updateShots')
 
   //Tests------------------------------------------------------------------
   it('updateSpaceObject position', () => {
@@ -38,15 +43,15 @@ describe('Physics tests', () => {
     expect(result.cameraVelocity).not.toEqual(so.cameraVelocity)
   })
 
-  //This doesnt work for some reason
-  // it('updateSpaceObject calling updateShots', () => {
-  //   const updateShotsSpy = vi.spyOn(physics, 'updateShots')
-  //   result.shotsInFlight = [newPhotonLaser()]
+  it('updateSpaceObject calling updateShots', () => {
+    const shot: PhotonLaser = newPhotonLaser()
 
-  //   physics.updateSpaceObject(result, dt)
+    result.shotsInFlight = [shot]
 
-  //   expect(updateShotsSpy).toHaveBeenCalled()
-  // })
+    physics.updateSpaceObject(result, dt)
+
+    expect(updateShotsSpy).toHaveBeenCalled()
+  })
 
   it('updateSpaceObject calling handleDeathExplosion', () => {
     const handleDeathExplosionSpy = vi.spyOn(mechanics, 'handleDeathExplosion')
@@ -55,5 +60,26 @@ describe('Physics tests', () => {
     physics.updateSpaceObject(result, dt)
 
     expect(handleDeathExplosionSpy).toHaveBeenCalled()
+  })
+
+  it('handleCollisions detecting collision', () => {
+    const resetCollisionsSpy = vi.spyOn(physics, 'resetCollisions')
+
+    handleCollisions(so1.cameraPosition, [so1, so2])
+
+    expect(so1.colliding).toBe(true)
+    expect(so2.colliding).toBe(true)
+    expect(so1.collidingWith[0].position).toStrictEqual(so2.position)
+    expect(so2.collidingWith[0].position).toStrictEqual(so1.position)
+    expect(resetCollisionsSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('resetCollisions', () => {
+    physics.resetCollisions([so1, so2])
+
+    expect(so1.colliding).toBe(false)
+    expect(so2.colliding).toBe(false)
+    expect(so1.collidingWith).empty
+    expect(so2.collidingWith).empty
   })
 })

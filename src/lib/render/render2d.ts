@@ -4,7 +4,7 @@ import { getScreenRect } from '../canvas_util'
 import type { SpaceObject } from '../interface'
 import type { UIStyle } from '../interface'
 import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
-import { getRemotePosition } from '../physics'
+import { getRemotePosition } from '../physics/physics'
 
 export function clearScreen(ctx: CanvasRenderingContext2D, style: UIStyle) {
   // ctx.fillStyle = document.documentElement.style.getPropertyValue('--main-bg-color')

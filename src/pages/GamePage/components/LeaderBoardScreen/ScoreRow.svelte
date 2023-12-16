@@ -3,7 +3,6 @@
   import { add2, newVec2, rndfVec2, round2, round2dec, smul2, sub2 } from 'mathil'
   import { localPlayerStore } from '../../../../stores/stores'
   import { worldStartPosition } from '../../../../lib/constants'
-  import { getWorldCoordinates, isWithinRadius, isWithinRadiusWorld } from '../../../../lib/physics'
   import { resetStars } from '../../../../lib/gameModes/regular'
   import { getGame } from '../Game/Utils/mainGame'
   import { applyEngine } from '../../../../lib/mechanics'

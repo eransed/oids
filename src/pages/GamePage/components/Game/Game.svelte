@@ -31,7 +31,6 @@
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
   import ProgressBar from '../../../../components/progress/progressBar.svelte'
-  import { getRemotePosition } from '../../../../lib/physics'
   import { screenScale } from '../../../../lib/constants'
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
   import Celebration from '../../../../components/celebration/celebration.svelte'

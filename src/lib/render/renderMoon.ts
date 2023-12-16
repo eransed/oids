@@ -1,7 +1,7 @@
 import { round2dec, type Vec2 } from 'mathil'
 import type { Crater, SpaceObject } from '../interface'
 import { renderShot } from './render2d'
-import type { UIStyle } from '../../style/styleInterfaces'
+import type { UIStyle } from '../interface'
 import { randomRed } from '../color'
 
 export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingContext2D, style: UIStyle): void {
