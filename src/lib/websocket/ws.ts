@@ -4,7 +4,11 @@ import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
-  return new URL(`ws://${new URL(window.location.href).hostname}:${port}`)
+  if (typeof window !== 'undefined') {
+    return new URL(`ws://${new URL(window.location.href).hostname}:${port}`)
+  } else {
+    return new URL(`ws://${new URL('http://localhost').hostname}:${port}`)
+  }
 }
 
 export function getReadyState(socket: WebSocket): number {

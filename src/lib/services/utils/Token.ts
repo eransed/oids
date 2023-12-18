@@ -6,8 +6,9 @@ import getProfile from '../user/profile'
 
 import { isLoggedInStore, userLoadingStore } from '../../../stores/stores'
 
-import type { Tokens } from '../../../interfaces/user'
-import { setCssFromSettings, syncThemeWithCss, themes } from '../../../style/defaultColors'
+import type { Tokens } from '../../interface'
+import { setCssFromSettings } from '../../../style/defaultColors'
+import { getLocationURL } from '../../../utils/utils'
 
 //Check if token is valid and renew
 export const validateToken = async () => {
@@ -28,7 +29,7 @@ export const validateToken = async () => {
   userLoadingStore.set(true)
 
   return await axios
-    .post(`http://${location.hostname}:6060/api/v1/auth/refreshToken`, body)
+    .post(`http://${getLocationURL()}:6060/api/v1/auth/refreshToken`, body)
     .then(async (response: AxiosResponse<Tokens>) => {
       if (response.status === 200) {
         accessToken = response.data.accessToken
@@ -37,7 +38,8 @@ export const validateToken = async () => {
         localStorage.setItem('accessToken', accessToken)
 
         return await getProfile()
-          .then((user) => {
+          .then((response) => {
+            const user = response.data
             isLoggedInStore.set(true)
             userLoadingStore.set(false)
             setCssFromSettings(user.theme)

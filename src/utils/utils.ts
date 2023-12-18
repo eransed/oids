@@ -3,6 +3,14 @@ import { isLoggedInStore, localPlayerStore, userStore, userIncludes } from '../s
 import type { Prisma, User } from '@prisma/client'
 import { createSpaceObject } from '../lib/factory'
 
+export function getLocationURL() {
+  if (typeof window !== 'undefined') {
+    return window.location.hostname
+  } else {
+    return 'localhost'
+  }
+}
+
 export function createSessionId(): string {
   return `s-${rndi(1, 10000)}`
 }

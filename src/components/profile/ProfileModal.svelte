@@ -31,16 +31,26 @@
     loading = true
     e.preventDefault()
     const formData = new FormData(e.target as HTMLFormElement)
-    const response = await login(formData)
-    if (response.status === 200) {
-      await getProfile()
-    } else {
-      alert = {
-        severity: 'error',
-        text: 'Wrong email or password, try again!',
-      }
+
+    const email = formData.get('email')?.toString()
+    const password = formData.get('password')?.toString()
+
+    if (email && password) {
+      await login(email, password)
+        .then(async (response) => {
+          localStorage.setItem('accessToken', response.data.accessToken)
+          localStorage.setItem('refreshToken', response.data.refreshToken)
+          await getProfile()
+          loading = false
+        })
+        .catch(() => {
+          alert = {
+            severity: 'error',
+            text: 'Wrong email or password, try again!',
+          }
+          loading = false
+        })
     }
-    loading = false
   }
 
   //Color of border color around profile portrait

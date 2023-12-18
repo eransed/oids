@@ -1,31 +1,26 @@
-import axios, { type AxiosResponse } from 'axios'
+import axios, { AxiosError, type AxiosResponse } from 'axios'
 
 import { isLoggedInStore } from '../../../stores/stores'
 import type { Tokens } from '../../interface'
+import { getLocationURL } from '../../../utils/utils'
 
-const login = async (req: FormData) => {
-  let status
-  let data
-  let error
+const login = async (email: string, password: string): Promise<AxiosResponse> => {
+  const json = {
+    email: email,
+    password: password,
+  }
 
-  const json = Object.fromEntries(req.entries())
-  await axios
-    .post(`http://${location.hostname}:6060/api/v1/auth/login`, json)
+  return await axios
+    .post(`http://${getLocationURL()}:6060/api/v1/auth/login`, json)
     .then((response: AxiosResponse<Tokens>) => {
-      data = response.data
-      status = response.status
-      if (status === 200) {
-        localStorage.setItem('accessToken', response.data.accessToken)
-        localStorage.setItem('refreshToken', response.data.refreshToken)
+      if (response.status === 200) {
         isLoggedInStore.set(true)
       }
+      return response
     })
-    .catch((err) => {
-      error = err
-      console.error(err)
+    .catch((error: AxiosError) => {
+      throw new Error(error.message)
     })
-
-  return { status, data, error }
 }
 
 export default login

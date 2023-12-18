@@ -1,6 +1,7 @@
 import axios, { type AxiosResponse } from 'axios'
 import type { Prisma, User } from '@prisma/client'
 import type { userIncludes } from '../../../stores/stores'
+import { getLocationURL } from '../../../utils/utils'
 
 const userList = async (): Promise<AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>[]>> => {
   const token = localStorage.getItem('accessToken')
@@ -10,7 +11,7 @@ const userList = async (): Promise<AxiosResponse<User & Prisma.UserGetPayload<ty
   }
 
   const response: AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>[]> = await axios
-    .get(`http://${location.hostname}:6060/api/v1/users/list`, config)
+    .get(`http://${getLocationURL()}:6060/api/v1/users/list`, config)
     .then((response: AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>[]>) => {
       return response
     })

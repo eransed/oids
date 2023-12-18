@@ -33,7 +33,7 @@
   import type { AlertType } from '../../components/alert/AlertType'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import { getThemeNumber, themes } from '../../style/defaultColors'
-  import type { Theme } from '../../style/styleInterfaces'
+  import type { Theme } from '../../lib/interface'
 
   onMount(() => {
     if ($isLoggedInStore && !$userStore) {

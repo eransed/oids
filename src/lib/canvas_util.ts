@@ -16,13 +16,6 @@ export function getScreenCenterPosition(ctx: CanvasRenderingContext2D): Vec2 {
   return floor2({ x: ctx.canvas.width / 2, y: ctx.canvas.height / 2 })
 }
 
-export function getScreenCenterPositionFromClient() {
-  return {
-    x: document.documentElement.clientWidth,
-    y: document.documentElement.clientHeight,
-  }
-}
-
 export function getScreenFromCanvas(ctx: CanvasRenderingContext2D): Vec2 {
   return { x: ctx.canvas.width, y: ctx.canvas.height }
 }

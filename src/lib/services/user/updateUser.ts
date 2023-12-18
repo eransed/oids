@@ -3,6 +3,7 @@ import axios, { type AxiosResponse } from 'axios'
 // import type { User } from "../../../interfaces/user"
 import type { Prisma, User } from '@prisma/client'
 import type { userIncludes } from '../../../stores/stores'
+import { getLocationURL } from '../../../utils/utils'
 
 const updateUser = async (user: User & Prisma.UserGetPayload<typeof userIncludes>): Promise<AxiosResponse<User | Error>> => {
   const token = localStorage.getItem('accessToken')
@@ -12,7 +13,7 @@ const updateUser = async (user: User & Prisma.UserGetPayload<typeof userIncludes
   }
 
   const response: AxiosResponse<User | Error> = await axios
-    .post(`http://${location.hostname}:6060/api/v1/users/update`, user, config)
+    .post(`http://${getLocationURL()}:6060/api/v1/users/update`, user, config)
     .then((data: AxiosResponse<User>) => {
       return data
     })
