@@ -8,7 +8,7 @@ import { menuOpen } from '../components/menu/MenuStore'
 export const activeKeyStates: Writable<KeyFunction[]> = writable()
 export const gameState: Writable<GameState> = writable()
 
-const DefaultKeyMap: KeyFunctionMap = {
+export const DefaultKeyMap: KeyFunctionMap = {
   thrust: { activators: ['w', 'ArrowUp'], keyStatus: false },
   reverseThrust: { activators: ['s', 'ArrowDown'], keyStatus: false },
   boost: { activators: ['b'], keyStatus: false },

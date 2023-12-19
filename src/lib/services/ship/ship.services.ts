@@ -42,12 +42,12 @@ export const createShipService = async (newShip: Ship): Promise<AxiosResponse<Sh
 export const getShips = async (testToken?: string): Promise<AxiosResponse<Ship[]>> => {
   let token = ''
 
-  if (typeof localStorage !== 'undefined') {
+  if (!testToken) {
     const savedToken = localStorage.getItem('accessToken')
     if (savedToken) {
       token = savedToken
     }
-  } else if (testToken) {
+  } else {
     token = testToken
   }
 

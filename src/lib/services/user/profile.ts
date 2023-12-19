@@ -12,12 +12,12 @@ import { getLocationURL } from '../../../utils/utils'
 const getProfile = async (testToken?: string): Promise<AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>>> => {
   let token = ''
 
-  if (typeof localStorage !== 'undefined') {
+  if (!testToken) {
     const savedToken = localStorage.getItem('accessToken')
     if (savedToken) {
       token = savedToken
     }
-  } else if (testToken) {
+  } else {
     token = testToken
   }
 

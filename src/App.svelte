@@ -7,6 +7,7 @@
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
   import Routes from './Routes.svelte'
   import Star from './components/animations/star.svelte'
+
   // import Cursor from './components/mouse/cursor.svelte'
 </script>
 

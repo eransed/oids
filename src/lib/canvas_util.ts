@@ -20,6 +20,6 @@ export function getScreenFromCanvas(ctx: CanvasRenderingContext2D): Vec2 {
   return { x: ctx.canvas.width, y: ctx.canvas.height }
 }
 
-export function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-  return <CanvasRenderingContext2D>canvas.getContext('2d')
+export function getContext(canvas: HTMLCanvasElement | null): CanvasRenderingContext2D | null {
+  return canvas ? canvas.getContext('2d') : null
 }
