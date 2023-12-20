@@ -1,4 +1,4 @@
-import { describe, it, expect, expectTypeOf, vi, type MockInstance, beforeEach } from 'vitest'
+import { describe, it, expect, expectTypeOf } from 'vitest'
 
 import { Game } from '../game'
 import { createSpaceObject } from '../factory'
@@ -6,9 +6,6 @@ import { DefaultKeyMap } from '../input'
 import { OidsSocket, getWsUrl } from '../websocket/ws'
 import { GameType } from '../interface'
 import type { UIStyle } from '../interface'
-import * as defaultColors from '../../style/defaultColors'
-import { nextFrame, renderFrame } from '../gameModes/regular'
-import { renderLoop } from '../time'
 
 describe('game tests', () => {
   const canvas = document.createElement('canvas')
