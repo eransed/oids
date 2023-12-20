@@ -13,7 +13,7 @@ import type { UIStyle } from './interface'
 export class Game {
   websocket: OidsSocket
   testShapes: Shape[] = []
-  private running = false
+  running = false
   type: GameType = GameType.SinglePlayer
   ctx: CanvasRenderingContext2D
   canvas: HTMLCanvasElement

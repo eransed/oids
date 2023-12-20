@@ -21,7 +21,7 @@ describe('canvas_util tests', () => {
   })
 
   it('canvas exists', () => {
-    expect(canvas).not.toBe(null)
+    expect(canvas).toBeDefined()
   })
 
   it('getContext returns ctx', () => {
