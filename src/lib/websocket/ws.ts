@@ -156,7 +156,7 @@ export class OidsSocket {
     return this.prettyStatusString
   }
 
-  addSimpleListener(callbackMessage: (data: string) => void) {
+  addSimpleListener(callbackMessage: (data: string | number | object) => void) {
     this.sockMsgListener = {
       event: 'message',
       fn: (event: MessageEvent) => {

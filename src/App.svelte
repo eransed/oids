@@ -13,6 +13,10 @@
     console.log(`Connected to websocket`)
     $socketStore.sendString('Hey from Frontend!')
 
+    setInterval(() => {
+      $socketStore.sendString('Hey from Frontend!')
+    }, 1000)
+
     $socketStore.addSimpleListener((d) => {
       console.log(d)
     })
