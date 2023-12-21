@@ -4,10 +4,12 @@ import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
+  console.log(port)
+
   if (typeof window !== 'undefined') {
-    return new URL(`ws://${new URL(window.location.href).hostname}:${port}`)
+    return new URL(`ws://${new URL(window.location.href).hostname}:${9001}`)
   } else {
-    return new URL(`ws://${new URL('http://localhost').hostname}:${port}`)
+    return new URL(`ws://${new URL('http://localhost').hostname}:${9001}`)
   }
 }
 
@@ -121,6 +123,20 @@ export class OidsSocket {
     }
   }
 
+  sendString(msg: string): void {
+    if (this.ws && this.connectInitialized) {
+      this.ws.send(msg)
+    } else {
+      this.connectPromise()
+        .then((ws) => {
+          ws.send(msg)
+        })
+        .catch((err) => {
+          console.error('Failed to send', err)
+        })
+    }
+  }
+
   disconnect(): void {
     if (this.ws) {
       this.ws.close()
@@ -138,6 +154,19 @@ export class OidsSocket {
 
   getStatusString(): string {
     return this.prettyStatusString
+  }
+
+  addSimpleListener(callbackMessage: (data: string) => void) {
+    this.sockMsgListener = {
+      event: 'message',
+      fn: (event: MessageEvent) => {
+        const data: string = event.data
+        callbackMessage(data)
+        return data
+      },
+    }
+
+    this.ws?.addEventListener(this.sockMsgListener.event, this.sockMsgListener.fn)
   }
 
   addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<SpaceObject>) => void): Promise<void> {

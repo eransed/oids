@@ -27,7 +27,7 @@ const serverGameEnabled = true
 const WS_PORT = OIDS_WS_PORT
 
 const server: WebSocketServer = new WebSocketServer({
-  port: WS_PORT,
+  port: 5678,
 })
 
 export let globalConnectedClients: Client[] = []

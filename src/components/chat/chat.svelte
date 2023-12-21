@@ -47,6 +47,7 @@
     $localPlayerStore.lastMessage = msgStr
     $localPlayerStore.online = true
     $socketStore.send($localPlayerStore)
+    console.log($socketStore)
     chatMsg = ''
     scrollToBottom()
   }

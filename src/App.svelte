@@ -7,6 +7,17 @@
   import CircularSpinner from './components/loaders/circularSpinner.svelte'
   import Routes from './Routes.svelte'
   import Star from './components/animations/star.svelte'
+  import { socketStore } from './stores/stores'
+
+  $socketStore.connect().then(() => {
+    console.log(`Connected to websocket`)
+    $socketStore.sendString('Hey from Frontend!')
+
+    $socketStore.addSimpleListener((d) => {
+      console.log(d)
+    })
+    // hostSession()
+  })
 
   // import Cursor from './components/mouse/cursor.svelte'
 </script>
