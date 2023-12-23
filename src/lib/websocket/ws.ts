@@ -123,13 +123,13 @@ export class OidsSocket {
     }
   }
 
-  sendString(msg: string): void {
+  sendString(msg: SpaceObject): void {
     if (this.ws && this.connectInitialized) {
-      this.ws.send(msg)
+      this.ws.send(JSON.stringify(msg))
     } else {
       this.connectPromise()
         .then((ws) => {
-          ws.send(msg)
+          ws.send(JSON.stringify(msg))
         })
         .catch((err) => {
           console.error('Failed to send', err)
@@ -156,7 +156,7 @@ export class OidsSocket {
     return this.prettyStatusString
   }
 
-  addSimpleListener(callbackMessage: (data: string | number | object) => void) {
+  addSimpleListener(callbackMessage: (data: string) => void) {
     this.sockMsgListener = {
       event: 'message',
       fn: (event: MessageEvent) => {
