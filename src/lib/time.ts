@@ -106,7 +106,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     updateSpaceObjects(game.bodies, dt)
     updateShapes(game.testShapes, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
-      game.websocket.send(getSendableSpaceObject(game.localPlayer))
+      game.websocket.sendJson(getSendableSpaceObject(game.localPlayer))
     }
     moveNewShotsToLocalBuffer(game.localPlayer)
     fid = requestAnimationFrame(update)
@@ -121,7 +121,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
         game.localPlayer.isPlaying = false
         // Game updates goes only to session peers
         game.localPlayer.messageType = MessageType.GAME_UPDATE
-        game.websocket.send(game.localPlayer)
+        game.websocket.sendJson(game.localPlayer)
         // sendSpaceObjectToBroadcastServer(game.localPlayer)
       }
       cancelAnimationFrame(fid)

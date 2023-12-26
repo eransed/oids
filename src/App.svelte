@@ -9,19 +9,19 @@
   import Star from './components/animations/star.svelte'
   import { socketStore, localPlayerStore } from './stores/stores'
 
-  $socketStore.connect().then(() => {
-    console.log(`Connected to websocket`)
-    // $socketStore.sendString('Hey from Frontend!')
+  // $socketStore.connect().then(() => {
+  //   console.log(`Connected to websocket`)
+  //   // $socketStore.sendString('Hey from Frontend!')
 
-    setInterval(() => {
-      $socketStore.sendString($localPlayerStore)
-    }, 1000)
+  //   // setInterval(() => {
+  //   //   $socketStore.sendJson($localPlayerStore)
+  //   // }, 1000)
 
-    $socketStore.addSimpleListener((d) => {
-      console.log(JSON.parse(d))
-    })
-    // hostSession()
-  })
+  //   // $socketStore.addSimpleListener((d) => {
+  //   //   console.log(JSON.parse(d))
+  //   // })
+  //   // hostSession()
+  // })
 
   // import Cursor from './components/mouse/cursor.svelte'
 </script>

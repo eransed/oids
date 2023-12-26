@@ -123,7 +123,7 @@ export class OidsSocket {
     }
   }
 
-  sendString(msg: SpaceObject): void {
+  sendJson(msg: SpaceObject): void {
     if (this.ws && this.connectInitialized) {
       this.ws.send(JSON.stringify(msg))
     } else {

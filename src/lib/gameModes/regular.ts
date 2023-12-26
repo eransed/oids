@@ -42,17 +42,17 @@ import { getCurrentTheme } from '../../style/defaultColors'
 import { handleCollisions } from '../physics/handleCollisions'
 //Stores
 
-let numberOfServerObjects = 0
+// let numberOfServerObjects = 0
 let ops = 0
 let dataLen = 0
 let dataKeys = 0
 let symbolsPerSec = 0
 let byteSpeed = 0
 let bitSpeed = 0
-let rxDataBytes = 0
+// let rxDataBytes = 0
 const symbolByteSize = 2
 const byteSize = 8
-let bytesRecievedLastSecond = 0
+// let bytesRecievedLastSecond = 0
 
 const timebuf = newDataStats()
 const downloadBuf = newDataStats()
@@ -229,103 +229,123 @@ export function initRegularGame(game: Game): void {
   game.all.push(game.localPlayer)
   game.serverVersion = game.localPlayer.serverVersion
 
-  let startTime = 0
+  // let startTime = 0
 
   info('Setting game socket listener...')
 
-  game.websocket.addListener(
-    (su) => {
-      // console.log(su)
-      //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
-      if (su.dataObject.messageType === MessageType.SHIP_UPDATE) {
-        const oldLvl = game.localPlayer.ship.level
-        const newLvl = su.dataObject.ship.level
+  game.websocket.connect()
 
-        if (oldLvl < newLvl) {
-          console.log('new lvl!')
-          shouldCelebrateLevelUp.set(true)
+  game.websocket.addSimpleListener((d) => {
+    const so: SpaceObject = JSON.parse(d)
+
+    console.log(so)
+
+    for (let i = 0; i < game.remotePlayers.length; i++) {
+      if (so.name === game.remotePlayers[i].name) {
+        if (!so.online) {
+          console.log(`${so.name} went offline`)
+          game.remotePlayers.splice(i)
+          continue
         }
 
-        game.localPlayer.ship.experience = su.dataObject.ship.experience
-        game.localPlayer.ship.level = su.dataObject.ship.level
+        game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
 
-        userStore.update((user) => {
-          const chosenShip = user.ships.findIndex((ship) => ship.id === su.dataObject.ship.id)
-
-          user.ships[chosenShip].experience = su.dataObject.ship.experience
-          user.ships[chosenShip].level = su.dataObject.ship.level
-
-          return user
-        })
-      }
-
-      if (su.dataObject.messageType === MessageType.SERVICE) {
-        game.serverVersion = su.dataObject.serverVersion
-        info(`Service message: server version: ${su.dataObject.serverVersion}`)
         return
-      } else if (su.dataObject.messageType === MessageType.CHAT_MESSAGE) {
-        chatMsgHistoryStore.update((previousMessages) => [
-          ...previousMessages,
-          { message: su.dataObject.lastMessage, timeDate: new Date(), user: su.dataObject },
-        ])
-        return
-      } else if (su.dataObject) {
-        const so: SpaceObject = su.dataObject
-        dataLen = su.unparsedDataLength
-        bytesRecievedLastSecond += dataLen
-        dataKeys = su.numberOfSpaceObjectKeys
-        rxDataBytes += dataLen * symbolByteSize
-        // addDataPoint(packetSize, su.spaceObjectByteSize)
-        if (performance.now() - startTime >= 1000) {
-          addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
-          ops = numberOfServerObjects
-          startTime = performance.now()
-          if (numberOfServerObjects > 0) {
-            symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
-            byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
-            bitSpeed = round2dec(byteSpeed * byteSize, 1)
-            addDataPoint(downloadBuf, bitSpeed)
-          }
-          numberOfServerObjects = 0
-          bytesRecievedLastSecond = 0
-        } else {
-          numberOfServerObjects++
-        }
-        for (let i = 0; i < game.remotePlayers.length; i++) {
-          if (so.name === game.remotePlayers[i].name) {
-            if (!so.online) {
-              console.log(`${so.name} went offline`)
-              game.remotePlayers.splice(i)
-              continue
-            }
-
-            game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
-
-            return
-          }
-        }
-        if (so.name !== game.localPlayer.name) {
-          game.remotePlayers.push(so)
-          log(`New ship online: ${so.name}`)
-        }
-      }
-    },
-    (su) => {
-      // console.log (su.dataObject)
-      // info(`Number of server obj: ${game.bodies.length}`)
-      // console.log(su.dataObject)
-
-      // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
-      if (!exists(su.dataObject, game.bodies)) {
-        // info(`Adding ${su.dataObject.name}`)
-        game.bodies.push(su.dataObject)
-      } else {
-        game.bodies.forEach((b, i) => {
-          game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(su.dataObject, game.bodies[i])
-        })
       }
     }
-  )
+    if (so.name !== game.localPlayer.name) {
+      game.remotePlayers.push(so)
+      log(`New ship online: ${so.name}`)
+    }
+  })
+
+  // game.websocket.addListener(
+  //   (su) => {
+  //     // console.log(su)
+  //     //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
+  //     if (su.dataObject.messageType === MessageType.SHIP_UPDATE) {
+  //       const oldLvl = game.localPlayer.ship.level
+  //       const newLvl = su.dataObject.ship.level
+
+  //       if (oldLvl < newLvl) {
+  //         console.log('new lvl!')
+  //         shouldCelebrateLevelUp.set(true)
+  //       }
+
+  //       game.localPlayer.ship.experience = su.dataObject.ship.experience
+  //       game.localPlayer.ship.level = su.dataObject.ship.level
+
+  //       userStore.update((user) => {
+  //         const chosenShip = user.ships.findIndex((ship) => ship.id === su.dataObject.ship.id)
+
+  //         user.ships[chosenShip].experience = su.dataObject.ship.experience
+  //         user.ships[chosenShip].level = su.dataObject.ship.level
+
+  //         return user
+  //       })
+  //     }
+
+  //     if (su.dataObject.messageType === MessageType.SERVICE) {
+  //       game.serverVersion = su.dataObject.serverVersion
+  //       info(`Service message: server version: ${su.dataObject.serverVersion}`)
+  //       return
+  //     } else if (su.dataObject.messageType === MessageType.CHAT_MESSAGE) {
+  //       chatMsgHistoryStore.update((previousMessages) => [
+  //         ...previousMessages,
+  //         { message: su.dataObject.lastMessage, timeDate: new Date(), user: su.dataObject },
+  //       ])
+  //       return
+  //     } else if (su.dataObject) {
+  //       const so: SpaceObject = su.dataObject
+  //       dataLen = su.unparsedDataLength
+  //       bytesRecievedLastSecond += dataLen
+  //       dataKeys = su.numberOfSpaceObjectKeys
+  //       rxDataBytes += dataLen * symbolByteSize
+  //       if (performance.now() - startTime >= 1000) {
+  //         addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
+  //         ops = numberOfServerObjects
+  //         startTime = performance.now()
+  //         if (numberOfServerObjects > 0) {
+  //           symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
+  //           byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
+  //           bitSpeed = round2dec(byteSpeed * byteSize, 1)
+  //           addDataPoint(downloadBuf, bitSpeed)
+  //         }
+  //         numberOfServerObjects = 0
+  //         bytesRecievedLastSecond = 0
+  //       } else {
+  //         numberOfServerObjects++
+  //       }
+  //       for (let i = 0; i < game.remotePlayers.length; i++) {
+  //         if (so.name === game.remotePlayers[i].name) {
+  //           if (!so.online) {
+  //             console.log(`${so.name} went offline`)
+  //             game.remotePlayers.splice(i)
+  //             continue
+  //           }
+
+  //           game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
+
+  //           return
+  //         }
+  //       }
+  //       if (so.name !== game.localPlayer.name) {
+  //         game.remotePlayers.push(so)
+  //         log(`New ship online: ${so.name}`)
+  //       }
+  //     }
+  //   },
+  //   (su) => {
+  //     // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
+  //     if (!exists(su.dataObject, game.bodies)) {
+  //       game.bodies.push(su.dataObject)
+  //     } else {
+  //       game.bodies.forEach((b, i) => {
+  //         game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(su.dataObject, game.bodies[i])
+  //       })
+  //     }
+  //   }
+  // )
 }
 
 function exists(entity: SpaceObject, entities: SpaceObject[]): boolean {
@@ -563,7 +583,7 @@ export function renderFrame(game: Game, dt: number): void {
 
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
   addDataPoint(ppsbuf, ops)
-  addDataPoint(rxByteDataBuf, rxDataBytes)
+  // addDataPoint(rxByteDataBuf, rxDataBytes)
   addDataPoint(speedbuf, 100 * magnitude2(game.localPlayer.velocity))
   addDataPoint(hpbuf, game.localPlayer.health)
   addDataPoint(packetSizeBuf, dataLen)
@@ -595,7 +615,7 @@ export function renderFrame(game: Game, dt: number): void {
     renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
     renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, ctx)
     renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
-    renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
+    // renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
 
     // renderRoundIndicator()
 
