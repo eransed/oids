@@ -144,6 +144,7 @@
     removeKeyControllers()
     removeTouchControls()
     game.stopGame()
+    $socketStore.resetListeners()
     window.removeEventListener('resize', handleResize)
   })
 </script>

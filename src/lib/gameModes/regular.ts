@@ -238,7 +238,7 @@ export function initRegularGame(game: Game): void {
   game.websocket.addSimpleListener((d) => {
     const so: SpaceObject = JSON.parse(d)
 
-    console.log(so)
+    console.log('Incoming data: ', JSON.parse(d).name)
 
     for (let i = 0; i < game.remotePlayers.length; i++) {
       if (so.name === game.remotePlayers[i].name) {
@@ -253,6 +253,7 @@ export function initRegularGame(game: Game): void {
         return
       }
     }
+
     if (so.name !== game.localPlayer.name) {
       game.remotePlayers.push(so)
       log(`New ship online: ${so.name}`)
