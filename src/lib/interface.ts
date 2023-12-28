@@ -246,6 +246,9 @@ export interface Ageable {
 export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable, Ageable {}
 
 export function getRenderableObjectCount(so: SpaceObject): number {
+  if (!so) {
+    return 0
+  }
   return 1 + so.shotsInFlight.length + so.collidingWith.length + so.shotsInFlightNew.length
 }
 

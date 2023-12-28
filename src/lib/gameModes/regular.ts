@@ -239,11 +239,14 @@ export function initRegularGame(game: Game): void {
     const so: SpaceObject = JSON.parse(d)
 
     console.log('Incoming data: ', JSON.parse(d).name)
+    if (!so.online) {
+      console.log(so)
+    }
 
     for (let i = 0; i < game.remotePlayers.length; i++) {
       if (so.name === game.remotePlayers[i].name) {
         if (!so.online) {
-          console.log(`${so.name} went offline`)
+          console.log(`${so} went offline`)
           game.remotePlayers.splice(i)
           continue
         }
