@@ -2,9 +2,11 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 import login from '../services/auth/login'
 import getProfile from '../services/user/profile'
 import { getShips } from '../services/ship/ship.services'
+import { getActiveSessions } from '../services/game/activeSessions'
 import type { User, Prisma, Ship } from '@prisma/client'
 import type { userIncludes } from '../../stores/stores'
 import { env } from './env'
+import type { Session } from '../interface'
 
 describe('Services tests', () => {
   let accessToken: string
@@ -27,5 +29,11 @@ describe('Services tests', () => {
     const result = await getShips(accessToken)
     expect(result.status).toBe(200)
     expectTypeOf(result.data).toMatchTypeOf<Ship[]>()
+  })
+
+  it('getActiveSessions service', async () => {
+    const result = await getActiveSessions()
+    expect(result.status).toBe(200)
+    expectTypeOf(result.data).toMatchTypeOf<Session[]>()
   })
 })

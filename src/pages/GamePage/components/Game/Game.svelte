@@ -22,7 +22,7 @@
   import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
   import { guestUserNameStore, isLoggedInStore, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
-  import { playersInSession } from '../../../../lib/services/game/playersInSession'
+  import { getPlayersInSession } from '../../../../lib/services/game/playersInSession'
   import { info } from 'mathil'
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
   import Ships from '../../../ProfilePage/Ships.svelte'
@@ -63,7 +63,7 @@
   })
 
   async function players(): Promise<Session> {
-    const players: Session = await playersInSession(sessionId).then((d) => d.data)
+    const players: Session = await getPlayersInSession(sessionId).then((d) => d.data)
 
     return players
   }

@@ -13,7 +13,7 @@ export default defineConfig({
       enabled: true,
       name: 'chrome',
       slowHijackESM: true,
-      // headless: true,
+      headless: true,
     },
     environmentMatchGlobs: [
       ['src/lib/tests/dom/**', 'jsdom'], // Use browser environment for tests in the dom folder

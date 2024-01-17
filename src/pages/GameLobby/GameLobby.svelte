@@ -23,7 +23,7 @@
   //Services
   import type { ChatMessage, ChosenShip, Session } from '../../lib/interface'
   import { createSessionId } from '../../utils/utils'
-  import { activeSessions } from '../../lib/services/game/activeSessions'
+  import { getActiveSessions } from '../../lib/services/game/activeSessions'
   import SessionList from './components/SessionList/SessionList.svelte'
 
   import { onDestroy, onMount } from 'svelte'
@@ -275,7 +275,7 @@
   }
 
   async function updateSessions() {
-    await activeSessions()
+    await getActiveSessions()
       .then((s) => {
         if (s.status === 200) {
           sessions = s.data
