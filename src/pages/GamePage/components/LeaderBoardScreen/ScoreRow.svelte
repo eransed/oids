@@ -1,6 +1,14 @@
 <script lang="ts">
   import type { SpaceObject } from '../../../../lib/interface'
-  import { add2, newVec2, rndfVec2, round2, round2dec, smul2, sub2 } from 'mathil'
+  import {
+    add2,
+    newVec2,
+    rndfVec2,
+    round2,
+    round2dec,
+    smul2,
+    sub2,
+  } from 'mathil'
   import { localPlayerStore } from '../../../../stores/stores'
   import { worldStartPosition } from '../../../../lib/constants'
   import { resetStars } from '../../../../lib/gameModes/regular'
@@ -27,8 +35,8 @@
   <th colspan="1">Kills</th>
   <th colspan="1">Hp</th>
   <!-- <th colspan="1">Bounces</th> -->
-  <th colspan="1">X</th>
-  <th colspan="1">Y</th>
+  <th colspan="1">vX</th>
+  <th colspan="1">vY</th>
   <th colspan="1">Battery</th>
   <th colspan="1">Joined</th>
   <th colspan="1">Session</th>
@@ -39,10 +47,14 @@
       class="clickable"
       title="Teleport to world start position"
       on:click={() => {
-        $localPlayerStore.cameraPosition = add2(worldStartPosition, rndfVec2(-teleOffset, teleOffset))
+        $localPlayerStore.cameraPosition = add2(
+          worldStartPosition,
+          rndfVec2(-teleOffset, teleOffset)
+        )
         resetStars(getGame())
       }}
-      style="color: {theObj.color}; font-weight: bold; font-style: italic">{theObj.name}</td
+      style="color: {theObj.color}; font-weight: bold; font-style: italic"
+      >{theObj.name}</td
     >
   {:else}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -54,7 +66,10 @@
           $localPlayerStore.cameraPosition = player.cameraPosition
           resetStars(getGame())
         } else if (serverObj) {
-          $localPlayerStore.cameraPosition = sub2(add2(serverObj.cameraPosition, rndfVec2(-teleOffset, teleOffset)), $localPlayerStore.viewFramePosition)
+          $localPlayerStore.cameraPosition = sub2(
+            add2(serverObj.cameraPosition, rndfVec2(-teleOffset, teleOffset)),
+            $localPlayerStore.viewFramePosition
+          )
         }
         resetStars(getGame())
       }}
@@ -64,8 +79,11 @@
   <td>{theObj.killCount}</td>
   <td>{theObj.health}</td>
   <!-- <td>{theObj.bounceCount}</td> -->
-  <td>{pos.x}</td>
-  <td>{pos.y}</td>
+  <!-- <td>{pos.x}</td>
+  <td>{pos.y}</td> -->
+
+  <td>{theObj.velocity.x.toFixed(2)}</td>
+  <td>{theObj.velocity.y.toFixed(2)}</td>
   {#if player}
     <td>{round2dec(player.batteryLevel, 0)}</td>
     <td>{player.joinedGame}</td>

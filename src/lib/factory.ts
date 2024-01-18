@@ -1,9 +1,18 @@
 import type { PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceShape } from './interface'
-import { mag2, magnitude2, newVec2, rndf, rndfVec2, rndi, type Vec2 } from 'mathil'
+import {
+  mag2,
+  magnitude2,
+  newVec2,
+  rndf,
+  rndfVec2,
+  rndi,
+  type Vec2,
+} from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 import { randomBlue } from './color'
 import type { Ship } from '@prisma/client'
+import { Towns } from './worlds/worldInterface'
 
 export function newPhotonLaser(): PhotonLaser {
   const shot: PhotonLaser = {
@@ -38,7 +47,10 @@ export function currentTimeDate(): string {
   return new Date().toLocaleString('sv-SE')
 }
 
-export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GAME_UPDATE): SpaceObject {
+export function createSpaceObject(
+  name = 'SpaceObject',
+  msgType = MessageType.GAME_UPDATE
+): SpaceObject {
   const initVel: Vec2 = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2 = {
     x: rndi(0, 100),
@@ -134,9 +146,12 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
       experience: 0,
     },
     moonType: 0,
+    hometown: Towns.Coruscant,
   }
 
-  spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)
+  spaceObject.hitRadius = Math.sqrt(
+    spaceObject.size.x ** 2 + spaceObject.size.y ** 2
+  )
 
   return spaceObject
 }

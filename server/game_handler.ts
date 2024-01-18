@@ -1,4 +1,4 @@
-import { info, usNow, EveryInterval, rndfVec2, good, newVec2, rndi, smul2, dist2, radToDeg, angle2, sub2, rndf } from 'mathil'
+import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf } from 'mathil'
 import { MessageType, SpaceObject } from '../src/lib/interface'
 
 import { Client, globalConnectedClients } from './main'
@@ -8,6 +8,7 @@ import { createSpaceObject } from '../src/lib/factory'
 import { fire, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
 import { getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
+import { GameMap, createWorldOne } from '../src/lib/worlds/worldInterface'
 
 export class GameHandler {
   game_started = false
@@ -25,6 +26,8 @@ export class GameHandler {
   // private every = new EveryInterval(this.tickRate)
   // private asteroidTicker = new EveryInterval(this.tickRate)
   private nextAsteroidToSendIndex = 0
+  private gameMap: GameMap = createWorldOne()
+  private sentOnce = false // only used during dev...
 
   broadcaster: (clients: Client[], data: SpaceObject, sessionId: string | null) => void
 
@@ -85,10 +88,32 @@ export class GameHandler {
         this.nextAsteroidToSendIndex = 0
       }
 
+      // Send town updates if there are any:
+      this.updateTownsIfApplicable()
+
       this.lastTime = performance.now()
     }, this.minTickTimeMs)
   }
   // server main loop end
+
+  updateTownsIfApplicable() {
+    if (this.sentOnce === true) return
+    this.sentOnce = true
+
+    info(`Broadcasting town...`)
+
+    for (let i = 0; i < this.gameMap.towns.length; i++) {
+      for (let j = 0; j < this.gameMap.towns[i].buildings.length; j++) {
+        const building = this.gameMap.towns[i].buildings[j]
+        info(`Broadcasting building: ${building.name}`)
+        info(`Broadcasting building speedx: ${building.velocity.x}`)
+        info(`Broadcasting building speedy: ${building.velocity.y}`)
+        this.broadcaster(globalConnectedClients, building, this.tied_session_id)
+      }
+    }
+
+    // broadcast world:
+  }
 
   prepareSoToSend(so: SpaceObject): SpaceObject {
     so.shotsFiredThisFrame = false
@@ -101,7 +126,7 @@ export class GameHandler {
   }
 
   spawnAsteroids(): SpaceObject[] {
-    const num = 30
+    const num = 2
     info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
       const npc = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)

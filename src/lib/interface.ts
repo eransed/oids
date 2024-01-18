@@ -2,6 +2,7 @@ import type { Writable } from 'svelte/store'
 import { newVec2, type Vec2 } from 'mathil'
 import type { Steerable } from './traits/Steerable'
 import type { ShipVariant } from '../style/ships'
+import type { Towns } from './worlds/worldInterface'
 
 export enum GameType {
   SinglePlayer,
@@ -206,6 +207,10 @@ export interface PlayingShip {
   ship: ChosenShip
 }
 
+export interface Belonging {
+  hometown: Towns
+}
+
 export interface SpaceObject
   extends PlayingShip,
     Shapable,
@@ -230,7 +235,8 @@ export interface SpaceObject
     Hoster,
     Typable,
     Bounded,
-    MoonType {}
+    MoonType,
+    Belonging {}
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number
@@ -243,10 +249,21 @@ export interface Ageable {
   age: number
 }
 
-export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable, Ageable {}
+export interface PhotonLaser
+  extends Damager,
+    Physical,
+    Damageable,
+    Rotatable,
+    Colorable,
+    Ageable {}
 
 export function getRenderableObjectCount(so: SpaceObject): number {
-  return 1 + so.shotsInFlight.length + so.collidingWith.length + so.shotsInFlightNew.length
+  return (
+    1 +
+    so.shotsInFlight.length +
+    so.collidingWith.length +
+    so.shotsInFlightNew.length
+  )
 }
 
 // export function applySteer(o: Steerable, deltaTime: number): void {
