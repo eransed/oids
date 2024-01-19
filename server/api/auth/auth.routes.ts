@@ -6,6 +6,8 @@ import { addRefreshTokenToWhitelist, deleteRefreshToken, findRefreshTokenById, r
 import { findUserById } from '../users/users.services'
 import hashToken from '../utils/hashToken'
 import { JWT_REFRESH_SECRET } from '../../pub_config'
+import passport from 'passport'
+import jwt from 'jsonwebtoken'
 
 export const auth = express.Router()
 
@@ -147,4 +149,14 @@ auth.post('/revokeRefreshTokens', async (req, res, next) => {
   } catch (err) {
     next(err)
   }
+})
+
+auth.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+
+auth.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+  const token = jwt.sign({ user: req.user }, process.env.JWT_SECRET || '', { expiresIn: '1h' })
+  res.cookie('jwtToken', token)
+  res.redirect('http://localhost:5173')
+
+  //implement jwt token handling
 })
