@@ -5,7 +5,6 @@ import { generateTokens, getPayLoadFromJwT } from '../utils/jwt'
 import { addRefreshTokenToWhitelist, deleteRefreshToken, findRefreshTokenById, revokeTokens } from './auth.services'
 import { findUserById } from '../users/users.services'
 import hashToken from '../utils/hashToken'
-import { JWT_REFRESH_SECRET } from '../../pub_config'
 import passport from 'passport'
 import jwt from 'jsonwebtoken'
 
@@ -14,6 +13,8 @@ export const auth = express.Router()
 import { createUser, findUserByEmail } from '../users/users.services'
 
 import { createNewUser } from '../utils/factory'
+import { jwtAuth } from '../middleware'
+import { User } from '@prisma/client'
 //Register endpoint
 auth.post('/register', async (req, res, next) => {
   try {
@@ -55,6 +56,7 @@ auth.post('/login', async (req, res, next) => {
       throw new Error('You must provide an email and a password.')
     }
 
+    //Find user by email
     const existingUser = await findUserByEmail(email)
 
     if (!existingUser) {
@@ -62,6 +64,7 @@ auth.post('/login', async (req, res, next) => {
       throw new Error('Invalid login credentials.')
     }
 
+    //Check incoming password against existing users password
     const validPassword = await bcrypt.compare(password, existingUser.password)
     if (!validPassword) {
       res.status(403)
@@ -87,6 +90,8 @@ auth.post('/login', async (req, res, next) => {
 
 //Refreshtoken
 auth.post('/refreshToken', async (req, res, next) => {
+  if (!process.env.JWT_REFRESH_SECRET) throw new Error('Missing Secret')
+
   try {
     const { refreshToken } = req.body
     if (!refreshToken) {
@@ -94,7 +99,7 @@ auth.post('/refreshToken', async (req, res, next) => {
       throw new Error('Missing refresh token.')
     }
 
-    const payLoadFromJWt = await getPayLoadFromJwT(refreshToken, JWT_REFRESH_SECRET).catch((e) => {
+    const payLoadFromJWt = await getPayLoadFromJwT(refreshToken, process.env.JWT_REFRESH_SECRET).catch((e) => {
       if (e) {
         res.status(401).send('Refreshtoken not valid')
       }
@@ -151,12 +156,23 @@ auth.post('/revokeRefreshTokens', async (req, res, next) => {
   }
 })
 
+//The configuration of this is coming from passport.config.ts in function useGoogleStrategy()
 auth.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
 
-auth.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-  const token = jwt.sign({ user: req.user }, process.env.JWT_SECRET || '', { expiresIn: '1h' })
-  res.cookie('jwtToken', token)
-  res.redirect('http://localhost:5173')
+//Please fix failureRedirect to
+auth.get('/google/callback', passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }), async (req, res) => {
+  if (!req.user) {
+    return
+  }
 
-  //implement jwt token handling
+  const user = req.user as User
+
+  const jti = uuidv4()
+  const { accessToken, refreshToken } = generateTokens(user, jti)
+  await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id })
+
+  res.cookie('accesToken', accessToken)
+  res.cookie('refreshToken', refreshToken)
+
+  res.redirect('http://localhost:5173')
 })

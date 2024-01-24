@@ -8,13 +8,24 @@ import { env } from 'process'
 
 const GoogleStrategy = passportGoogle.Strategy
 
+interface googleUser {
+  email: string
+  id: string
+}
+
 export function useGoogleStrategy() {
+  const clientID = env.GOOGLE_CLIENT_ID
+  const clientSecret = env.GOOGLE_CLIENT_SECRET
+
+  if (!clientID || !clientSecret) {
+    throw new Error('Google Client ID not found')
+  }
+
   passport.use(
     new GoogleStrategy(
       {
-        // clientID: '412167345851-4u0jgknloie16nmqj73lvc66ocuk58ld.apps.googleusercontent.com',
-        clientID: env.GOOGLE_CLIENT_ID || '',
-        clientSecret: env.GOOGLE_CLIENT_SECRET || '',
+        clientID: clientID,
+        clientSecret: clientSecret,
         callbackURL: 'http://localhost:6060/api/v1/auth/google/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
@@ -22,13 +33,22 @@ export function useGoogleStrategy() {
           if (!profile._json.email) throw 'User does not have email'
           if (!profile._json.name) throw 'User does not have a name'
 
-          let user = await findUserByEmail(profile._json.email)
+          const foundUser = await findUserByEmail(profile._json.email)
+
+          if (!foundUser) throw 'No user found with that email'
+
+          const user: googleUser = {
+            email: foundUser.email,
+            id: foundUser.id,
+          }
 
           if (user) {
+            console.log('User found: ', user)
             done(null, user)
           } else {
-            user = await createUser(createNewUser(profile._json.email, profile._json.name, ''))
-            done(null, user)
+            const newUser = await createUser(createNewUser(profile._json.email, profile._json.name, ''))
+            console.log('Created new user: ', newUser)
+            done(null, newUser)
           }
         } catch (err) {
           console.error(err)
