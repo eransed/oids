@@ -6,15 +6,14 @@ import { addRefreshTokenToWhitelist, deleteRefreshToken, findRefreshTokenById, r
 import { findUserById } from '../users/users.services'
 import hashToken from '../utils/hashToken'
 import passport from 'passport'
-import jwt from 'jsonwebtoken'
 
 export const auth = express.Router()
 
 import { createUser, findUserByEmail } from '../users/users.services'
 
 import { createNewUser } from '../utils/factory'
-import { jwtAuth } from '../middleware'
 import { User } from '@prisma/client'
+import { Tokens } from '../../../src/lib/interface'
 //Register endpoint
 auth.post('/register', async (req, res, next) => {
   try {
@@ -171,8 +170,8 @@ auth.get('/google/callback', passport.authenticate('google', { failureRedirect: 
   const { accessToken, refreshToken } = generateTokens(user, jti)
   await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id })
 
-  res.cookie('accesToken', accessToken)
-  res.cookie('refreshToken', refreshToken)
+  // res.cookie('accesToken', accessToken)
+  // res.cookie('refreshToken', refreshToken)
 
-  res.redirect('http://localhost:5173')
+  res.redirect(`http://localhost:5173/auth-callback?accessToken=${accessToken}&refreshToken=${refreshToken}`)
 })

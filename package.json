@@ -59,6 +59,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "prisma": "^4.10.1",
+    "query-string": "^8.1.0",
     "svelte-routing": "^1.6.0",
     "ts-node": "^10.9.1",
     "uuid": "^9.0.0",

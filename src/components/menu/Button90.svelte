@@ -12,6 +12,7 @@
   export let loading: boolean = false
   export let disabled: boolean = loading
   export let icon: string = ''
+  export let socialIcon: string = ''
   export let buttonType: 'submit' | 'button' | 'reset' = 'button'
   export let buttonConfig: Button90Config = {
     buttonText: '',
@@ -41,12 +42,18 @@
   $: minWidth = minWidth
 </script>
 
-<div class="wrapper" on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
+<div
+  class="wrapper"
+  on:mousemove={handleMousemove}
+  on:mouseleave={handleMouseLeave}
+>
   <button
     type={buttonType}
     title={buttonConfig.buttonText}
     {disabled}
-    style="width: {width}; min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border-bottom: {buttonConfig.selected ? border : 'none'}"
+    style="width: {width}; min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border-bottom: {buttonConfig.selected
+      ? border
+      : 'none'}"
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
@@ -55,6 +62,10 @@
     {:else if icon}
       <div class="icon">
         <img draggable="false" src={icon} alt={icon} />
+      </div>
+    {:else if socialIcon}
+      <div class="socialIcon">
+        <img draggable="false" src={socialIcon} alt={socialIcon} />
       </div>
     {:else}
       {buttonConfig.buttonText}
@@ -78,7 +89,15 @@
   }
 
   .icon img {
-    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(30%);
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
+      brightness(83%) contrast(30%);
+    width: 35px;
+    height: 35px;
+  }
+
+  .socialIcon img {
+    /* filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
+      brightness(83%) contrast(30%); */
     width: 35px;
     height: 35px;
   }
@@ -103,7 +122,8 @@
     width: -moz-fit-content;
     width: fit-content;
     height: 4em;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+      'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-weight: bold;
     font-size: 15px;
     letter-spacing: calc(var(--top) * 1.05 - var(--top));
@@ -118,7 +138,8 @@
   }
 
   button:hover img {
-    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
+      brightness(83%) contrast(125%);
     transform: scale(1.1);
     transition: all 0.3s ease-out;
   }
@@ -151,11 +172,13 @@
   }
 
   .selected img {
-    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
+      brightness(83%) contrast(125%);
   }
 
   button:disabled {
     cursor: not-allowed;
-    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(1%);
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
+      brightness(83%) contrast(1%);
   }
 </style>

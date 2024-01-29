@@ -3,7 +3,7 @@
   import Button90 from '../menu/Button90.svelte'
 
   //navButtons
-  import { logOutButton, loginButton } from './profileButtons'
+  import { logOutButton, loginButton, loginGoogle } from './profileButtons'
 
   //Stores
   import { isLoggedInStore, userStore } from '../../stores/stores'
@@ -19,6 +19,7 @@
   import Alert from '../alert/Alert.svelte'
   import type { AlertType } from '../alert/AlertType'
   import { navigate } from 'svelte-routing'
+  import { Icons } from '../../style/icons'
 
   let loading: boolean = false
 
@@ -60,11 +61,35 @@
 {#if !$isLoggedInStore}
   <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <form on:submit|preventDefault={handleSubmit} on:formdata class="form">
-      <input placeholder="Email" name="email" type="email" autocomplete="email" />
+      <input
+        placeholder="Email"
+        name="email"
+        type="email"
+        autocomplete="email"
+      />
 
-      <input placeholder="Password" name="password" type="password" autocomplete="current-password" />
+      <input
+        placeholder="Password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+      />
       <div class="button">
-        <Button90 buttonType="submit" {loading} buttonConfig={loginButton} mouseTracking={false} />
+        <Button90
+          buttonType="submit"
+          {loading}
+          buttonConfig={loginButton}
+          mouseTracking={false}
+        />
+      </div>
+      <div class="button">
+        <Button90
+          buttonType="button"
+          buttonConfig={loginGoogle}
+          mouseTracking={false}
+          socialIcon={Icons.Google}
+          addInfo="Login with Google"
+        />
       </div>
     </form>
     <Alert severity={alert.severity} text={alert.text} />
@@ -76,7 +101,13 @@
       <div class="column" style={'flex: 0.5;'}>
         <div class="modalProfile" style="--borderColor: {borderColor};">
           <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <img on:click={() => navigate('/profile')} draggable="false" class="avatar" src={$userStore.image} alt="Rocket Ship" />
+          <img
+            on:click={() => navigate('/profile')}
+            draggable="false"
+            class="avatar"
+            src={$userStore.image}
+            alt="Rocket Ship"
+          />
         </div>
       </div>
       <div class="column">
@@ -91,7 +122,10 @@
           <p style="margin-top: 0.5em;">Email: {$userStore?.email}</p>
 
           <p>
-            Created: {$userStore && new Intl.DateTimeFormat('en-SE').format(new Date($userStore.createdAt))}
+            Created: {$userStore &&
+              new Intl.DateTimeFormat('en-SE').format(
+                new Date($userStore.createdAt)
+              )}
           </p>
         </div>
       </div>

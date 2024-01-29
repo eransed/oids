@@ -355,7 +355,7 @@ export interface Route {
   displayText: string
   path: string
   inHeader: boolean
-  icon: string
+  icon?: string
 }
 
 export interface ChatMessage {
