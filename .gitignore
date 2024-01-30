@@ -25,5 +25,5 @@ dist-ssr
 .vscode
 
 .env
-.sqlite
+*.sqlite
 *env.ts
