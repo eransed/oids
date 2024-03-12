@@ -1,12 +1,23 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import type { ChosenShip, Session, SpaceObject } from '../../../../lib/interface'
+  import type {
+    ChosenShip,
+    Session,
+    Ship,
+    SpaceObject,
+  } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
   import { Game } from '../../../../lib/game'
-  import { getKeyMap, initKeyControllers, initTouchControls, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
+  import {
+    getKeyMap,
+    initKeyControllers,
+    initTouchControls,
+    removeKeyControllers,
+    removeTouchControls,
+  } from '../../../../lib/input'
 
   //Components
   import GameMenu from '../Menu/GameMenu.svelte'
@@ -19,14 +30,26 @@
   import ScoreScreen from '../LeaderBoardScreen/ScoreScreen.svelte'
 
   // Game variants
-  import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
-  import { guestUserNameStore, isLoggedInStore, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
+  import {
+    initRegularGame,
+    nextFrame,
+    renderFrame,
+    resetStars,
+  } from '../../../../lib/gameModes/regular'
+  import {
+    guestUserNameStore,
+    isLoggedInStore,
+    localPlayerStore,
+    socketStore,
+    userStore,
+    shouldCelebrateLevelUp,
+  } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { getPlayersInSession } from '../../../../lib/services/game/playersInSession'
   import { info } from 'mathil'
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
   import Ships from '../../../ProfilePage/Ships.svelte'
-  import type { Ship } from '@prisma/client'
+  // import type { Ship } from '@prisma/client'
   import AddShip from '../../../ProfilePage/AddShip.svelte'
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
@@ -63,7 +86,9 @@
   })
 
   async function players(): Promise<Session> {
-    const players: Session = await getPlayersInSession(sessionId).then((d) => d.data)
+    const players: Session = await getPlayersInSession(sessionId).then(
+      (d) => d.data
+    )
 
     return players
   }
@@ -109,7 +134,13 @@
       }
     }
 
-    game = new Game(canvas, $localPlayerStore, $socketStore, getKeyMap(), showDeadMenu)
+    game = new Game(
+      canvas,
+      $localPlayerStore,
+      $socketStore,
+      getKeyMap(),
+      showDeadMenu
+    )
     gameRef(game)
     game.localPlayer.sessionId = sessionId
     players().then((d) => {
@@ -150,7 +181,12 @@
 
 <div class="shipWrapper" style="z-index: 1;">
   <div class="shipAvatar">
-    <img style="width: 80%;" draggable="false" src={getShipBundleCache($localPlayerStore.ship.shipVariant).svgUrl} alt={$localPlayerStore.ship.name} />
+    <img
+      style="width: 80%;"
+      draggable="false"
+      src={getShipBundleCache($localPlayerStore.ship.shipVariant).svgUrl}
+      alt={$localPlayerStore.ship.name}
+    />
     <div class="shipLevel">{$localPlayerStore.ship.level}</div>
   </div>
   <div class="shipInfo">
@@ -158,10 +194,18 @@
       {$localPlayerStore.ship.name}
     </div>
     <div class="shipHealth">
-      <ProgressBar progressColor="#50aa50" progress={$localPlayerStore.health} max={$localPlayerStore.startHealth} />
+      <ProgressBar
+        progressColor="#50aa50"
+        progress={$localPlayerStore.health}
+        max={$localPlayerStore.startHealth}
+      />
     </div>
     <div class="shipEnergy">
-      <ProgressBar progressColor="#4040ff" progress={$localPlayerStore.batteryLevel} max={$localPlayerStore.batteryCapacity} />
+      <ProgressBar
+        progressColor="#4040ff"
+        progress={$localPlayerStore.batteryLevel}
+        max={$localPlayerStore.batteryCapacity}
+      />
     </div>
   </div>
 </div>
@@ -192,13 +236,19 @@
       <Chat chatTitle={false} joinedSessionId={sessionId} inGameChat />
     </div>
     <div class="xp">
-      <ProgressBar progress={$localPlayerStore.ship.experience} max={getShipXpRequirement($localPlayerStore.ship.level)} />
+      <ProgressBar
+        progress={$localPlayerStore.ship.experience}
+        max={getShipXpRequirement($localPlayerStore.ship.level)}
+      />
     </div>
   {/if}
 </div>
 
 {#if $showShipDetails}
-  <ModalSimple closeBtn={() => ($showShipDetails = !$showShipDetails)} saveButton={false}>
+  <ModalSimple
+    closeBtn={() => ($showShipDetails = !$showShipDetails)}
+    saveButton={false}
+  >
     <ShipDetails ship={$localPlayerStore.ship} />
   </ModalSimple>
 {/if}
@@ -208,14 +258,22 @@
 {/if}
 
 {#if $shouldCelebrateLevelUp}
-  <Celebration celebrationText={`You've reached level ${$localPlayerStore.ship.level}`} celebrationTimeoutCallback={() => ($shouldCelebrateLevelUp = false)} />
+  <Celebration
+    celebrationText={`You've reached level ${$localPlayerStore.ship.level}`}
+    celebrationTimeoutCallback={() => ($shouldCelebrateLevelUp = false)}
+  />
 {/if}
 
 {#if $isLoggedInStore && $userStore.ships.length > 1 && !chosenShip}
   {#if $userStore.ships.length === 0}
     <AddShip openModal={!chosenShip} />
   {:else}
-    <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
+    <ModalSimple
+      title="Playable ships"
+      saveButton={false}
+      cancelButton={!!chosenShip}
+      closeBtn={() => (shipModalOpen = false)}
+    >
       <Ships
         changeShipOnClick={false}
         clickedShipCallback={(ship) => {
@@ -233,7 +291,10 @@
           $localPlayerStore.name = $userStore.name
           game.startGame(initRegularGame, renderFrame, nextFrame)
           resetStars(game)
-          localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
+          localStorage.setItem(
+            'chosenShip',
+            JSON.stringify({ id: ship.id, userId: ship.userId })
+          )
         }}
       />
     </ModalSimple>
@@ -260,7 +321,12 @@
     height: 50px;
     border-radius: 50%;
     background-color: var(--main-card-color);
-    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
+    border: 2px solid
+      color-mix(
+        in srgb,
+        var(--main-accent-color) 20%,
+        var(--main-text-color) 10%
+      );
 
     z-index: 1;
     /* margin-right: -0.4em; */
@@ -274,7 +340,12 @@
     height: 50px;
     border-radius: 0.5em;
     background-color: var(--main-card-color);
-    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
+    border: 2px solid
+      color-mix(
+        in srgb,
+        var(--main-accent-color) 20%,
+        var(--main-text-color) 10%
+      );
 
     display: flex;
     flex-direction: column;
@@ -285,7 +356,12 @@
   .shipLevel {
     position: absolute;
     background-color: var(--main-card-color);
-    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
+    border: 2px solid
+      color-mix(
+        in srgb,
+        var(--main-accent-color) 20%,
+        var(--main-text-color) 10%
+      );
     border-radius: 50%;
     text-align: center;
     justify-content: center;

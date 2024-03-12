@@ -1,15 +1,20 @@
 import axios, { type AxiosResponse } from 'axios'
 
 //Svelte store
-import { isLoggedInStore, localPlayerStore, userStore, userIncludes } from '../../../stores/stores'
+import {
+  isLoggedInStore,
+  localPlayerStore,
+  userStore,
+} from '../../../stores/stores'
 
 //Interface
 // import type { User } from '../../../interfaces/user'
-import type { Prisma, User } from '@prisma/client'
+// import type { Prisma, User } from '@prisma/client'
 import { setCssFromSettings } from '../../../style/defaultColors'
 import { getLocationURL } from '../../../utils/utils'
+import { User } from '../../interface'
 
-const getProfile = async (testToken?: string): Promise<AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>>> => {
+const getProfile = async (testToken?: string): Promise<AxiosResponse<User>> => {
   let token = ''
 
   if (!testToken) {
@@ -25,9 +30,9 @@ const getProfile = async (testToken?: string): Promise<AxiosResponse<User & Pris
     headers: { Authorization: `Bearer ${token}` },
   }
 
-  const response: AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>> = await axios
+  const response: AxiosResponse<User> = await axios
     .get(`http://${getLocationURL()}:6060/api/v1/users/profile`, config)
-    .then((response: AxiosResponse<User & Prisma.UserGetPayload<typeof userIncludes>>) => {
+    .then((response: AxiosResponse<User>) => {
       userStore.set(response.data)
 
       const id = response.data.id

@@ -46,7 +46,13 @@ export function renderShip(
 
   // Draw ship image
   if (so.ship) {
-    ctx.drawImage(getShipBundleCache(so.ship.shipVariant).img, -75, -75, 150, 150)
+    ctx.drawImage(
+      getShipBundleCache(so.ship.shipVariant).img,
+      -75,
+      -75,
+      150,
+      150
+    )
   } else {
     ctx.drawImage(getShipBundleCache(0).img, -75, -75, 150, 150)
   }
@@ -65,14 +71,26 @@ export function renderShip(
   if (showVectors) {
     // Render vectors
     renderVector(smul2(so.velocity, 1.6), so.viewFramePosition, ctx, 50, '#fa3')
-    renderVector(smul2(direction2(so.angleDegree), 10), so.viewFramePosition, ctx, 50, '#fff')
+    renderVector(
+      smul2(direction2(so.angleDegree), 10),
+      so.viewFramePosition,
+      ctx,
+      50,
+      '#fff'
+    )
   }
 
   // Draw shots
   renderShot(so, ctx, style)
 }
 
-export function renderShip_(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle, renderPos: Vec2 | null = null): void {
+export function renderShip_(
+  so: SpaceObject,
+  ctx: CanvasRenderingContext2D,
+  renderAsLocalPlayer = false,
+  style: UIStyle,
+  renderPos: Vec2 | null = null
+): void {
   const scale = setScaledFont(ctx)
   const shipSize: Vec2 = { x: 60, y: 100 }
   so.size = shipSize

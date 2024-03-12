@@ -1,14 +1,14 @@
 <script lang="ts">
-  import type { Ship } from '@prisma/client'
+  // import type { Ship } from '@prisma/client'
   import { formatDate } from '../../utils/utils'
-  import { deleteShip, getShips, updateShip } from '../../lib/services/ship/ship.services'
+  import { deleteShip, updateShip } from '../../lib/services/ship/ship.services'
   import getProfile from '../../lib/services/user/profile'
-  import { localPlayerStore, socketStore, userStore } from '../../stores/stores'
+  import { userStore } from '../../stores/stores'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
-  import { ShipVariant, ShipBundles, getShipBundleCache } from '../../style/ships'
-  import { fade } from 'svelte/transition'
+  import { ShipBundles, getShipBundleCache } from '../../style/ships'
   import { Icons } from '../../style/icons'
   import Button90 from '../../components/menu/Button90.svelte'
+  import type { Ship } from '../../lib/interface'
 
   export let loading: boolean = false
   export let clickedShipCallback: (ship: Ship) => void = () => {}
@@ -46,12 +46,14 @@
   async function handleSaveAvatar() {
     if (changeShip) {
       console.log(changeShip)
-      await updateShip(changeShip.name, changeShip.variant, changeShip.id).then((d) => {
-        if (d.status === 200) {
-          getProfile()
-          changeShip = undefined
+      await updateShip(changeShip.name, changeShip.variant, changeShip.id).then(
+        (d) => {
+          if (d.status === 200) {
+            getProfile()
+            changeShip = undefined
+          }
         }
-      })
+      )
     }
   }
 
@@ -66,7 +68,12 @@
 {#each $userStore.ships as ship, i}
   <div class="ship" style="animation-delay: {150 * i}ms;">
     <!-- svelte-ignore a11y-missing-attribute -->
-    <button class="avatar" style="animation-delay: {150 * i}ms;" title="Edit Ship" on:click={() => clickedShip(ship)}>
+    <button
+      class="avatar"
+      style="animation-delay: {150 * i}ms;"
+      title="Edit Ship"
+      on:click={() => clickedShip(ship)}
+    >
       <img class="chosenAvatar" src={getShipBundleCache(ship.variant).svgUrl} />
     </button>
 
@@ -107,20 +114,34 @@
         }}
       />
     </div>
-    <div style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%">
+    <div
+      style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%"
+    >
       <h3 style="align-self: center">Ship name:</h3>
-      <input disabled={loading} bind:value={changeShip.name} placeholder={changeShip.name} />
+      <input
+        disabled={loading}
+        bind:value={changeShip.name}
+        placeholder={changeShip.name}
+      />
     </div>
     {#each Object.values(ShipBundles) as Ship, i}
       <button
         class="imgCard"
-        style=" background: {Ship.type === changeShip.variant ? 'var(--main-accent2-color)' : ''};
+        style=" background: {Ship.type === changeShip.variant
+          ? 'var(--main-accent2-color)'
+          : ''};
                   animation-delay: {150 * i}ms;"
         on:click={() => {
           if (changeShip) {
             changeShip.variant = Ship.type
           }
-        }}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
+        }}
+        ><img
+          draggable="false"
+          src={Ship.svgUrl}
+          alt={Ship.svgUrl}
+          style=" margin: 1em"
+        /></button
       >
     {/each}
   </ModalSimple>

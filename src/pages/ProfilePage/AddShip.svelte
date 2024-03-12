@@ -8,9 +8,10 @@
   import { createShipService } from '../../lib/services/ship/ship.services'
   import getProfile from '../../lib/services/user/profile'
   import { ShipBundles } from '../../style/ships'
-  import type { Ship } from '@prisma/client'
+  // import type { Ship } from '@prisma/client'
   import { userStore } from '../../stores/stores'
   import { createShip } from '../../lib/factory'
+  import type { Ship } from '../../lib/interface'
 
   //Props
   export let loading: boolean = false
@@ -58,7 +59,10 @@
     saveBtn={async () => handleNewShip()}
     doneCallback={() => (newShipDone = true)}
   >
-    <div style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%" in:fade={{ duration: 250, delay: 50 }}>
+    <div
+      style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%"
+      in:fade={{ duration: 250, delay: 50 }}
+    >
       <h3 style="align-self: center">Name your new ship 🚀:</h3>
       <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
     </div>
@@ -69,9 +73,17 @@
     {#each Object.values(ShipBundles) as Ship, i}
       <button
         class="imgCard"
-        style="background: {Ship.type === newShip.variant ? 'var(--main-accent2-color)' : ''};
+        style="background: {Ship.type === newShip.variant
+          ? 'var(--main-accent2-color)'
+          : ''};
                   animation-delay: {150 * i}ms;"
-        on:click={() => (newShip.variant = Ship.type)}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
+        on:click={() => (newShip.variant = Ship.type)}
+        ><img
+          draggable="false"
+          src={Ship.svgUrl}
+          alt={Ship.svgUrl}
+          style=" margin: 1em"
+        /></button
       >
     {/each}
   </ModalSimple>

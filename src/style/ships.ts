@@ -1,21 +1,29 @@
-// import Retro from '../assets/ships/retro.svg'
-// import Ship from '../assets/ships/ship.svg'
-// import SpaceCraft from '../assets/ships/spaceCraft.svg'
-// import Viking from '../assets/ships/viking.svg'
-
 import { warn } from 'mathil'
+import Retro from '../assets/ships/retro.svg'
+import Ship from '../assets/ships/ship.svg'
+import SpaceCraft from '../assets/ships/spaceCraft.svg'
+import Viking from '../assets/ships/viking.svg'
 
-const Retro = '/src/assets/ships/retro.svg'
-const Ship = '/src/assets/ships/ship.svg'
-const SpaceCraft = '/src/assets/ships/spaceCraft.svg'
-const Viking = '/src/assets/ships/viking.svg'
+//Image cache
+export const RetroImg = new Image()
+RetroImg.src = Retro
+
+export const ShipImg = new Image()
+ShipImg.src = Ship
+
+export const SpaceCraftImg = new Image()
+SpaceCraftImg.src = SpaceCraft
+
+export const VikingImg = new Image()
+VikingImg.src = Viking
 
 export enum ShipVariant {
-  Retro = 0,
+  Retro,
   Ship,
   SpaceCraft,
   Viking,
 }
+
 export interface ShipBundle {
   name: string
   img: HTMLImageElement
@@ -23,23 +31,23 @@ export interface ShipBundle {
   svgUrl: string
 }
 
-export function createShipBundle(variant: ShipVariant = ShipVariant.Retro, svgUrl: string = Retro): ShipBundle {
-  const shipImage = new Image()
-  shipImage.src = svgUrl
-
+export function createShipBundle(
+  variant: ShipVariant = ShipVariant.Retro,
+  shipImage: HTMLImageElement
+): ShipBundle {
   return {
     name: '',
     img: shipImage,
     type: variant,
-    svgUrl: svgUrl,
+    svgUrl: shipImage.src,
   }
 }
 
 export const ShipBundles = {
-  Retro: createShipBundle(ShipVariant.Retro, Retro),
-  Ship: createShipBundle(ShipVariant.Ship, Ship),
-  SpaceCraft: createShipBundle(ShipVariant.SpaceCraft, SpaceCraft),
-  Viking: createShipBundle(ShipVariant.Viking, Viking),
+  Retro: createShipBundle(ShipVariant.Retro, RetroImg),
+  Ship: createShipBundle(ShipVariant.Ship, ShipImg),
+  SpaceCraft: createShipBundle(ShipVariant.SpaceCraft, SpaceCraftImg),
+  Viking: createShipBundle(ShipVariant.Viking, VikingImg),
 }
 
 export function getShipBundleCache(type: ShipVariant): ShipBundle {

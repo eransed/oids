@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { userStore, userIncludes } from '../../stores/stores'
+  import { userStore } from '../../stores/stores'
 
   //Components
   import Page from '../../components/page/page.svelte'
@@ -19,7 +19,7 @@
   import { onMount } from 'svelte'
 
   //Interfaces
-  import type { Prisma, User } from '@prisma/client'
+  // import type { Prisma, User } from '@prisma/client'
   import type { AlertType } from '../../components/alert/AlertType'
   import { fade } from 'svelte/transition'
   import { deleteUser } from '../../lib/services/user/delete'
@@ -29,14 +29,14 @@
 
   //Themes
   import { getThemeNumber, themes } from '../../style/defaultColors'
-  import type { Theme } from '../../lib/interface'
+  import type { Theme, User } from '../../lib/interface'
 
-  async function getUsers(): Promise<User & Prisma.UserGetPayload<typeof userIncludes>[]> {
+  async function getUsers(): Promise<User> {
     loading = true
     return await userList()
       .then((v) => {
         loading = false
-        return (users = v.data)
+        users.push(v.data)
       })
       .catch((err) => {
         return err
@@ -47,7 +47,7 @@
     getUsers()
   })
 
-  let editingUser: (User & Prisma.UserGetPayload<typeof userIncludes>) | undefined = undefined
+  let editingUser: User | undefined = undefined
   let edit: boolean = false
 
   let name = ''
@@ -56,7 +56,7 @@
   let roleOptions = ['admin', 'player', 'guest']
   let alert: AlertType | undefined = undefined
   let addNewUser = false
-  let users: (User & Prisma.UserGetPayload<typeof userIncludes>)[] = []
+  let users: User[] = []
   let loading = false
 
   let chosenTheme: Theme
@@ -153,7 +153,9 @@
   async function delUser() {
     const result = confirm(`Want to delete user: ${editingUser?.name}?`)
     if (result) {
-      const prompt = window.prompt(`Write ${editingUser?.name} in the box to delete user.`)
+      const prompt = window.prompt(
+        `Write ${editingUser?.name} in the box to delete user.`
+      )
       if (prompt === name) {
         loading = true
 
@@ -220,10 +222,26 @@
           />
         </div>
         {#if addNewUser}
-          <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
-            <input disabled={loading} bind:value={newUser.name} placeholder="Name" />
-            <input disabled={loading} bind:value={newUser.email} placeholder="Email" />
-            <input disabled={loading} bind:value={newUser.password} placeholder="Password" />
+          <div
+            in:fade={{ duration: 250, delay: 50 }}
+            out:fade={{ duration: 250 }}
+            class="addUser"
+          >
+            <input
+              disabled={loading}
+              bind:value={newUser.name}
+              placeholder="Name"
+            />
+            <input
+              disabled={loading}
+              bind:value={newUser.email}
+              placeholder="Email"
+            />
+            <input
+              disabled={loading}
+              bind:value={newUser.password}
+              placeholder="Password"
+            />
             <Button90
               disabled={loading}
               icon={Icons.Cancel}
@@ -263,8 +281,20 @@
               {#each Object.values(users) as u}
                 {#if edit && u.id === editingUser?.id}
                   <tr>
-                    <td><input disabled={loading} on:keypress={onKeyPress} bind:value={name} /></td>
-                    <td><input disabled={loading} on:keypress={onKeyPress} bind:value={email} /></td>
+                    <td
+                      ><input
+                        disabled={loading}
+                        on:keypress={onKeyPress}
+                        bind:value={name}
+                      /></td
+                    >
+                    <td
+                      ><input
+                        disabled={loading}
+                        on:keypress={onKeyPress}
+                        bind:value={email}
+                      /></td
+                    >
                     <td>
                       <select disabled={loading} bind:value={role}>
                         {#each roleOptions as value}

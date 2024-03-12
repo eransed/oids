@@ -418,3 +418,39 @@ export interface Button90Config {
   selected: boolean
   routeParam?: string
 }
+
+//Extracted from prisma types
+export interface Ship {
+  id: string
+  level: number
+  name: string
+  updatedAt: Date
+  createdAt: Date
+  experience: number
+  userId: string
+  variant: number
+  played: number
+}
+
+export interface User {
+  id: string
+  email: string
+  password: string
+  name: string
+  createdAt: Date
+  updatedAt: Date
+  role: string
+  theme: number
+  image: string
+  played: number
+  ships: Ship[]
+  gameHistory: Game[]
+}
+
+export interface Game {
+  id: number
+  sessionId: string
+  win: boolean
+  played: Date
+  userId: string | null
+}

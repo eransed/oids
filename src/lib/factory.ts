@@ -1,17 +1,9 @@
 import type { PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceShape } from './interface'
-import {
-  mag2,
-  magnitude2,
-  newVec2,
-  rndf,
-  rndfVec2,
-  rndi,
-  type Vec2,
-} from 'mathil'
+import { newVec2, rndf, rndi, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
-import { randomBlue } from './color'
-import type { Ship } from '@prisma/client'
+// import type { Ship } from '@prisma/client'
+import type { Ship } from './interface'
 import { Towns } from './worlds/worldInterface'
 
 export function newPhotonLaser(): PhotonLaser {

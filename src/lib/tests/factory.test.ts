@@ -1,7 +1,7 @@
 import { describe, it, expectTypeOf } from 'vitest'
 import { createShip, createSpaceObject } from '../factory'
-import type { SpaceObject } from '../interface'
-import type { Ship } from '@prisma/client'
+import type { Ship, SpaceObject } from '../interface'
+// import type { Ship } from '@prisma/client'
 
 describe('Factory tests', () => {
   it('createSpaceObject returns a spaceObject', () => {
