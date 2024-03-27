@@ -3,7 +3,7 @@ import axios, { type AxiosResponse } from 'axios'
 // import type { User } from "../../../interfaces/user"
 // import type { Prisma, User } from '@prisma/client'
 import { getLocationURL } from '../../../utils/utils'
-import { User } from '../../interface'
+import type { User } from '../../interface'
 
 const updateUser = async (user: User): Promise<AxiosResponse<User | Error>> => {
   const token = localStorage.getItem('accessToken')

@@ -1,7 +1,7 @@
 import axios, { type AxiosResponse } from 'axios'
 
 // import type { User } from '@prisma/client'
-import { User } from '../../interface'
+import type { User } from '../../interface'
 
 import { getLocationURL } from '../../../utils/utils'
 

@@ -44,7 +44,10 @@
       })
     }
 
-    chosenTheme = themes[$userStore.theme]
+    if($isLoggedInStore) {
+
+      chosenTheme = themes[$userStore.theme]
+    }
   })
 
   $: if ($userStore) {

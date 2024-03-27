@@ -12,7 +12,7 @@ import {
 // import type { Prisma, User } from '@prisma/client'
 import { setCssFromSettings } from '../../../style/defaultColors'
 import { getLocationURL } from '../../../utils/utils'
-import { User } from '../../interface'
+import type { User } from '../../interface'
 
 const getProfile = async (testToken?: string): Promise<AxiosResponse<User>> => {
   let token = ''

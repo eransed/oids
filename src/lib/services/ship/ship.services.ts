@@ -2,7 +2,7 @@ import axios, { type AxiosResponse } from 'axios'
 // import type { Ship } from '@prisma/client'
 import type { ShipVariant } from '../../../style/ships'
 import { getLocationURL } from '../../../utils/utils'
-import { Ship } from '../../interface'
+import type { Ship } from '../../interface'
 
 export interface newShip {
   name: string

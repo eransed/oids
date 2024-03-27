@@ -1,7 +1,7 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 // import type { User } from '@prisma/client'
 import { getLocationURL } from '../../../utils/utils'
-import { User } from '../../interface'
+import type { User } from '../../interface'
 
 export async function deleteUser(email: string): Promise<AxiosResponse<User>> {
   const token = localStorage.getItem('accessToken')

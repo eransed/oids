@@ -2,7 +2,7 @@ import { rndi } from 'mathil'
 import { isLoggedInStore, localPlayerStore, userStore } from '../stores/stores'
 // import type { Prisma, User } from '@prisma/client'
 import { createSpaceObject } from '../lib/factory'
-import { User } from '../lib/interface'
+import type { User } from '../lib/interface'
 
 export function getLocationURL() {
   if (typeof window !== 'undefined') {
