@@ -69,7 +69,7 @@ export function createSpaceObject(
     canonOverHeat: false,
     colliding: false,
     collidingWith: [],
-    color: '#90d',
+    color: '#db8',
     damage: 5,
     deadFrameCount: 0,
     didHit: false,

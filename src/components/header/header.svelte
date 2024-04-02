@@ -41,7 +41,7 @@
 <div class="header">
   <nav in:slide={{ duration: 500 }}>
     <div class="hamburger" style="--menuOpen: {menuOpen}">
-      <button on:click={() => (toggleMenu = !toggleMenu)}>{toggleMenu ? '{ o }' : '{ o }'} </button>
+      <button on:click={() => (toggleMenu = !toggleMenu)}>{'{ o }'} </button>
     </div>
 
     <div in:fade={{ duration: 500, delay: 0 }} out:fade={{ duration: 500, delay: 500 }} class="menuItem" style="--display: {display};">
@@ -93,9 +93,9 @@
     <div class="theme">
       <button class="themeToggle" on:click={() => themeToggler()}>
         {#if $settingsStore.theme === DeepMidnight}
-          <i in:fade={{ duration: 500, delay: 500 }} out:fly={{ duration: 250, delay: 0 }} class="fa-solid fa-moon fa-2xl" />
+          <i in:fade={{ duration: 750, delay: 50 }} class="fa-solid fa-moon fa-2xl" />
         {:else}
-          <i in:fade={{ duration: 500, delay: 500 }} out:fly={{ duration: 250, delay: 0 }} class="fa-solid fa-sun fa-2xl" />
+          <i in:fade={{ duration: 750, delay: 50 }} class="fa-solid fa-sun fa-2xl" />
         {/if}
       </button>
     </div>

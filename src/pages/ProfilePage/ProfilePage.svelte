@@ -160,7 +160,7 @@
         {/each}
       </div>
       <div class="content" style="padding: 1em; position: relative">
-        {#if $profileComponent === 'shipStation'}
+        {#if $profileComponent === ProfileButtons.shipStation.config.routeParam}
           <h3>Your ships</h3>
 
           <div class="newShip">
@@ -185,19 +185,7 @@
           <Ships />
         {/if}
 
-        {#if $profileComponent === 'matchHistory'}
-          <h3>Match History</h3>
-          {#if $userStore.gameHistory}
-            {#each Object.values($userStore.gameHistory) as game}
-              <br />
-              <p>Game Name: {game.sessionId}</p>
-              <p><i>{formatDate(game.played)}</i></p>
-              <p>{game.win ? 'Won' : 'Lost'}</p>
-              <br />
-            {/each}
-          {/if}
-        {/if}
-        {#if $profileComponent === 'settings'}
+        {#if $profileComponent === ProfileButtons.settings.config.routeParam}
           <div class="userHeader">
             <button
               title="Change avatar"

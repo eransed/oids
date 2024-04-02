@@ -1,33 +1,16 @@
 <script lang="ts">
-  import { activeKeyStates, keyDisplayName as keyDisplayText } from "../../../../lib/input"
+  import {
+    activeKeyStates,
+    keyDisplayName as keyDisplayText,
+  } from '../../../../lib/input'
+  import type { KeyFunction } from '../../../../lib/interface'
+  import { submitHotkeyChange } from './hotKeysChange'
   export let activeColor: string
+
+
 </script>
 
-<style>
-  .scoreTable {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-wrap: wrap;
-    position: relative;
-    inset: 0;
-    margin: auto;
-  }
-
-  table {
-    max-height: 70%;
-    display: block;
-  }
-
-  table,
-  td {
-    padding: 6px;
-    font-weight: bold;
-    font-size: 14px;
-  }
-</style>
-
-<div class="scoreTable">
+<div class="hotKeyTable">
   <table>
     <thead>
       <tr>
@@ -38,17 +21,56 @@
     </thead>
 
     {#each $activeKeyStates as keyFunction}
-      <tbody>
+      <tbody class="keyRow">
         <tr>
           {#if keyFunction.keyStatus}
-            <td style="color: {activeColor}">{"+ " + keyFunction.displayText}</td>
+            <td style="color: {activeColor}"
+              >{'+ ' + keyFunction.displayText}</td
+            >
           {:else}
-            <td style="color: 'grey'">{"- " + keyFunction.displayText}</td>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <td style="color: 'grey'">{'- ' + keyFunction.displayText}</td>
           {/if}
-          <td>{keyFunction.activators.map((v) => " " + keyDisplayText(v))}</td>
-          <td>{keyFunction.toggle ? "<toggle>" : "<momentary>"}</td>
+          <td style="display: flex; gap: 0.5em">
+            <button class="addKey buttonStyle">+</button>
+            {#each keyFunction.activators as activator}
+              <button on:click={() => submitHotkeyChange({keyFunction: keyFunction, activator: activator, del: true})} style={keyFunction.keyStatus ? `background-color: ${activeColor}` : ''} class="buttonStyle">{keyDisplayText(activator)}</button>
+            {/each}
+          </td>
+          <td>{keyFunction.toggle ? '<toggle>' : '<momentary>'}</td>
         </tr>
       </tbody>
     {/each}
   </table>
 </div>
+
+<style>
+  .buttonStyle {
+    padding: 0.15em;
+  }
+
+  .keyRow:hover .addKey {
+    visibility: visible;
+  }
+
+  .addKey {
+    visibility: hidden;
+  }
+
+  .hotKeyTable {
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    inset: 0;
+    margin: auto;
+  }
+
+  table,
+  td {
+    padding: 3px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+</style>
