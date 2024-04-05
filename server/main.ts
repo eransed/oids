@@ -20,7 +20,7 @@ dotenv.config()
 apiServer()
 
 // start host server
-// start_host_server()
+start_host_server()
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const pack = require("../package.json")
