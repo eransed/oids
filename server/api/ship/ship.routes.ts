@@ -2,7 +2,6 @@ import express from 'express'
 import { Request, Response, NextFunction } from 'express'
 import { isAuthenticated } from '../middleware'
 import { createShip, getShips, deleteShip, updateShip } from './ship.services'
-import { JWT_ACCESS_SECRET } from '../../pub_config'
 import { findUserById } from '../users/users.services'
 import { createNewShip } from '../utils/factory'
 import { Ship, User } from '@prisma/client'
@@ -11,6 +10,8 @@ import { getPayLoadFromJwT } from '../utils/jwt'
 export const ship = express.Router()
 
 ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const { authorization } = req.headers
     const newShip: Ship = req.body
@@ -21,7 +22,7 @@ ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: 
     }
 
     const token = authorization.split(' ')[1]
-    const payLoadFromJWt = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payLoadFromJWt = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 
@@ -45,6 +46,8 @@ ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: 
 })
 
 ship.get('/list', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const { authorization } = req.headers
 
@@ -54,7 +57,7 @@ ship.get('/list', isAuthenticated, async (req: Request, res: Response, next: Nex
     }
 
     const token = authorization.split(' ')[1]
-    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payloadFromJwT = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 
@@ -76,6 +79,8 @@ ship.get('/list', isAuthenticated, async (req: Request, res: Response, next: Nex
 })
 
 ship.post('/delete', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const { authorization } = req.headers
     const { id } = req.body
@@ -86,7 +91,7 @@ ship.post('/delete', isAuthenticated, async (req: Request, res: Response, next: 
     }
 
     const token = authorization.split(' ')[1]
-    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payloadFromJwT = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 
@@ -108,6 +113,8 @@ ship.post('/delete', isAuthenticated, async (req: Request, res: Response, next: 
 })
 
 ship.post('/update', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const { authorization } = req.headers
     const { name, variant, id } = req.body
@@ -118,7 +125,7 @@ ship.post('/update', isAuthenticated, async (req: Request, res: Response, next: 
     }
 
     const token = authorization.split(' ')[1]
-    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payloadFromJwT = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 

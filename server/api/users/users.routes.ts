@@ -2,20 +2,21 @@ import { Request, Response, NextFunction } from 'express'
 import express from 'express'
 import { isAuthenticated } from '../middleware'
 import { deleteUser, findUserByEmail, findUserById, getUsers, saveGame, updateUser } from './users.services'
-import { JWT_ACCESS_SECRET } from '../../pub_config'
 import { Game, Prisma, User } from '@prisma/client'
 import { getPayLoadFromJwT } from '../utils/jwt'
 
 export const users = express.Router()
 
 users.get('/profile', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const { authorization } = req.headers
 
     if (authorization) {
       const token = authorization.split(' ')[1]
 
-      const payLoadFromJWt = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+      const payLoadFromJWt = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
         res.status(401).send('Token not valid')
       })
 
@@ -44,6 +45,8 @@ const userIncludes = Prisma.validator<Prisma.UserArgs>()({
 })
 
 users.post('/update', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const user: User & Prisma.UserGetPayload<typeof userIncludes> = req.body
 
@@ -55,7 +58,7 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
     }
 
     const token = authorization.split(' ')[1]
-    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payloadFromJwT = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 
@@ -93,6 +96,8 @@ users.post('/update', isAuthenticated, async (req: Request, res: Response, next:
 })
 
 users.post('/savegame', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const { authorization } = req.headers
 
@@ -102,7 +107,7 @@ users.post('/savegame', isAuthenticated, async (req: Request, res: Response, nex
     }
 
     const token = authorization.split(' ')[1]
-    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payloadFromJwT = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 
@@ -125,6 +130,8 @@ users.post('/savegame', isAuthenticated, async (req: Request, res: Response, nex
 })
 
 users.get('/list', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const { authorization } = req.headers
 
@@ -134,7 +141,7 @@ users.get('/list', isAuthenticated, async (req: Request, res: Response, next: Ne
     }
 
     const token = authorization.split(' ')[1]
-    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payloadFromJwT = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 
@@ -157,6 +164,7 @@ users.get('/list', isAuthenticated, async (req: Request, res: Response, next: Ne
 })
 
 users.post('/deleteUser', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
   try {
     const { authorization } = req.headers
 
@@ -174,7 +182,7 @@ users.post('/deleteUser', isAuthenticated, async (req: Request, res: Response, n
 
     const token = authorization.split(' ')[1]
 
-    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payloadFromJwT = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 
@@ -202,6 +210,8 @@ users.post('/deleteUser', isAuthenticated, async (req: Request, res: Response, n
 })
 
 users.post('/deleteMe', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+
   try {
     const { authorization } = req.headers
 
@@ -212,7 +222,7 @@ users.post('/deleteMe', isAuthenticated, async (req: Request, res: Response, nex
 
     const token = authorization.split(' ')[1]
 
-    const payloadFromJwT = await getPayLoadFromJwT(token, JWT_ACCESS_SECRET).catch(() => {
+    const payloadFromJwT = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
       res.status(401).send('Error on getting payload from JwT')
     })
 
@@ -239,3 +249,6 @@ users.post('/deleteMe', isAuthenticated, async (req: Request, res: Response, nex
     next(err)
   }
 })
+function next(): void {
+  throw new Error('Function not implemented.')
+}

@@ -16,6 +16,7 @@
   import TestPage from './pages/TestPage/TestPage.svelte'
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
   import SettingsPage from './pages/SettingsPage/SettingsPage.svelte'
+  import Callback from './pages/Auth/Callback.svelte'
 </script>
 
 <Router>
@@ -25,7 +26,12 @@
   <Route path={routes.home.path}>
     <LandingPage />
   </Route>
-  <Route path={routes.game.path} let:params><GamePage gameIdParam={params.id} /></Route>
+  <Route path={routes.auth.path}>
+    <Callback />
+  </Route>
+  <Route path={routes.game.path} let:params
+    ><GamePage gameIdParam={params.id} /></Route
+  >
   <Route path={routes.end.path}><PostGamePage /></Route>
   <Route path={routes.profile.path}>
     <ProfilePage />

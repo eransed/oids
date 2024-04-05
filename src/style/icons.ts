@@ -14,7 +14,8 @@ import EditUser from '../assets/icons/editUser.svg'
 import Cancel from '../assets/icons/cancel.svg'
 import Delete from '../assets/icons/Delete.svg'
 import Play from '../assets/icons/play.svg'
-import Add from "../assets/icons/add.svg"
+import Add from '../assets/icons/add.svg'
+import Google from '../assets/icons/google.svg'
 
 export const Icons = {
   Admin,
@@ -33,7 +34,8 @@ export const Icons = {
   Cancel,
   Delete,
   Play,
-  Add
+  Add,
+  Google,
 }
 
 export const IconColor = '#D2B48C'

@@ -5,10 +5,27 @@ import type { Express } from 'express'
 import morgan from 'morgan'
 import routes from './api/routes/routes'
 import cors from 'cors'
-import { log } from 'mathil'
+import { good, log } from 'mathil'
+import session from 'express-session'
+import passport from 'passport'
+import { useGoogleStrategy } from './api/auth/passport.config'
 
 export const apiServer = () => {
   const router: Express = express()
+
+  router.use(
+    session({
+      secret: process.env.SESSION_SECRET || '',
+      resave: false,
+      saveUninitialized: true,
+    })
+  )
+
+  /** Routes */
+  useGoogleStrategy()
+
+  router.use(passport.initialize())
+  router.use(passport.session())
 
   router.use(cors())
 
@@ -33,9 +50,7 @@ export const apiServer = () => {
     next()
   })
 
-  /** Routes */
   router.use('/api/v1', routes)
-
   /** Error handling */
   router.use((req, res, next) => {
     const error = new Error('not found')
@@ -47,5 +62,5 @@ export const apiServer = () => {
   /** Server */
   const httpServer = http.createServer(router)
   const PORT: string | number = process.env.PORT ?? 6060
-  httpServer.listen(PORT, () => log(`API server is running on port ${PORT}`))
+  httpServer.listen(PORT, () => good(`API server is running on port ${PORT}`))
 }
