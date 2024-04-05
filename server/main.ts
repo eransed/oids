@@ -12,6 +12,9 @@ import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
 
 import { findShip, updateShipExperienceAndLevel } from './api/ship/ship.services'
+import dotenv from 'dotenv'
+dotenv.config()
+
 
 // start ApiServer
 apiServer()
