@@ -1,9 +1,15 @@
 import axios, { type AxiosResponse } from 'axios'
 
-import type { User } from '@prisma/client'
+// import type { User } from '@prisma/client'
+import type { User } from '../../interface'
+
 import { getLocationURL } from '../../../utils/utils'
 
-const register = async (email: string, name: string, password: string): Promise<AxiosResponse<User | Error>> => {
+const register = async (
+  email: string,
+  name: string,
+  password: string
+): Promise<AxiosResponse<User | Error>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {
@@ -11,7 +17,11 @@ const register = async (email: string, name: string, password: string): Promise<
   }
 
   const response: AxiosResponse<User | Error> = await axios
-    .post(`http://${getLocationURL()}:6060/api/v1/auth/register`, { email, name, password }, config)
+    .post(
+      `http://${getLocationURL()}:6060/api/v1/auth/register`,
+      { email, name, password },
+      config
+    )
     .then((data: AxiosResponse<User>) => {
       return data
     })

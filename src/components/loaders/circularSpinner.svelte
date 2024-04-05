@@ -7,10 +7,15 @@
 
 <script lang="ts">
   import Ship from '../../assets/ships/ship.svg'
+  import TypeWriter from '../typeWriter/TypeWriter.svelte'
 
   export let ship: boolean = false
+  export let text: string = ''
 </script>
 
+{#if text} 
+<p style="text-align: center;"><TypeWriter loadingDots text={text}/></p>
+{/if}
 {#if ship}
   <div class="ship">
     <img draggable="false" alt="Ship" src={Ship} />
@@ -45,7 +50,7 @@
     border-color: rgb(47, 167, 252, 0.5);
     border-right-color: rgb(47, 167, 252, 0);
     border-radius: 50%;
-    margin: auto;
+    /* margin: auto; */
     animation-name: spin;
     animation-duration: 3.5s;
     animation-timing-function: linear;

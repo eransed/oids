@@ -1,8 +1,7 @@
 <script lang="ts">
   import type { ChosenShip } from '../../lib/interface'
   import { localPlayerStore } from '../../stores/stores'
-  import { getShipBundleCache } from '../../style/ships'
-  import Cursor from '../mouse/cursor.svelte'
+  // import Cursor from '../mouse/cursor.svelte'
   import ShipCardImg from './ShipImg.svelte'
 
   export let chosenShip: ChosenShip
@@ -19,7 +18,13 @@
 </script>
 
 <div class="shipWrapper">
-  <button on:click={() => handleClickShip()} class="imgCard" style="background-color: {yourship ? 'var(--main-accent2-color)' : 'var(--main-accent-color)'}">
+  <button
+    on:click={() => handleClickShip()}
+    class="imgCard"
+    style="background-color: {yourship
+      ? 'var(--main-accent2-color)'
+      : 'var(--main-accent-color)'}"
+  >
     <p>{shipOwner}</p>
     <div class="level">{chosenShip.level}</div>
     <ShipCardImg ship={chosenShip} />

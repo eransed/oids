@@ -15,6 +15,7 @@
   import GameLobby from './pages/GameLobby/GameLobby.svelte'
   import TestPage from './pages/TestPage/TestPage.svelte'
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
+  import SettingsPage from './pages/SettingsPage/SettingsPage.svelte'
   import Callback from './pages/Auth/Callback.svelte'
 </script>
 
@@ -40,4 +41,6 @@
   </Route>
   <Route path={routes.test.path}><TestPage /></Route>
   <Route path={routes.admin.path}><AdminPage /></Route>
+  <Route path={routes.settings.path}><SettingsPage /></Route>
+
 </Router>

@@ -1,7 +1,8 @@
 import axios, { type AxiosResponse } from 'axios'
-import type { Ship } from '@prisma/client'
-import type { ShipBundle, ShipVariant } from '../../../style/ships'
+// import type { Ship } from '@prisma/client'
+import type { ShipVariant } from '../../../style/ships'
 import { getLocationURL } from '../../../utils/utils'
+import type { Ship } from '../../interface'
 
 export interface newShip {
   name: string
@@ -18,7 +19,9 @@ export interface newShip {
 //   userId: string
 // }
 
-export const createShipService = async (newShip: Ship): Promise<AxiosResponse<Ship>> => {
+export const createShipService = async (
+  newShip: Ship
+): Promise<AxiosResponse<Ship>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {
@@ -39,7 +42,9 @@ export const createShipService = async (newShip: Ship): Promise<AxiosResponse<Sh
   return response
 }
 
-export const getShips = async (testToken?: string): Promise<AxiosResponse<Ship[]>> => {
+export const getShips = async (
+  testToken?: string
+): Promise<AxiosResponse<Ship[]>> => {
   let token = ''
 
   if (!testToken) {
@@ -90,7 +95,11 @@ export const deleteShip = async (id: string): Promise<AxiosResponse<Ship>> => {
   return response
 }
 
-export const updateShip = async (name: string, variant: ShipVariant, id: string): Promise<AxiosResponse<Ship>> => {
+export const updateShip = async (
+  name: string,
+  variant: ShipVariant,
+  id: string
+): Promise<AxiosResponse<Ship>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {

@@ -3,36 +3,26 @@
   import { fade } from 'svelte/transition'
 
   //Stores
-  import { guestUserStore, pageHasHeaderStore, userStore, isLoggedInStore } from '../../stores/stores'
+  import {
+    guestUserStore,
+    pageHasHeaderStore,
+    userStore,
+  } from '../../stores/stores'
 
   //Components
   import TypeWriter from '../../components/typeWriter/TypeWriter.svelte'
-  import Star from '../../components/animations/star.svelte'
-  import ModalSimple from '../../components/modal/ModalSimple.svelte'
+  import { navigate } from 'svelte-routing'
 
   pageHasHeaderStore.set(true)
 
-  const welcomeMessage = 'Welcome to OIDS '
-  let help = false
+  const welcomeMessage = `Welcome to OIDS ${
+    $userStore ? $userStore.name : $guestUserStore.name
+  }`
+
 </script>
 
 <div out:fade class="landingPage">
-  {#if $isLoggedInStore && $userStore}
-    <TypeWriter text={welcomeMessage + $userStore.name} />
-  {:else}
-    <TypeWriter
-      text={welcomeMessage + $guestUserStore.name}
-      doneCallback={() => {
-        setTimeout(() => {
-          help = true
-        }, 3000)
-      }}
-    />
-    {#if help}
-      <TypeWriter text={'You ready for an adventure?'} />
-    {/if}
-  {/if}
-  <br />
+  <TypeWriter text={welcomeMessage} />
 </div>
 
 <style>

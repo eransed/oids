@@ -23,22 +23,10 @@ const shipStation: ProfileButton = {
   },
 }
 
-const matchHistory: ProfileButton = {
-  icon: Icons.Play,
-  config: {
-    buttonText: 'Match history',
-    clickCallback: () => {
-      profileComponent.set('matchHistory')
-    },
-    routeParam: 'matchHistory',
-    selected: false,
-  },
-}
-
 const settings: ProfileButton = {
   icon: Icons.Settings,
   config: {
-    buttonText: 'User & Settings',
+    buttonText: 'User settings',
     clickCallback: () => {
       profileComponent.set('settings')
     },
@@ -47,6 +35,6 @@ const settings: ProfileButton = {
   },
 }
 
-const ProfileButtons = { settings, shipStation, matchHistory }
+const ProfileButtons = { settings, shipStation }
 
 export { ProfileButtons }

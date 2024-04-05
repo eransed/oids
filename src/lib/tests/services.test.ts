@@ -3,10 +3,9 @@ import login from '../services/auth/login'
 import getProfile from '../services/user/profile'
 import { getShips } from '../services/ship/ship.services'
 import { getActiveSessions } from '../services/game/activeSessions'
-import type { User, Prisma, Ship } from '@prisma/client'
-import type { userIncludes } from '../../stores/stores'
+// import type { User, Prisma, Ship } from '@prisma/client'
 import { env } from './env'
-import type { Session } from '../interface'
+import type { Session, Ship, User } from '../interface'
 
 describe('Services tests', () => {
   let accessToken: string
@@ -22,7 +21,7 @@ describe('Services tests', () => {
   it('getProfile service', async () => {
     const result = await getProfile(accessToken)
     expect(result.status).toBe(200)
-    expectTypeOf(result.data).toMatchTypeOf<User & Prisma.UserGetPayload<typeof userIncludes>>()
+    expectTypeOf(result.data).toMatchTypeOf<User>()
   })
 
   it('getShips service', async () => {

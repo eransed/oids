@@ -1,7 +1,8 @@
 import { rndi } from 'mathil'
-import { isLoggedInStore, localPlayerStore, userStore, userIncludes } from '../stores/stores'
-import type { Prisma, User } from '@prisma/client'
+import { isLoggedInStore, localPlayerStore, userStore } from '../stores/stores'
+// import type { Prisma, User } from '@prisma/client'
 import { createSpaceObject } from '../lib/factory'
+import type { User } from '../lib/interface'
 
 export function getLocationURL() {
   if (typeof window !== 'undefined') {
@@ -38,7 +39,7 @@ export const handleLogout = (): void => {
 
 export const createdGuestName = `p-${rndi(1, 900000)}`
 
-export const gUser: User & Prisma.UserGetPayload<typeof userIncludes> = {
+export const gUser: User = {
   id: createdGuestName,
   email: '',
   name: createdGuestName,

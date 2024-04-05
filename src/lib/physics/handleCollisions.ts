@@ -4,8 +4,11 @@ import type { SpaceObject } from '../interface'
 import { handleHittingShot } from '../mechanics'
 import { renderHitExplosion } from '../render/renderFx'
 import { resetCollisions, isWithinRadiusWorld, getWorldCoordinates, isWithinRadius, headingFromangle2 } from './physics'
+import { circleBounce } from './CircleBounce'
 
 export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D | null = null): void {
+
+
   resetCollisions(spaceObjects)
   for (const npc0 of spaceObjects) {
     if (npc0.isDead) continue
@@ -21,6 +24,9 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
         npc1.collidingWith.push(npc0)
         // npc0.health -= collisionFrameDamage
         // npc1.health -= collisionFrameDamage
+
+        circleBounce(npc0, npc1)
+
 
         if (ctx) {
           const relative0 = sub2(getWorldCoordinates(npc0), cameraPosition)
@@ -46,6 +52,7 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
             npc1.velocity = add2(npc1.velocity, heading)
             npc1.lastDamagedByName = shot.ownerName
             shot.didHit = true
+            circleBounce(shot, npc1, 10, false)
             if (npc1.health < 1) {
               if (addIfNotExists(npc1.name, npc0.kills) === true) {
                 console.log('You killed: ' + npc1.name)

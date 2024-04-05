@@ -1,11 +1,11 @@
 import axios, { type AxiosResponse } from 'axios'
 
 // import type { User } from "../../../interfaces/user"
-import type { Prisma, User } from '@prisma/client'
-import type { userIncludes } from '../../../stores/stores'
+// import type { Prisma, User } from '@prisma/client'
 import { getLocationURL } from '../../../utils/utils'
+import type { User } from '../../interface'
 
-const updateUser = async (user: User & Prisma.UserGetPayload<typeof userIncludes>): Promise<AxiosResponse<User | Error>> => {
+const updateUser = async (user: User): Promise<AxiosResponse<User | Error>> => {
   const token = localStorage.getItem('accessToken')
 
   const config = {

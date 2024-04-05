@@ -13,7 +13,7 @@ import { GameMap, createWorldOne } from '../src/lib/worlds/worldInterface'
 export class GameHandler {
   game_started = false
   asteroids: SpaceObject[] = []
-  game_interval: NodeJS.Timer | undefined = undefined
+  game_interval: NodeJS.Timeout | undefined = undefined
   start_time_us: number = usNow()
   tied_session_id: string | null = null
 

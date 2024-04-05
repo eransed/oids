@@ -12,7 +12,8 @@
 
   // Utils
   import { rndi } from 'mathil'
-  import type { User } from '@prisma/client'
+  import type { User } from '../../lib/interface'
+  // import type { User } from '@prisma/client'
 
   pageHasHeaderStore.set(true)
 

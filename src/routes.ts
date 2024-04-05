@@ -33,10 +33,6 @@ export const routes = {
     inHeader: false,
   },
   test: <Route>{ path: '/test', displayText: 'Test', inHeader: false },
-  admin: <Route>{
-    path: '/admin',
-    displayText: 'Admin',
-    inHeader: true,
-    icon: Icons.Admin,
-  },
+  settings: <Route>{ path: '/settings', displayText: 'Settings', inHeader: true, icon: Icons.Settings },
+  admin: <Route>{ path: '/admin', displayText: 'Admin', inHeader: true, icon: Icons.Admin },
 }

@@ -39,7 +39,9 @@ const DefaultTouchMap: TouchFunctionMap = {
 // Input helper functions
 export function keyDisplayName(key: string) {
   if (key === ' ') return 'Spacebar'
-  return key
+
+  // Making sure to return first letter as uppercased
+  return key.charAt(0).toUpperCase() + key.substring(1)
 }
 
 export function capitalFirstChar(str: string) {
