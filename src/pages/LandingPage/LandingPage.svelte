@@ -22,7 +22,7 @@
 </script>
 
 <div out:fade class="landingPage">
-  <TypeWriter doneCallback={() => navigate('/play')} text={welcomeMessage} />
+  <TypeWriter text={welcomeMessage} />
 </div>
 
 <style>
