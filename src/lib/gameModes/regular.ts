@@ -375,7 +375,7 @@ function handleLocalPlayer(game: Game) {
     if (game.keyFuncMap.systemGraphs.keyStatus) {
       renderShip(localPlayer, game.ctx, true, game.style, null, true)
     } else {
-      renderShip(localPlayer, game.ctx, true, game.style)
+      renderShip(localPlayer, game.ctx, true, game.style, null)
     }
   }
 }

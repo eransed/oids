@@ -138,12 +138,13 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 
   if (ActiveKeyMap.boost.keyStatus) {
-    //so.afterBurnerEnabled = true
     applyEngineThrust(so, 0, true)
-  }
-
+  } 
+  
+  //Mockingbird the status for thrusters
+  so.afterBurner = ActiveKeyMap.thrust.keyStatus
+  
   if (ActiveKeyMap.thrust.keyStatus) {
-    //so.afterBurnerEnabled = true
     applyEngineThrust(so, 0)
   }
 

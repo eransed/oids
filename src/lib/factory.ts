@@ -50,6 +50,7 @@ export function createSpaceObject(
   }
 
   const spaceObject: SpaceObject = {
+    afterBurner: false,
     messageType: msgType,
     viewport: { x: 0, y: 0 },
     viewportScale: 1,
@@ -97,6 +98,7 @@ export function createSpaceObject(
     online: false,
     photonColor: '#f00',
     position: initPos,
+    positionalTrace: [],
     serverVersion: '',
     shape: SpaceShape.SmallShip,
     shotBlowFrame: 16,

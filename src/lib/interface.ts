@@ -129,6 +129,7 @@ export interface Thrustable extends Positionable, Physical {
   batteryLevel: number
   batteryCapacity: number
   enginePower: number
+  afterBurner: boolean
   thrustFlames: ThrustFlameAtom[]
 }
 
@@ -161,6 +162,10 @@ export interface Damager extends Positionable {
   didHit: boolean
   shotBlowFrame: number
   ownerName: string
+}
+
+export interface Traceable extends Positionable {
+  positionalTrace: Vec2[]
 }
 
 export interface Damageable extends Positionable {
@@ -236,7 +241,8 @@ export interface SpaceObject
     Typable,
     Bounded,
     MoonType,
-    Belonging {}
+    Belonging,
+    Traceable {}
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number
