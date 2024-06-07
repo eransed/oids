@@ -95,9 +95,10 @@ export function renderShip(
     
     for (let i = so.positionalTrace.length - 1; i > -1; i--) {
     // for (let i = 0; i < so.positionalTrace.length; i++) {
-      const t = sub2(shipTranslation, so.positionalTrace[i])
+      const t = sub2(so.positionalTrace[i], shipTranslation)
+      const pos = so.positionalTrace[i]
       ctx.translate(t.x, t.y)
-      ctx.fillRect(-10, 50, 20, 20)
+      ctx.fillRect(pos.x, pos.y, 20, 20)
     }
 
   }
