@@ -1,7 +1,7 @@
 import type { SpaceObject } from '../interface'
 import type { UIStyle } from '../interface'
 
-import { direction2, newVec2, round2dec, smul2, sub2, type Vec2 } from 'mathil'
+import { add2, direction2, mul2, newVec2, round2dec, sdiv2, smul2, sub2, type Vec2 } from 'mathil'
 import { screenScale } from '../constants'
 // import * as ship from '../../assets/ship.svg'
 import { renderShot, renderVector, setScaledFont } from './render2d'
@@ -26,7 +26,10 @@ export function renderShip(
   let shipTranslation = newVec2()
 
   ctx.save()
+  let isLocal = false
   if (!renderPos) {
+    isLocal = true
+    // used for localplayer
     ctx.translate(so.viewFramePosition.x, so.viewFramePosition.y)
     shipTranslation = so.viewFramePosition
     // renderVec2(`world: ${to_string2(so.position)}`, so.viewFramePosition, ctx)
@@ -69,40 +72,6 @@ export function renderShip(
     ctx.fillText(so.name, (-1.2 * so.size.x) / 2, -30)
     ctx.fillText('offline', (-1.2 * so.size.x) / 2, 30)
   }
-
-  ctx.fillStyle = '#fa0'
-  if (so.afterBurner) {
-    if(so.ship.shipVariant === ShipVariant.Retro){
-      ctx.fillRect(-50, 70, 10, 40)
-      ctx.fillRect(43, 70, 10, 40)
-    }
-  }
-
-  // Restore drawing
-  ctx.restore()
-
-  ctx.save()
-  ctx.fillStyle = '#fa0'
-
-
-  so.positionalTrace.push(so.viewFramePosition)
-
-  if (so.positionalTrace.length > 120) {
-    so.positionalTrace.shift()
-  }
-
-  if (so.afterBurner) {
-    
-    for (let i = so.positionalTrace.length - 1; i > -1; i--) {
-    // for (let i = 0; i < so.positionalTrace.length; i++) {
-      const t = sub2(so.positionalTrace[i], shipTranslation)
-      const pos = so.positionalTrace[i]
-      ctx.translate(t.x, t.y)
-      ctx.fillRect(pos.x, pos.y, 20, 20)
-    }
-
-  }
-
     
   // Restore drawing
   ctx.restore()

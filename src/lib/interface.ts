@@ -165,7 +165,8 @@ export interface Damager extends Positionable {
 }
 
 export interface Traceable extends Positionable {
-  positionalTrace: Vec2[]
+  positionalTrace: SpaceObject[] | null
+  ticksSinceLastSnapShot: number
 }
 
 export interface Damageable extends Positionable {
