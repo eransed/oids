@@ -13,19 +13,24 @@ import { useGoogleStrategy } from './api/auth/passport.config'
 export const apiServer = () => {
   const router: Express = express()
 
-  router.use(
-    session({
-      secret: process.env.SESSION_SECRET || '',
-      resave: false,
-      saveUninitialized: true,
-    })
-  )
-
   /** Routes */
-  useGoogleStrategy()
 
-  router.use(passport.initialize())
-  router.use(passport.session())
+  const useGoogleAuth = false
+
+  if (useGoogleAuth) {
+
+    router.use(
+      session({
+        secret: process.env.SESSION_SECRET || '',
+        resave: false,
+        saveUninitialized: true,
+      })
+    )
+
+    useGoogleStrategy()
+    router.use(passport.initialize())
+    router.use(passport.session())
+  }
 
   router.use(cors())
 
