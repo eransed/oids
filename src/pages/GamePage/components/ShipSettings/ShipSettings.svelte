@@ -6,7 +6,7 @@
     // let out: string = ':' + (typeof value) + ' = '
     // const valType = (typeof value)
     let out = ''
-    if (typeof value === 'object') {
+    if (typeof value === 'object' && value) {
       Object.entries(<object>value).forEach((v) => {
         out += `${v[0]}: ${prettySpaceObjectValue(v[1])}, `
       })
