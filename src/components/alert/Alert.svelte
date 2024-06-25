@@ -1,13 +1,14 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
   import { alertColors } from '../../style/defaultColors'
+  import type { AlertType } from './AlertType'
 
   /**
    * @param severity - error, warning, info, success
    * @description An alert popup with different colors
    */
-  export let severity: 'error' | 'warning' | 'info' | 'success' = 'info'
-  export let text: string = ''
+  export let severity: AlertType['severity'] = 'info'
+  export let text: AlertType['text'] = ''
 
   $: if (text) {
     color = alertColors[severity]

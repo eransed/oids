@@ -137,10 +137,9 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    animation: show 1s ease-in-out forwards;
+    animation: show 700ms ease-in-out forwards;
     color: var(--main-text-color);
     align-content: flex-start;
-
     z-index: 0;
   }
 
