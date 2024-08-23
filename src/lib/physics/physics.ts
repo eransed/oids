@@ -1,10 +1,11 @@
 import type { Bounceable, Bounded, Collidable, Damager, Physical, Rotatable, SpaceObject } from '../interface'
-import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, warn, good, bad, error } from 'mathil'
+import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, warn, good, bad, error, rndi, rndfVec2 } from 'mathil'
 import { renderHitExplosion } from '../render/renderFx'
 import { handleDeathExplosion, handleHittingShot } from '../mechanics'
 import { angularFriction, explosionDuration, linearFriction, missileDamageVelocityTransferFactor, timeScale } from '../constants'
 import type { Shape } from '../shapes/Shape'
 import { updateShots } from './updateShots'
+import { createSpaceObject } from '../factory'
 
 export function updateShape(shape: Shape, dt: number): void {
   if (isNaN(dt)) return
@@ -23,6 +24,8 @@ export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
   })
 }
 
+const ticksBetweenSnapshots = 0
+
 export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) return so
@@ -36,6 +39,31 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   so.acceleration = { x: 0, y: 0 }
   so.velocity = limitVec2(so.velocity, { x: 250, y: 250 })
   so.angleDegree += so.angularVelocity * deltaTime
+  so.ticksSinceLastSnapShot++
+  if (so.positionalTrace && so.ticksSinceLastSnapShot > ticksBetweenSnapshots) {
+    so.ticksSinceLastSnapShot = 0
+    const trace = createSpaceObject()
+    trace.position = so.position
+    trace.viewFramePosition = so.viewFramePosition
+    trace.angleDegree = so.angleDegree
+    trace.cameraPosition = add2(so.cameraPosition, rndfVec2(-20, 20))
+    trace.cameraVelocity = so.cameraVelocity
+    trace.velocity = so.velocity
+    trace.positionalTrace = null
+    so.positionalTrace.push(trace)
+      
+    if (so.positionalTrace.length > 6) {
+      so.positionalTrace.shift()
+    }
+    
+    so.positionalTrace.forEach((t) => {
+      applyFriction(t, 0.7)
+      // alignHeadingToVelocity(t)
+      updateSpaceObject(t, dt)
+    })
+
+  }
+
   if (so.health <= 0) {
     handleDeathExplosion(so, explosionDuration)
   }
@@ -154,6 +182,7 @@ export function getWorldCoordinates(e: (Physical & Bounded) | null): Vec2 {
 }
 
 export function getRemotePosition(remoteObject: SpaceObject, localObject: SpaceObject) {
+  // seems to be working for local players also...?
   const position = sub2(add2(remoteObject.viewFramePosition, remoteObject.cameraPosition), localObject.cameraPosition)
   return position
 }

@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { getPayLoadFromJwT } from './utils/jwt'
 import jwt from 'jsonwebtoken'
-import { env } from 'process'
 
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
   if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')

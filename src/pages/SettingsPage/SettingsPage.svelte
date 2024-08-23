@@ -2,8 +2,6 @@
   //Stores
   import {
     pageHasHeaderStore,
-    userStore,
-    isLoggedInStore,
     localPlayerStore,
   } from '../../stores/stores'
   import { settingsComponent } from './SettingsButtons'
@@ -15,26 +13,14 @@
   import Alert from '../../components/alert/Alert.svelte'
 
   //Util
-  import getProfile from '../../lib/services/user/profile'
   import { onDestroy, onMount } from 'svelte'
 
   //Component
   import type { AlertType } from '../../components/alert/AlertType'
-  import { themes } from '../../style/defaultColors'
-  import type { Theme } from '../../lib/interface'
   import HotKeys from '../GamePage/components/Hotkeys/hotKeys.svelte'
   import { initKeyControllers, removeKeyControllers } from '../../lib/input'
 
   onMount(() => {
-    if ($isLoggedInStore && !$userStore) {
-      getProfile().then(() => {
-        chosenTheme = themes[$userStore.theme]
-      })
-    }
-
-    if ($isLoggedInStore) {
-      chosenTheme = themes[$userStore.theme]
-    }
     initKeyControllers()
   })
 
@@ -42,20 +28,14 @@
     removeKeyControllers()
   })
 
-  $: if ($userStore) {
-    chosenAvatar = $userStore.image
-  }
 
   pageHasHeaderStore.set(true)
 
-  let alert: AlertType | undefined = undefined
-
-  let chosenAvatar: string
-  let chosenTheme: Theme
+  let alerto: AlertType
 </script>
 
-{#if alert}
-  <Alert severity={alert.severity} text={alert.text} />
+{#if alerto}
+  <Alert severity={alerto.severity} text={alerto.text} />
 {/if}
 <Page>
   <div class="profileWrapper">

@@ -1,4 +1,4 @@
-import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf } from 'mathil'
+import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf, warn } from 'mathil'
 import { MessageType, SpaceObject } from '../src/lib/interface'
 
 import { Client, globalConnectedClients } from './main'
@@ -80,12 +80,18 @@ export class GameHandler {
         }
       }
 
-      this.asteroids[this.nextAsteroidToSendIndex] = this.prepareSoToSend(this.asteroids[this.nextAsteroidToSendIndex])
-      this.asteroids[this.nextAsteroidToSendIndex].collidingWith = []
-      this.broadcaster(globalConnectedClients, this.asteroids[this.nextAsteroidToSendIndex], sessionId)
-      this.nextAsteroidToSendIndex++
-      if (this.nextAsteroidToSendIndex >= this.asteroids.length) {
-        this.nextAsteroidToSendIndex = 0
+      const obj = this.asteroids[this.nextAsteroidToSendIndex]
+      if (obj) {
+        this.asteroids[this.nextAsteroidToSendIndex] = this.prepareSoToSend(obj)
+        this.asteroids[this.nextAsteroidToSendIndex].collidingWith = []
+        this.broadcaster(globalConnectedClients, this.asteroids[this.nextAsteroidToSendIndex], sessionId)
+        this.nextAsteroidToSendIndex++
+        if (this.nextAsteroidToSendIndex >= this.asteroids.length) {
+          this.nextAsteroidToSendIndex = 0
+        }
+      } else {
+        // warn ('oh shit')
+        // console.log("nextAsteroidToSendIndex", this.nextAsteroidToSendIndex, this.asteroids)
       }
 
       // Send town updates if there are any:
@@ -136,7 +142,7 @@ export class GameHandler {
       npc.velocity = rndfVec2(0.1, 0.3)
       npc.hitRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
       npc.mass = 50
-      npc.health = 500
+      npc.health = 50
       npc.startHealth = npc.health
       npc.photonColor = '#f00'
       npc.inverseFireRate = 15

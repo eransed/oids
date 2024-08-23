@@ -2,27 +2,50 @@ import type { KeyFunction } from '../../../../lib/interface'
 import { activeKeyStates } from '../../../../lib/input'
 
 interface submitHotkeyChangeProps {
-  activator: string
+  keyMap: KeyFunction[]
   keyFunction: KeyFunction
   del?: boolean
+  chosenKey: string
 }
 
 export const submitHotkeyChange = ({
-  activator,
+  keyMap,
   keyFunction,
   del = false,
-}: submitHotkeyChangeProps) => {
-  if (del) {
-    keyFunction.activators = keyFunction.activators.filter(
-      (item) => item !== activator
-    )
+  chosenKey,
+  }: submitHotkeyChangeProps) => {
+  
+  checkExistingKeyMap(keyMap, chosenKey)
 
-    activeKeyStates.update((d) => d)
-    console.log(`Deleted ${activator} from ${keyFunction.displayText}`)
-    return `Deleted ${activator} from ${keyFunction.displayText}`
+  if(del) {
+    deleteHotkey(keyFunction, chosenKey)
+    return
   }
-  keyFunction.activators.push('h')
-  activeKeyStates.update((d) => d)
 
-  return `Added ${activator} to ${keyFunction.displayText}`
+  keyFunction.activators.push(chosenKey)
+  activeKeyStates.update((d) => d)
+  
+
+}
+
+function checkExistingKeyMap(keyMap: KeyFunction[], chosenKey: string) {
+  for (let i = 0; i < keyMap.length; i++){
+    keyMap[i].activators.map((v) => {
+      if(v === chosenKey) {
+        deleteHotkey(keyMap[i], chosenKey)
+      }
+    })
+  }
+}
+
+function deleteHotkey(keyFunction: KeyFunction, chosenKey: string){
+    
+      keyFunction.activators = keyFunction.activators.filter(
+        (item) => item !== chosenKey
+      )
+
+      activeKeyStates.update((d) => d)
+      // console.log(`Deleted ${chosenKey} from ${keyFunction.displayText}`)
+      return `Deleted ${chosenKey} from ${keyFunction.displayText}`
+    
 }

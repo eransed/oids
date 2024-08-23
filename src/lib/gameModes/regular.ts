@@ -40,6 +40,7 @@ import { chatMsgHistoryStore, localPlayerStore, shouldCelebrateLevelUp, userStor
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 import { getCurrentTheme } from '../../style/defaultColors'
 import { handleCollisions } from '../physics/handleCollisions'
+import { renderTrail } from '../render/renderShipTrail'
 //Stores
 
 let numberOfServerObjects = 0
@@ -375,8 +376,21 @@ function handleLocalPlayer(game: Game) {
     if (game.keyFuncMap.systemGraphs.keyStatus) {
       renderShip(localPlayer, game.ctx, true, game.style, null, true)
     } else {
-      renderShip(localPlayer, game.ctx, true, game.style)
+      renderShip(localPlayer, game.ctx, true, game.style, null)
     }
+
+    if (localPlayer.positionalTrace) {
+
+      for(let i = localPlayer.positionalTrace.length - 1; i >= 0; i--) {
+        const trace = localPlayer.positionalTrace[i]
+        const tracePos = getRemotePosition(trace, game.localPlayer)
+        if (localPlayer.afterBurner) {
+          renderTrail(localPlayer.positionalTrace[i], game.ctx, true, game.style, tracePos)
+        }
+      }
+
+    }
+
   }
 }
 
@@ -399,35 +413,50 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
     })
   }
 
-  stillPlaying.forEach((so) => {
-    const remotePos = getRemotePosition(so, game.localPlayer)
+  stillPlaying.forEach((remotePlayer) => {
+    const remotePos = getRemotePosition(remotePlayer, game.localPlayer)
 
-    if (so.health <= 0) {
-      handleDeathExplosion(so, explosionDuration)
-      if (!so.obliterated) {
-        renderExplosionFrame(so, game.ctx, remotePos)
+    // hack: should not be done here...
+
+
+    if (remotePlayer.health <= 0) {
+      handleDeathExplosion(remotePlayer, explosionDuration)
+      if (!remotePlayer.obliterated) {
+        renderExplosionFrame(remotePlayer, game.ctx, remotePos)
       }
       return
     } else {
-      renderShip(so, game.ctx, false, game.style, remotePos)
-      if (game.keyFuncMap.systemGraphs.keyStatus) {
-        renderViewport(game.ctx, so)
-        renderHitRadius(so, game.ctx)
+      renderShip(remotePlayer, game.ctx, false, game.style, remotePos)
+     
+      if (remotePlayer.positionalTrace) {
+
+        for(let i = remotePlayer.positionalTrace.length - 1; i >= 0; i--) {
+          const trace = remotePlayer.positionalTrace[i]
+          const tracePos = getRemotePosition(trace, game.localPlayer)
+          if (remotePlayer.afterBurner) {
+            renderTrail(remotePlayer.positionalTrace[i], game.ctx, true, game.style, tracePos)
+          }
+        }
       }
-      if (so.health < so.startHealth) {
+
+      if (game.keyFuncMap.systemGraphs.keyStatus) {
+        renderViewport(game.ctx, remotePlayer)
+        renderHitRadius(remotePlayer, game.ctx)
+      }
+      if (remotePlayer.health < remotePlayer.startHealth) {
         const theme = getCurrentTheme()
         renderProgressBar(
-          add2(remotePos, newVec2(-so.hitRadius / 1, -so.hitRadius / 0.65)),
+          add2(remotePos, newVec2(-remotePlayer.hitRadius / 1, -remotePlayer.hitRadius / 0.65)),
           'Hp',
-          so.health,
-          so.startHealth,
+          remotePlayer.health,
+          remotePlayer.startHealth,
           game.ctx,
           0,
           false,
           '#fff',
           theme.accent,
           theme.text,
-          so.hitRadius / 200
+          remotePlayer.hitRadius / 200
         )
       }
     }
@@ -513,7 +542,7 @@ export function moveView(game: Game) {
   // bound ship to viewframe
   const center = getScreenCenterPosition(game.ctx)
 
-  const d = dist2(center, game.localPlayer.position)
+  // const d = dist2(center, game.localPlayer.position)
   cameraLag.push(game.localPlayer.velocity)
   if (cameraLag.length > cameraLagSize) {
     game.localPlayer.viewFramePosition = add2(center, smul2(cameraLag[0], 5))

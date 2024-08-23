@@ -1,13 +1,42 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte'
+  import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
   import {
+
+  DefaultKeyMap,
     activeKeyStates,
+    getKeyMap,
     keyDisplayName as keyDisplayText,
+    keyFuncArrayFromKeyFunctionMap,
+    setKeyMap,
   } from '../../../../lib/input'
-  import type { KeyFunction } from '../../../../lib/interface'
   import { submitHotkeyChange } from './hotKeysChange'
+  import type { KeyFunction } from '../../../../lib/interface'
   export let activeColor: string
+  let changeKey: KeyFunction | undefined
 
+  function keydown(event: KeyboardEvent) {
+    if (!changeKey) {
+      return
+    }
 
+    submitHotkeyChange({
+      keyMap: $activeKeyStates,
+      chosenKey: event.key,
+      keyFunction: changeKey,
+      del: false,
+    })
+
+    changeKey = undefined
+  }
+
+  onMount(() => {
+    document.addEventListener('keydown', keydown)
+  })
+
+  onDestroy(() => {
+    document.removeEventListener('keydown', keydown)
+  })
 </script>
 
 <div class="hotKeyTable">
@@ -32,10 +61,52 @@
             <td style="color: 'grey'">{'- ' + keyFunction.displayText}</td>
           {/if}
           <td style="display: flex; gap: 0.5em">
-            <button class="addKey buttonStyle">+</button>
+            <button
+              class="addKey buttonStyle"
+              on:click={() => (changeKey = keyFunction)}>+</button
+            >
+            {#if changeKey === keyFunction}
+              <ModalSimple
+                saveButton={false}
+                closeBtn={() => (changeKey = undefined)}
+              >
+                <span style="text-align: center;">
+                  <table style="width: 100%;">
+                    <th><h3>{keyFunction.displayText}</h3></th>
+
+                    <tr>
+                      <td>Hotkeys:</td><td
+                        >{#each keyFunction.activators as activator}{activator} /
+                        {/each}</td
+                      >
+                    </tr>
+                  </table>
+
+                  <h3 style="padding: 1em;">
+                    Press a key to assign to {keyFunction.displayText}
+                  </h3>
+                </span>
+              </ModalSimple>
+            {/if}
             {#each keyFunction.activators as activator}
-              <button on:click={() => submitHotkeyChange({keyFunction: keyFunction, activator: activator, del: true})} style={keyFunction.keyStatus ? `background-color: ${activeColor}` : ''} class="buttonStyle">{keyDisplayText(activator)}</button>
+              <button
+                title="Click to delete!"
+                on:click={() =>
+                  submitHotkeyChange({
+                    keyMap: $activeKeyStates,
+                    chosenKey: activator,
+                    keyFunction: keyFunction,
+                    del: true,
+                  })}
+                style={keyFunction.keyStatus
+                  ? `background-color: ${activeColor}`
+                  : ''}
+                class="buttonStyle">{keyDisplayText(activator)}</button
+              >
             {/each}
+            {#if keyFunction.activators.length === 0}
+              <p style="color: red;">No button assigned!</p>
+            {/if}
           </td>
           <td>{keyFunction.toggle ? '<toggle>' : '<momentary>'}</td>
         </tr>

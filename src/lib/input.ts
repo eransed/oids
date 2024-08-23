@@ -54,6 +54,8 @@ Object.entries(DefaultKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
   value.displayText = capitalFirstChar(key)
 })
 
+
+
 let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
 const ActiveTouch: TouchFunctionMap = DefaultTouchMap
 
@@ -75,7 +77,7 @@ export function getKeyBindings(): KeyFunction[] {
   return keyFuncArrayFromKeyFunctionMap(ActiveKeyMap)
 }
 
-function keyFuncArrayFromKeyFunctionMap(kfm: KeyFunctionMap) {
+export function keyFuncArrayFromKeyFunctionMap(kfm: KeyFunctionMap) {
   const keyValues: KeyFunction[] = []
   Object.values(kfm).forEach((value) => {
     keyValues.push(value)
@@ -138,12 +140,13 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   }
 
   if (ActiveKeyMap.boost.keyStatus) {
-    //so.afterBurnerEnabled = true
     applyEngineThrust(so, 0, true)
-  }
-
+  } 
+  
+  //Mockingbird the status for thrusters
+  so.afterBurner = ActiveKeyMap.thrust.keyStatus
+  
   if (ActiveKeyMap.thrust.keyStatus) {
-    //so.afterBurnerEnabled = true
     applyEngineThrust(so, 0)
   }
 
