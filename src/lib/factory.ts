@@ -141,7 +141,8 @@ export function createSpaceObject(
     },
     moonType: 0,
     hometown: Towns.Coruscant,
-    ticksSinceLastSnapShot: 0
+    ticksSinceLastSnapShot: 0,
+    characterGlobalPosition: newVec2()
   }
 
   spaceObject.hitRadius = Math.sqrt(

@@ -3,16 +3,19 @@ import { getContext } from './canvas_util'
 import { LightSource, LineSegment } from './shapes'
 import { renderLoop } from './time'
 // import * as WelcomeScreen from './gameModes/welcomeScreen'
-import type { Shape } from './shapes/Shape'
 import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
 import type { Vec2 } from 'mathil'
 import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
 import type { UIStyle } from './interface'
 
+export enum GameMode {
+  SPACE_MODE,
+  ARCADE_MODE,
+}
 export class Game {
+  mode: GameMode = GameMode.SPACE_MODE
   websocket: OidsSocket
-  testShapes: Shape[] = []
   running = false
   type: GameType = GameType.SinglePlayer
   ctx: CanvasRenderingContext2D

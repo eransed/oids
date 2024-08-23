@@ -104,7 +104,6 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     updateSpaceObjects(game.remotePlayers, dt)
     updateSpaceObject(game.localPlayer, dt)
     updateSpaceObjects(game.bodies, dt)
-    updateShapes(game.testShapes, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
       game.websocket.send(getSendableSpaceObject(game.localPlayer))
     }

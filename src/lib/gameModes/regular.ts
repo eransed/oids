@@ -1,6 +1,6 @@
-import type { Game } from '../game'
+import { GameMode, type Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
-import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
+import { arcadeModeKeyController, gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
 import {
   add2,
   direction2,
@@ -34,7 +34,7 @@ import { newPhotonLaser } from '../factory'
 import { reduceShotSize, reduceSoSize } from '../websocket/util'
 import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMoon'
 import { renderShip } from '../render/renderShip'
-import { renderProgressBar, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
+import { renderProgressBar, renderRoundIndicator, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
 import { chatMsgHistoryStore, localPlayerStore, shouldCelebrateLevelUp, userStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
@@ -392,28 +392,11 @@ function handleLocalPlayer(game: Game) {
     }
 
   }
+  moveView(game)
 }
 
-function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] {
-  remotes.forEach((so) => {
-    so.framesSinceLastServerUpdate++
-  })
-
-  const stillPlaying = remotes.filter((so) => {
-    return so.isPlaying === true
-  })
-
-  const stoppedPlaying = remotes.filter((so) => {
-    return so.isPlaying === false
-  })
-
-  if (stoppedPlaying.length > 0) {
-    stoppedPlaying.forEach((s) => {
-      console.log(`${s.name} exited the game`)
-    })
-  }
-
-  stillPlaying.forEach((remotePlayer) => {
+function renderRemotePlayerInSpaceMode(remotes: SpaceObject[], game: Game): void {
+  remotes.forEach((remotePlayer) => {
     const remotePos = getRemotePosition(remotePlayer, game.localPlayer)
 
     // hack: should not be done here...
@@ -461,6 +444,26 @@ function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] 
       }
     }
   })
+}
+
+function handleRemotePlayers(remotes: SpaceObject[]): SpaceObject[] {
+  remotes.forEach((so) => {
+    so.framesSinceLastServerUpdate++
+  })
+
+  const stillPlaying = remotes.filter((so) => {
+    return so.isPlaying === true
+  })
+
+  const stoppedPlaying = remotes.filter((so) => {
+    return so.isPlaying === false
+  })
+
+  if (stoppedPlaying.length > 0) {
+    stoppedPlaying.forEach((s) => {
+      console.log(`${s.name} exited the game`)
+    })
+  }
 
   return stillPlaying
 }
@@ -554,6 +557,9 @@ export function moveView(game: Game) {
 }
 
 export function renderFrame(game: Game, dt: number): void {
+
+  // Heads up stuff
+
   every.tick(() => {
     game.localPlayer.viewport = getScreenRect(game.ctx)
     setCanvasSizeToClientViewFrame(game.ctx)
@@ -568,26 +574,29 @@ export function renderFrame(game: Game, dt: number): void {
     gameState.set({ scoreScreenData: { player: game.localPlayer, remotePlayers: remotePlayers, serverObjects: game.bodies } })
   })
 
-  const ctx = game.ctx
-  game.lightSource.position = game.localPlayer.position
-  game.lightSource.direction = direction2(game.localPlayer.angleDegree)
-
-  game.testShapes.forEach((s) => {
-    s.render(ctx)
-  })
-
   if (game.keyFuncMap.systemGraphs.keyStatus) {
-    fpsCounter(ops, dt, game, ctx)
+    fpsCounter(ops, dt, game, game.ctx)
   }
 
+
+  if (game.mode === GameMode.ARCADE_MODE) {
+    // Render arcade style game
+
+  } else {
+    // Render space style game
+    handleStarBackdrop(game)
+    game.remotePlayers = handleRemotePlayers(game.remotePlayers)
+    renderRemotePlayerInSpaceMode(game.remotePlayers, game)
+    handleGameBodies(game)
+    handleLocalPlayer(game)
+  }
+
+
+  // Stats - G
   let objCount = 0
   game.remotePlayers.forEach((p) => {
     objCount += getRenderableObjectCount(p)
   })
-
-  handleStarBackdrop(game)
-  game.remotePlayers = handleRemotePlayers(game.remotePlayers, game)
-  handleGameBodies(game)
 
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
   addDataPoint(ppsbuf, ops)
@@ -613,40 +622,33 @@ export function renderFrame(game: Game, dt: number): void {
       const w = 250
       const space = 200
       const startx = 110
-      if (i < half) renderGraph(g, { x: 400, y: startx + i * space }, { x: w, y: h }, ctx)
-      else renderGraph(g, { x: 1300, y: startx + (i - half) * space }, { x: w, y: h }, ctx)
+      if (i < half) renderGraph(g, { x: 400, y: startx + i * space }, { x: w, y: h }, game.ctx)
+      else renderGraph(g, { x: 1300, y: startx + (i - half) * space }, { x: w, y: h }, game.ctx)
     })
 
-    renderInfoText(`packets/sec: ${ops}`, 450, ctx)
-    renderInfoText(`packet symbol count: ${dataLen}`, 500, ctx)
-    renderInfoText(`object key count: ${dataKeys}`, 550, ctx)
-    renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
-    renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, ctx)
-    renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
-    renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
+    renderInfoText(`packets/sec: ${ops}`, 450, game.ctx)
+    renderInfoText(`packet symbol count: ${dataLen}`, 500, game.ctx)
+    renderInfoText(`object key count: ${dataKeys}`, 550, game.ctx)
+    renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, game.ctx)
+    renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, game.ctx)
+    renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, game.ctx)
+    renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, game.ctx)
 
-    // renderRoundIndicator()
-
-    renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
+    renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, game.ctx)
 
     // Position info for debugging
-    renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
-    renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
-    renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add2(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
+    renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(-100, -100)), game.ctx, game.style)
+    renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(200, -150)), game.ctx, game.style)
+    renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add2(game.localPlayer.viewFramePosition, newVec2(-400, -200)), game.ctx, game.style)
     renderVec2(
       `world: ${to_string2(add2(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
       add2(game.localPlayer.viewFramePosition, newVec2(0, 100)),
-      ctx,
+      game.ctx,
       game.style
     )
-    renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), ctx, game.style)
+    renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), game.ctx, game.style)
   }
 
-  //HandleLocalPlayer
-
-  handleLocalPlayer(game)
-
-  moveView(game)
 }
 
 function handleStarBackdrop(game: Game): void {
@@ -672,14 +674,16 @@ function handleStarBackdrop(game: Game): void {
 
 export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
-    spaceObjectKeyController(game.localPlayer, dt)
-    spaceTouchController(game.localPlayer, dt)
+    if (game.mode === GameMode.SPACE_MODE) {
+      spaceObjectKeyController(game.localPlayer, dt)
+      spaceTouchController(game.localPlayer, dt)
+    } else {
+      arcadeModeKeyController(game.localPlayer, dt)
+      // arcadeTouchController(game.localPlayer, dt)
+    }
   }
 
   friction(game.localPlayer)
-  game.testShapes.forEach((s) => {
-    friction(s)
-  })
 
   if (game.remotePlayers.length === 0) {
     ops = 0

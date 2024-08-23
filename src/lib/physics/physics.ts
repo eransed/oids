@@ -7,6 +7,8 @@ import type { Shape } from '../shapes/Shape'
 import { updateShots } from './updateShots'
 import { createSpaceObject } from '../factory'
 
+const traceLength = 1
+
 export function updateShape(shape: Shape, dt: number): void {
   if (isNaN(dt)) return
   const deltaTime: number = dt * timeScale
@@ -52,7 +54,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
     trace.positionalTrace = null
     so.positionalTrace.push(trace)
       
-    if (so.positionalTrace.length > 6) {
+    if (so.positionalTrace.length > traceLength) {
       so.positionalTrace.shift()
     }
     

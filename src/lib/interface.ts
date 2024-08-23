@@ -105,6 +105,16 @@ export interface Positionable {
   viewFramePosition: Vec2
 }
 
+export interface Crashable {
+  crashed: boolean
+}
+
+export interface Landable {
+  // Stepable, Oribitable, Planetable, Groundable, Terrable, Globeable (Capable of being landed)
+  // You are so freaking landable!!
+  characterGlobalPosition: Vec2
+}
+
 export interface Physical extends Positionable {
   mass: number
   size: Vec2
@@ -243,7 +253,8 @@ export interface SpaceObject
     Bounded,
     MoonType,
     Belonging,
-    Traceable {}
+    Traceable,
+    Landable {}
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number
@@ -302,6 +313,7 @@ export interface KeyFunctionMap {
   shipDetails: KeyFunctionStore
   chat: KeyFunctionStore
   menu: KeyFunctionStore
+  jump: KeyFunctionStore
 }
 
 export interface TouchFunctionMap {
