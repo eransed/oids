@@ -25,7 +25,7 @@ import { handleDeathExplosion } from '../mechanics'
 import { friction, getRemotePosition, offScreen_mm, wrap_mm } from '../physics/physics'
 import { loadingText, renderHitRadius, renderInfoText, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType } from '../interface'
+import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type ServerUpdate } from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
 import { explosionDuration, screenScale, worldSize, worldStartPosition } from '../constants'
@@ -156,7 +156,6 @@ export function initRegularGame(game: Game): void {
     return
   }
 
-  // game.clearBodies()
   game.reset()
 
   game.type = GameType.MultiPlayer
@@ -168,8 +167,6 @@ export function initRegularGame(game: Game): void {
   loadingText('Loading...', game.ctx)
   initKeyControllers()
   initTouchControls()
-
-  const offset = 500
 
   setCanvasSizeToClientViewFrame(game.ctx)
 
@@ -196,7 +193,6 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.cameraPosition = worldStartPosition
   game.localPlayer.viewFramePosition = rndfVec2(0, 0)
   game.localPlayer.position = rndfVec2(0, 0)
-  // game.localPlayer.position = add2(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
 
   for (let i = 0; i < 400; i++) {
     // create starts
@@ -206,25 +202,8 @@ export function initRegularGame(game: Game): void {
 
   resetStars(game)
 
-  // game.stars.push(newVec2())
-  // game.stars.push(smul2(worldSize, 0.5))
-
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
-  //Shootable non-player objects
-  // const asteroidCount = 1
-  // for (let i = 0; i < asteroidCount; i++) {
-  //   const asteroid = createSpaceObject()
-  //   asteroid.position = rndfVec2(0, 1200)
-  //   asteroid.health = 1000
-  //   asteroid.name = 'asteroid-' + i
-  //   asteroid.hitRadius = 220
-  //   asteroid.size = newVec2(200, 200)
-  //   asteroid.mass = 10
-  //   game.bodies.push(asteroid)
-  // }
-
-  // game.remotePlayers = []
   game.all = game.all.concat(game.bodies)
   game.all.push(game.localPlayer)
   game.serverVersion = game.localPlayer.serverVersion
@@ -233,97 +212,138 @@ export function initRegularGame(game: Game): void {
 
   info('Setting game socket listener...')
 
-  game.websocket.addListener(
-    (su) => {
-      // console.log(su)
-      //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
-      if (su.dataObject.messageType === MessageType.SHIP_UPDATE) {
-        const oldLvl = game.localPlayer.ship.level
-        const newLvl = su.dataObject.ship.level
+  function handleShipUpdate(su: ServerUpdate<SpaceObject>) {
+    const oldLvl = game.localPlayer.ship.level
+    const newLvl = su.dataObject.ship.level
 
-        if (oldLvl < newLvl) {
-          console.log('new lvl!')
-          shouldCelebrateLevelUp.set(true)
+    if (oldLvl < newLvl) {
+      console.log('new lvl!')
+      shouldCelebrateLevelUp.set(true)
+    }
+
+    game.localPlayer.ship.experience = su.dataObject.ship.experience
+    game.localPlayer.ship.level = su.dataObject.ship.level
+
+    userStore.update((user) => {
+      const chosenShip = user.ships.findIndex(
+        (ship) => ship.id === su.dataObject.ship.id
+      )
+
+      user.ships[chosenShip].experience = su.dataObject.ship.experience
+      user.ships[chosenShip].level = su.dataObject.ship.level
+
+      return user
+    })
+  }
+
+  function handleNetworkStatisticUpdates(su: ServerUpdate<SpaceObject>) {
+      dataLen = su.unparsedDataLength
+      bytesRecievedLastSecond += dataLen
+      dataKeys = su.numberOfSpaceObjectKeys
+      rxDataBytes += dataLen * symbolByteSize
+      // addDataPoint(packetSize, su.spaceObjectByteSize)
+      if (performance.now() - startTime >= 1000) {
+        addDataPoint(
+          timebuf,
+          getLatestValue(timebuf) + (performance.now() - startTime)
+        )
+        ops = numberOfServerObjects
+        startTime = performance.now()
+        if (numberOfServerObjects > 0) {
+          symbolsPerSec = round2dec(
+            bytesRecievedLastSecond / numberOfServerObjects,
+            1
+          )
+          byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
+          bitSpeed = round2dec(byteSpeed * byteSize, 1)
+          addDataPoint(downloadBuf, bitSpeed)
         }
-
-        game.localPlayer.ship.experience = su.dataObject.ship.experience
-        game.localPlayer.ship.level = su.dataObject.ship.level
-
-        userStore.update((user) => {
-          const chosenShip = user.ships.findIndex((ship) => ship.id === su.dataObject.ship.id)
-
-          user.ships[chosenShip].experience = su.dataObject.ship.experience
-          user.ships[chosenShip].level = su.dataObject.ship.level
-
-          return user
-        })
+        numberOfServerObjects = 0
+        bytesRecievedLastSecond = 0
+      } else {
+        numberOfServerObjects++
       }
+  }
 
-      if (su.dataObject.messageType === MessageType.SERVICE) {
-        game.serverVersion = su.dataObject.serverVersion
-        info(`Service message: server version: ${su.dataObject.serverVersion}`)
+  function handleGameUpdate(su: ServerUpdate<SpaceObject>) {
+    const so: SpaceObject = su.dataObject
+    handleNetworkStatisticUpdates(su)
+    for (let i = 0; i < game.remotePlayers.length; i++) {
+      if (so.name === game.remotePlayers[i].name) {
+        if (!so.online) {
+          console.log(`${so.name} went offline`)
+          game.remotePlayers.splice(i)
+          continue
+        }
+
+        game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(
+          so,
+          game.remotePlayers[i]
+        )
+
         return
-      } else if (su.dataObject.messageType === MessageType.CHAT_MESSAGE) {
-        chatMsgHistoryStore.update((previousMessages) => [
-          ...previousMessages,
-          { message: su.dataObject.lastMessage, timeDate: new Date(), user: su.dataObject },
-        ])
-        return
-      } else if (su.dataObject) {
-        const so: SpaceObject = su.dataObject
-        dataLen = su.unparsedDataLength
-        bytesRecievedLastSecond += dataLen
-        dataKeys = su.numberOfSpaceObjectKeys
-        rxDataBytes += dataLen * symbolByteSize
-        // addDataPoint(packetSize, su.spaceObjectByteSize)
-        if (performance.now() - startTime >= 1000) {
-          addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
-          ops = numberOfServerObjects
-          startTime = performance.now()
-          if (numberOfServerObjects > 0) {
-            symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
-            byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
-            bitSpeed = round2dec(byteSpeed * byteSize, 1)
-            addDataPoint(downloadBuf, bitSpeed)
-          }
-          numberOfServerObjects = 0
-          bytesRecievedLastSecond = 0
-        } else {
-          numberOfServerObjects++
-        }
-        for (let i = 0; i < game.remotePlayers.length; i++) {
-          if (so.name === game.remotePlayers[i].name) {
-            if (!so.online) {
-              console.log(`${so.name} went offline`)
-              game.remotePlayers.splice(i)
-              continue
-            }
+      }
+    }
+    if (so.name !== game.localPlayer.name) {
+      game.remotePlayers.push(so)
+      log(`New ship online: ${so.name}`)
+    }
+  }
 
-            game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
+  function handleNpcUpdate(npcUpdate: ServerUpdate<SpaceObject>) {
+    // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
+    if (!exists(npcUpdate.dataObject, game.bodies)) {
+      // info(`Adding ${su.dataObject.name}`)
+      game.bodies.push(npcUpdate.dataObject)
+    } else {
+      game.bodies.forEach((b, i) => {
+        game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(
+          npcUpdate.dataObject,
+          game.bodies[i]
+        )
+      })
+    }
+  }
 
-            return
+  function handleChatUpdate(playerUpdate: ServerUpdate<SpaceObject>) {
+      chatMsgHistoryStore.update((previousMessages) => [
+        ...previousMessages,
+        {
+          message: playerUpdate.dataObject.lastMessage,
+          timeDate: new Date(),
+          user: playerUpdate.dataObject,
+        },
+      ])
+  }
+
+  function handleServerInformationUpdate(playerUpdate: ServerUpdate<SpaceObject>) {
+    game.serverVersion = playerUpdate.dataObject.serverVersion
+    info(
+      `Service message: server version: ${playerUpdate.dataObject.serverVersion}`
+    )
+  }
+
+  game.websocket.addListener(
+    (playerUpdate) => {
+      switch (playerUpdate.dataObject.messageType) {
+        case MessageType.SHIP_UPDATE:
+          handleShipUpdate(playerUpdate)
+          break;
+        case MessageType.SERVICE:
+          handleServerInformationUpdate(playerUpdate)
+          break;
+        case MessageType.CHAT_MESSAGE:
+          handleChatUpdate(playerUpdate)
+          break;
+        default:
+          if(playerUpdate.dataObject) {
+            handleGameUpdate(playerUpdate)
           }
-        }
-        if (so.name !== game.localPlayer.name) {
-          game.remotePlayers.push(so)
-          log(`New ship online: ${so.name}`)
-        }
+          break;
       }
     },
-    (su) => {
-      // console.log (su.dataObject)
-      // info(`Number of server obj: ${game.bodies.length}`)
-      // console.log(su.dataObject)
-
-      // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
-      if (!exists(su.dataObject, game.bodies)) {
-        // info(`Adding ${su.dataObject.name}`)
-        game.bodies.push(su.dataObject)
-      } else {
-        game.bodies.forEach((b, i) => {
-          game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(su.dataObject, game.bodies[i])
-        })
-      }
+    (npcUpdate) => {
+      handleNpcUpdate(npcUpdate)
     }
   )
 }
