@@ -3,7 +3,7 @@
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
   import {
 
-  DefaultKeyMap,
+  DefaultSpaceModeKeyMap,
     activeKeyStates,
     getKeyMap,
     keyDisplayName as keyDisplayText,

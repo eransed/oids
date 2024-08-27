@@ -6,8 +6,11 @@ import { angularFriction, explosionDuration, linearFriction, missileDamageVeloci
 import type { Shape } from '../shapes/Shape'
 import { updateShots } from './updateShots'
 import { createSpaceObject } from '../factory'
+import { GameMode } from '../game'
 
 const traceLength = 1
+
+
 
 export function updateShape(shape: Shape, dt: number): void {
   if (isNaN(dt)) return
@@ -29,11 +32,20 @@ export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
 const ticksBetweenSnapshots = 0
 
 export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
+
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) return so
   const deltaTime: number = dt * timeScale
   const v: Vec2 = scalarMultiply2(so.velocity, deltaTime)
   const a: Vec2 = scalarMultiply2(so.acceleration, deltaTime)
+  
+  // arcade stuff:
+  if (so.gameMode === GameMode.ARCADE_MODE) {
+    so.characterGlobalPosition = add2(so.characterGlobalPosition, v)
+    floorGravity(so)
+    applyFriction(so, 0.9)
+  }
+
   so.velocity = add2(so.velocity, a)
   so.position = add2(so.position, v)
   so.cameraVelocity = smul2(v, 1)
@@ -92,12 +104,34 @@ export function offScreen_mm(v: Vec2, screen_min: Vec2, screen_max: Vec2) {
   if (v.y < screen_min.y) return true
   return false
 }
-
+ 
 export function wrap_mm(v: Vec2, min: Vec2, max: Vec2): void {
   if (v.x > max.x) v.x = min.x
   if (v.x < min.x) v.x = max.x
   if (v.y > max.y) v.y = min.y
   if (v.y < min.y) v.y = max.y
+}
+
+export const groundLevel = 1800
+
+export function floorGravity(so: SpaceObject, G=1) {
+  if (so.characterGlobalPosition.y >= groundLevel) {
+    so.characterGlobalPosition.y = groundLevel
+    so.acceleration = newVec2()
+    so.velocity = newVec2()
+    so.isJumping = false
+  } else {
+    const translatedCenterOfThePlanet = groundLevel + 4
+    const m0 = 30
+    const m1 = 20
+    const v01: Vec2 = sub2(newVec2(so.characterGlobalPosition.x, translatedCenterOfThePlanet), so.characterGlobalPosition)
+    const r: number = magnitude2(v01) * 3
+    const r2: number = Math.pow(r, 2)
+    const F: number = G * ((m0 * m1) / r2)
+    const gvec: Vec2 = scalarMultiply2(v01, F)    
+    so.acceleration = add2(so.acceleration, gvec)
+    so.characterGlobalPosition.y = so.characterGlobalPosition.y + so.acceleration.y
+  }
 }
 
 export function gravity(from: SpaceObject, to: SpaceObject, G = 1): void {

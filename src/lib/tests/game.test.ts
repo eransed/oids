@@ -2,7 +2,7 @@ import { describe, it, expect, expectTypeOf, vi, type MockInstance, beforeEach }
 
 import { Game } from '../game'
 import { createSpaceObject } from '../factory'
-import { DefaultKeyMap } from '../input'
+import { DefaultSpaceModeKeyMap } from '../input'
 import { OidsSocket, getWsUrl } from '../websocket/ws'
 import { GameType } from '../interface'
 import type { UIStyle } from '../interface'
@@ -20,7 +20,7 @@ describe('game tests', () => {
     //
   }
 
-  const newGame = new Game(canvas, localPlayer, socket, DefaultKeyMap, callback)
+  const newGame = new Game(canvas, localPlayer, socket, DefaultSpaceModeKeyMap, callback)
 
   it('game is initialized', () => {
     expect(newGame).toBeDefined()

@@ -14,7 +14,6 @@ export enum GameMode {
   ARCADE_MODE,
 }
 export class Game {
-  mode: GameMode = GameMode.ARCADE_MODE
   websocket: OidsSocket
   running = false
   type: GameType = GameType.SinglePlayer

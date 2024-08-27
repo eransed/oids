@@ -1,6 +1,18 @@
 import { GameMode, type Game } from '../game'
-import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
-import { arcadeModeKeyController, gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
+import {
+  setCanvasSizeToClientViewFrame,
+  getScreenRect,
+  getScreenCenterPosition,
+  getScreenFromCanvas,
+} from '../canvas_util'
+import {
+  arcadeModeKeyController,
+  gameState,
+  initKeyControllers,
+  initTouchControls,
+  spaceObjectKeyController,
+  spaceTouchController,
+} from '../input'
 import {
   add2,
   direction2,
@@ -22,27 +34,77 @@ import {
   error,
   sdiv2,
   norm,
+  Vec3,
+  newVec3,
+  dropz,
 } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
-import { friction, getRemotePosition, getWorldCoordinates, offScreen_mm, wrap_mm } from '../physics/physics'
-import { loadingText, renderHitRadius, renderInfoText, renderLine, renderPoint } from '../render/render2d'
+import {
+  friction,
+  getRemotePosition,
+  getWorldCoordinates,
+  offScreen_mm,
+  wrap_mm,
+} from '../physics/physics'
+import {
+  loadingText,
+  renderHitRadius,
+  renderInfoText,
+  renderLine,
+  renderPoint,
+} from '../render/render2d'
 import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type ServerUpdate } from '../interface'
+import {
+  GameType,
+  getRenderableObjectCount,
+  SpaceShape,
+  type SpaceObject,
+  MessageType,
+  type ServerUpdate,
+} from '../interface'
 import { randomAnyColor } from '../color'
 import { test } from '../test'
-import { explosionDuration, screenScale, worldSize, worldStartPosition } from '../constants'
-import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from '../stats'
+import {
+  explosionDuration,
+  screenScale,
+  worldSize,
+  worldStartPosition,
+} from '../constants'
+import {
+  addDataPoint,
+  getLatestValue,
+  GRAPHS,
+  msPretty,
+  newDataStats,
+  renderGraph,
+} from '../stats'
 import { newPhotonLaser } from '../factory'
 import { reduceShotSize, reduceSoSize } from '../websocket/util'
-import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMoon'
+import {
+  earthMoonColor,
+  earthMoonCraters,
+  renderMoon,
+} from '../render/renderMoon'
 import { renderShip } from '../render/renderShip'
-import { renderProgressBar, renderRoundIndicator, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
+import {
+  renderProgressBar,
+  renderRoundIndicator,
+  renderSpaceObjectStatusBar,
+  renderVec2,
+  renderViewport,
+} from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
-import { chatMsgHistoryStore, localPlayerStore, shouldCelebrateLevelUp, userStore } from '../../stores/stores'
+import {
+  chatMsgHistoryStore,
+  localPlayerStore,
+  shouldCelebrateLevelUp,
+  userStore,
+} from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 import { getCurrentTheme } from '../../style/defaultColors'
 import { handleCollisions } from '../physics/handleCollisions'
 import { renderTrail } from '../render/renderShipTrail'
+import { renderCharacter } from '../render/renderCharacter'
 //Stores
 
 let numberOfServerObjects = 0
@@ -128,7 +190,10 @@ batbuf.baseUnit = '%'
 // packetSize.maxSize = 1000
 // packetSize.baseUnit = 'B'
 
-function randomPositionInCurrentViewFrame(so: SpaceObject, screenSize: Vec2): Vec2 {
+function randomPositionInCurrentViewFrame(
+  so: SpaceObject,
+  screenSize: Vec2
+): Vec2 {
   return {
     x: rndi(so.cameraPosition.x, so.cameraPosition.x + screenSize.x),
     y: rndi(so.cameraPosition.y, so.cameraPosition.y + screenSize.y),
@@ -143,7 +208,10 @@ export function resetStars(game: Game | null) {
 
   setTimeout(() => {
     game.stars.forEach((s, i) => {
-      const r = randomPositionInCurrentViewFrame(game.localPlayer, getScreenFromCanvas(game.ctx))
+      const r = randomPositionInCurrentViewFrame(
+        game.localPlayer,
+        getScreenFromCanvas(game.ctx)
+      )
 
       s.position.x = r.x
       s.position.y = r.y
@@ -198,13 +266,18 @@ export function initRegularGame(game: Game): void {
 
   for (let i = 0; i < 400; i++) {
     // create stars
-    const star = {position: rndfVec2(0, 0), speedFactor: 1, size: rndi(2,5)} 
+    const star = { position: rndfVec2(0, 0), speedFactor: 1, size: rndi(2, 5) }
     game.stars.push(star)
   }
 
   resetStars(game)
 
-  console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
+  console.log(
+    'Your ship name is: ' +
+      game.localPlayer.name +
+      '\nAnd your color is: ' +
+      game.localPlayer.color
+  )
 
   game.all = game.all.concat(game.bodies)
   game.all.push(game.localPlayer)
@@ -239,32 +312,32 @@ export function initRegularGame(game: Game): void {
   }
 
   function handleNetworkStatisticUpdates(su: ServerUpdate<SpaceObject>) {
-      dataLen = su.unparsedDataLength
-      bytesRecievedLastSecond += dataLen
-      dataKeys = su.numberOfSpaceObjectKeys
-      rxDataBytes += dataLen * symbolByteSize
-      // addDataPoint(packetSize, su.spaceObjectByteSize)
-      if (performance.now() - startTime >= 1000) {
-        addDataPoint(
-          timebuf,
-          getLatestValue(timebuf) + (performance.now() - startTime)
+    dataLen = su.unparsedDataLength
+    bytesRecievedLastSecond += dataLen
+    dataKeys = su.numberOfSpaceObjectKeys
+    rxDataBytes += dataLen * symbolByteSize
+    // addDataPoint(packetSize, su.spaceObjectByteSize)
+    if (performance.now() - startTime >= 1000) {
+      addDataPoint(
+        timebuf,
+        getLatestValue(timebuf) + (performance.now() - startTime)
+      )
+      ops = numberOfServerObjects
+      startTime = performance.now()
+      if (numberOfServerObjects > 0) {
+        symbolsPerSec = round2dec(
+          bytesRecievedLastSecond / numberOfServerObjects,
+          1
         )
-        ops = numberOfServerObjects
-        startTime = performance.now()
-        if (numberOfServerObjects > 0) {
-          symbolsPerSec = round2dec(
-            bytesRecievedLastSecond / numberOfServerObjects,
-            1
-          )
-          byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
-          bitSpeed = round2dec(byteSpeed * byteSize, 1)
-          addDataPoint(downloadBuf, bitSpeed)
-        }
-        numberOfServerObjects = 0
-        bytesRecievedLastSecond = 0
-      } else {
-        numberOfServerObjects++
+        byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
+        bitSpeed = round2dec(byteSpeed * byteSize, 1)
+        addDataPoint(downloadBuf, bitSpeed)
       }
+      numberOfServerObjects = 0
+      bytesRecievedLastSecond = 0
+    } else {
+      numberOfServerObjects++
+    }
   }
 
   function handleGameUpdate(su: ServerUpdate<SpaceObject>) {
@@ -308,46 +381,45 @@ export function initRegularGame(game: Game): void {
   }
 
   function handleChatUpdate(playerUpdate: ServerUpdate<SpaceObject>) {
-      chatMsgHistoryStore.update((previousMessages) => [
-        ...previousMessages,
-        {
-          message: playerUpdate.dataObject.lastMessage,
-          timeDate: new Date(),
-          user: playerUpdate.dataObject,
-        },
-      ])
+    chatMsgHistoryStore.update((previousMessages) => [
+      ...previousMessages,
+      {
+        message: playerUpdate.dataObject.lastMessage,
+        timeDate: new Date(),
+        user: playerUpdate.dataObject,
+      },
+    ])
   }
 
-  function handleServerInformationUpdate(playerUpdate: ServerUpdate<SpaceObject>) {
+  function handleServerInformationUpdate(
+    playerUpdate: ServerUpdate<SpaceObject>
+  ) {
     game.serverVersion = playerUpdate.dataObject.serverVersion
     info(
       `Service message: server version: ${playerUpdate.dataObject.serverVersion}`
     )
   }
 
-  game.websocket.addListener(
-    (playerUpdate) => {
-      switch (playerUpdate.dataObject.messageType) {
-        case MessageType.SHIP_UPDATE:
-          handleShipUpdate(playerUpdate)
-          break;
-        case MessageType.SERVICE:
-          handleServerInformationUpdate(playerUpdate)
-          break;
-        case MessageType.CHAT_MESSAGE:
-          handleChatUpdate(playerUpdate)
-          break;
-        default:
-          if(playerUpdate.dataObject) {
-            handleGameUpdate(playerUpdate)
-          }
-          break;
-      }
-    },
-    (npcUpdate) => {
-      handleNpcUpdate(npcUpdate)
+  function playerUpdate(so: ServerUpdate<SpaceObject>) {
+    switch (so.dataObject.messageType) {
+      case MessageType.SHIP_UPDATE:
+        handleShipUpdate(so)
+        break
+      case MessageType.SERVICE:
+        handleServerInformationUpdate(so)
+        break
+      case MessageType.CHAT_MESSAGE:
+        handleChatUpdate(so)
+        break
+      default:
+        if (so.dataObject) {
+          handleGameUpdate(so)
+        }
+        break
     }
-  )
+  }
+
+  game.websocket.addListener(playerUpdate, handleNpcUpdate)
 }
 
 function exists(entity: SpaceObject, entities: SpaceObject[]): boolean {
@@ -402,17 +474,20 @@ function handleLocalPlayer(game: Game) {
     }
 
     if (localPlayer.positionalTrace) {
-
-      for(let i = localPlayer.positionalTrace.length - 1; i >= 0; i--) {
+      for (let i = localPlayer.positionalTrace.length - 1; i >= 0; i--) {
         const trace = localPlayer.positionalTrace[i]
         const tracePos = getRemotePosition(trace, game.localPlayer)
         if (localPlayer.afterBurner) {
-          renderTrail(localPlayer.positionalTrace[i], game.ctx, true, game.style, tracePos)
+          renderTrail(
+            localPlayer.positionalTrace[i],
+            game.ctx,
+            true,
+            game.style,
+            tracePos
+          )
         }
       }
-
     }
-
   }
 
   //Track other players with beam!
@@ -434,12 +509,14 @@ function handleLocalPlayer(game: Game) {
   moveView(game)
 }
 
-function renderRemotePlayerInSpaceMode(remotes: SpaceObject[], game: Game): void {
+function renderRemotePlayerInSpaceMode(
+  remotes: SpaceObject[],
+  game: Game
+): void {
   remotes.forEach((remotePlayer) => {
     const remotePos = getRemotePosition(remotePlayer, game.localPlayer)
 
     // hack: should not be done here...
-
 
     if (remotePlayer.health <= 0) {
       handleDeathExplosion(remotePlayer, explosionDuration)
@@ -449,14 +526,19 @@ function renderRemotePlayerInSpaceMode(remotes: SpaceObject[], game: Game): void
       return
     } else {
       renderShip(remotePlayer, game.ctx, false, game.style, remotePos)
-     
-      if (remotePlayer.positionalTrace) {
 
-        for(let i = remotePlayer.positionalTrace.length - 1; i >= 0; i--) {
+      if (remotePlayer.positionalTrace) {
+        for (let i = remotePlayer.positionalTrace.length - 1; i >= 0; i--) {
           const trace = remotePlayer.positionalTrace[i]
           const tracePos = getRemotePosition(trace, game.localPlayer)
           if (remotePlayer.afterBurner) {
-            renderTrail(remotePlayer.positionalTrace[i], game.ctx, true, game.style, tracePos)
+            renderTrail(
+              remotePlayer.positionalTrace[i],
+              game.ctx,
+              true,
+              game.style,
+              tracePos
+            )
           }
         }
       }
@@ -468,7 +550,10 @@ function renderRemotePlayerInSpaceMode(remotes: SpaceObject[], game: Game): void
       if (remotePlayer.health < remotePlayer.startHealth) {
         const theme = getCurrentTheme()
         renderProgressBar(
-          add2(remotePos, newVec2(-remotePlayer.hitRadius / 1, -remotePlayer.hitRadius / 0.65)),
+          add2(
+            remotePos,
+            newVec2(-remotePlayer.hitRadius / 1, -remotePlayer.hitRadius / 0.65)
+          ),
           'Hp',
           remotePlayer.health,
           remotePlayer.startHealth,
@@ -519,7 +604,12 @@ function handleGameBodies(game: Game): SpaceObject[] {
     } else {
       renderMoon(body, bodyPos, game.ctx, game.style)
       if (game.keyFuncMap.systemGraphs.keyStatus) {
-        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
+        renderVec2(
+          `camera: ${to_string2(body.cameraPosition)}`,
+          add2(bodyPos, newVec2(-100, -100)),
+          game.ctx,
+          game.style
+        )
         renderHitRadius(body, game.ctx)
       }
 
@@ -596,7 +686,6 @@ export function moveView(game: Game) {
 }
 
 export function renderFrame(game: Game, dt: number): void {
-
   // Heads up stuff
 
   every.tick(() => {
@@ -610,7 +699,13 @@ export function renderFrame(game: Game, dt: number): void {
 
     localPlayerStore.update((s) => ({ ...s, ship: s.ship }))
 
-    gameState.set({ scoreScreenData: { player: game.localPlayer, remotePlayers: remotePlayers, serverObjects: game.bodies } })
+    gameState.set({
+      scoreScreenData: {
+        player: game.localPlayer,
+        remotePlayers: remotePlayers,
+        serverObjects: game.bodies,
+      },
+    })
   })
 
   if (game.keyFuncMap.systemGraphs.keyStatus) {
@@ -618,11 +713,13 @@ export function renderFrame(game: Game, dt: number): void {
   }
 
   //Change GameMode
-  game.mode = game.keyFuncMap.changeMode.keyStatus ? GameMode.ARCADE_MODE : GameMode.SPACE_MODE
+  game.localPlayer.gameMode = game.keyFuncMap.changeMode.keyStatus    
+    ? GameMode.SPACE_MODE
+    : GameMode.ARCADE_MODE
 
-
-  if (game.mode === GameMode.ARCADE_MODE) {
+  if (game.localPlayer.gameMode === GameMode.ARCADE_MODE) {
     // Render arcade style game
+    renderCharacter(game.localPlayer, game.ctx)
 
   } else {
     // Render space style game
@@ -631,9 +728,7 @@ export function renderFrame(game: Game, dt: number): void {
     renderRemotePlayerInSpaceMode(game.remotePlayers, game)
     handleGameBodies(game)
     handleLocalPlayer(game)
-
   }
-
 
   // Stats - G
   let objCount = 0
@@ -641,7 +736,10 @@ export function renderFrame(game: Game, dt: number): void {
     objCount += getRenderableObjectCount(p)
   })
 
-  addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
+  addDataPoint(
+    renderObjBuf,
+    objCount + getRenderableObjectCount(game.localPlayer)
+  )
   addDataPoint(ppsbuf, ops)
   addDataPoint(rxByteDataBuf, rxDataBytes)
   addDataPoint(speedbuf, 100 * magnitude2(game.localPlayer.velocity))
@@ -651,9 +749,21 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(angularVelocityGraph, game.localPlayer.angularVelocity * 1000)
   addDataPoint(ammoGraph, game.localPlayer.ammo)
   try {
-    addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)
-    addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(game.localPlayer)).length)
-    addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(game.localPlayer))).length)
+    addDataPoint(
+      shotSize,
+      new TextEncoder().encode(
+        JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))
+      ).length
+    )
+    addDataPoint(
+      soSize,
+      new TextEncoder().encode(JSON.stringify(game.localPlayer)).length
+    )
+    addDataPoint(
+      dataTest,
+      new TextEncoder().encode(JSON.stringify(reduceSoSize(game.localPlayer)))
+        .length
+    )
   } catch (e) {
     /* empty */
   }
@@ -665,39 +775,83 @@ export function renderFrame(game: Game, dt: number): void {
       const w = 250
       const space = 200
       const startx = 110
-      if (i < half) renderGraph(g, { x: 400, y: startx + i * space }, { x: w, y: h }, game.ctx)
-      else renderGraph(g, { x: 1300, y: startx + (i - half) * space }, { x: w, y: h }, game.ctx)
+      if (i < half)
+        renderGraph(
+          g,
+          { x: 400, y: startx + i * space },
+          { x: w, y: h },
+          game.ctx
+        )
+      else
+        renderGraph(
+          g,
+          { x: 1300, y: startx + (i - half) * space },
+          { x: w, y: h },
+          game.ctx
+        )
     })
 
     renderInfoText(`packets/sec: ${ops}`, 450, game.ctx)
     renderInfoText(`packet symbol count: ${dataLen}`, 500, game.ctx)
     renderInfoText(`object key count: ${dataKeys}`, 550, game.ctx)
     renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, game.ctx)
-    renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, game.ctx)
-    renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, game.ctx)
+    renderInfoText(
+      `rx byte speed: ${siPretty(byteSpeed, 'B/s')}`,
+      650,
+      game.ctx
+    )
+    renderInfoText(
+      `rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`,
+      700,
+      game.ctx
+    )
     renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, game.ctx)
 
     renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, game.ctx)
 
     // Position info for debugging
-    renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(-100, -100)), game.ctx, game.style)
-    renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(200, -150)), game.ctx, game.style)
-    renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add2(game.localPlayer.viewFramePosition, newVec2(-400, -200)), game.ctx, game.style)
     renderVec2(
-      `world: ${to_string2(add2(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
+      `camera: ${to_string2(game.localPlayer.cameraPosition)}`,
+      add2(game.localPlayer.viewFramePosition, newVec2(-100, -100)),
+      game.ctx,
+      game.style
+    )
+    renderVec2(
+      `view: ${to_string2(game.localPlayer.viewFramePosition)}`,
+      add2(game.localPlayer.viewFramePosition, newVec2(200, -150)),
+      game.ctx,
+      game.style
+    )
+    renderVec2(
+      `position: ${to_string2(game.localPlayer.position)}`,
+      add2(game.localPlayer.viewFramePosition, newVec2(-400, -200)),
+      game.ctx,
+      game.style
+    )
+    renderVec2(
+      `world: ${to_string2(
+        add2(
+          game.localPlayer.viewFramePosition,
+          game.localPlayer.cameraPosition
+        )
+      )}`,
       add2(game.localPlayer.viewFramePosition, newVec2(0, 100)),
       game.ctx,
       game.style
     )
-    renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), game.ctx, game.style)
+    renderVec2(
+      `velocity: ${to_string2(game.localPlayer.velocity)}`,
+      add2(game.localPlayer.viewFramePosition, newVec2(300, 200)),
+      game.ctx,
+      game.style
+    )
   }
-
 }
 
 function handleStarBackdrop(game: Game): void {
+
   // move star ref with inverted view frame position and factor
   for (let i = 0; i < game.stars.length; i++) {
-
     const star = game.stars[i]
 
     if (
@@ -726,21 +880,23 @@ function handleStarBackdrop(game: Game): void {
     renderPoint(game.ctx, starpos, game.style.starColor, star.size)
 
     //Warp effect
-    renderLine(
-      game.ctx,
-      {
-        p1: starpos,
-        p2: smul2(game.localPlayer.viewFramePosition, 1),
-      },
-      game.style.starColor,
-      0.0025 * magnitude2(game.localPlayer.velocity)
-    )
+    if(magnitude2(game.localPlayer.velocity) > 0) {
+      renderLine(
+        game.ctx,
+        {
+          p1: starpos,
+          p2: smul2(game.localPlayer.viewFramePosition, 1),
+        },
+        game.style.starColor,
+        0.0025 * magnitude2(game.localPlayer.velocity)
+      )
+    }
   }
 }
 
 export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
-    if (game.mode === GameMode.SPACE_MODE) {
+    if (game.localPlayer.gameMode === GameMode.SPACE_MODE) {
       spaceObjectKeyController(game.localPlayer, dt)
       spaceTouchController(game.localPlayer, dt)
     } else {
@@ -764,7 +920,13 @@ export function nextFrame(game: Game, dt: number): void {
     return so.online || so.isLocal
   })
 
-  const currentSpaceObjects = game.all.concat(game.remotePlayers).concat(game.bodies)
+  const currentSpaceObjects = game.all
+    .concat(game.remotePlayers)
+    .concat(game.bodies)
 
-  handleCollisions(game.localPlayer.cameraPosition, currentSpaceObjects, game.ctx)
+  handleCollisions(
+    game.localPlayer.cameraPosition,
+    currentSpaceObjects,
+    game.ctx
+  )
 }

@@ -1,8 +1,14 @@
-import { SpaceObject } from "../interface"
-
+import type { SpaceObject } from "../interface"
+import { groundLevel } from "../physics/physics"
 
 export function renderCharacter(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
-    const p = so.characterGlobalPosition // Where should we land?
-    ctx.rect(p.x, p.y, 100, 100)
-}
+  ctx.save()
+  ctx.fillStyle = '#fff'
+  ctx.fillRect(0, groundLevel, so.viewport.x, 100)
 
+  const h = 100
+  ctx.fillRect(so.characterGlobalPosition.x, so.characterGlobalPosition.y - h, 50, h)
+
+
+  ctx.restore()
+}

@@ -1,11 +1,9 @@
-import type { Bounded, Remote, SpaceObject } from '../interface'
+import type { Bounded, Remote, SpaceObject, UIStyle } from '../interface'
 import { degToRad, linearTransform, magnitude2, round2dec, scalarMultiply2, to_string2, type Vec2 } from 'mathil'
 import { getScreenFromCanvas, getScreenRect } from '../canvas_util'
 import { getNamesAsString, setScaledFont } from './render2d'
-// import { getConnInfo, getReadyStateText } from '../websocket/webSocket'
 import { screenScale, timeScale } from '../constants'
 import type { Game } from '../game'
-import type { UIStyle } from '../../style/styleInterfaces'
 
 //Rendering the viewport of other players
 export function renderViewport(ctx: CanvasRenderingContext2D, remotePlayer: Remote & Bounded): void {

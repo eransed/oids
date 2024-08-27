@@ -8,7 +8,7 @@ import { menuOpen } from '../components/menu/MenuStore'
 export const activeKeyStates: Writable<KeyFunction[]> = writable()
 export const gameState: Writable<GameState> = writable()
 
-export const DefaultKeyMap: KeyFunctionMap = {
+export const DefaultSpaceModeKeyMap: KeyFunctionMap = {
   thrust: { activators: ['w', 'ArrowUp'], keyStatus: false },
   reverseThrust: { activators: ['s', 'ArrowDown'], keyStatus: false },
   boost: { activators: ['b'], keyStatus: false },
@@ -29,7 +29,31 @@ export const DefaultKeyMap: KeyFunctionMap = {
   menu: { activators: ['Escape'], keyStatus: false, store: writable<boolean>(false), toggle: true },
   jump: { activators: ['j'], keyStatus: false, store: writable<boolean>(false), toggle: false },
   changeMode: { activators: ['m'], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  tractorBeam: { activators: ['t'], keyStatus: false, store: writable<boolean>(false), toggle: true }
+  tractorBeam: { activators: ['t'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+}
+
+export const DefaultArcadeModeKeyMap: KeyFunctionMap = {
+  thrust: { activators: ['w', 'ArrowUp'], keyStatus: false },
+  reverseThrust: { activators: ['s', 'ArrowDown'], keyStatus: false },
+  boost: { activators: ['b'], keyStatus: false },
+  halt: { activators: ['h'], keyStatus: false, toggle: true },
+  turnLeft: { activators: ['a', 'ArrowLeft'], keyStatus: false },
+  turnRight: { activators: ['d', 'ArrowRight'], keyStatus: false },
+  strafeLeft: { activators: ['q', 'PageUp'], keyStatus: false },
+  strafeRight: { activators: ['e', 'PageDown'], keyStatus: false },
+  fire: { activators: ['ctrl'], keyStatus: false },
+  reload: { activators: ['r'], keyStatus: false },
+  selfDestroy: { activators: ['k'], keyStatus: false },
+  systemGraphs: { activators: ['g'], keyStatus: false, toggle: true },
+  leaderBoard: { activators: ['p'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  hotKeys: { activators: ['o'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  shipSettings: { activators: ['i'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  shipDetails: { activators: ['y'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  chat: { activators: ['c'], keyStatus: false, store: writable<boolean>(true), toggle: true },
+  menu: { activators: ['Escape'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  jump: { activators: [' '], keyStatus: false, store: writable<boolean>(false), toggle: false },
+  changeMode: { activators: ['m'], keyStatus: false, store: writable<boolean>(false), toggle: true },
+  tractorBeam: { activators: ['t'], keyStatus: false, store: writable<boolean>(false), toggle: true },
 }
 
 const DefaultTouchMap: TouchFunctionMap = {
@@ -53,13 +77,13 @@ export function capitalFirstChar(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-Object.entries(DefaultKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
+Object.entries(DefaultSpaceModeKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
   value.displayText = capitalFirstChar(key)
 })
 
 
 
-let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
+let ActiveKeyMap: KeyFunctionMap = DefaultSpaceModeKeyMap
 const ActiveTouch: TouchFunctionMap = DefaultTouchMap
 
 export function setKeyStateStore() {
@@ -130,6 +154,23 @@ function reloadSpaceObject(so: SpaceObject) {
 
 export function arcadeModeKeyController(so: SpaceObject, dt = 1) {
   // pass
+  if (ActiveKeyMap.turnRight.keyStatus) {
+    so.characterGlobalPosition.x += 1 * dt
+    so.acceleration.x = 0.0005 * dt
+  }
+
+  if (ActiveKeyMap.turnLeft.keyStatus) {
+    so.characterGlobalPosition.x -= 1 * dt
+  so.acceleration.x = -0.0005   * dt
+  }
+
+  if (ActiveKeyMap.jump.keyStatus) {
+    if (!so.isJumping) {
+      so.isJumping = true
+      so.acceleration.y = -2.3
+      so.characterGlobalPosition.y-=1
+    }
+  }
 }
 
 export function spaceObjectKeyController(so: SpaceObject, dt = 1) {

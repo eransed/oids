@@ -5,6 +5,8 @@ import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 // import type { Ship } from '@prisma/client'
 import type { Ship } from './interface'
 import { Towns } from './worlds/worldInterface'
+import { groundLevel } from './physics/physics'
+import { GameMode } from './game'
 
 export function newPhotonLaser(): PhotonLaser {
   const shot: PhotonLaser = {
@@ -142,7 +144,9 @@ export function createSpaceObject(
     moonType: 0,
     hometown: Towns.Coruscant,
     ticksSinceLastSnapShot: 0,
-    characterGlobalPosition: newVec2()
+    characterGlobalPosition: newVec2(500, groundLevel),
+    isJumping: false,
+    gameMode: GameMode.SPACE_MODE
   }
 
   spaceObject.hitRadius = Math.sqrt(

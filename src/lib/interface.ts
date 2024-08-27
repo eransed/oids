@@ -3,6 +3,7 @@ import { newVec2, type Vec2 } from 'mathil'
 import type { Steerable } from './traits/Steerable'
 import type { ShipVariant } from '../style/ships'
 import type { Towns } from './worlds/worldInterface'
+import { GameMode } from './game'
 
 export enum GameType {
   SinglePlayer,
@@ -227,6 +228,14 @@ export interface Belonging {
   hometown: Towns
 }
 
+export interface Jumpable {
+  isJumping: boolean
+}
+
+
+export interface GameModable {
+  gameMode: GameMode
+}
 export interface SpaceObject
   extends PlayingShip,
     Shapable,
@@ -254,7 +263,9 @@ export interface SpaceObject
     MoonType,
     Belonging,
     Traceable,
-    Landable {}
+    Landable,
+    Jumpable, 
+    GameModable {}
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number
