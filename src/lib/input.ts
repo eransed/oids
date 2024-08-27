@@ -28,6 +28,7 @@ export const DefaultKeyMap: KeyFunctionMap = {
   chat: { activators: ['c'], keyStatus: false, store: writable<boolean>(true), toggle: true },
   menu: { activators: ['Escape'], keyStatus: false, store: writable<boolean>(false), toggle: true },
   jump: { activators: ['j'], keyStatus: false, store: writable<boolean>(false), toggle: false },
+  changeMode: { activators: ['m'], keyStatus: false, store: writable<boolean>(false), toggle: true }
 }
 
 const DefaultTouchMap: TouchFunctionMap = {

@@ -578,6 +578,9 @@ export function renderFrame(game: Game, dt: number): void {
     fpsCounter(ops, dt, game, game.ctx)
   }
 
+  //Change GameMode
+  game.mode = game.keyFuncMap.changeMode.keyStatus ? GameMode.SPACE_MODE : GameMode.ARCADE_MODE
+
 
   if (game.mode === GameMode.ARCADE_MODE) {
     // Render arcade style game

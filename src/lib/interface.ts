@@ -314,6 +314,7 @@ export interface KeyFunctionMap {
   chat: KeyFunctionStore
   menu: KeyFunctionStore
   jump: KeyFunctionStore
+  changeMode: KeyFunctionStore
 }
 
 export interface TouchFunctionMap {

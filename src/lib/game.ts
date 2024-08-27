@@ -14,7 +14,7 @@ export enum GameMode {
   ARCADE_MODE,
 }
 export class Game {
-  mode: GameMode = GameMode.SPACE_MODE
+  mode: GameMode = GameMode.ARCADE_MODE
   websocket: OidsSocket
   running = false
   type: GameType = GameType.SinglePlayer
@@ -107,7 +107,11 @@ export class Game {
     this.stopper = renderLoop(this, renderFrame, nextFrame)
   }
 
-  startGame(initFn: (g: Game) => void, renderFn: (game: Game, dt: number) => void, nextFn: (game: Game, dt: number) => void): void {
+  startGame(
+    initFn: (g: Game) => void,
+    renderFn: (game: Game, dt: number) => void,
+    nextFn: (game: Game, dt: number) => void
+  ): void {
     this.shouldSendToServer = true
     this.localPlayer.isPlaying = true
     initFn(this)
