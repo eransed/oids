@@ -20,10 +20,12 @@ import {
   dist2,
   warn,
   error,
+  sdiv2,
+  norm,
 } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
-import { friction, getRemotePosition, offScreen_mm, wrap_mm } from '../physics/physics'
-import { loadingText, renderHitRadius, renderInfoText, renderPoint } from '../render/render2d'
+import { friction, getRemotePosition, getWorldCoordinates, offScreen_mm, wrap_mm } from '../physics/physics'
+import { loadingText, renderHitRadius, renderInfoText, renderLine, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type ServerUpdate } from '../interface'
 import { randomAnyColor } from '../color'
@@ -143,8 +145,8 @@ export function resetStars(game: Game | null) {
     game.stars.forEach((s, i) => {
       const r = randomPositionInCurrentViewFrame(game.localPlayer, getScreenFromCanvas(game.ctx))
 
-      s.x = r.x
-      s.y = r.y
+      s.position.x = r.x
+      s.position.y = r.y
     })
   }, 250)
   info('reset stars')
@@ -195,8 +197,8 @@ export function initRegularGame(game: Game): void {
   game.localPlayer.position = rndfVec2(0, 0)
 
   for (let i = 0; i < 400; i++) {
-    // create starts
-    const star = rndfVec2(0, 0)
+    // create stars
+    const star = {position: rndfVec2(0, 0), speedFactor: 1, size: rndi(2,5)} 
     game.stars.push(star)
   }
 
@@ -412,6 +414,23 @@ function handleLocalPlayer(game: Game) {
     }
 
   }
+
+  //Track other players with beam!
+  if (game.keyFuncMap.tractorBeam.keyStatus) {
+    for (let i = 0; i < game.remotePlayers.length; i++) {
+      const remotePlayer = game.remotePlayers[i]
+
+      renderLine(
+        game.ctx,
+        {
+          p1: getRemotePosition(remotePlayer, game.localPlayer),
+          p2: game.localPlayer.viewFramePosition,
+        },
+        game.style.starColor,
+        1
+      )
+    }
+  }
   moveView(game)
 }
 
@@ -599,7 +618,7 @@ export function renderFrame(game: Game, dt: number): void {
   }
 
   //Change GameMode
-  game.mode = game.keyFuncMap.changeMode.keyStatus ? GameMode.SPACE_MODE : GameMode.ARCADE_MODE
+  game.mode = game.keyFuncMap.changeMode.keyStatus ? GameMode.ARCADE_MODE : GameMode.SPACE_MODE
 
 
   if (game.mode === GameMode.ARCADE_MODE) {
@@ -612,6 +631,7 @@ export function renderFrame(game: Game, dt: number): void {
     renderRemotePlayerInSpaceMode(game.remotePlayers, game)
     handleGameBodies(game)
     handleLocalPlayer(game)
+
   }
 
 
@@ -677,21 +697,44 @@ export function renderFrame(game: Game, dt: number): void {
 function handleStarBackdrop(game: Game): void {
   // move star ref with inverted view frame position and factor
   for (let i = 0; i < game.stars.length; i++) {
-    if (offScreen_mm(game.stars[i], game.localPlayer.cameraPosition, add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)))) {
+
+    const star = game.stars[i]
+
+    if (
+      offScreen_mm(
+        star.position,
+        game.localPlayer.cameraPosition,
+        add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx))
+      )
+    ) {
       // just wrapping the stars looks better:
       // but this causes the stars to bunch up in a line or grid pattern after flying around some
       // so add some randomness when wrapping and regenerate them outside of the screen...
       const minRand = 0
       const maxRand = 500
       wrap_mm(
-        game.stars[i],
+        star.position,
         sub2(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)),
-        add2(add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand))
+        add2(
+          add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)),
+          rndfVec2(minRand, maxRand)
+        )
       )
     }
 
-    const starpos = sub2(game.stars[i], smul2(game.localPlayer.cameraPosition, 1))
-    renderPoint(game.ctx, starpos, game.style.starColor, screenScale * 1.5)
+    const starpos = sub2(star.position, game.localPlayer.cameraPosition)
+    renderPoint(game.ctx, starpos, game.style.starColor, star.size)
+
+    //Warp effect
+    renderLine(
+      game.ctx,
+      {
+        p1: starpos,
+        p2: smul2(game.localPlayer.viewFramePosition, 1),
+      },
+      game.style.starColor,
+      0.0025 * magnitude2(game.localPlayer.velocity)
+    )
   }
 }
 

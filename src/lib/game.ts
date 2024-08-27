@@ -7,7 +7,7 @@ import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
 import type { Vec2 } from 'mathil'
 import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
-import type { UIStyle } from './interface'
+import type { Star, UIStyle } from './interface'
 
 export enum GameMode {
   SPACE_MODE,
@@ -34,7 +34,7 @@ export class Game {
   stopper: (() => Promise<number>) | null = null
   serverVersion = '_unknown_server_version_'
   style: UIStyle = getCurrentStyle()
-  stars: Vec2[] = []
+  stars: Star[] = []
 
   constructor(
     _canvas: HTMLCanvasElement,

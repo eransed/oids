@@ -315,6 +315,7 @@ export interface KeyFunctionMap {
   menu: KeyFunctionStore
   jump: KeyFunctionStore
   changeMode: KeyFunctionStore
+  tractorBeam: KeyFunctionStore
 }
 
 export interface TouchFunctionMap {
@@ -473,4 +474,10 @@ export interface Game {
   win: boolean
   played: Date
   userId: string | null
+}
+
+export interface Star {
+  position: Vec2
+  speedFactor: number
+  size: number
 }
