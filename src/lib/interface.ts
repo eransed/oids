@@ -232,7 +232,6 @@ export interface Jumpable {
   isJumping: boolean
 }
 
-
 export interface GameModable {
   gameMode: GameMode
 }
@@ -264,7 +263,7 @@ export interface SpaceObject
     Belonging,
     Traceable,
     Landable,
-    Jumpable, 
+    Jumpable,
     GameModable {}
 
 export interface ServerUpdate<T> {
@@ -278,21 +277,10 @@ export interface Ageable {
   age: number
 }
 
-export interface PhotonLaser
-  extends Damager,
-    Physical,
-    Damageable,
-    Rotatable,
-    Colorable,
-    Ageable {}
+export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable, Ageable {}
 
 export function getRenderableObjectCount(so: SpaceObject): number {
-  return (
-    1 +
-    so.shotsInFlight.length +
-    so.collidingWith.length +
-    so.shotsInFlightNew.length
-  )
+  return 1 + so.shotsInFlight.length + so.collidingWith.length + so.shotsInFlightNew.length
 }
 
 // export function applySteer(o: Steerable, deltaTime: number): void {
@@ -356,7 +344,7 @@ export interface KeyFunction {
 }
 
 export interface KeyFunctionStore extends KeyFunction {
-  store: Writable<boolean>
+  store: boolean
 }
 
 export interface GameState {

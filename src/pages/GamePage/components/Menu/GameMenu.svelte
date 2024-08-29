@@ -4,7 +4,7 @@
   import type { Game } from '../../../../lib/game'
   import { settingsStore } from '../../../../stores/stores'
   import { toggleAndGetTheme } from '../../../../style/defaultColors'
-  import { getKeyMap, initKeyControllers, removeKeyControllers } from '../../../../lib/input'
+  import { ActiveKeyMapStore, initKeyControllers, removeKeyControllers } from '../../../../lib/input'
   import { onMount } from 'svelte'
   import MenuWrapper from '../../../../components/menu/MenuWrapper.svelte'
   import Button90 from '../../../../components/menu/Button90.svelte'
@@ -27,13 +27,13 @@
     }
 
     if (e.key === 'e' || e.key === 'Escape') {
-      getKeyMap().menu.store.set(false)
+      $ActiveKeyMapStore.menu.store = false
       deleteEventListener()
       initKeyControllers()
     }
 
     if (e.key === 'q') {
-      getKeyMap().menu.store.set(false)
+      $ActiveKeyMapStore.menu.store = false
       currentGame.stopGame()
       navigate('/play')
       deleteEventListener()
@@ -51,7 +51,7 @@
   const continueGame: Button90Config = {
     buttonText: 'Continue (E)',
     clickCallback() {
-      getKeyMap().menu.store.set(false)
+      $ActiveKeyMapStore.menu.store = false
       initKeyControllers()
       deleteEventListener()
     },
@@ -61,7 +61,7 @@
   const exit: Button90Config = {
     buttonText: 'Quit Game (Q)',
     clickCallback() {
-      getKeyMap().menu.store.set(false)
+      $ActiveKeyMapStore.menu.store = false
       currentGame.stopGame()
 
       navigate('/play')

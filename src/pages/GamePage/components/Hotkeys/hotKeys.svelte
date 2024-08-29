@@ -1,15 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
-  import {
-
-  DefaultSpaceModeKeyMap,
-    activeKeyStates,
-    getKeyMap,
-    keyDisplayName as keyDisplayText,
-    keyFuncArrayFromKeyFunctionMap,
-    setKeyMap,
-  } from '../../../../lib/input'
+  import { DefaultSpaceModeKeyMap, activeKeyStates, keyDisplayName as keyDisplayText, keyFuncArrayFromKeyFunctionMap } from '../../../../lib/input'
   import { submitHotkeyChange } from './hotKeysChange'
   import type { KeyFunction } from '../../../../lib/interface'
   export let activeColor: string
@@ -53,23 +45,15 @@
       <tbody class="keyRow">
         <tr>
           {#if keyFunction.keyStatus}
-            <td style="color: {activeColor}"
-              >{'+ ' + keyFunction.displayText}</td
-            >
+            <td style="color: {activeColor}">{'+ ' + keyFunction.displayText}</td>
           {:else}
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <td style="color: 'grey'">{'- ' + keyFunction.displayText}</td>
           {/if}
           <td style="display: flex; gap: 0.5em">
-            <button
-              class="addKey buttonStyle"
-              on:click={() => (changeKey = keyFunction)}>+</button
-            >
+            <button class="addKey buttonStyle" on:click={() => (changeKey = keyFunction)}>+</button>
             {#if changeKey === keyFunction}
-              <ModalSimple
-                saveButton={false}
-                closeBtn={() => (changeKey = undefined)}
-              >
+              <ModalSimple saveButton={false} closeBtn={() => (changeKey = undefined)}>
                 <span style="text-align: center;">
                   <table style="width: 100%;">
                     <th><h3>{keyFunction.displayText}</h3></th>
@@ -98,9 +82,7 @@
                     keyFunction: keyFunction,
                     del: true,
                   })}
-                style={keyFunction.keyStatus
-                  ? `background-color: ${activeColor}`
-                  : ''}
+                style={keyFunction.keyStatus ? `background-color: ${activeColor}` : ''}
                 class="buttonStyle">{keyDisplayText(activator)}</button
               >
             {/each}
