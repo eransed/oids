@@ -1,22 +1,30 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
-  import { DefaultSpaceModeKeyMap, activeKeyStates, keyDisplayName as keyDisplayText, keyFuncArrayFromKeyFunctionMap } from '../../../../lib/input'
+  import { ActiveKeyMapStore, keyDisplayName as keyDisplayText, keyFuncArrayFromKeyFunctionMap } from '../../../../lib/input'
   import { submitHotkeyChange } from './hotKeysChange'
-  import type { KeyFunction } from '../../../../lib/interface'
+  import type { KeyFunction, KeyFunctionMap, KeyFunctionStore } from '../../../../lib/interface'
+  import type { GameMode } from '../../../../lib/game'
+
+  //Params
   export let activeColor: string
-  let changeKey: KeyFunction | undefined
+  export let keyFunctionMap: KeyFunctionMap
+  export let Mode: GameMode
+
+  $: keyFunctions = keyFuncArrayFromKeyFunctionMap(keyFunctionMap)
+  let changeKey: KeyFunctionStore | undefined
 
   function keydown(event: KeyboardEvent) {
     if (!changeKey) {
       return
     }
 
-    submitHotkeyChange({
-      keyMap: $activeKeyStates,
+    keyFunctions = submitHotkeyChange({
+      keyFunctionArray: keyFunctions,
       chosenKey: event.key,
       keyFunction: changeKey,
       del: false,
+      mode: Mode,
     })
 
     changeKey = undefined
@@ -41,7 +49,7 @@
       </tr>
     </thead>
 
-    {#each $activeKeyStates as keyFunction}
+    {#each keyFunctions as keyFunction}
       <tbody class="keyRow">
         <tr>
           {#if keyFunction.keyStatus}
@@ -76,12 +84,13 @@
               <button
                 title="Click to delete!"
                 on:click={() =>
-                  submitHotkeyChange({
-                    keyMap: $activeKeyStates,
+                  (keyFunctions = submitHotkeyChange({
+                    keyFunctionArray: keyFunctions,
                     chosenKey: activator,
                     keyFunction: keyFunction,
                     del: true,
-                  })}
+                    mode: Mode,
+                  }))}
                 style={keyFunction.keyStatus ? `background-color: ${activeColor}` : ''}
                 class="buttonStyle">{keyDisplayText(activator)}</button
               >

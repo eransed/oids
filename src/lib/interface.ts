@@ -317,6 +317,11 @@ export interface KeyFunctionMap {
   tractorBeam: KeyFunctionStore
 }
 
+export interface GameModeHotkeys {
+  spaceMode?: KeyFunctionMap | undefined
+  arcadeMode?: KeyFunctionMap | undefined
+}
+
 export interface TouchFunctionMap {
   thrust: boolean
   menu: boolean
@@ -339,7 +344,7 @@ export interface TouchFunctionMap {
 export interface KeyFunction {
   activators: string[]
   keyStatus: boolean
-  displayText?: string
+  displayText: string
   toggle?: boolean
 }
 
@@ -409,6 +414,7 @@ export interface Crater {
 export interface Settings {
   uiStyle: UIStyle
   theme: Theme
+  hotKeys: GameModeHotkeys | undefined
 }
 
 export interface UIStyle {
@@ -465,6 +471,7 @@ export interface User {
   played: number
   ships: Ship[]
   gameHistory: Game[]
+  hotkeys: GameModeHotkeys
 }
 
 export interface Game {

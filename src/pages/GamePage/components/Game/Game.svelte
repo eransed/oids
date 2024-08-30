@@ -6,7 +6,7 @@
   //Svelte
   import { onDestroy, onMount } from 'svelte'
   import { Game } from '../../../../lib/game'
-  import { ActiveKeyMapStore, initKeyControllers, initTouchControls, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
+  import { ActiveKeyMapStore, initKeyControllers, initTouchControls, keyFuncArrayFromKeyFunctionMap, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
 
   //Components
   import GameMenu from '../Menu/GameMenu.svelte'
@@ -37,6 +37,8 @@
   import ProfileModal from '../../../../components/profile/ProfileModal.svelte'
   import ShipCardInfo from '../../../../components/ships/ShipCardInfo.svelte'
   import { getShipBundleCache } from '../../../../style/ships'
+  import Button90 from '../../../../components/menu/Button90.svelte'
+  import { resetHotkeysToDefault } from '../../../../utils/utils'
 
   let game: Game
 
@@ -159,25 +161,41 @@
   </div>
 </div>
 
-<div class="gameInfo">
-  <InGameInfo title={'Leaderboard'} showModal={$ActiveKeyMapStore.leaderBoard.store}>
-    <div class="scoreScreen">
-      <ScoreScreen />
-    </div>
-  </InGameInfo>
+{#if game}
+  <div class="gameInfo">
+    <InGameInfo title={'Leaderboard'} showModal={$ActiveKeyMapStore.leaderBoard.store}>
+      <div class="scoreScreen">
+        <ScoreScreen />
+      </div>
+    </InGameInfo>
 
-  <InGameInfo title={'Key Map'} showModal={$ActiveKeyMapStore.hotKeys.store}>
-    <div class="hotKeys">
-      <HotKeys activeColor={$localPlayerStore.color} />
-    </div>
-  </InGameInfo>
+    <InGameInfo title={'Key Map'} showModal={$ActiveKeyMapStore.hotKeys.store}>
+      <div style="position: absolute; top: 0; right: 0; scale: 0.8">
+        <!-- Cant implement right now since its altering the Default KeyMap objects -->
+        <!-- <Button90
+          borderBottom
+          buttonType="button"
+          buttonConfig={{
+            buttonText: 'Reset hotkeys',
+            clickCallback() {
+              resetHotkeysToDefault(game.localPlayer.gameMode)
+            },
+            selected: false,
+          }}
+        /> -->
+      </div>
+      <div class="hotKeys">
+        <HotKeys Mode={game.localPlayer.gameMode} activeColor={$localPlayerStore.color} keyFunctionMap={$ActiveKeyMapStore} />
+      </div>
+    </InGameInfo>
 
-  <InGameInfo title={'Ship Settings'} showModal={$ActiveKeyMapStore.shipSettings.store}>
-    <div class="hotKeys">
-      <ShipSettings />
-    </div>
-  </InGameInfo>
-</div>
+    <InGameInfo title={'Ship Settings'} showModal={$ActiveKeyMapStore.shipSettings.store}>
+      <div class="hotKeys">
+        <ShipSettings />
+      </div>
+    </InGameInfo>
+  </div>
+{/if}
 
 <div class="bottomInterface">
   {#if $ActiveKeyMapStore.chat.store}

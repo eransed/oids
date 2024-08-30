@@ -1,9 +1,6 @@
 <script lang="ts">
   //Stores
-  import {
-    pageHasHeaderStore,
-    localPlayerStore,
-  } from '../../stores/stores'
+  import { pageHasHeaderStore, localPlayerStore } from '../../stores/stores'
   import { settingsComponent } from './SettingsButtons'
 
   //Components
@@ -18,7 +15,8 @@
   //Component
   import type { AlertType } from '../../components/alert/AlertType'
   import HotKeys from '../GamePage/components/Hotkeys/hotKeys.svelte'
-  import { initKeyControllers, removeKeyControllers } from '../../lib/input'
+  import { DefaultArcadeModeKeyMap, DefaultSpaceModeKeyMap, initKeyControllers, keyFuncArrayFromKeyFunctionMap, removeKeyControllers, savedHotkeysStore } from '../../lib/input'
+  import { GameMode } from '../../lib/game'
 
   onMount(() => {
     initKeyControllers()
@@ -27,7 +25,6 @@
   onDestroy(() => {
     removeKeyControllers()
   })
-
 
   pageHasHeaderStore.set(true)
 
@@ -42,38 +39,52 @@
     <div class="buttons">
       {#each Object.values(SettingsButtons) as button}
         <div>
-          <Button90
-            addInfo={button.config.buttonText}
-            icon={button.icon}
-            buttonConfig={button.config}
-            selected={$settingsComponent === button.config.routeParam}
-          />
+          <Button90 addInfo={button.config.buttonText} icon={button.icon} buttonConfig={button.config} selected={$settingsComponent === button.config.routeParam} />
         </div>
       {/each}
     </div>
-    <div class="content" style="padding: 1em; position: relative">
-      {#if $settingsComponent === SettingsButtons.controls.config.routeParam}
+    {#if $settingsComponent === SettingsButtons.controlsSpace.config.routeParam}
+      <div class="content" style="padding: 1em; position: relative">
         <table>
           <tr>
             <th>
-              <h3>Hotkeys</h3>
+              <h3>Hotkeys - Using Ship</h3>
             </th>
           </tr>
           <tr>
             <td>
-              <HotKeys activeColor={$localPlayerStore.color} />
+              <HotKeys Mode={GameMode.SPACE_MODE} activeColor={$localPlayerStore.color} keyFunctionMap={$savedHotkeysStore?.spaceMode ? $savedHotkeysStore.spaceMode : DefaultSpaceModeKeyMap} />
             </td>
           </tr>
           <tr>
             <td colspan="2">
-              <hr
-                style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5"
-              />
+              <hr style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5" />
             </td>
           </tr>
         </table>
-      {/if}
-    </div>
+      </div>
+    {/if}
+    {#if $settingsComponent === SettingsButtons.controlsArcade.config.routeParam}
+      <div class="content" style="padding: 1em; position: relative">
+        <table>
+          <tr>
+            <th>
+              <h3>Hotkeys - Player Mode (Arcade)</h3>
+            </th>
+          </tr>
+          <tr>
+            <td>
+              <HotKeys Mode={GameMode.ARCADE_MODE} activeColor={$localPlayerStore.color} keyFunctionMap={$savedHotkeysStore?.arcadeMode ? $savedHotkeysStore.arcadeMode : DefaultArcadeModeKeyMap} />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <hr style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5" />
+            </td>
+          </tr>
+        </table>
+      </div>
+    {/if}
   </div>
 </Page>
 

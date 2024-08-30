@@ -1,15 +1,6 @@
 import { GameMode, type Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
-import {
-  ActiveKeyMapStore,
-  arcadeModeKeyController,
-  DefaultArcadeModeKeyMap,
-  gameState,
-  initKeyControllers,
-  initTouchControls,
-  spaceObjectKeyController,
-  spaceTouchController,
-} from '../input'
+import { ActiveKeyMapStore, arcadeModeKeyController, DefaultArcadeModeKeyMap, gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
 import {
   add2,
   direction2,
@@ -674,12 +665,7 @@ export function renderFrame(game: Game, dt: number): void {
     renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(-100, -100)), game.ctx, game.style)
     renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(200, -150)), game.ctx, game.style)
     renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add2(game.localPlayer.viewFramePosition, newVec2(-400, -200)), game.ctx, game.style)
-    renderVec2(
-      `world: ${to_string2(add2(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
-      add2(game.localPlayer.viewFramePosition, newVec2(0, 100)),
-      game.ctx,
-      game.style
-    )
+    renderVec2(`world: ${to_string2(add2(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`, add2(game.localPlayer.viewFramePosition, newVec2(0, 100)), game.ctx, game.style)
     renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), game.ctx, game.style)
   }
 }
@@ -695,11 +681,7 @@ function handleStarBackdrop(game: Game): void {
       // so add some randomness when wrapping and regenerate them outside of the screen...
       const minRand = 0
       const maxRand = 500
-      wrap_mm(
-        star.position,
-        sub2(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)),
-        add2(add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand))
-      )
+      wrap_mm(star.position, sub2(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)), add2(add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand)))
     }
 
     const starpos = sub2(star.position, game.localPlayer.cameraPosition)
@@ -726,7 +708,6 @@ export function nextFrame(game: Game, dt: number): void {
       spaceObjectKeyController(game.localPlayer, dt)
       spaceTouchController(game.localPlayer, dt)
     } else {
-      ActiveKeyMapStore.set(DefaultArcadeModeKeyMap)
       arcadeModeKeyController(game.localPlayer, dt)
       // arcadeTouchController(game.localPlayer, dt)
     }

@@ -1,8 +1,6 @@
 import { writable, type Writable } from 'svelte/store'
 import type { Button90Config } from '../../lib/interface'
 
-
-
 import { Icons } from '../../style/icons'
 
 interface ProfileButton {
@@ -10,21 +8,31 @@ interface ProfileButton {
   config: Button90Config
 }
 
-
-
-const controls: ProfileButton = {
+const controlsSpace: ProfileButton = {
   icon: Icons.Play,
   config: {
-    buttonText: 'Controls',
+    buttonText: 'Controls Space',
     clickCallback: () => {
-      settingsComponent.set('controls')
+      settingsComponent.set('controlsSpace')
     },
-    routeParam: 'controls',
+    routeParam: 'controlsSpace',
     selected: false,
   },
 }
 
-export const SettingsButtons = { controls }
+const controlsArcade: ProfileButton = {
+  icon: Icons.MoonLanding,
+  config: {
+    buttonText: 'Controls Arcade',
+    clickCallback: () => {
+      settingsComponent.set('controlsArcade')
+    },
+    routeParam: 'controlsArcade',
+    selected: false,
+  },
+}
+
+export const SettingsButtons = { controlsSpace, controlsArcade }
 
 //Stores
-export const settingsComponent: Writable<string> = writable(controls.config.routeParam)
+export const settingsComponent: Writable<string> = writable(controlsSpace.config.routeParam)

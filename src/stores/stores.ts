@@ -26,19 +26,16 @@ export const pageHasHeaderStore: Writable<boolean> = writable(true)
 
 export const gameSessionIdStore: Writable<string | undefined> = writable('')
 
-export const localPlayerStore: Writable<SpaceObject> = writable(
-  createSpaceObject(createdGuestName)
-)
+export const localPlayerStore: Writable<SpaceObject> = writable(createSpaceObject(createdGuestName))
 
-export const socketStore: Writable<OidsSocket> = writable(
-  new OidsSocket(getWsUrl())
-)
+export const socketStore: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
 
 export const chatMsgHistoryStore: Writable<ChatMessage[]> = writable([])
 
 export const settingsStore: Writable<Settings> = writable({
   uiStyle: cnvTheme(DeepMidnight),
   theme: DeepMidnight,
+  hotKeys: undefined,
 })
 
 export const shouldCelebrateLevelUp: Writable<boolean> = writable(false)

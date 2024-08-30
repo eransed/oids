@@ -1,11 +1,6 @@
 <script lang="ts">
   //Stores
-  import {
-    pageHasHeaderStore,
-    userStore,
-    isLoggedInStore,
-    settingsStore,
-  } from '../../stores/stores'
+  import { pageHasHeaderStore, userStore, isLoggedInStore, settingsStore } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -37,15 +32,15 @@
   import { getThemeNumber, themes } from '../../style/defaultColors'
   import type { Theme } from '../../lib/interface'
 
-  onMount(() => {
+  onMount(async () => {
     if ($isLoggedInStore && !$userStore) {
-      getProfile().then(() => {
-        chosenTheme = themes[$userStore.theme]
-      })
+      const user = await getProfile()
+      if (user.data) {
+        chosenTheme = themes[user.data.theme]
+      }
     }
 
-    if($isLoggedInStore) {
-
+    if ($isLoggedInStore) {
       chosenTheme = themes[$userStore.theme]
     }
   })
@@ -70,9 +65,7 @@
   async function delUser() {
     const result = confirm(`Want to delete your account: ${$userStore.name}?`)
     if (result) {
-      const prompt = window.prompt(
-        `Write ${$userStore.name} in the box to delete user.`
-      )
+      const prompt = window.prompt(`Write ${$userStore.name} in the box to delete user.`)
       if (prompt === $userStore.name) {
         loading = true
 
@@ -150,12 +143,7 @@
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
           <div>
-            <Button90
-              addInfo={button.config.buttonText}
-              icon={button.icon}
-              buttonConfig={button.config}
-              selected={$profileComponent === button.config.routeParam}
-            />
+            <Button90 addInfo={button.config.buttonText} icon={button.icon} buttonConfig={button.config} selected={$profileComponent === button.config.routeParam} />
           </div>
         {/each}
       </div>
@@ -187,42 +175,20 @@
 
         {#if $profileComponent === ProfileButtons.settings.config.routeParam}
           <div class="userHeader">
-            <button
-              title="Change avatar"
-              class="avatar"
-              on:click={() => (avatarDialog = true)}
-              ><img
-                class="chosenAvatar"
-                src={$userStore.image}
-                alt={Avatars.AstronautDog}
-              /></button
-            >
+            <button title="Change avatar" class="avatar" on:click={() => (avatarDialog = true)}><img class="chosenAvatar" src={$userStore.image} alt={Avatars.AstronautDog} /></button>
             <div class="userInfo">
               <h3>{$userStore.name}</h3>
               <p>Created: <i>{formatDate($userStore.createdAt)}</i></p>
             </div>
           </div>
           {#if avatarDialog}
-            <ModalSimple
-              title="Choose an avatar!"
-              disabled={loading}
-              saveBtn={async () => await handleSaveAvatar()}
-              closeBtn={() => (avatarDialog = false)}
-            >
+            <ModalSimple title="Choose an avatar!" disabled={loading} saveBtn={async () => await handleSaveAvatar()} closeBtn={() => (avatarDialog = false)}>
               {#each Object.values(Avatars) as Avatar, i}
                 <button
                   class="imgCard"
-                  style="background: {Avatar === chosenAvatar
-                    ? 'var(--main-accent2-color)'
-                    : ''};
+                  style="background: {Avatar === chosenAvatar ? 'var(--main-accent2-color)' : ''};
                   animation-delay: {150 * i}ms;"
-                  on:click={() => (chosenAvatar = Avatar)}
-                  ><img
-                    draggable="false"
-                    src={Avatar}
-                    alt={Avatar}
-                    style=" margin: 1em"
-                  /></button
+                  on:click={() => (chosenAvatar = Avatar)}><img draggable="false" src={Avatar} alt={Avatar} style=" margin: 1em" /></button
                 >
               {/each}
             </ModalSimple>
@@ -284,21 +250,11 @@
             <!-- <td><input disabled={loading} on:keypress={onKeyPress} bind:value={email} /></td> -->
             <tr style="opacity: {opacity};">
               <td>Name</td>
-              <td
-                ><input
-                  disabled={!editSettings}
-                  bind:value={$userStore.name}
-                /></td
-              >
+              <td><input disabled={!editSettings} bind:value={$userStore.name} /></td>
             </tr>
             <tr style="opacity: {opacity};">
               <td>Email</td>
-              <td
-                ><input
-                  disabled={!editSettings}
-                  bind:value={$userStore.email}
-                /></td
-              >
+              <td><input disabled={!editSettings} bind:value={$userStore.email} /></td>
             </tr>
             <tr style="opacity: {opacity};">
               <td>Theme</td>
@@ -315,9 +271,7 @@
 
             <tr>
               <td colspan="2">
-                <hr
-                  style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5"
-                />
+                <hr style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5" />
               </td>
             </tr>
             <tr>
@@ -344,9 +298,7 @@
       </div>
     {:else}
       <div>
-        <p style="color: var(--main-text-color)">
-          Please login to see your profile
-        </p>
+        <p style="color: var(--main-text-color)">Please login to see your profile</p>
         <ProfileModal />
       </div>
     {/if}
