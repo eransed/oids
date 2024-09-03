@@ -1,6 +1,6 @@
 import { setGraphLineColor } from '../lib/constants'
 import { setGameSettings } from '../pages/GamePage/components/Game/Utils/mainGame'
-import type { Settings, Theme, UIStyle } from './styleInterfaces'
+import type { Settings, Theme, UIStyle } from '../lib/interface'
 import { info } from 'mathil'
 
 export function getThemeNumber(theme: Theme): number {

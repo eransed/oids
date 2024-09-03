@@ -9,10 +9,6 @@ import type { Vec2 } from 'mathil'
 import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
 import type { Star, UIStyle } from './interface'
 
-export enum GameMode {
-  SPACE_MODE,
-  ARCADE_MODE,
-}
 export class Game {
   websocket: OidsSocket
   running = false
@@ -40,7 +36,7 @@ export class Game {
     _localPlayer: SpaceObject,
     _websocket: OidsSocket,
     keyFuncMap: KeyFunctionMap,
-    _OnDeadLocalPlayerCallBack: () => void
+    _OnDeadLocalPlayerCallBack: () => void,
   ) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
@@ -109,7 +105,7 @@ export class Game {
   startGame(
     initFn: (g: Game) => void,
     renderFn: (game: Game, dt: number) => void,
-    nextFn: (game: Game, dt: number) => void
+    nextFn: (game: Game, dt: number) => void,
   ): void {
     this.shouldSendToServer = true
     this.localPlayer.isPlaying = true
