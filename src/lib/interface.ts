@@ -1,4 +1,3 @@
-import type { Writable } from 'svelte/store'
 import { newVec2, type Vec2 } from 'mathil'
 import type { Steerable } from './traits/Steerable'
 import type { ShipVariant } from '../style/ships'
@@ -298,6 +297,7 @@ export interface GameSettings {
 }
 
 export interface KeyFunctionMap {
+  name: string
   thrust: KeyFunction
   reverseThrust: KeyFunction
   boost: KeyFunction
@@ -322,8 +322,8 @@ export interface KeyFunctionMap {
 }
 
 export interface GameModeHotkeys {
-  spaceMode?: KeyFunctionMap | undefined
-  arcadeMode?: KeyFunctionMap | undefined
+  spaceMode: KeyFunctionMap
+  arcadeMode: KeyFunctionMap
 }
 
 export interface TouchFunctionMap {

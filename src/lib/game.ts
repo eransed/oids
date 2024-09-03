@@ -1,4 +1,4 @@
-import { GameType, type SpaceObject, type KeyFunctionMap } from './interface'
+import { GameType, type SpaceObject } from './interface'
 import { getContext } from './canvas_util'
 import { LightSource, LineSegment } from './shapes'
 import { renderLoop } from './time'
@@ -23,20 +23,18 @@ export class Game {
   all: SpaceObject[] = []
   shouldSendToServer = false
   hasCalledCallback = false
-  keyFuncMap: KeyFunctionMap
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
   serverVersion = '_unknown_server_version_'
   style: UIStyle = getCurrentStyle()
   stars: Star[] = []
 
-  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _websocket: OidsSocket, keyFuncMap: KeyFunctionMap, _OnDeadLocalPlayerCallBack: () => void) {
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _websocket: OidsSocket, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
     this.websocket = _websocket
     this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
     this.ctx = getContext(this.canvas)
-    this.keyFuncMap = keyFuncMap
     syncThemeWithCss()
   }
 

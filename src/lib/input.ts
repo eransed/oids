@@ -89,6 +89,7 @@ export const DefaultSpaceModeKeyMap: KeyFunctionMap = {
     toggle: true,
     displayText: 'Tractor Beam',
   },
+  name: 'DefaultSpace',
 }
 
 export const DefaultArcadeModeKeyMap: KeyFunctionMap = {
@@ -167,6 +168,7 @@ export const DefaultArcadeModeKeyMap: KeyFunctionMap = {
     toggle: true,
     displayText: 'Tractor Beam',
   },
+  name: 'DefaultArcade',
 }
 
 const DefaultTouchMap: TouchFunctionMap = {
@@ -211,31 +213,37 @@ export function getKeyBindings(): KeyFunction[] {
 export function keyFuncArrayFromKeyFunctionMap(kfm: KeyFunctionMap) {
   const keyValues: KeyFunctionStore[] = []
   Object.values(kfm).forEach((value) => {
-    keyValues.push(value)
+    if (typeof value !== 'string') {
+      keyValues.push(value)
+    }
   })
   return keyValues
 }
 
 function arrowControl(e: KeyboardEvent, keyUseState: boolean) {
   Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunctionStore) => {
-    keyFunction.activators.map((activator: string) => {
-      if (activator === e.key) {
-        if (keyFunction.toggle && keyUseState && e.type === 'keydown') {
-          keyFunction.keyStatus = !keyFunction.keyStatus
-        } else if (!keyFunction.toggle) {
-          keyFunction.keyStatus = keyUseState
-        }
+    if (typeof keyFunction !== 'string') {
+      keyFunction.activators.map((activator: string) => {
+        if (activator === e.key) {
+          if (keyFunction.toggle && keyUseState && e.type === 'keydown') {
+            keyFunction.keyStatus = !keyFunction.keyStatus
+          } else if (!keyFunction.toggle) {
+            keyFunction.keyStatus = keyUseState
+          }
 
-        keyFunction.store = keyFunction.keyStatus
-      }
-    })
+          keyFunction.store = keyFunction.keyStatus
+        }
+      })
+    }
   })
   setKeyStateStore()
 }
 
 function resetState() {
-  Object.values(ActiveKeyMap).forEach((keyFunction) => {
-    keyFunction.keyStatus = false
+  Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunction | string) => {
+    if (typeof keyFunction !== 'string') {
+      keyFunction.keyStatus = false
+    }
   })
 }
 
@@ -275,16 +283,15 @@ export function arcadeModeKeyController(so: SpaceObject, dt = 1) {
 
   if (ActiveKeyMap.changeMode.keyStatus) {
     console.log(ActiveKeyMap.changeMode.keyStatus)
-    if (so.gameMode === GameMode.ARCADE_MODE) {
-      ActiveKeyMap.changeMode.keyStatus = false
-      so.gameMode = GameMode.SPACE_MODE
-      if (savedHotkeys?.arcadeMode) {
-        ActiveKeyMapStore.set(savedHotkeys.arcadeMode)
-        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.arcadeMode))
-      } else {
-        ActiveKeyMapStore.set(DefaultArcadeModeKeyMap)
-        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultArcadeModeKeyMap))
-      }
+
+    ActiveKeyMap.changeMode.keyStatus = false
+    so.gameMode = GameMode.SPACE_MODE
+    if (savedHotkeys?.spaceMode) {
+      ActiveKeyMapStore.set(savedHotkeys.spaceMode)
+      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.spaceMode))
+    } else {
+      ActiveKeyMapStore.set(DefaultSpaceModeKeyMap)
+      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultSpaceModeKeyMap))
     }
   }
 }
@@ -293,16 +300,14 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   const dts: number = dt * timeScale
 
   if (ActiveKeyMap.changeMode.keyStatus) {
-    if (so.gameMode === GameMode.SPACE_MODE) {
-      ActiveKeyMap.changeMode.keyStatus = false
-      so.gameMode = GameMode.ARCADE_MODE
-      if (savedHotkeys?.spaceMode) {
-        ActiveKeyMapStore.set(savedHotkeys.spaceMode)
-        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.spaceMode))
-      } else {
-        ActiveKeyMapStore.set(DefaultSpaceModeKeyMap)
-        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultSpaceModeKeyMap))
-      }
+    ActiveKeyMap.changeMode.keyStatus = false
+    so.gameMode = GameMode.ARCADE_MODE
+    if (savedHotkeys?.arcadeMode) {
+      ActiveKeyMapStore.set(savedHotkeys.arcadeMode)
+      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.arcadeMode))
+    } else {
+      ActiveKeyMapStore.set(DefaultArcadeModeKeyMap)
+      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultArcadeModeKeyMap))
     }
   }
 

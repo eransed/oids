@@ -50,58 +50,60 @@
     </thead>
 
     {#each keyFunctions as keyFunction}
-      <tbody class="keyRow">
-        <tr>
-          {#if keyFunction.keyStatus}
-            <td style="color: {activeColor}">{'+ ' + keyFunction.displayText}</td>
-          {:else}
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <td style="color: 'grey'">{'- ' + keyFunction.displayText}</td>
-          {/if}
-          <td style="display: flex; gap: 0.5em">
-            <button class="addKey buttonStyle" on:click={() => (changeKey = keyFunction)}>+</button>
-            {#if changeKey === keyFunction}
-              <ModalSimple saveButton={false} closeBtn={() => (changeKey = undefined)}>
-                <span style="text-align: center;">
-                  <table style="width: 100%;">
-                    <th><h3>{keyFunction.displayText}</h3></th>
-
-                    <tr>
-                      <td>Hotkeys:</td><td
-                        >{#each keyFunction.activators as activator}{activator} /
-                        {/each}</td
-                      >
-                    </tr>
-                  </table>
-
-                  <h3 style="padding: 1em;">
-                    Press a key to assign to {keyFunction.displayText}
-                  </h3>
-                </span>
-              </ModalSimple>
+      {#if typeof keyFunction !== 'string'}
+        <tbody class="keyRow">
+          <tr>
+            {#if keyFunction.keyStatus}
+              <td style="color: {activeColor}">{'+ ' + keyFunction.displayText}</td>
+            {:else}
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <td style="color: 'grey'">{'- ' + keyFunction.displayText}</td>
             {/if}
-            {#each keyFunction.activators as activator}
-              <button
-                title="Click to delete!"
-                on:click={() =>
-                  (keyFunctions = submitHotkeyChange({
-                    keyFunctionArray: keyFunctions,
-                    chosenKey: activator,
-                    keyFunction: keyFunction,
-                    del: true,
-                    mode: Mode,
-                  }))}
-                style={keyFunction.keyStatus ? `background-color: ${activeColor}` : ''}
-                class="buttonStyle">{keyDisplayText(activator)}</button
-              >
-            {/each}
-            {#if keyFunction.activators.length === 0}
-              <p style="color: red;">No button assigned!</p>
-            {/if}
-          </td>
-          <td>{keyFunction.toggle ? '<toggle>' : '<momentary>'}</td>
-        </tr>
-      </tbody>
+            <td style="display: flex; gap: 0.5em">
+              <button class="addKey buttonStyle" on:click={() => (changeKey = keyFunction)}>+</button>
+              {#if changeKey === keyFunction}
+                <ModalSimple saveButton={false} closeBtn={() => (changeKey = undefined)}>
+                  <span style="text-align: center;">
+                    <table style="width: 100%;">
+                      <th><h3>{keyFunction.displayText}</h3></th>
+
+                      <tr>
+                        <td>Hotkeys:</td><td
+                          >{#each keyFunction.activators as activator}{activator} /
+                          {/each}</td
+                        >
+                      </tr>
+                    </table>
+
+                    <h3 style="padding: 1em;">
+                      Press a key to assign to {keyFunction.displayText}
+                    </h3>
+                  </span>
+                </ModalSimple>
+              {/if}
+              {#each keyFunction.activators as activator}
+                <button
+                  title="Click to delete!"
+                  on:click={() =>
+                    (keyFunctions = submitHotkeyChange({
+                      keyFunctionArray: keyFunctions,
+                      chosenKey: activator,
+                      keyFunction: keyFunction,
+                      del: true,
+                      mode: Mode,
+                    }))}
+                  style={keyFunction.keyStatus ? `background-color: ${activeColor}` : ''}
+                  class="buttonStyle">{keyDisplayText(activator)}</button
+                >
+              {/each}
+              {#if keyFunction.activators.length === 0}
+                <p style="color: red;">No button assigned!</p>
+              {/if}
+            </td>
+            <td>{keyFunction.toggle ? '<toggle>' : '<momentary>'}</td>
+          </tr>
+        </tbody>
+      {/if}
     {/each}
   </table>
 </div>

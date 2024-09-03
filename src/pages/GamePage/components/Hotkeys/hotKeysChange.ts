@@ -18,7 +18,9 @@ export const submitHotkeyChange = ({ keyFunctionArray, keyFunction, del = false,
     deleteHotkey(keyFunction, chosenKey)
   } else {
     keyFunction.activators.push(chosenKey)
-    activeHotKeys.update((d) => d)
+    activeHotKeys.update((d) => {
+      return d
+    })
   }
 
   localStorage.setItem(GameMode[mode], JSON.stringify(keyFunctionArray))
@@ -44,18 +46,22 @@ export const submitHotkeyChange = ({ keyFunctionArray, keyFunction, del = false,
 
 function checkExistingKeyMap(keyMap: KeyFunctionStore[], chosenKey: string) {
   for (let i = 0; i < keyMap.length; i++) {
-    keyMap[i].activators.map((v) => {
-      if (v === chosenKey) {
-        deleteHotkey(keyMap[i], chosenKey)
-      }
-    })
+    if (typeof keyMap[i] !== 'string') {
+      keyMap[i].activators.map((v) => {
+        if (v === chosenKey) {
+          deleteHotkey(keyMap[i], chosenKey)
+        }
+      })
+    }
   }
 }
 
 function deleteHotkey(keyFunction: KeyFunctionStore, chosenKey: string) {
   keyFunction.activators = keyFunction.activators.filter((item) => item !== chosenKey)
 
-  activeHotKeys.update((d) => d)
+  activeHotKeys.update((d) => {
+    return d
+  })
   // console.log(`Deleted ${chosenKey} from ${keyFunction.displayText}`)
   return `Deleted ${chosenKey} from ${keyFunction.displayText}`
 }

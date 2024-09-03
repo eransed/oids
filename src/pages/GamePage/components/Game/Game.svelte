@@ -1,12 +1,12 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import type { ChosenShip, Session, Ship, SpaceObject } from '../../../../lib/interface'
+  import type { ChosenShip, Session, Ship } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
   import { Game } from '../../../../lib/game'
-  import { ActiveKeyMapStore, initKeyControllers, initTouchControls, keyFuncArrayFromKeyFunctionMap, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
+  import { ActiveKeyMapStore, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
 
   //Components
   import GameMenu from '../Menu/GameMenu.svelte'
@@ -31,14 +31,9 @@
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
   import ProgressBar from '../../../../components/progress/progressBar.svelte'
-  import { screenScale } from '../../../../lib/constants'
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
   import Celebration from '../../../../components/celebration/celebration.svelte'
-  import ProfileModal from '../../../../components/profile/ProfileModal.svelte'
-  import ShipCardInfo from '../../../../components/ships/ShipCardInfo.svelte'
   import { getShipBundleCache } from '../../../../style/ships'
-  import Button90 from '../../../../components/menu/Button90.svelte'
-  import { resetHotkeysToDefault } from '../../../../utils/utils'
 
   let game: Game
 
@@ -104,7 +99,7 @@
       }
     }
 
-    game = new Game(canvas, $localPlayerStore, $socketStore, $ActiveKeyMapStore, showDeadMenu)
+    game = new Game(canvas, $localPlayerStore, $socketStore, showDeadMenu)
     gameRef(game)
     game.localPlayer.sessionId = sessionId
     players().then((d) => {
@@ -169,7 +164,7 @@
       </div>
     </InGameInfo>
 
-    <InGameInfo title={'Key Map'} showModal={$ActiveKeyMapStore.hotKeys.store}>
+    <InGameInfo title={`Key Map - ${$ActiveKeyMapStore.name}`} showModal={$ActiveKeyMapStore.hotKeys.store}>
       <div style="position: absolute; top: 0; right: 0; scale: 0.8">
         <!-- Cant implement right now since its altering the Default KeyMap objects -->
         <!-- <Button90

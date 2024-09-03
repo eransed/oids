@@ -2,7 +2,7 @@ import { rndi } from 'mathil'
 import { isLoggedInStore, localPlayerStore, userStore } from '../stores/stores'
 // import type { Prisma, User } from '@prisma/client'
 import { createSpaceObject } from '../lib/factory'
-import type { GameModeHotkeys, KeyFunctionMap, KeyFunctionStore, User } from '../lib/interface'
+import type { KeyFunctionMap, KeyFunctionStore, User } from '../lib/interface'
 import { activeHotKeys, ActiveKeyMapStore, DefaultArcadeModeKeyMap, DefaultSpaceModeKeyMap, keyFuncArrayFromKeyFunctionMap, savedHotkeysStore } from '../lib/input'
 import { GameMode } from '../lib/interface'
 
@@ -69,7 +69,9 @@ export function convertSavedHotkeys(savedHotkeysJson: KeyFunctionStore[]): KeyFu
         .replace(/([A-Z])/g, (match, p1, offset) => (offset === 0 ? p1.toLowerCase() : p1)) as keyof KeyFunctionMap
 
       // Add the hotkey object to the converted hotkeys map
-      convertedHotkeys[key] = hotkey
+      if (key !== 'name') {
+        convertedHotkeys[key] = hotkey
+      }
     }
   })
 
@@ -78,17 +80,16 @@ export function convertSavedHotkeys(savedHotkeysJson: KeyFunctionStore[]): KeyFu
 
 function resetAllButtons(keyFuncMap: KeyFunctionMap) {
   Object.values(keyFuncMap).forEach((v: KeyFunctionStore) => {
-    v.keyStatus = false
-    v.store = false
+    if (typeof v !== 'string') {
+      v.keyStatus = false
+      v.store = false
+    }
   })
 }
 
-export function checkHotkeys(): GameModeHotkeys | undefined {
+export function checkHotkeys(): void {
   const savedSpaceHotkeysJson = localStorage.getItem(GameMode[GameMode.SPACE_MODE])
   const savedArcadeHotkeysJson = localStorage.getItem(GameMode[GameMode.ARCADE_MODE])
-
-  let spaceHotkeys: KeyFunctionMap = DefaultSpaceModeKeyMap
-  let arcadeHotkeys: KeyFunctionMap = DefaultArcadeModeKeyMap
 
   if (!savedSpaceHotkeysJson && !savedArcadeHotkeysJson) {
     console.log('%cUsing default hotkeys. No saved hotkeys found.', 'color:red')
@@ -99,31 +100,37 @@ export function checkHotkeys(): GameModeHotkeys | undefined {
     if (savedSpaceHotkeysJson) {
       const convertedSpaceHotkeys = convertSavedHotkeys(JSON.parse(savedSpaceHotkeysJson))
       if (convertedSpaceHotkeys) {
-        spaceHotkeys = convertedSpaceHotkeys
-        resetAllButtons(spaceHotkeys)
+        resetAllButtons(convertedSpaceHotkeys)
+        ActiveKeyMapStore.set(convertedSpaceHotkeys)
+        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(convertedSpaceHotkeys))
+        if (convertedSpaceHotkeys) {
+          savedHotkeysStore.update((v) => {
+            v.spaceMode = convertedSpaceHotkeys
+            return v
+          })
+        }
       }
-      console.log('saved spaceHotkeys ', spaceHotkeys)
     }
 
     if (savedArcadeHotkeysJson) {
       const convertedArcadeHotkeys = convertSavedHotkeys(JSON.parse(savedArcadeHotkeysJson))
 
       if (convertedArcadeHotkeys) {
-        arcadeHotkeys = convertedArcadeHotkeys
+        const arcadeHotkeys = convertedArcadeHotkeys
         resetAllButtons(arcadeHotkeys)
+        ActiveKeyMapStore.set(arcadeHotkeys)
+        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(arcadeHotkeys))
+        savedHotkeysStore.update((v) => {
+          v.arcadeMode = arcadeHotkeys
+          return v
+        })
       }
-      console.log('saved arcadeHotkeys ', arcadeHotkeys)
     }
   } catch (error) {
     console.error('Failed to parse saved hotkeys JSON:', error)
-    console.log('%cUsing default hotkeys due to JSON parse error.', 'color:red')
+    console.log('%cUsing default h otkeys due to JSON parse error.', 'color:red')
     return undefined
   }
-
-  const hotkeys = { spaceMode: spaceHotkeys, arcadeMode: arcadeHotkeys }
-  savedHotkeysStore.set(hotkeys)
-
-  return hotkeys
 }
 
 export function resetHotkeysToDefault(mode: GameMode) {

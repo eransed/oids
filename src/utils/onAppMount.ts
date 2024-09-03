@@ -1,8 +1,5 @@
 import { info } from 'mathil'
 import { validateToken } from '../lib/services/utils/Token'
-import { checkHotkeys } from './utils'
-import { capitalFirstChar, savedHotkeysStore } from '../lib/input'
-import type { KeyFunctionStore } from '../lib/interface'
 
 /**
  * Asynchronus function that runs at startup.
@@ -12,7 +9,7 @@ import type { KeyFunctionStore } from '../lib/interface'
 export const onAppMount = async (): Promise<void> => {
   info('onAppmount')
 
-  checkHotkeys()
+  // checkHotkeys()
 
   return new Promise<void>((resolve, reject) => {
     validateToken()
