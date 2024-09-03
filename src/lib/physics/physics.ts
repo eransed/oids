@@ -1,16 +1,13 @@
-import type { Bounceable, Bounded, Collidable, Damager, Physical, Rotatable, SpaceObject } from '../interface'
-import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, warn, good, bad, error, rndi, rndfVec2 } from 'mathil'
-import { renderHitExplosion } from '../render/renderFx'
-import { handleDeathExplosion, handleHittingShot } from '../mechanics'
-import { angularFriction, explosionDuration, linearFriction, missileDamageVelocityTransferFactor, timeScale } from '../constants'
+import type { Bounded, Collidable, Physical, Rotatable, SpaceObject } from '../interface'
+import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, rndfVec2 } from 'mathil'
+import { handleDeathExplosion } from '../mechanics'
+import { angularFriction, explosionDuration, linearFriction, timeScale } from '../constants'
 import type { Shape } from '../shapes/Shape'
 import { updateShots } from './updateShots'
 import { createSpaceObject } from '../factory'
-import { GameMode } from '../game'
+import { GameMode } from '../interface'
 
 const traceLength = 1
-
-
 
 export function updateShape(shape: Shape, dt: number): void {
   if (isNaN(dt)) return
@@ -32,13 +29,12 @@ export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
 const ticksBetweenSnapshots = 0
 
 export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
-
   // If assigning nan to npc.velocity, position or acceleration it will stay nan for ever
   if (isNaN(dt)) return so
   const deltaTime: number = dt * timeScale
   const v: Vec2 = scalarMultiply2(so.velocity, deltaTime)
   const a: Vec2 = scalarMultiply2(so.acceleration, deltaTime)
-  
+
   // arcade stuff:
   if (so.gameMode === GameMode.ARCADE_MODE) {
     so.characterGlobalPosition = add2(so.characterGlobalPosition, v)
@@ -65,17 +61,16 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
     trace.velocity = so.velocity
     trace.positionalTrace = null
     so.positionalTrace.push(trace)
-      
+
     if (so.positionalTrace.length > traceLength) {
       so.positionalTrace.shift()
     }
-    
+
     so.positionalTrace.forEach((t) => {
       applyFriction(t, 0.7)
       // alignHeadingToVelocity(t)
       updateSpaceObject(t, dt)
     })
-
   }
 
   if (so.health <= 0) {
@@ -104,7 +99,7 @@ export function offScreen_mm(v: Vec2, screen_min: Vec2, screen_max: Vec2) {
   if (v.y < screen_min.y) return true
   return false
 }
- 
+
 export function wrap_mm(v: Vec2, min: Vec2, max: Vec2): void {
   if (v.x > max.x) v.x = min.x
   if (v.x < min.x) v.x = max.x
@@ -114,7 +109,7 @@ export function wrap_mm(v: Vec2, min: Vec2, max: Vec2): void {
 
 export const groundLevel = 1800
 
-export function floorGravity(so: SpaceObject, G=1) {
+export function floorGravity(so: SpaceObject, G = 1) {
   if (so.characterGlobalPosition.y >= groundLevel) {
     so.characterGlobalPosition.y = groundLevel
     so.acceleration = newVec2()
@@ -128,7 +123,7 @@ export function floorGravity(so: SpaceObject, G=1) {
     const r: number = magnitude2(v01) * 3
     const r2: number = Math.pow(r, 2)
     const F: number = G * ((m0 * m1) / r2)
-    const gvec: Vec2 = scalarMultiply2(v01, F)    
+    const gvec: Vec2 = scalarMultiply2(v01, F)
     so.acceleration = add2(so.acceleration, gvec)
     so.characterGlobalPosition.y = so.characterGlobalPosition.y + so.acceleration.y
   }

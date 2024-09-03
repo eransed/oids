@@ -15,7 +15,6 @@ import { findShip, updateShipExperienceAndLevel } from './api/ship/ship.services
 import dotenv from 'dotenv'
 dotenv.config()
 
-
 // start ApiServer
 apiServer()
 
@@ -69,15 +68,15 @@ interface clientUpdated {
   updated: Date
 }
 
-function debugData(so: SpaceObject) {
-  const logdata = {
-    name: so.name,
-    session: so.sessionId,
-    messageType: MessageType[so.messageType],
-    lastMessage: so.lastMessage,
-  }
-  console.log({ logdata })
-}
+// function debugData(so: SpaceObject) {
+//   const logdata = {
+//     name: so.name,
+//     session: so.sessionId,
+//     messageType: MessageType[so.messageType],
+//     lastMessage: so.lastMessage,
+//   }
+//   console.log({ logdata })
+// }
 
 export class Client {
   ws: WebSocket
@@ -364,7 +363,7 @@ class Every {
     }
   }
 }
-broadcastToAllClients
+// broadcastToAllClients
 
 function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: SpaceObject): void {
   // info(`Sending:`)

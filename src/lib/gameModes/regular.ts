@@ -1,45 +1,20 @@
-import { GameMode, type Game } from '../game'
+import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
-import { ActiveKeyMapStore, arcadeModeKeyController, DefaultArcadeModeKeyMap, gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
-import {
-  add2,
-  direction2,
-  info,
-  log,
-  magnitude2,
-  newVec2,
-  rndfVec2,
-  rndi,
-  round2dec,
-  siPretty,
-  smul2,
-  sub2,
-  to_string2,
-  vec2Array,
-  type Vec2,
-  dist2,
-  warn,
-  error,
-  sdiv2,
-  norm,
-  Vec3,
-  newVec3,
-  dropz,
-} from 'mathil'
+import { ActiveKeyMapStore, arcadeModeKeyController, gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
+import { add2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPretty, smul2, sub2, to_string2, vec2Array, type Vec2, warn, error } from 'mathil'
 import { handleDeathExplosion } from '../mechanics'
-import { friction, getRemotePosition, getWorldCoordinates, offScreen_mm, wrap_mm } from '../physics/physics'
+import { friction, getRemotePosition, offScreen_mm, wrap_mm } from '../physics/physics'
 import { loadingText, renderHitRadius, renderInfoText, renderLine, renderPoint } from '../render/render2d'
 import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType, type ServerUpdate } from '../interface'
-import { randomAnyColor } from '../color'
+import { GameType, getRenderableObjectCount, type SpaceObject, MessageType, type ServerUpdate, GameMode, type KeyFunctionMap } from '../interface'
 import { test } from '../test'
-import { explosionDuration, screenScale, worldSize, worldStartPosition } from '../constants'
+import { explosionDuration, worldSize, worldStartPosition } from '../constants'
 import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from '../stats'
 import { newPhotonLaser } from '../factory'
 import { reduceShotSize, reduceSoSize } from '../websocket/util'
-import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMoon'
+import { renderMoon } from '../render/renderMoon'
 import { renderShip } from '../render/renderShip'
-import { renderProgressBar, renderRoundIndicator, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
+import { renderProgressBar, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
 import { renderExplosionFrame } from '../render/renderFx'
 import { chatMsgHistoryStore, localPlayerStore, shouldCelebrateLevelUp, userStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
@@ -48,6 +23,12 @@ import { handleCollisions } from '../physics/handleCollisions'
 import { renderTrail } from '../render/renderShipTrail'
 import { renderCharacter } from '../render/renderCharacter'
 //Stores
+
+let activeKeyMap: KeyFunctionMap
+
+ActiveKeyMapStore.subscribe((v) => {
+  activeKeyMap = v
+})
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -146,7 +127,7 @@ export function resetStars(game: Game | null) {
   }
 
   setTimeout(() => {
-    game.stars.forEach((s, i) => {
+    game.stars.forEach((s) => {
       const r = randomPositionInCurrentViewFrame(game.localPlayer, getScreenFromCanvas(game.ctx))
 
       s.position.x = r.x
@@ -380,7 +361,7 @@ function handleLocalPlayer(game: Game) {
     //     localPlayer.hitRadius / 100
     //   )
     // }
-    if (game.keyFuncMap.systemGraphs.keyStatus) {
+    if (activeKeyMap.systemGraphs.keyStatus) {
       renderShip(localPlayer, game.ctx, true, game.style, null, true)
     } else {
       renderShip(localPlayer, game.ctx, true, game.style, null)
@@ -398,7 +379,7 @@ function handleLocalPlayer(game: Game) {
   }
 
   //Track other players with beam!
-  if (game.keyFuncMap.tractorBeam.keyStatus) {
+  if (activeKeyMap.tractorBeam.keyStatus) {
     for (let i = 0; i < game.remotePlayers.length; i++) {
       const remotePlayer = game.remotePlayers[i]
 
@@ -409,7 +390,7 @@ function handleLocalPlayer(game: Game) {
           p2: game.localPlayer.viewFramePosition,
         },
         game.style.starColor,
-        1
+        1,
       )
     }
   }
@@ -441,7 +422,7 @@ function renderRemotePlayerInSpaceMode(remotes: SpaceObject[], game: Game): void
         }
       }
 
-      if (game.keyFuncMap.systemGraphs.keyStatus) {
+      if (activeKeyMap.systemGraphs.keyStatus) {
         renderViewport(game.ctx, remotePlayer)
         renderHitRadius(remotePlayer, game.ctx)
       }
@@ -458,7 +439,7 @@ function renderRemotePlayerInSpaceMode(remotes: SpaceObject[], game: Game): void
           '#fff',
           theme.accent,
           theme.text,
-          remotePlayer.hitRadius / 200
+          remotePlayer.hitRadius / 200,
         )
       }
     }
@@ -498,7 +479,7 @@ function handleGameBodies(game: Game): SpaceObject[] {
       }
     } else {
       renderMoon(body, bodyPos, game.ctx, game.style)
-      if (game.keyFuncMap.systemGraphs.keyStatus) {
+      if (activeKeyMap.systemGraphs.keyStatus) {
         renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
         renderHitRadius(body, game.ctx)
       }
@@ -516,7 +497,7 @@ function handleGameBodies(game: Game): SpaceObject[] {
           '#fff',
           theme.accent,
           theme.text,
-          body.hitRadius / 350
+          body.hitRadius / 350,
         )
       }
     }
@@ -551,14 +532,9 @@ export class Every {
 }
 
 const every = new Every(25)
-const every30 = new Every(60)
 
 const cameraLagSize = 1
 const cameraLag = vec2Array(cameraLagSize, 0, 0)
-
-function last(arr: Vec2[]): Vec2 {
-  return arr[arr.length - 1]
-}
 
 export function moveView(game: Game) {
   // bound ship to viewframe
@@ -598,12 +574,9 @@ export function renderFrame(game: Game, dt: number): void {
     })
   })
 
-  if (game.keyFuncMap.systemGraphs.keyStatus) {
+  if (activeKeyMap.systemGraphs.keyStatus) {
     fpsCounter(ops, dt, game, game.ctx)
   }
-
-  //Change GameMode
-  // game.localPlayer.gameMode = game.keyFuncMap.changeMode.keyStatus ? GameMode.ARCADE_MODE : GameMode.SPACE_MODE
 
   if (game.localPlayer.gameMode === GameMode.ARCADE_MODE) {
     // Render arcade style game
@@ -634,13 +607,13 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(ammoGraph, game.localPlayer.ammo)
   try {
     addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)
-    addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(game.localPlayer)).length)
-    addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(game.localPlayer))).length)
+    // addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(game.localPlayer)).length)
+    // addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(game.localPlayer))).length)
   } catch (e) {
-    /* empty */
+    warn(`${e}`)
   }
 
-  if (game.keyFuncMap.systemGraphs.keyStatus) {
+  if (activeKeyMap.systemGraphs.keyStatus) {
     GRAPHS.forEach((g, i) => {
       const half = Math.floor(GRAPHS.length / 2)
       const h = 130
@@ -696,7 +669,7 @@ function handleStarBackdrop(game: Game): void {
           p2: smul2(game.localPlayer.viewFramePosition, 1),
         },
         game.style.starColor,
-        0.0025 * magnitude2(game.localPlayer.velocity)
+        0.0025 * magnitude2(game.localPlayer.velocity),
       )
     }
   }
@@ -706,7 +679,7 @@ export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
     if (game.localPlayer.gameMode === GameMode.SPACE_MODE) {
       spaceObjectKeyController(game.localPlayer, dt)
-      spaceTouchController(game.localPlayer, dt)
+      spaceTouchController(game.localPlayer)
     } else {
       arcadeModeKeyController(game.localPlayer, dt)
       // arcadeTouchController(game.localPlayer, dt)

@@ -4,7 +4,7 @@ import { timeScale } from './constants'
 import { dist2, newVec2, type Vec2 } from 'mathil'
 import { writable, type Writable } from 'svelte/store'
 import { menuOpen } from '../components/menu/MenuStore'
-import { GameMode } from './game'
+import { GameMode } from './interface'
 
 export const activeHotKeys: Writable<KeyFunctionStore[]> = writable()
 export const gameState: Writable<GameState> = writable()
@@ -255,14 +255,6 @@ function reloadSpaceObject(so: SpaceObject) {
 }
 
 export function arcadeModeKeyController(so: SpaceObject, dt = 1) {
-  if (savedHotkeys?.arcadeMode) {
-    ActiveKeyMapStore.set(savedHotkeys.arcadeMode)
-    activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.arcadeMode))
-  } else {
-    ActiveKeyMapStore.set(DefaultArcadeModeKeyMap)
-    activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultArcadeModeKeyMap))
-  }
-
   if (ActiveKeyMap.turnRight.keyStatus) {
     so.characterGlobalPosition.x += 1 * dt
     so.acceleration.x = 0.0005 * dt
@@ -282,29 +274,36 @@ export function arcadeModeKeyController(so: SpaceObject, dt = 1) {
   }
 
   if (ActiveKeyMap.changeMode.keyStatus) {
+    console.log(ActiveKeyMap.changeMode.keyStatus)
     if (so.gameMode === GameMode.ARCADE_MODE) {
       ActiveKeyMap.changeMode.keyStatus = false
       so.gameMode = GameMode.SPACE_MODE
+      if (savedHotkeys?.arcadeMode) {
+        ActiveKeyMapStore.set(savedHotkeys.arcadeMode)
+        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.arcadeMode))
+      } else {
+        ActiveKeyMapStore.set(DefaultArcadeModeKeyMap)
+        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultArcadeModeKeyMap))
+      }
     }
   }
 }
 
 export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
-  if (savedHotkeys?.spaceMode) {
-    ActiveKeyMapStore.set(savedHotkeys.spaceMode)
-    activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.spaceMode))
-  } else {
-    ActiveKeyMapStore.set(DefaultSpaceModeKeyMap)
-    activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultSpaceModeKeyMap))
-  }
-
   const dts: number = dt * timeScale
 
   if (ActiveKeyMap.changeMode.keyStatus) {
     if (so.gameMode === GameMode.SPACE_MODE) {
+      ActiveKeyMap.changeMode.keyStatus = false
       so.gameMode = GameMode.ARCADE_MODE
+      if (savedHotkeys?.spaceMode) {
+        ActiveKeyMapStore.set(savedHotkeys.spaceMode)
+        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.spaceMode))
+      } else {
+        ActiveKeyMapStore.set(DefaultSpaceModeKeyMap)
+        activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultSpaceModeKeyMap))
+      }
     }
-    ActiveKeyMap.changeMode.keyStatus = false
   }
 
   if (ActiveKeyMap.halt.keyStatus) {
@@ -396,9 +395,7 @@ export function removeTouchControls() {
   document.removeEventListener('touchmove', touchMoveHandler)
 }
 
-export function spaceTouchController(so: SpaceObject, dt = 1) {
-  const dts: number = dt * timeScale
-
+export function spaceTouchController(so: SpaceObject) {
   if (ActiveTouch.thrust) {
     applyEngineThrust(so, 0, false)
   }
@@ -461,7 +458,6 @@ function touchEndHandler(event: TouchEvent) {
 
   // Handle touch end
   for (let i = 0; i < touches.length; i++) {
-    const touch = touches[i]
     ActiveTouch.thrust = false
     ActiveTouch.reverseThrust = false
     ActiveTouch.fire = false

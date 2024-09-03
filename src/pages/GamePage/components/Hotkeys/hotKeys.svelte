@@ -4,7 +4,7 @@
   import { ActiveKeyMapStore, keyDisplayName as keyDisplayText, keyFuncArrayFromKeyFunctionMap } from '../../../../lib/input'
   import { submitHotkeyChange } from './hotKeysChange'
   import type { KeyFunction, KeyFunctionMap, KeyFunctionStore } from '../../../../lib/interface'
-  import type { GameMode } from '../../../../lib/game'
+  import { GameMode } from '../../../../lib/interface'
 
   //Params
   export let activeColor: string

@@ -1,6 +1,6 @@
 import type { KeyFunctionStore } from '../../../../lib/interface'
 import { activeHotKeys, savedHotkeysStore } from '../../../../lib/input'
-import { GameMode } from '../../../../lib/game'
+import { GameMode } from '../../../../lib/interface'
 import { convertSavedHotkeys } from '../../../../utils/utils'
 
 interface submitHotkeyChangeProps {

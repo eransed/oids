@@ -3,7 +3,11 @@ import { newVec2, type Vec2 } from 'mathil'
 import type { Steerable } from './traits/Steerable'
 import type { ShipVariant } from '../style/ships'
 import type { Towns } from './worlds/worldInterface'
-import { GameMode } from './game'
+
+export enum GameMode {
+  SPACE_MODE,
+  ARCADE_MODE,
+}
 
 export enum GameType {
   SinglePlayer,

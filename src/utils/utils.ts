@@ -1,10 +1,10 @@
 import { rndi } from 'mathil'
-import { isLoggedInStore, localPlayerStore, settingsStore, userStore } from '../stores/stores'
+import { isLoggedInStore, localPlayerStore, userStore } from '../stores/stores'
 // import type { Prisma, User } from '@prisma/client'
 import { createSpaceObject } from '../lib/factory'
-import type { GameModeHotkeys, KeyFunction, KeyFunctionMap, KeyFunctionStore, User } from '../lib/interface'
-import { activeHotKeys, ActiveKeyMapStore, capitalFirstChar, DefaultArcadeModeKeyMap, DefaultSpaceModeKeyMap, keyFuncArrayFromKeyFunctionMap, savedHotkeysStore } from '../lib/input'
-import { GameMode } from '../lib/game'
+import type { GameModeHotkeys, KeyFunctionMap, KeyFunctionStore, User } from '../lib/interface'
+import { activeHotKeys, ActiveKeyMapStore, DefaultArcadeModeKeyMap, DefaultSpaceModeKeyMap, keyFuncArrayFromKeyFunctionMap, savedHotkeysStore } from '../lib/input'
+import { GameMode } from '../lib/interface'
 
 export function getLocationURL() {
   if (typeof window !== 'undefined') {
@@ -57,7 +57,7 @@ export const gUser: User = {
   hotkeys: { spaceMode: DefaultSpaceModeKeyMap, arcadeMode: DefaultArcadeModeKeyMap },
 }
 
-export function convertSavedHotkeys(savedHotkeysJson: any): KeyFunctionMap {
+export function convertSavedHotkeys(savedHotkeysJson: KeyFunctionStore[]): KeyFunctionMap {
   const convertedHotkeys: KeyFunctionMap = { ...DefaultArcadeModeKeyMap }
 
   savedHotkeysJson.forEach((hotkey: KeyFunctionStore) => {

@@ -5,14 +5,9 @@ import { renderLoop } from './time'
 // import * as WelcomeScreen from './gameModes/welcomeScreen'
 import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
-import type { Vec2 } from 'mathil'
 import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
 import type { Star, UIStyle } from './interface'
 
-export enum GameMode {
-  SPACE_MODE,
-  ARCADE_MODE,
-}
 export class Game {
   websocket: OidsSocket
   running = false
@@ -35,13 +30,7 @@ export class Game {
   style: UIStyle = getCurrentStyle()
   stars: Star[] = []
 
-  constructor(
-    _canvas: HTMLCanvasElement,
-    _localPlayer: SpaceObject,
-    _websocket: OidsSocket,
-    keyFuncMap: KeyFunctionMap,
-    _OnDeadLocalPlayerCallBack: () => void
-  ) {
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _websocket: OidsSocket, keyFuncMap: KeyFunctionMap, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
     this.websocket = _websocket
@@ -106,11 +95,7 @@ export class Game {
     this.stopper = renderLoop(this, renderFrame, nextFrame)
   }
 
-  startGame(
-    initFn: (g: Game) => void,
-    renderFn: (game: Game, dt: number) => void,
-    nextFn: (game: Game, dt: number) => void
-  ): void {
+  startGame(initFn: (g: Game) => void, renderFn: (game: Game, dt: number) => void, nextFn: (game: Game, dt: number) => void): void {
     this.shouldSendToServer = true
     this.localPlayer.isPlaying = true
     initFn(this)

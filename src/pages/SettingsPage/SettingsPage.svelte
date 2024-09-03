@@ -16,7 +16,7 @@
   import type { AlertType } from '../../components/alert/AlertType'
   import HotKeys from '../GamePage/components/Hotkeys/hotKeys.svelte'
   import { DefaultArcadeModeKeyMap, DefaultSpaceModeKeyMap, initKeyControllers, keyFuncArrayFromKeyFunctionMap, removeKeyControllers, savedHotkeysStore } from '../../lib/input'
-  import { GameMode } from '../../lib/game'
+  import { GameMode } from '../../lib/interface'
 
   onMount(() => {
     initKeyControllers()
