@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "prisma": "^4.10.1"
+    "prisma": "^5.19.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13"

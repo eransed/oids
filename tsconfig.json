@@ -18,8 +18,8 @@
     "isolatedModules": true,
     "strict": true,
     "removeComments": true,
-    "outDir": "build"
-
+    "outDir": "build",
+    "skipLibCheck": true
     // "outFile": "build/out.js"
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "custom.d.ts"],

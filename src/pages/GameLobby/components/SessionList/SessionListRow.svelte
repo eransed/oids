@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { navigate } from 'svelte-routing/src/history'
   import type { SpaceObject } from '../../../../lib/interface'
 
   export let player: SpaceObject | null = null

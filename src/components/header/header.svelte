@@ -12,7 +12,7 @@
   //css
   import './style.css'
   import Modal from '../modal/Modal.svelte'
-  import { navigate } from 'svelte-routing/src/history'
+  import { navigate } from 'svelte-routing'
   import { slide, fade, fly } from 'svelte/transition'
   import { DeepMidnight, toggleAndGetTheme } from '../../style/defaultColors'
   import { Avatars } from '../../style/avatars'
