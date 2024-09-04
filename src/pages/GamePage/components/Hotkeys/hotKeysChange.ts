@@ -1,18 +1,22 @@
-import type { KeyFunctionStore } from '../../../../lib/interface'
-import { activeHotKeys, savedHotkeysStore } from '../../../../lib/input'
+import type { KeyFunctionStore, KeyMapManager } from '../../../../lib/interface'
+import { activeHotKeys, keyFuncArrayFromKeyFunctionMap } from '../../../../lib/input'
 import { GameMode } from '../../../../lib/interface'
-import { convertSavedHotkeys } from '../../../../utils/utils'
 
 interface submitHotkeyChangeProps {
-  keyFunctionArray: KeyFunctionStore[]
   keyFunction: KeyFunctionStore
   del?: boolean
   chosenKey: string
   mode: GameMode
+  keyMapManager: KeyMapManager
 }
 
-export const submitHotkeyChange = ({ keyFunctionArray, keyFunction, del = false, chosenKey, mode }: submitHotkeyChangeProps): KeyFunctionStore[] => {
-  checkExistingKeyMap(keyFunctionArray, chosenKey)
+export const submitHotkeyChange = ({ keyFunction, del = false, chosenKey, mode, keyMapManager }: submitHotkeyChangeProps): KeyFunctionStore[] => {
+  const newKeyMap = { ...keyMapManager.getKeyMap() }
+
+  checkExistingKeyMap(keyFuncArrayFromKeyFunctionMap(newKeyMap), chosenKey)
+
+  //implement keymapmanager changing to new keymap instead of altering default map
+  console.log(keyMapManager)
 
   if (del) {
     deleteHotkey(keyFunction, chosenKey)
@@ -23,25 +27,25 @@ export const submitHotkeyChange = ({ keyFunctionArray, keyFunction, del = false,
     })
   }
 
-  localStorage.setItem(GameMode[mode], JSON.stringify(keyFunctionArray))
+  localStorage.setItem(GameMode[mode], JSON.stringify(newKeyMap))
 
-  const convertedToSave = convertSavedHotkeys(keyFunctionArray)
+  // const convertedToSave = convertSavedHotkeys(keyFunctionArray)
 
-  savedHotkeysStore.update((v) => {
-    if (mode === GameMode.SPACE_MODE) {
-      if (v?.spaceMode) {
-        v.spaceMode = convertedToSave
-      }
-    }
-    if (mode === GameMode.ARCADE_MODE) {
-      if (v?.arcadeMode) {
-        v.arcadeMode = convertedToSave
-      }
-    }
-    return v
-  })
+  // savedHotkeysStore.update((v) => {
+  //   if (mode === GameMode.SPACE_MODE) {
+  //     if (v?.spaceMode) {
+  //       v.spaceMode = convertedToSave
+  //     }
+  //   }
+  //   if (mode === GameMode.ARCADE_MODE) {
+  //     if (v?.arcadeMode) {
+  //       v.arcadeMode = convertedToSave
+  //     }
+  //   }
+  //   return v
+  // })
 
-  return keyFunctionArray
+  return keyFuncArrayFromKeyFunctionMap(newKeyMap)
 }
 
 function checkExistingKeyMap(keyMap: KeyFunctionStore[], chosenKey: string) {

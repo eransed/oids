@@ -296,6 +296,12 @@ export interface GameSettings {
   hotKeys: KeyFunction
 }
 
+export interface KeyMapManager {
+  resetKeyMap: () => void
+  setKeyMap: (map: KeyFunctionMap) => void
+  getKeyMap: () => KeyFunctionMap
+}
+
 export interface KeyFunctionMap {
   name: string
   thrust: KeyFunction
@@ -319,11 +325,6 @@ export interface KeyFunctionMap {
   jump: KeyFunctionStore
   changeMode: KeyFunctionStore
   tractorBeam: KeyFunctionStore
-}
-
-export interface GameModeHotkeys {
-  spaceMode: KeyFunctionMap
-  arcadeMode: KeyFunctionMap
 }
 
 export interface TouchFunctionMap {
@@ -418,7 +419,6 @@ export interface Crater {
 export interface Settings {
   uiStyle: UIStyle
   theme: Theme
-  hotKeys: GameModeHotkeys | undefined
 }
 
 export interface UIStyle {
@@ -475,7 +475,6 @@ export interface User {
   played: number
   ships: Ship[]
   gameHistory: Game[]
-  hotkeys: GameModeHotkeys
 }
 
 export interface Game {

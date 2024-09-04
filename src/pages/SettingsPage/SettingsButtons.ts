@@ -2,6 +2,7 @@ import { writable, type Writable } from 'svelte/store'
 import type { Button90Config } from '../../lib/interface'
 
 import { Icons } from '../../style/icons'
+import { activeHotKeys, ActiveKeyMapStore, arcadeKeyMapManager, keyFuncArrayFromKeyFunctionMap, spaceKeyMapManager } from '../../lib/input'
 
 interface ProfileButton {
   icon: string
@@ -13,6 +14,8 @@ const controlsSpace: ProfileButton = {
   config: {
     buttonText: 'Controls Space',
     clickCallback: () => {
+      ActiveKeyMapStore.set(spaceKeyMapManager.getKeyMap())
+      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(spaceKeyMapManager.getKeyMap()))
       settingsComponent.set('controlsSpace')
     },
     routeParam: 'controlsSpace',
@@ -25,6 +28,8 @@ const controlsArcade: ProfileButton = {
   config: {
     buttonText: 'Controls Arcade',
     clickCallback: () => {
+      ActiveKeyMapStore.set(arcadeKeyMapManager.getKeyMap())
+      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(arcadeKeyMapManager.getKeyMap()))
       settingsComponent.set('controlsArcade')
     },
     routeParam: 'controlsArcade',

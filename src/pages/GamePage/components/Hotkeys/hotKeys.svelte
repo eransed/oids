@@ -3,15 +3,16 @@
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
   import { ActiveKeyMapStore, keyDisplayName as keyDisplayText, keyFuncArrayFromKeyFunctionMap } from '../../../../lib/input'
   import { submitHotkeyChange } from './hotKeysChange'
-  import type { KeyFunction, KeyFunctionMap, KeyFunctionStore } from '../../../../lib/interface'
+  import type { KeyFunction, KeyFunctionMap, KeyFunctionStore, KeyMapManager } from '../../../../lib/interface'
   import { GameMode } from '../../../../lib/interface'
+  import { activeHotKeys } from '../../../../lib/input'
 
   //Params
   export let activeColor: string
-  export let keyFunctionMap: KeyFunctionMap
   export let Mode: GameMode
+  export let keyMapManager: KeyMapManager
 
-  $: keyFunctions = keyFuncArrayFromKeyFunctionMap(keyFunctionMap)
+  $: keyFunctions = keyFuncArrayFromKeyFunctionMap(keyMapManager.getKeyMap())
   let changeKey: KeyFunctionStore | undefined
 
   function keydown(event: KeyboardEvent) {
@@ -20,11 +21,11 @@
     }
 
     keyFunctions = submitHotkeyChange({
-      keyFunctionArray: keyFunctions,
       chosenKey: event.key,
       keyFunction: changeKey,
       del: false,
       mode: Mode,
+      keyMapManager,
     })
 
     changeKey = undefined
@@ -49,11 +50,11 @@
       </tr>
     </thead>
 
-    {#each keyFunctions as keyFunction}
-      {#if typeof keyFunction !== 'string'}
-        <tbody class="keyRow">
-          <tr>
-            {#if keyFunction.keyStatus}
+    {#each keyFunctions as keyFunction, i}
+      <tbody class="keyRow">
+        <tr>
+          {#if typeof keyFunction !== 'string'}
+            {#if $activeHotKeys[i].keyStatus}
               <td style="color: {activeColor}">{'+ ' + keyFunction.displayText}</td>
             {:else}
               <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -86,13 +87,13 @@
                   title="Click to delete!"
                   on:click={() =>
                     (keyFunctions = submitHotkeyChange({
-                      keyFunctionArray: keyFunctions,
                       chosenKey: activator,
                       keyFunction: keyFunction,
                       del: true,
                       mode: Mode,
+                      keyMapManager,
                     }))}
-                  style={keyFunction.keyStatus ? `background-color: ${activeColor}` : ''}
+                  style={$activeHotKeys[i].keyStatus ? `background-color: ${activeColor}` : ''}
                   class="buttonStyle">{keyDisplayText(activator)}</button
                 >
               {/each}
@@ -101,9 +102,9 @@
               {/if}
             </td>
             <td>{keyFunction.toggle ? '<toggle>' : '<momentary>'}</td>
-          </tr>
-        </tbody>
-      {/if}
+          {/if}
+        </tr>
+      </tbody>
     {/each}
   </table>
 </div>

@@ -1,175 +1,19 @@
-import type { GameModeHotkeys, GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject, TouchFunctionMap } from './interface'
+import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject, TouchFunctionMap } from './interface'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
 import { dist2, newVec2, type Vec2 } from 'mathil'
 import { writable, type Writable } from 'svelte/store'
 import { menuOpen } from '../components/menu/MenuStore'
 import { GameMode } from './interface'
+import { DefaultSpaceModeKeyMap } from './hotkeys/spaceHotkeys'
+import { DefaultArcadeModeKeyMap } from './hotkeys/arcadeHotkeys'
+import { createKeyMapManager } from './hotkeys/keyMapManager'
+
+export const spaceKeyMapManager = createKeyMapManager(DefaultSpaceModeKeyMap)
+export const arcadeKeyMapManager = createKeyMapManager(DefaultArcadeModeKeyMap)
 
 export const activeHotKeys: Writable<KeyFunctionStore[]> = writable()
 export const gameState: Writable<GameState> = writable()
-
-export const savedHotkeysStore: Writable<GameModeHotkeys> = writable()
-let savedHotkeys: GameModeHotkeys
-savedHotkeysStore.subscribe((v) => (savedHotkeys = v))
-
-export const DefaultSpaceModeKeyMap: KeyFunctionMap = {
-  thrust: { activators: ['w', 'ArrowUp'], keyStatus: false, displayText: 'Thrust' },
-  reverseThrust: { activators: ['s', 'ArrowDown'], keyStatus: false, displayText: 'Reverse Thrust' },
-  boost: { activators: ['b'], keyStatus: false, displayText: 'Boost' },
-  halt: { activators: ['h'], keyStatus: false, toggle: true, displayText: 'Halt' },
-  turnLeft: { activators: ['a', 'ArrowLeft'], keyStatus: false, displayText: 'Turn Left' },
-  turnRight: { activators: ['d', 'ArrowRight'], keyStatus: false, displayText: 'Turn Right' },
-  strafeLeft: { activators: ['q', 'PageUp'], keyStatus: false, displayText: 'Strafe Left' },
-  strafeRight: { activators: ['e', 'PageDown'], keyStatus: false, displayText: 'Strafe Right' },
-  fire: { activators: [' '], keyStatus: false, displayText: 'Fire' },
-  reload: { activators: ['r'], keyStatus: false, displayText: 'Reload' },
-  selfDestroy: { activators: ['k'], keyStatus: false, displayText: 'Self Destroy' },
-  systemGraphs: { activators: ['g'], keyStatus: false, toggle: true, displayText: 'System Graphs' },
-  leaderBoard: {
-    activators: ['p'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Leader Board',
-  },
-  hotKeys: {
-    activators: ['o'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Hot Keys',
-  },
-  shipSettings: {
-    activators: ['i'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Ship Settings',
-  },
-  shipDetails: {
-    activators: ['y'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Ship Details',
-  },
-  chat: {
-    activators: ['c'],
-    keyStatus: true,
-    store: true,
-    toggle: true,
-    displayText: 'Chat',
-  },
-  menu: {
-    activators: ['Escape'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Menu',
-  },
-  jump: {
-    activators: ['j'],
-    keyStatus: false,
-    store: false,
-    toggle: false,
-    displayText: 'Jump',
-  },
-  changeMode: {
-    activators: ['m'],
-    keyStatus: false,
-    store: false,
-    toggle: false,
-    displayText: 'Change Mode',
-  },
-  tractorBeam: {
-    activators: ['t'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Tractor Beam',
-  },
-  name: 'DefaultSpace',
-}
-
-export const DefaultArcadeModeKeyMap: KeyFunctionMap = {
-  thrust: { activators: ['w', 'ArrowUp'], keyStatus: false, displayText: 'Thrust' },
-  reverseThrust: { activators: ['s', 'ArrowDown'], keyStatus: false, displayText: 'Reverse Thrust' },
-  boost: { activators: ['b'], keyStatus: false, displayText: 'Boost' },
-  halt: { activators: ['h'], keyStatus: false, toggle: true, displayText: 'Halt' },
-  turnLeft: { activators: ['a', 'ArrowLeft'], keyStatus: false, displayText: 'Turn Left' },
-  turnRight: { activators: ['d', 'ArrowRight'], keyStatus: false, displayText: 'Turn Right' },
-  strafeLeft: { activators: ['q', 'PageUp'], keyStatus: false, displayText: 'Strafe Left' },
-  strafeRight: { activators: ['e', 'PageDown'], keyStatus: false, displayText: 'Strafe Right' },
-  fire: { activators: ['ctrl'], keyStatus: false, displayText: 'Fire' },
-  reload: { activators: ['r'], keyStatus: false, displayText: 'Reload' },
-  selfDestroy: { activators: ['k'], keyStatus: false, displayText: 'Self Destroy' },
-  systemGraphs: { activators: ['g'], keyStatus: false, toggle: true, displayText: 'System Graphs' },
-  leaderBoard: {
-    activators: ['p'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Leader Board',
-  },
-  hotKeys: {
-    activators: ['o'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Hot Keys',
-  },
-  shipSettings: {
-    activators: ['i'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Ship Settings',
-  },
-  shipDetails: {
-    activators: ['y'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Ship Details',
-  },
-  chat: {
-    activators: ['c'],
-    keyStatus: true,
-    store: true,
-    toggle: true,
-    displayText: 'Chat',
-  },
-  menu: {
-    activators: ['Escape'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Menu',
-  },
-  jump: {
-    activators: [' '],
-    keyStatus: false,
-    store: false,
-    toggle: false,
-    displayText: 'Jump',
-  },
-  changeMode: {
-    activators: ['m'],
-    keyStatus: false,
-    store: false,
-    toggle: false,
-    displayText: 'Change Mode',
-  },
-  tractorBeam: {
-    activators: ['t'],
-    keyStatus: false,
-    store: false,
-    toggle: true,
-    displayText: 'Tractor Beam',
-  },
-  name: 'DefaultArcade',
-}
 
 const DefaultTouchMap: TouchFunctionMap = {
   thrust: false,
@@ -192,7 +36,7 @@ export function capitalFirstChar(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-export const ActiveKeyMapStore: Writable<KeyFunctionMap> = writable(DefaultSpaceModeKeyMap)
+export const ActiveKeyMapStore: Writable<KeyFunctionMap> = writable(spaceKeyMapManager.getKeyMap())
 const ActiveTouch: TouchFunctionMap = DefaultTouchMap
 
 let ActiveKeyMap: KeyFunctionMap
@@ -282,17 +126,10 @@ export function arcadeModeKeyController(so: SpaceObject, dt = 1) {
   }
 
   if (ActiveKeyMap.changeMode.keyStatus) {
-    console.log(ActiveKeyMap.changeMode.keyStatus)
-
     ActiveKeyMap.changeMode.keyStatus = false
     so.gameMode = GameMode.SPACE_MODE
-    if (savedHotkeys?.spaceMode) {
-      ActiveKeyMapStore.set(savedHotkeys.spaceMode)
-      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.spaceMode))
-    } else {
-      ActiveKeyMapStore.set(DefaultSpaceModeKeyMap)
-      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultSpaceModeKeyMap))
-    }
+    ActiveKeyMapStore.set(spaceKeyMapManager.getKeyMap())
+    activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(spaceKeyMapManager.getKeyMap()))
   }
 }
 
@@ -302,13 +139,8 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   if (ActiveKeyMap.changeMode.keyStatus) {
     ActiveKeyMap.changeMode.keyStatus = false
     so.gameMode = GameMode.ARCADE_MODE
-    if (savedHotkeys?.arcadeMode) {
-      ActiveKeyMapStore.set(savedHotkeys.arcadeMode)
-      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(savedHotkeys.arcadeMode))
-    } else {
-      ActiveKeyMapStore.set(DefaultArcadeModeKeyMap)
-      activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(DefaultArcadeModeKeyMap))
-    }
+    ActiveKeyMapStore.set(arcadeKeyMapManager.getKeyMap())
+    activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(arcadeKeyMapManager.getKeyMap()))
   }
 
   if (ActiveKeyMap.halt.keyStatus) {

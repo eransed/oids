@@ -15,8 +15,11 @@
   //Component
   import type { AlertType } from '../../components/alert/AlertType'
   import HotKeys from '../GamePage/components/Hotkeys/hotKeys.svelte'
-  import { DefaultArcadeModeKeyMap, DefaultSpaceModeKeyMap, initKeyControllers, keyFuncArrayFromKeyFunctionMap, removeKeyControllers, savedHotkeysStore } from '../../lib/input'
+  import { arcadeKeyMapManager, initKeyControllers, removeKeyControllers, spaceKeyMapManager } from '../../lib/input'
   import { GameMode } from '../../lib/interface'
+  import { DefaultArcadeModeKeyMap } from '../../lib/hotkeys/arcadeHotkeys'
+  import { DefaultSpaceModeKeyMap } from '../../lib/hotkeys/spaceHotkeys'
+  import HotkeysPage from './HotkeysPage.svelte'
 
   onMount(() => {
     initKeyControllers()
@@ -44,46 +47,10 @@
       {/each}
     </div>
     {#if $settingsComponent === SettingsButtons.controlsSpace.config.routeParam}
-      <div class="content" style="padding: 1em; position: relative">
-        <table>
-          <tr>
-            <th>
-              <h3>Hotkeys - Using Ship</h3>
-            </th>
-          </tr>
-          <tr>
-            <td>
-              <HotKeys Mode={GameMode.SPACE_MODE} activeColor={$localPlayerStore.color} keyFunctionMap={$savedHotkeysStore?.spaceMode ? $savedHotkeysStore.spaceMode : DefaultSpaceModeKeyMap} />
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              <hr style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5" />
-            </td>
-          </tr>
-        </table>
-      </div>
+      <HotkeysPage mode={GameMode.SPACE_MODE} keyMapManager={spaceKeyMapManager} />
     {/if}
     {#if $settingsComponent === SettingsButtons.controlsArcade.config.routeParam}
-      <div class="content" style="padding: 1em; position: relative">
-        <table>
-          <tr>
-            <th>
-              <h3>Hotkeys - Player Mode (Arcade)</h3>
-            </th>
-          </tr>
-          <tr>
-            <td>
-              <HotKeys Mode={GameMode.ARCADE_MODE} activeColor={$localPlayerStore.color} keyFunctionMap={$savedHotkeysStore?.arcadeMode ? $savedHotkeysStore.arcadeMode : DefaultArcadeModeKeyMap} />
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              <hr style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5" />
-            </td>
-          </tr>
-        </table>
-      </div>
+      <HotkeysPage mode={GameMode.ARCADE_MODE} keyMapManager={arcadeKeyMapManager} />
     {/if}
   </div>
 </Page>

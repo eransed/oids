@@ -1,12 +1,12 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import type { ChosenShip, Session, Ship } from '../../../../lib/interface'
+  import { GameMode, type ChosenShip, type Session, type Ship } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
   import { Game } from '../../../../lib/game'
-  import { ActiveKeyMapStore, removeKeyControllers, removeTouchControls } from '../../../../lib/input'
+  import { ActiveKeyMapStore, arcadeKeyMapManager, removeKeyControllers, removeTouchControls, spaceKeyMapManager } from '../../../../lib/input'
 
   //Components
   import GameMenu from '../Menu/GameMenu.svelte'
@@ -180,7 +180,7 @@
         /> -->
       </div>
       <div class="hotKeys">
-        <HotKeys Mode={game.localPlayer.gameMode} activeColor={$localPlayerStore.color} keyFunctionMap={$ActiveKeyMapStore} />
+        <HotKeys Mode={game.localPlayer.gameMode} activeColor={$localPlayerStore.color} keyMapManager={$localPlayerStore.gameMode === GameMode.SPACE_MODE ? spaceKeyMapManager : arcadeKeyMapManager} />
       </div>
     </InGameInfo>
 
