@@ -1,5 +1,5 @@
 import type { KeyFunctionStore, KeyMapManager } from '../../../../lib/interface'
-import { activeHotKeys, keyFuncArrayFromKeyFunctionMap } from '../../../../lib/input'
+import { activeHotKeys, ActiveKeyMapStore, arcadeKeyMapManagerStore, keyFuncArrayFromKeyFunctionMap, spaceKeyMapManagerStore } from '../../../../lib/input'
 import { GameMode } from '../../../../lib/interface'
 
 interface submitHotkeyChangeProps {
@@ -13,10 +13,11 @@ interface submitHotkeyChangeProps {
 export const submitHotkeyChange = ({ keyFunction, del = false, chosenKey, mode, keyMapManager }: submitHotkeyChangeProps): KeyFunctionStore[] => {
   const newKeyMap = { ...keyMapManager.getKeyMap() }
 
+  newKeyMap.name = mode === GameMode.SPACE_MODE ? 'Custom Space' : 'Custom Arcade'
+
   checkExistingKeyMap(keyFuncArrayFromKeyFunctionMap(newKeyMap), chosenKey)
 
   //implement keymapmanager changing to new keymap instead of altering default map
-  console.log(keyMapManager)
 
   if (del) {
     deleteHotkey(keyFunction, chosenKey)
@@ -45,6 +46,17 @@ export const submitHotkeyChange = ({ keyFunction, del = false, chosenKey, mode, 
   //   return v
   // })
 
+  keyMapManager.setKeyMap(newKeyMap)
+  ActiveKeyMapStore.set(keyMapManager.getKeyMap())
+  activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(keyMapManager.getKeyMap()))
+
+  spaceKeyMapManagerStore.update((v) => {
+    return v
+  })
+  arcadeKeyMapManagerStore.update((v) => {
+    return v
+  })
+
   return keyFuncArrayFromKeyFunctionMap(newKeyMap)
 }
 
@@ -68,4 +80,17 @@ function deleteHotkey(keyFunction: KeyFunctionStore, chosenKey: string) {
   })
   // console.log(`Deleted ${chosenKey} from ${keyFunction.displayText}`)
   return `Deleted ${chosenKey} from ${keyFunction.displayText}`
+}
+
+export function resetKeyMapToDefault(keyMapManager: KeyMapManager) {
+  keyMapManager.resetKeyMap()
+  ActiveKeyMapStore.set(keyMapManager.getKeyMap())
+  activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(keyMapManager.getKeyMap()))
+
+  spaceKeyMapManagerStore.update((v) => {
+    return v
+  })
+  arcadeKeyMapManagerStore.update((v) => {
+    return v
+  })
 }

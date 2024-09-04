@@ -6,7 +6,7 @@
   //Svelte
   import { onDestroy, onMount } from 'svelte'
   import { Game } from '../../../../lib/game'
-  import { ActiveKeyMapStore, arcadeKeyMapManager, removeKeyControllers, removeTouchControls, spaceKeyMapManager } from '../../../../lib/input'
+  import { ActiveKeyMapStore, arcadeKeyMapManagerStore, removeKeyControllers, removeTouchControls, spaceKeyMapManagerStore } from '../../../../lib/input'
 
   //Components
   import GameMenu from '../Menu/GameMenu.svelte'
@@ -34,13 +34,14 @@
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
   import Celebration from '../../../../components/celebration/celebration.svelte'
   import { getShipBundleCache } from '../../../../style/ships'
+  import Button90 from '../../../../components/menu/Button90.svelte'
+  import { Icons } from '../../../../style/icons'
+  import { resetKeyMapToDefault } from '../Hotkeys/hotKeysChange'
 
   let game: Game
 
   //Props
   export let sessionId: string
-
-  console.log(sessionId)
 
   let canvas: HTMLCanvasElement
   // let cleanup: () => void
@@ -136,6 +137,8 @@
     game.stopGame()
     window.removeEventListener('resize', handleResize)
   })
+
+  $: keyMapManager = $localPlayerStore.gameMode === GameMode.SPACE_MODE ? $spaceKeyMapManagerStore : $arcadeKeyMapManagerStore
 </script>
 
 <div class="shipWrapper" style="z-index: 1;">
@@ -165,22 +168,20 @@
     </InGameInfo>
 
     <InGameInfo title={`Key Map - ${$ActiveKeyMapStore.name}`} showModal={$ActiveKeyMapStore.hotKeys.store}>
-      <div style="position: absolute; top: 0; right: 0; scale: 0.8">
-        <!-- Cant implement right now since its altering the Default KeyMap objects -->
-        <!-- <Button90
-          borderBottom
-          buttonType="button"
-          buttonConfig={{
-            buttonText: 'Reset hotkeys',
-            clickCallback() {
-              resetHotkeysToDefault(game.localPlayer.gameMode)
-            },
-            selected: false,
-          }}
-        /> -->
-      </div>
       <div class="hotKeys">
-        <HotKeys Mode={game.localPlayer.gameMode} activeColor={$localPlayerStore.color} keyMapManager={$localPlayerStore.gameMode === GameMode.SPACE_MODE ? spaceKeyMapManager : arcadeKeyMapManager} />
+        <!-- {#if keyMapManager.getKeyMap().name !== 'Space' && keyMapManager.getKeyMap().name !== 'Arcade'}
+          <Button90
+            buttonType="button"
+            icon={Icons.Reset}
+            addInfo={`Reset default to: ${keyMapManager.getDefault().name}`}
+            buttonConfig={{ buttonText: `Reset to default: ${keyMapManager.getDefault().name}`, clickCallback: () => resetKeyMapToDefault(keyMapManager), selected: false }}
+          />
+        {/if} -->
+        <HotKeys
+          Mode={game.localPlayer.gameMode}
+          activeColor={$localPlayerStore.color}
+          keyMapManager={$localPlayerStore.gameMode === GameMode.SPACE_MODE ? $spaceKeyMapManagerStore : $arcadeKeyMapManagerStore}
+        />
       </div>
     </InGameInfo>
 

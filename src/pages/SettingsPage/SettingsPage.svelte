@@ -14,11 +14,8 @@
 
   //Component
   import type { AlertType } from '../../components/alert/AlertType'
-  import HotKeys from '../GamePage/components/Hotkeys/hotKeys.svelte'
-  import { arcadeKeyMapManager, initKeyControllers, removeKeyControllers, spaceKeyMapManager } from '../../lib/input'
+  import { arcadeKeyMapManagerStore, initKeyControllers, removeKeyControllers, spaceKeyMapManagerStore } from '../../lib/input'
   import { GameMode } from '../../lib/interface'
-  import { DefaultArcadeModeKeyMap } from '../../lib/hotkeys/arcadeHotkeys'
-  import { DefaultSpaceModeKeyMap } from '../../lib/hotkeys/spaceHotkeys'
   import HotkeysPage from './HotkeysPage.svelte'
 
   onMount(() => {
@@ -47,10 +44,10 @@
       {/each}
     </div>
     {#if $settingsComponent === SettingsButtons.controlsSpace.config.routeParam}
-      <HotkeysPage mode={GameMode.SPACE_MODE} keyMapManager={spaceKeyMapManager} />
+      <HotkeysPage keyMapManager={$spaceKeyMapManagerStore} />
     {/if}
     {#if $settingsComponent === SettingsButtons.controlsArcade.config.routeParam}
-      <HotkeysPage mode={GameMode.ARCADE_MODE} keyMapManager={arcadeKeyMapManager} />
+      <HotkeysPage keyMapManager={$arcadeKeyMapManagerStore} />
     {/if}
   </div>
 </Page>

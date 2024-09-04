@@ -1,4 +1,4 @@
-import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject, TouchFunctionMap } from './interface'
+import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, KeyMapManager, SpaceObject, TouchFunctionMap } from './interface'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
 import { dist2, newVec2, type Vec2 } from 'mathil'
@@ -9,8 +9,14 @@ import { DefaultSpaceModeKeyMap } from './hotkeys/spaceHotkeys'
 import { DefaultArcadeModeKeyMap } from './hotkeys/arcadeHotkeys'
 import { createKeyMapManager } from './hotkeys/keyMapManager'
 
-export const spaceKeyMapManager = createKeyMapManager(DefaultSpaceModeKeyMap)
-export const arcadeKeyMapManager = createKeyMapManager(DefaultArcadeModeKeyMap)
+export const spaceKeyMapManagerStore: Writable<KeyMapManager> = writable(createKeyMapManager(DefaultSpaceModeKeyMap))
+export const arcadeKeyMapManagerStore: Writable<KeyMapManager> = writable(createKeyMapManager(DefaultArcadeModeKeyMap))
+
+let spaceKeyMapManager: KeyMapManager
+let arcadeKeyMapManager: KeyMapManager
+
+spaceKeyMapManagerStore.subscribe((v) => (spaceKeyMapManager = v))
+arcadeKeyMapManagerStore.subscribe((v) => (arcadeKeyMapManager = v))
 
 export const activeHotKeys: Writable<KeyFunctionStore[]> = writable()
 export const gameState: Writable<GameState> = writable()
@@ -36,7 +42,7 @@ export function capitalFirstChar(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-export const ActiveKeyMapStore: Writable<KeyFunctionMap> = writable(spaceKeyMapManager.getKeyMap())
+export const ActiveKeyMapStore: Writable<KeyFunctionMap> = writable(DefaultSpaceModeKeyMap)
 const ActiveTouch: TouchFunctionMap = DefaultTouchMap
 
 let ActiveKeyMap: KeyFunctionMap

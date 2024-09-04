@@ -297,6 +297,7 @@ export interface GameSettings {
 }
 
 export interface KeyMapManager {
+  getDefault: () => KeyFunctionMap
   resetKeyMap: () => void
   setKeyMap: (map: KeyFunctionMap) => void
   getKeyMap: () => KeyFunctionMap

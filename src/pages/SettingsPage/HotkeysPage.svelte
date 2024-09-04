@@ -1,26 +1,41 @@
 <script lang="ts">
   import Button90 from '../../components/menu/Button90.svelte'
+  import { activeHotKeys, arcadeKeyMapManagerStore, keyFuncArrayFromKeyFunctionMap, spaceKeyMapManagerStore } from '../../lib/input'
   import { GameMode, type KeyFunctionMap, type KeyMapManager } from '../../lib/interface'
   import { localPlayerStore } from '../../stores/stores'
   import HotKeys from '../GamePage/components/Hotkeys/hotKeys.svelte'
+  import { Icons } from '../../style/icons'
 
-  export let mode: GameMode
+  import { ActiveKeyMapStore } from '../../lib/input'
+  import { resetKeyMapToDefault } from '../GamePage/components/Hotkeys/hotKeysChange'
+
   export let keyMapManager: KeyMapManager
-
-  let keyMap = keyMapManager.getKeyMap()
 </script>
 
 <div class="content" style="padding: 1em; position: relative">
   <table>
     <tr>
       <th>
-        <h3>Hotkeys - {keyMap.name}</h3>
-        <Button90 buttonType="button" buttonConfig={{ buttonText: 'Test', clickCallback: () => keyMapManager.resetKeyMap(), selected: false }} />
+        <h3>Hotkeys - {$ActiveKeyMapStore.name}</h3>
+        {#if keyMapManager.getKeyMap().name !== 'Space' && keyMapManager.getKeyMap().name !== 'Arcade'}
+          <div style="position: absolute; top: 0; right: 25px">
+            <Button90
+              buttonType="button"
+              icon={Icons.Reset}
+              addInfo={`Reset default to: ${keyMapManager.getDefault().name}`}
+              buttonConfig={{ buttonText: `Reset to default: ${keyMapManager.getDefault().name}`, clickCallback: () => resetKeyMapToDefault(keyMapManager), selected: false }}
+            />
+          </div>
+        {/if}
       </th>
     </tr>
     <tr>
       <td>
-        <HotKeys Mode={mode} activeColor={$localPlayerStore.color} {keyMapManager} />
+        <HotKeys
+          Mode={$localPlayerStore.gameMode}
+          activeColor={$localPlayerStore.color}
+          keyMapManager={$localPlayerStore.gameMode === GameMode.SPACE_MODE ? $spaceKeyMapManagerStore : $arcadeKeyMapManagerStore}
+        />
       </td>
     </tr>
     <tr>
