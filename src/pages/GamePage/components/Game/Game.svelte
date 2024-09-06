@@ -137,8 +137,6 @@
     game.stopGame()
     window.removeEventListener('resize', handleResize)
   })
-
-  $: keyMapManager = $localPlayerStore.gameMode === GameMode.SPACE_MODE ? $spaceKeyMapManagerStore : $arcadeKeyMapManagerStore
 </script>
 
 <div class="shipWrapper" style="z-index: 1;">
