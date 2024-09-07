@@ -5,7 +5,7 @@ import { add2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPret
 import { handleDeathExplosion } from '../mechanics'
 import { friction, getRemotePosition } from '../physics/physics'
 import { loadingText, renderHitRadius, renderInfoText, renderLine } from '../render/render2d'
-import { fpsCounter } from '../time'
+import { Every, fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, type SpaceObject, MessageType, type ServerUpdate, GameMode, type KeyFunctionMap } from '../interface'
 import { test } from '../test'
 import { explosionDuration, worldSize, worldStartPosition } from '../constants'
@@ -28,10 +28,11 @@ import { handleChatUpdate } from './handlers/incomingDataHandlers/handleChatUpda
 import { exists } from './handlers/incomingDataHandlers/handleNpcUpdate'
 import { handleStarBackdrop } from './handlers/handleStarBackDrop'
 import { handleMoveView } from './handlers/handleMoveView'
-import { handleLocalPlayer } from './handlers/handleLocalPlayer'
+import { handleLocalPlayer, initLocalPlayer } from './handlers/handleLocalPlayer'
 import { handleGameBodies } from './handlers/handleGameBodies'
 import { handleRemotePlayers } from './handlers/handleRemotePlayers'
 import { renderRemotePlayerInSpaceMode } from '../render/renderRemotePlayers'
+import { initNetworkStats } from './handlers/handleNetStats'
 //Stores
 
 let activeKeyMap: KeyFunctionMap
@@ -49,75 +50,24 @@ let byteSpeed = 0
 let bitSpeed = 0
 let rxDataBytes = 0
 let bytesRecievedLastSecond = 0
+let startTime = 0
 
 const symbolByteSize = 2
 const byteSize = 8
-const timebuf = newDataStats()
-const downloadBuf = newDataStats()
+const angularVelocityGraph = newDataStats()
+const ammoGraph = newDataStats()
+const dataTest = newDataStats()
+const soSize = newDataStats()
+const shotSize = newDataStats()
+const speedbuf = newDataStats()
+const hpbuf = newDataStats()
 const packetSizeBuf = newDataStats()
 const rxByteDataBuf = newDataStats()
-const renderObjBuf = newDataStats()
 const ppsbuf = newDataStats()
-const speedbuf = newDataStats()
+const renderObjBuf = newDataStats()
+const timebuf = newDataStats()
+const downloadBuf = newDataStats()
 const batbuf = newDataStats()
-const hpbuf = newDataStats()
-const shotSize = newDataStats()
-const soSize = newDataStats()
-const dataTest = newDataStats()
-const ammoGraph = newDataStats()
-const angularVelocityGraph = newDataStats()
-
-angularVelocityGraph.baseUnit = 'mdeg/f'
-angularVelocityGraph.label = 'Angular Vel.'
-ammoGraph.label = 'Ammo'
-ammoGraph.baseUnit = ''
-
-dataTest.baseUnit = 'B'
-dataTest.label = 'Reduced So Size'
-
-soSize.baseUnit = 'B'
-soSize.label = 'SpaceObject Size'
-
-shotSize.baseUnit = 'B'
-shotSize.label = 'Shot size'
-
-speedbuf.baseUnit = 'm/s'
-speedbuf.accUnit = 'm'
-speedbuf.label = 'Speed'
-// speedbuf.maxSize = 500
-
-hpbuf.baseUnit = 'hp'
-hpbuf.label = 'Hp'
-// hpbuf.maxSize = 1000
-
-// symbuf.maxSize = 500
-packetSizeBuf.baseUnit = 'B'
-packetSizeBuf.label = 'Packet'
-
-rxByteDataBuf.baseUnit = 'B'
-rxByteDataBuf.label = 'Data downloaded'
-// rxByteDataBuf.maxSize = 1000
-
-ppsbuf.baseUnit = 'pps'
-ppsbuf.label = 'Packets/sec'
-// ppsbuf.maxSize = 1000
-
-// renderObjBuf.maxSize = 2000
-renderObjBuf.baseUnit = 'obj'
-renderObjBuf.label = 'Obj/frame'
-
-timebuf.baseUnit = 's'
-timebuf.prettyPrint = msPretty
-timebuf.maxSize = 60
-timebuf.label = 'Time'
-
-downloadBuf.label = 'Download'
-downloadBuf.baseUnit = 'bit/s'
-downloadBuf.accUnit = 'bit'
-downloadBuf.maxSize = 60
-
-batbuf.label = 'Battery'
-batbuf.baseUnit = '%'
 
 // const packetSize = newDataStats()
 // packetSize.maxSize = 1000
@@ -164,32 +114,12 @@ export function initRegularGame(game: Game): void {
   loadingText('Loading...', game.ctx)
   initKeyControllers()
   initTouchControls()
+  initNetworkStats(angularVelocityGraph, ammoGraph, dataTest, soSize, shotSize, speedbuf, hpbuf, packetSizeBuf, rxByteDataBuf, ppsbuf, renderObjBuf, timebuf, downloadBuf, batbuf)
 
   setCanvasSizeToClientViewFrame(game.ctx)
 
   //Local player init
-  warn(`Resets local player position`)
-  game.reset()
-  game.localPlayer.mass = 1
-  game.localPlayer.missileDamage = 1
-  game.localPlayer.missileSpeed = 19
-  game.localPlayer.armedDelay = 10
-  game.localPlayer.shotsPerFrame = 1
-  game.localPlayer.ammo = 1000000
-  game.localPlayer.angleDegree = -120
-  game.localPlayer.health = 350
-  game.localPlayer.startHealth = game.localPlayer.health
-  game.localPlayer.batteryLevel = 5000
-  game.localPlayer.batteryCapacity = 5000
-  game.localPlayer.steeringPower = 1.5
-  game.localPlayer.enginePower = 0.25
-  game.localPlayer.photonColor = '#f00'
-  game.localPlayer.isLocal = true
-  game.localPlayer.color = '#db8'
-  game.localPlayer.worldSize = worldSize // server sends size of world
-  game.localPlayer.cameraPosition = worldStartPosition
-  game.localPlayer.viewFramePosition = rndfVec2(0, 0)
-  game.localPlayer.position = rndfVec2(0, 0)
+  initLocalPlayer(game)
 
   for (let i = 0; i < 400; i++) {
     // create stars
@@ -197,15 +127,11 @@ export function initRegularGame(game: Game): void {
     game.stars.push(star)
   }
 
-  resetStars(game)
-
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
   game.all = game.all.concat(game.bodies)
   game.all.push(game.localPlayer)
   game.serverVersion = game.localPlayer.serverVersion
-
-  let startTime = 0
 
   info('Setting game socket listener...')
 
@@ -286,23 +212,6 @@ export function initRegularGame(game: Game): void {
   }
 
   game.websocket.addListener(playerUpdate, handleNpcUpdate)
-}
-
-export class Every {
-  private currentTick = 0
-  maxTicks = 1
-
-  constructor(maxTicks: number) {
-    this.maxTicks = maxTicks
-  }
-
-  tick(callback: () => void) {
-    this.currentTick++
-    if (this.currentTick >= this.maxTicks) {
-      callback()
-      this.currentTick = 0
-    }
-  }
 }
 
 const every = new Every(25)

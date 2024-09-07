@@ -1,4 +1,5 @@
-import { explosionDuration } from '../../constants'
+import { rndfVec2, warn } from 'mathil'
+import { explosionDuration, worldSize, worldStartPosition } from '../../constants'
 import type { Game } from '../../game'
 import type { KeyFunctionMap } from '../../interface'
 import { handleDeathExplosion } from '../../mechanics'
@@ -77,4 +78,29 @@ export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
     }
   }
   handleMoveView(game)
+}
+
+export function initLocalPlayer(game: Game) {
+  warn(`Resets local player position`)
+  game.reset()
+  game.localPlayer.mass = 1
+  game.localPlayer.missileDamage = 1
+  game.localPlayer.missileSpeed = 19
+  game.localPlayer.armedDelay = 10
+  game.localPlayer.shotsPerFrame = 1
+  game.localPlayer.ammo = 1000000
+  game.localPlayer.angleDegree = -120
+  game.localPlayer.health = 350
+  game.localPlayer.startHealth = game.localPlayer.health
+  game.localPlayer.batteryLevel = 5000
+  game.localPlayer.batteryCapacity = 5000
+  game.localPlayer.steeringPower = 1.5
+  game.localPlayer.enginePower = 0.25
+  game.localPlayer.photonColor = '#f00'
+  game.localPlayer.isLocal = true
+  game.localPlayer.color = '#db8'
+  game.localPlayer.worldSize = worldSize // server sends size of world
+  game.localPlayer.cameraPosition = worldStartPosition
+  game.localPlayer.viewFramePosition = rndfVec2(0, 0)
+  game.localPlayer.position = rndfVec2(0, 0)
 }
