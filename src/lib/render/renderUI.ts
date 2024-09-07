@@ -31,14 +31,14 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
   const scale = setScaledFont(ctx)
 
   const renderSpeedometer = (screen: Vec2, so: SpaceObject, ctx: CanvasRenderingContext2D) => {
-    renderRoundIndicator({ x: screen.x - 400, y: screen.y - 370 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 150, 'y m/s')
-    renderRoundIndicator({ x: screen.x - 1100, y: screen.y - 370 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 150, 'x m/s')
+    renderRoundIndicator({ x: screen.x - 500, y: screen.y - 500 }, 100 * Math.abs(so.velocity.y), 0, 2000, ctx, 400, 'y m/s')
+    renderRoundIndicator({ x: screen.x - 1500, y: screen.y - 500 }, 100 * Math.abs(so.velocity.x), 0, 2000, ctx, 400, 'x m/s')
   }
 
   ctx.save()
 
   //Speedometer
-  // renderSpeedometer(screen, so, ctx)
+  renderSpeedometer(screen, so, ctx)
 
   ctx.fillStyle = '#fff'
   ctx.fillText(`Local: ${so.name}`, xpos, yrow1)
@@ -66,7 +66,7 @@ export function renderSpaceObjectStatusBar(serverObjects: SpaceObject[], so: Spa
 
 //Frame-info
 export function renderFrameInfo(ops: number, fps: number, frameTimeMs: number, fc: number, game: Game, ctx: CanvasRenderingContext2D): void {
-  const xpos = 26
+  const xpos = 900
   const dec = 1
   const screen: Vec2 = getScreenRect(ctx)
   const ratio: number = round2dec(screen.x / screen.y, 2)

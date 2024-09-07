@@ -284,7 +284,7 @@ export function renderFrame(game: Game, dt: number): void {
       const h = 130
       const w = 250
       const space = 200
-      const startx = 110
+      const startx = 300
       if (i < half) renderGraph(g, { x: 400, y: startx + i * space }, { x: w, y: h }, game.ctx)
       else renderGraph(g, { x: 1300, y: startx + (i - half) * space }, { x: w, y: h }, game.ctx)
     })
