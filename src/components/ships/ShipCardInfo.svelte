@@ -3,6 +3,7 @@
   import { localPlayerStore } from '../../stores/stores'
   // import Cursor from '../mouse/cursor.svelte'
   import ShipCardImg from './ShipImg.svelte'
+  import { isLoggedInStore } from '../../stores/stores'
 
   export let chosenShip: ChosenShip
   export let shipOwner: string
@@ -18,13 +19,8 @@
 </script>
 
 <div class="shipWrapper">
-  <button
-    on:click={() => handleClickShip()}
-    class="imgCard"
-    style="background-color: {yourship
-      ? 'var(--main-accent2-color)'
-      : 'var(--main-accent-color)'}"
-  >
+  <p>{$isLoggedInStore ? 'Chosen Ship' : 'Guest ship'}</p>
+  <button on:click={() => handleClickShip()} class="imgCard" style="background-color: {yourship ? 'var(--main-accent2-color)' : 'var(--main-accent-color)'}">
     <p>{shipOwner}</p>
     <div class="level">{chosenShip.level}</div>
     <ShipCardImg ship={chosenShip} />
@@ -48,7 +44,7 @@
   .shipWrapper {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column;
+    flex-direction: row;
     width: 8em;
     height: 8em;
     border-radius: 0.5em;

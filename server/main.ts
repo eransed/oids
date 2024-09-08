@@ -13,6 +13,7 @@ import { GameHandler } from './game_handler'
 
 import { findShip, updateShipExperienceAndLevel } from './api/ship/ship.services'
 import dotenv from 'dotenv'
+import { sessionHandler } from './sessions'
 dotenv.config()
 
 // start ApiServer
@@ -34,7 +35,12 @@ const server: WebSocketServer = new WebSocketServer({
 
 export let globalConnectedClients: Client[] = []
 
-function createGame(sessionId: string) {
+const game_handlers: GameHandler[] = []
+const serverSessionHandler = sessionHandler(game_handlers, globalConnectedClients)
+
+serverSessionHandler.startSessions()
+
+export function createGame(sessionId: string) {
   const gameHandler = new GameHandler((clients: Client[], data: SpaceObject, sessionId: string | null) => {
     // info(`Sending to session: ${sessionId}`)
     const sendCount = serverBroadcast<SpaceObject>(data, clients, sessionId)
@@ -60,8 +66,6 @@ function createGame(sessionId: string) {
 
   return gameHandler
 }
-
-const game_handlers: GameHandler[] = []
 
 interface clientUpdated {
   id: string
@@ -482,23 +486,17 @@ export function getActivePlayersFromSession(sessionId: string): SpaceObject[] {
 export function getSessions(): Session[] {
   const sessions: Session[] = []
 
-  globalConnectedClients.forEach((client: Client) => {
-    if (client.lastDataObject) {
-      sessions.push({
-        host: client.lastDataObject,
-        id: client.lastDataObject.sessionId,
-        players: getPlayersFromSessionId(client.lastDataObject.sessionId),
-      })
+  for (let i = 0; game_handlers.length > i; i++) {
+    const game_handler = game_handlers[i]
+
+    if (game_handler.tied_session_id) {
+      const players = getPlayersFromSessionId(game_handler.tied_session_id)
+
+      sessions.push({ id: game_handler.tied_session_id, players: players })
     }
-  })
+  }
 
-  const filteredSessions = sessions.filter((s) => {
-    return s.host.isHost === true
-  })
-
-  info(`returned: ${filteredSessions.length} sessions`)
-
-  return filteredSessions
+  return sessions
 }
 
 server.on('connection', function connection(clientConnection: WebSocket, req: IncomingMessage) {

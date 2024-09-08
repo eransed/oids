@@ -3,8 +3,8 @@
   import SessionListRow from './SessionListRow.svelte'
 
   export let sessions: Session[]
-  export let localPlayer: SpaceObject
-  export let joinSession: ((so: SpaceObject | null) => void) | null = null
+  export let joinSession: ((sessionId: string) => void) | null = null
+  export let localPlayer: SpaceObject | undefined
 </script>
 
 <div class="scoreTable">
@@ -18,7 +18,7 @@
     {#each sessions as session}
       <tbody>
         <tr>
-          <SessionListRow {joinSession} localPlayer={localPlayer.name === session.host.name} player={session.host} numberOfPlayers={session.players.length} />
+          <SessionListRow {joinSession} {session} {localPlayer} numberOfPlayers={session.players.length} />
         </tr>
       </tbody>
     {/each}

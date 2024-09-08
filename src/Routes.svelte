@@ -12,11 +12,11 @@
   import PostGamePage from './pages/PostGamePage/PostGamePage.svelte'
   import ProfilePage from './pages/ProfilePage/ProfilePage.svelte'
   import Header from './components/header/header.svelte'
-  import GameLobby from './pages/GameLobby/GameLobby.svelte'
   import TestPage from './pages/TestPage/TestPage.svelte'
   import AdminPage from './pages/AdminPage/AdminPage.svelte'
   import SettingsPage from './pages/SettingsPage/SettingsPage.svelte'
   import Callback from './pages/Auth/Callback.svelte'
+  import GameLobbyServers from './pages/GameLobby/GameLobbyServers.svelte'
 </script>
 
 <Router>
@@ -29,18 +29,15 @@
   <Route path={routes.auth.path}>
     <Callback />
   </Route>
-  <Route path={routes.game.path} let:params
-    ><GamePage gameIdParam={params.id} /></Route
-  >
+  <Route path={routes.game.path} let:params><GamePage gameIdParam={params.id} /></Route>
   <Route path={routes.end.path}><PostGamePage /></Route>
   <Route path={routes.profile.path}>
     <ProfilePage />
   </Route>
   <Route path={routes.play.path}>
-    <GameLobby />
+    <GameLobbyServers />
   </Route>
   <Route path={routes.test.path}><TestPage /></Route>
   <Route path={routes.admin.path}><AdminPage /></Route>
   <Route path={routes.settings.path}><SettingsPage /></Route>
-
 </Router>
