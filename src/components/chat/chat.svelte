@@ -159,7 +159,7 @@
     max-height: 12.5em;
     overflow-y: auto;
     overflow-x: hidden;
-    max-width: 100%;
+    width: 350px;
     padding: 0.5em;
   }
 

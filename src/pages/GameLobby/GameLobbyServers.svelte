@@ -419,6 +419,7 @@
 
   .right {
     grid-template-rows: 1fr auto auto;
+    width: 350px;
   }
 
   .buttonWrapper {
