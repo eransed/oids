@@ -377,7 +377,7 @@ export interface Unique {
 }
 
 export interface Session {
-  host: SpaceObject
+  // host: SpaceObject
   id: string
   players: SpaceObject[]
 }

@@ -24,8 +24,6 @@ export const guestUserStore: Writable<User> = writable(gUser)
 
 export const pageHasHeaderStore: Writable<boolean> = writable(true)
 
-export const gameSessionIdStore: Writable<string | undefined> = writable('')
-
 export const localPlayerStore: Writable<SpaceObject> = writable(createSpaceObject(createdGuestName))
 
 export const socketStore: Writable<OidsSocket> = writable(new OidsSocket(getWsUrl()))
