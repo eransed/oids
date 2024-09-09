@@ -1,11 +1,7 @@
 import axios, { type AxiosResponse } from 'axios'
 
 //Svelte store
-import {
-  isLoggedInStore,
-  localPlayerStore,
-  userStore,
-} from '../../../stores/stores'
+import { localPlayerStore, userStore } from '../../../stores/stores'
 
 //Interface
 // import type { User } from '../../../interfaces/user'
@@ -38,7 +34,6 @@ const getProfile = async (testToken?: string): Promise<AxiosResponse<User>> => {
       const id = response.data.id
 
       localPlayerStore.update((v) => ({ ...v, id: id }))
-      isLoggedInStore.set(true)
       console.log('Welcome: ', response.data, response.data)
       if (!testToken) {
         setCssFromSettings(response.data.theme)

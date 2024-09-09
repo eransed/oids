@@ -7,7 +7,7 @@
   import ProfileModal from '../profile/ProfileModal.svelte'
 
   //Stores
-  import { userStore, settingsStore, isLoggedInStore } from '../../stores/stores'
+  import { userStore, settingsStore } from '../../stores/stores'
 
   //css
   import './style.css'
@@ -23,7 +23,7 @@
     showLogin = !showLogin
   }
 
-  $: borderColor = $isLoggedInStore && $userStore ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
+  $: borderColor = $userStore ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
 
   $: pathname = location.pathname
 
@@ -100,7 +100,7 @@
       </button>
     </div>
     <div class="modalProfile" style="--borderColor: {borderColor};" on:mousedown={handleClickProfile}>
-      <img draggable="false" class="avatar" src={$isLoggedInStore && $userStore ? $userStore.image : Avatars.AstronautMale} alt="Avatar" />
+      <img draggable="false" class="avatar" src={$userStore ? $userStore.image : Avatars.AstronautMale} alt="Avatar" />
     </div>
 
     {#if showLogin}

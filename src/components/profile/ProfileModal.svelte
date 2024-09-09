@@ -6,7 +6,7 @@
   import { logOutButton, loginButton, loginGoogle } from './profileButtons'
 
   //Stores
-  import { isLoggedInStore, userStore } from '../../stores/stores'
+  import { userStore } from '../../stores/stores'
 
   //Svelte
   import { fade } from 'svelte/transition'
@@ -55,59 +55,32 @@
   }
 
   //Color of border color around profile portrait
-  $: borderColor = $isLoggedInStore ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
+  $: borderColor = $userStore ? 'rgb(144, 238, 144)' : 'rgb(255, 165, 0)'
 </script>
 
-{#if !$isLoggedInStore}
+{#if !$userStore}
   <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <form on:submit|preventDefault={handleSubmit} on:formdata class="form">
-      <input
-        placeholder="Email"
-        name="email"
-        type="email"
-        autocomplete="email"
-      />
+      <input placeholder="Email" name="email" type="email" autocomplete="email" />
 
-      <input
-        placeholder="Password"
-        name="password"
-        type="password"
-        autocomplete="current-password"
-      />
+      <input placeholder="Password" name="password" type="password" autocomplete="current-password" />
       <div class="button">
-        <Button90
-          buttonType="submit"
-          {loading}
-          buttonConfig={loginButton}
-          mouseTracking={false}
-        />
+        <Button90 buttonType="submit" {loading} buttonConfig={loginButton} mouseTracking={false} />
       </div>
       <div class="button">
-        <Button90
-          buttonType="button"
-          buttonConfig={loginGoogle}
-          mouseTracking={false}
-          socialIcon={Icons.Google}
-          addInfo="Login with Google"
-        />
+        <Button90 buttonType="button" buttonConfig={loginGoogle} mouseTracking={false} socialIcon={Icons.Google} addInfo="Login with Google" />
       </div>
     </form>
     <Alert severity={alert.severity} text={alert.text} />
   </div>
 {/if}
-{#if $userStore && $isLoggedInStore}
+{#if $userStore}
   <div class="profileModal" in:fade={{ duration: 600, delay: 150 }}>
     <div class="row1">
       <div class="column" style={'flex: 0.5;'}>
         <div class="modalProfile" style="--borderColor: {borderColor};">
           <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <img
-            on:click={() => navigate('/profile')}
-            draggable="false"
-            class="avatar"
-            src={$userStore.image}
-            alt="Rocket Ship"
-          />
+          <img on:click={() => navigate('/profile')} draggable="false" class="avatar" src={$userStore.image} alt="Rocket Ship" />
         </div>
       </div>
       <div class="column">
@@ -122,10 +95,7 @@
           <p style="margin-top: 0.5em;">Email: {$userStore?.email}</p>
 
           <p>
-            Created: {$userStore &&
-              new Intl.DateTimeFormat('en-SE').format(
-                new Date($userStore.createdAt)
-              )}
+            Created: {$userStore && new Intl.DateTimeFormat('en-SE').format(new Date($userStore.createdAt))}
           </p>
         </div>
       </div>

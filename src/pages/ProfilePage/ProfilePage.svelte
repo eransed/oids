@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { pageHasHeaderStore, userStore, isLoggedInStore, settingsStore } from '../../stores/stores'
+  import { pageHasHeaderStore, userStore, settingsStore } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -33,14 +33,14 @@
   import type { Theme } from '../../lib/interface'
 
   onMount(async () => {
-    if ($isLoggedInStore && !$userStore) {
+    if (!$userStore) {
       const user = await getProfile()
       if (user.data) {
         chosenTheme = themes[user.data.theme]
       }
     }
 
-    if ($isLoggedInStore) {
+    if ($userStore) {
       chosenTheme = themes[$userStore.theme]
     }
   })
@@ -63,6 +63,10 @@
   $: opacity = editSettings ? 1 : 0.5
 
   async function delUser() {
+    if (!$userStore) {
+      console.error('No user found')
+      return
+    }
     const result = confirm(`Want to delete your account: ${$userStore.name}?`)
     if (result) {
       const prompt = window.prompt(`Write ${$userStore.name} in the box to delete user.`)
@@ -82,13 +86,18 @@
           })
           .catch((err) => {
             loading = false
-            throw new Error(err)
+            console.error(err)
           })
       }
     }
   }
 
   async function handleSaveSettings() {
+    if (!$userStore) {
+      console.error('Uesr not logged in')
+      return
+    }
+
     loading = true
 
     const theme = getThemeNumber(chosenTheme)
@@ -139,7 +148,7 @@
 {/if}
 <Page>
   <div class="profileWrapper">
-    {#if $isLoggedInStore && $userStore}
+    {#if $userStore}
       <div class="buttons">
         {#each Object.values(ProfileButtons) as button}
           <div>

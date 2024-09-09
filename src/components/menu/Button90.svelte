@@ -43,6 +43,7 @@
   $: minWidth = minWidth
 </script>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="wrapper" on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
   <button
     type={buttonType}

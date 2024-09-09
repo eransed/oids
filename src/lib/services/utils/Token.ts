@@ -4,7 +4,7 @@ import axios from 'axios'
 import type { AxiosError, AxiosResponse } from 'axios'
 import getProfile from '../user/profile'
 
-import { isLoggedInStore, userLoadingStore } from '../../../stores/stores'
+import { userLoadingStore } from '../../../stores/stores'
 
 import type { Tokens } from '../../interface'
 import { setCssFromSettings } from '../../../style/defaultColors'
@@ -40,7 +40,6 @@ export const validateToken = async () => {
         return await getProfile()
           .then((response) => {
             const user = response.data
-            isLoggedInStore.set(true)
             userLoadingStore.set(false)
             setCssFromSettings(user.theme)
 

@@ -8,13 +8,11 @@ import type { Settings } from '../lib/interface'
 import { cnvTheme, DeepMidnight } from '../style/defaultColors'
 import { gUser, createdGuestName } from '../utils/utils'
 
-export const isLoggedInStore: Writable<boolean> = writable()
-
 // export const userIncludes = Prisma.validator<Prisma.UserArgs>()({
 //   include: { ships: true, gameHistory: true },
 // })
 
-export const userStore: Writable<User> = writable()
+export const userStore: Writable<User | undefined> = writable(undefined)
 
 export const userLoadingStore: Writable<boolean> = writable()
 

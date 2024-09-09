@@ -20,7 +20,7 @@
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
-  import { guestUserNameStore, isLoggedInStore, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
+  import { guestUserNameStore, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { getPlayersInSession } from '../../../../lib/services/game/playersInSession'
   import { info } from 'mathil'
@@ -76,26 +76,27 @@
 
   onMount(async () => {
     // cleanup = initSettingsControl()
-    if (!$isLoggedInStore) {
+    if (!$userStore) {
       $localPlayerStore.name = $guestUserNameStore
     }
+    if ($userStore) {
+      if ($userStore.ships.length === 1) {
+        $localPlayerStore.ship = createChosenShip($userStore.ships[0])
+        chosenShip = $localPlayerStore.ship
+      } else {
+        const storedShipJson = localStorage.getItem('chosenShip')
 
-    if ($isLoggedInStore && $userStore.ships.length === 1) {
-      $localPlayerStore.ship = createChosenShip($userStore.ships[0])
-      chosenShip = $localPlayerStore.ship
-    } else {
-      const storedShipJson = localStorage.getItem('chosenShip')
+        if (storedShipJson) {
+          const localStorageShip = JSON.parse(storedShipJson)
+          const shipFromStorage = $userStore.ships.find((ship) => {
+            if (ship.id === localStorageShip.id) return ship
+          })
 
-      if (storedShipJson && $isLoggedInStore) {
-        const localStorageShip = JSON.parse(storedShipJson)
-        const shipFromStorage = $userStore.ships.find((ship) => {
-          if (ship.id === localStorageShip.id) return ship
-        })
-
-        if (shipFromStorage) {
-          $localPlayerStore.ship = createChosenShip(shipFromStorage)
-          console.log('found ship in localstorage:', shipFromStorage)
-          chosenShip = $localPlayerStore.ship
+          if (shipFromStorage) {
+            $localPlayerStore.ship = createChosenShip(shipFromStorage)
+            console.log('found ship in localstorage:', shipFromStorage)
+            chosenShip = $localPlayerStore.ship
+          }
         }
       }
     }
@@ -111,7 +112,7 @@
         game.localPlayer.isHost = true
       }
     })
-    if (!$isLoggedInStore || chosenShip) {
+    if (!$userStore || chosenShip) {
       game.startGame(initRegularGame, renderFrame, nextFrame)
       resetStars(game)
     }
@@ -216,7 +217,7 @@
   <Celebration celebrationText={`You've reached level ${$localPlayerStore.ship.level}`} celebrationTimeoutCallback={() => ($shouldCelebrateLevelUp = false)} />
 {/if}
 
-{#if $isLoggedInStore && $userStore.ships.length > 1 && !chosenShip}
+{#if $userStore && $userStore.ships.length > 1 && !chosenShip}
   {#if $userStore.ships.length === 0}
     <AddShip openModal={!chosenShip} />
   {:else}

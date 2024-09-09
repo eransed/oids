@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { guestUserNameStore, userStore, localPlayerStore, pageHasHeaderStore, isLoggedInStore, guestUserStore, socketStore, chatMsgHistoryStore } from '../../stores/stores'
+  import { guestUserNameStore, userStore, localPlayerStore, pageHasHeaderStore, guestUserStore, socketStore, chatMsgHistoryStore } from '../../stores/stores'
 
   //Interfaces
   import { MessageType, type SpaceObject } from '../../lib/interface'
@@ -54,7 +54,7 @@
     }, 600)
   }
 
-  $: if ($isLoggedInStore === false) {
+  $: if (!$userStore) {
     console.log('User logged out - renaming to guest name')
     $localPlayerStore.name = $guestUserStore.name
     setTimeout(() => {
@@ -86,7 +86,7 @@
   async function initLobbySocket() {
     return new Promise<void>((resolve, reject) => {
       $localPlayerStore.name = $userStore ? $userStore.name : $guestUserNameStore
-      if (!$isLoggedInStore) {
+      if (!$userStore) {
         $localPlayerStore.ship = {
           name: '',
           shipVariant: 0,
@@ -189,7 +189,7 @@
       }
     }
 
-    if ($isLoggedInStore && $userStore && !storedShipJson) {
+    if ($userStore && !storedShipJson) {
       shipModalOpen = true
       if ($userStore.ships.length > 0) {
         $localPlayerStore.ship = createChosenShip($userStore.ships[0])
@@ -309,7 +309,7 @@
   }
 </script>
 
-{#if $isLoggedInStore}
+{#if $userStore}
   {#if shipModalOpen}
     {#if $userStore.ships.length === 0}
       <AddShip openModal={!chosenShip} />
@@ -442,14 +442,6 @@
     .sessionInfo {
       max-height: 33vh;
       overflow-x: auto;
-    }
-
-    .left,
-    .center,
-    .right {
-      min-width: unset;
-
-      margin-left: 0px;
     }
 
     .lobbyWrapper {
