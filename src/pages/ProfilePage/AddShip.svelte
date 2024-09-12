@@ -9,7 +9,7 @@
   import getProfile from '../../lib/services/user/profile'
   import { ShipBundles } from '../../style/ships'
   // import type { Ship } from '@prisma/client'
-  import { userStore } from '../../stores/stores'
+  import { localPlayerStore, userStore } from '../../stores/stores'
   import { createShip } from '../../lib/factory'
   import type { Ship } from '../../lib/interface'
 
@@ -20,14 +20,21 @@
 
   let newShipDone: boolean = false
 
-  let newShip: Ship = createShip($userStore.id)
+  let newShip: Ship = createShip('new')
 
   async function handleNewShip(): Promise<void> {
+    if (!$userStore) {
+      throw new Error("Can't create a new ship if user not logged in")
+    }
+
+    newShip.id = $userStore.id
     loading = true
+
     return new Promise<void>((resolve, reject) => {
       createShipService(newShip)
         .then((response) => {
           if (response.status === 200) {
+            $localPlayerStore.ship = response.data
             loading = false
             openModal = false
             getProfile().then(() => {
@@ -48,46 +55,33 @@
   //   })}
 </script>
 
-{#if openModal}
-  <ModalSimple
-    title="Add a new ship to your collection"
-    disabled={loading || !newShipDone}
-    closeBtn={() => {
-      closeModal()
-      openModal = false
-    }}
-    saveBtn={async () => handleNewShip()}
-    doneCallback={() => (newShipDone = true)}
-  >
-    <div
-      style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%"
-      in:fade={{ duration: 250, delay: 50 }}
-    >
-      <h3 style="align-self: center">Name your new ship 🚀:</h3>
-      <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
-    </div>
-    <div style="width: 100%; color: var(--main-text-color)">
-      <h3 style="align-self: center">Choose your ship type</h3>
-    </div>
+<ModalSimple
+  title="Add a new ship to your collection"
+  disabled={loading || !newShipDone}
+  closeBtn={() => {
+    closeModal()
+    openModal = false
+  }}
+  saveBtn={async () => handleNewShip()}
+  doneCallback={() => (newShipDone = true)}
+>
+  <div style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%" in:fade={{ duration: 250, delay: 50 }}>
+    <h3 style="align-self: center">Name your new ship 🚀:</h3>
+    <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
+  </div>
+  <div style="width: 100%; color: var(--main-text-color)">
+    <h3 style="align-self: center">Choose your ship type</h3>
+  </div>
 
-    {#each Object.values(ShipBundles) as Ship, i}
-      <button
-        class="imgCard"
-        style="background: {Ship.type === newShip.variant
-          ? 'var(--main-accent2-color)'
-          : ''};
+  {#each Object.values(ShipBundles) as Ship, i}
+    <button
+      class="imgCard"
+      style="background: {Ship.type === newShip.variant ? 'var(--main-accent2-color)' : ''};
                   animation-delay: {150 * i}ms;"
-        on:click={() => (newShip.variant = Ship.type)}
-        ><img
-          draggable="false"
-          src={Ship.svgUrl}
-          alt={Ship.svgUrl}
-          style=" margin: 1em"
-        /></button
-      >
-    {/each}
-  </ModalSimple>
-{/if}
+      on:click={() => (newShip.variant = Ship.type)}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
+    >
+  {/each}
+</ModalSimple>
 
 <style>
   .imgCard {

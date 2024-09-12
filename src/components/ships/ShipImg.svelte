@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { ChosenShip } from '../../lib/interface'
+  import type { Ship } from '../../lib/interface'
   import { getShipBundleCache } from '../../style/ships'
 
-  export let ship: ChosenShip
+  export let ship: Ship
 </script>
 
-<img draggable="false" src={getShipBundleCache(ship.shipVariant).svgUrl} alt={ship.name} />
+<img draggable="false" src={getShipBundleCache(ship.variant).svgUrl} alt={ship.name} />
 
 <style>
   img {

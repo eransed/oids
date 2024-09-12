@@ -46,14 +46,12 @@
   async function handleSaveAvatar() {
     if (changeShip) {
       console.log(changeShip)
-      await updateShip(changeShip.name, changeShip.variant, changeShip.id).then(
-        (d) => {
-          if (d.status === 200) {
-            getProfile()
-            changeShip = undefined
-          }
+      await updateShip(changeShip.name, changeShip.variant, changeShip.id).then((d) => {
+        if (d.status === 200) {
+          getProfile()
+          changeShip = undefined
         }
-      )
+      })
     }
   }
 
@@ -65,39 +63,30 @@
   }
 </script>
 
-{#each $userStore.ships as ship, i}
-  <div class="ship" style="animation-delay: {150 * i}ms;">
-    <!-- svelte-ignore a11y-missing-attribute -->
-    <button
-      class="avatar"
-      style="animation-delay: {150 * i}ms;"
-      title="Edit Ship"
-      on:click={() => clickedShip(ship)}
-    >
-      <img class="chosenAvatar" src={getShipBundleCache(ship.variant).svgUrl} />
-    </button>
+{#if $userStore}
+  {#each $userStore.ships as ship, i}
+    <div class="ship" style="animation-delay: {150 * i}ms;">
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <button class="avatar" style="animation-delay: {150 * i}ms;" title="Edit Ship" on:click={() => clickedShip(ship)}>
+        <img class="chosenAvatar" src={getShipBundleCache(ship.variant).svgUrl} />
+      </button>
 
-    <div class="shipInfo">
-      <h4>
-        {ship.name}
-      </h4>
-      <p style="font-style: italic">Created: {formatDate(ship.createdAt)}</p>
-      <br />
-      <p>Level {ship.level}</p>
-      <p>Experience {ship.experience}</p>
-      <br />
+      <div class="shipInfo">
+        <h4>
+          {ship.name}
+        </h4>
+        <p style="font-style: italic">Created: {formatDate(ship.createdAt)}</p>
+        <br />
+        <p>Level {ship.level}</p>
+        <p>Experience {ship.experience}</p>
+        <br />
+      </div>
     </div>
-  </div>
-{/each}
+  {/each}
+{/if}
 
 {#if changeShip}
-  <ModalSimple
-    disabled={loading}
-    doneCallback={() => (updatedShipDone = true)}
-    title="Change your ship"
-    saveBtn={async () => await handleSaveAvatar()}
-    closeBtn={() => (changeShip = undefined)}
-  >
+  <ModalSimple disabled={loading} doneCallback={() => (updatedShipDone = true)} title="Change your ship" saveBtn={async () => await handleSaveAvatar()} closeBtn={() => (changeShip = undefined)}>
     <div class="shipActions" style="position: absolute; top: 0; right: 0">
       <Button90
         disabled={loading}
@@ -114,34 +103,20 @@
         }}
       />
     </div>
-    <div
-      style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%"
-    >
+    <div style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%">
       <h3 style="align-self: center">Ship name:</h3>
-      <input
-        disabled={loading}
-        bind:value={changeShip.name}
-        placeholder={changeShip.name}
-      />
+      <input disabled={loading} bind:value={changeShip.name} placeholder={changeShip.name} />
     </div>
     {#each Object.values(ShipBundles) as Ship, i}
       <button
         class="imgCard"
-        style=" background: {Ship.type === changeShip.variant
-          ? 'var(--main-accent2-color)'
-          : ''};
+        style=" background: {Ship.type === changeShip.variant ? 'var(--main-accent2-color)' : ''};
                   animation-delay: {150 * i}ms;"
         on:click={() => {
           if (changeShip) {
             changeShip.variant = Ship.type
           }
-        }}
-        ><img
-          draggable="false"
-          src={Ship.svgUrl}
-          alt={Ship.svgUrl}
-          style=" margin: 1em"
-        /></button
+        }}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
       >
     {/each}
   </ModalSimple>

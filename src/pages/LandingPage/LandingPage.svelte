@@ -3,22 +3,16 @@
   import { fade } from 'svelte/transition'
 
   //Stores
-  import {
-    guestUserStore,
-    pageHasHeaderStore,
-    userStore,
-  } from '../../stores/stores'
+  import { guestUser, pageHasHeaderStore, userStore } from '../../stores/stores'
 
   //Components
   import TypeWriter from '../../components/typeWriter/TypeWriter.svelte'
   import { navigate } from 'svelte-routing'
+  import { gUser } from '../../utils/utils'
 
   pageHasHeaderStore.set(true)
 
-  const welcomeMessage = `Welcome to OIDS ${
-    $userStore ? $userStore.name : $guestUserStore.name
-  }`
-
+  const welcomeMessage = `Welcome to OIDS ${$userStore ? $userStore.name : $guestUser.name}`
 </script>
 
 <div out:fade class="landingPage">

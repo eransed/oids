@@ -49,15 +49,6 @@ export interface Shapable {
   shape: SpaceShape
 }
 
-export interface ChosenShip {
-  name: string
-  level: number
-  userId: string
-  shipVariant: ShipVariant
-  id: string
-  experience: number
-}
-
 export interface Colorable {
   color: string
 }
@@ -224,7 +215,7 @@ export enum MessageType {
 }
 
 export interface PlayingShip {
-  ship: ChosenShip
+  ship: Ship
 }
 
 export interface Belonging {

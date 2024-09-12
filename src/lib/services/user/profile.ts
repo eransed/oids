@@ -31,10 +31,12 @@ const getProfile = async (testToken?: string): Promise<AxiosResponse<User>> => {
     .then((response: AxiosResponse<User>) => {
       userStore.set(response.data)
 
-      const id = response.data.id
+      const user = response.data
+      const defaultShip = user.ships[0]
 
-      localPlayerStore.update((v) => ({ ...v, id: id }))
-      console.log('Welcome: ', response.data, response.data)
+      localPlayerStore.update((v) => ({ ...v, id: user.id, ship: defaultShip ?? [] }))
+
+      console.log('Welcome: ', response.data.name, response.data)
       if (!testToken) {
         setCssFromSettings(response.data.theme)
       }

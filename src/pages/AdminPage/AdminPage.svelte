@@ -91,7 +91,7 @@
             }
             editingUser = undefined
             edit = false
-            if ($userStore.id === editedUser.id) {
+            if ($userStore && $userStore.id === editedUser.id) {
               getProfile()
             }
           } else {
@@ -153,9 +153,7 @@
   async function delUser() {
     const result = confirm(`Want to delete user: ${editingUser?.name}?`)
     if (result) {
-      const prompt = window.prompt(
-        `Write ${editingUser?.name} in the box to delete user.`
-      )
+      const prompt = window.prompt(`Write ${editingUser?.name} in the box to delete user.`)
       if (prompt === name) {
         loading = true
 
@@ -222,26 +220,10 @@
           />
         </div>
         {#if addNewUser}
-          <div
-            in:fade={{ duration: 250, delay: 50 }}
-            out:fade={{ duration: 250 }}
-            class="addUser"
-          >
-            <input
-              disabled={loading}
-              bind:value={newUser.name}
-              placeholder="Name"
-            />
-            <input
-              disabled={loading}
-              bind:value={newUser.email}
-              placeholder="Email"
-            />
-            <input
-              disabled={loading}
-              bind:value={newUser.password}
-              placeholder="Password"
-            />
+          <div in:fade={{ duration: 250, delay: 50 }} out:fade={{ duration: 250 }} class="addUser">
+            <input disabled={loading} bind:value={newUser.name} placeholder="Name" />
+            <input disabled={loading} bind:value={newUser.email} placeholder="Email" />
+            <input disabled={loading} bind:value={newUser.password} placeholder="Password" />
             <Button90
               disabled={loading}
               icon={Icons.Cancel}
@@ -270,19 +252,7 @@
         {/if}
 
         {#if users && !loading}
-          <UserList
-            {chosenTheme}
-            delUser={() => delUser()}
-            sendUpdateUser={() => sendUpdateUser()}
-            {edit}
-            {users}
-            {loading}
-            {name}
-            {email}
-            {role}
-            {editingUser}
-            onKeyPress={(e) => onKeyPress(e)}
-          />
+          <UserList {chosenTheme} delUser={() => delUser()} sendUpdateUser={() => sendUpdateUser()} {edit} {users} {loading} {name} {email} {role} {editingUser} onKeyPress={(e) => onKeyPress(e)} />
         {:else}
           <CircularSpinner />
         {/if}
@@ -302,7 +272,7 @@
     width: 100ch;
   }
 
-   .addUser input {
+  .addUser input {
     background-color: var(--main-bg-color);
     outline: none;
     border: none;

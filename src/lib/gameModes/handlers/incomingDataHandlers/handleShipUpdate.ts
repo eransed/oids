@@ -15,6 +15,10 @@ export function handleShipUpdate(su: ServerUpdate<SpaceObject>) {
   game.localPlayer.ship.level = su.dataObject.ship.level
 
   userStore.update((user) => {
+    if (!user) {
+      console.error('No user to update')
+      return
+    }
     const chosenShip = user.ships.findIndex((ship) => ship.id === su.dataObject.ship.id)
 
     user.ships[chosenShip].experience = su.dataObject.ship.experience

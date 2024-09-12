@@ -3,7 +3,8 @@ import { navigate } from 'svelte-routing'
 import type { Button90Config } from '../../lib/interface'
 
 //Utils
-import { getLocationURL, handleLogout } from '../../utils/utils'
+import { getLocationURL } from '../../utils/utils'
+import { handleLogout } from '../../utils/logoutHandler'
 
 export const logOutButton: Button90Config = {
   buttonText: 'Log out',

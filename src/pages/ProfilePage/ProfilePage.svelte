@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { pageHasHeaderStore, userStore, settingsStore } from '../../stores/stores'
+  import { pageHasHeaderStore, userStore, settingsStore, localPlayerStore } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -16,7 +16,7 @@
   import { formatDate } from '../../utils/utils'
   import getProfile from '../../lib/services/user/profile'
   import { onMount } from 'svelte'
-  import { handleLogout } from '../../utils/utils'
+  import { handleLogout } from '../../utils/logoutHandler'
 
   //Assets
   import { Icons } from '../../style/icons'
@@ -76,7 +76,7 @@
         await deleteMe()
           .then((res) => {
             if (res.status === 200) {
-              handleLogout()
+              handleLogout($localPlayerStore.sessionId)
               alert = {
                 severity: 'success',
                 text: `Your account has been deleted forever :(`,
@@ -178,7 +178,6 @@
           {#if openModal}
             <AddShip {openModal} closeModal={() => (openModal = false)} />
           {/if}
-
           <Ships />
         {/if}
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { ChosenShip } from '../../../../lib/interface'
+  import type { Ship } from '../../../../lib/interface'
   import ShipImg from '../../../../components/ships/ShipImg.svelte'
-  export let ship: ChosenShip
+  export let ship: Ship
 </script>
 
 <div class="ship">

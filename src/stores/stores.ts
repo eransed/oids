@@ -16,9 +16,7 @@ export const userStore: Writable<User | undefined> = writable(undefined)
 
 export const userLoadingStore: Writable<boolean> = writable()
 
-export const guestUserNameStore: Writable<string> = writable(createdGuestName)
-
-export const guestUserStore: Writable<User> = writable(gUser)
+export const guestUser: Writable<User> = writable(gUser)
 
 export const pageHasHeaderStore: Writable<boolean> = writable(true)
 

@@ -195,13 +195,6 @@ export class OidsSocket {
   }
 }
 
-interface WebSocketEventMap_copy {
-  close: CloseEvent
-  error: Event
-  message: MessageEvent
-  open: Event
-}
-
 export interface SocketListener<K extends keyof WebSocketEventMap> {
   event: K
   fn: (e: WebSocketEventMap[K]) => void

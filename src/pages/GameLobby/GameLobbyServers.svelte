@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { guestUserNameStore, userStore, localPlayerStore, pageHasHeaderStore, guestUserStore, socketStore, chatMsgHistoryStore } from '../../stores/stores'
+  import { guestUser, userStore, localPlayerStore, pageHasHeaderStore, socketStore, chatMsgHistoryStore } from '../../stores/stores'
 
   //Interfaces
   import { MessageType, type SpaceObject } from '../../lib/interface'
@@ -11,7 +11,7 @@
   import Chat from '../../components/chat/chat.svelte'
 
   //Services
-  import type { ChatMessage, ChosenShip, Session, Ship } from '../../lib/interface'
+  import type { ChatMessage, ServerUpdate, Session, Ship } from '../../lib/interface'
   import { createSessionId } from '../../utils/utils'
   import { getActiveSessions } from '../../lib/services/game/activeSessions'
   import SessionList from './components/SessionList/SessionList.svelte'
@@ -29,40 +29,7 @@
   import AddShip from '../ProfilePage/AddShip.svelte'
   import ShipCardInfo from '../../components/ships/ShipCardInfo.svelte'
   import { worldStartPosition } from '../../lib/constants'
-
-  /**
-   * Reactive on changes to $user store.
-   */
-  $: if ($userStore && $userStore.name !== $localPlayerStore.name) {
-    $localPlayerStore.name = $userStore.name
-    info(`sending loc player`)
-    setTimeout(() => {
-      $socketStore.send($localPlayerStore)
-    }, 500)
-    if ($userStore.ships.length === 1) {
-      $localPlayerStore.ship = createChosenShip($userStore.ships[0])
-      console.log($userStore.ships)
-      setTimeout(() => {
-        $socketStore.send($localPlayerStore)
-      }, 600)
-    } else {
-      shipModalOpen = true
-    }
-
-    setTimeout(() => {
-      updateSessions()
-    }, 600)
-  }
-
-  $: if (!$userStore) {
-    console.log('User logged out - renaming to guest name')
-    $localPlayerStore.name = $guestUserStore.name
-    setTimeout(() => {
-      $socketStore.send($localPlayerStore)
-      log('$: if ($isLoggedIn === false)')
-      updateSessions()
-    }, 700)
-  }
+  import { fade, fly } from 'svelte/transition'
 
   pageHasHeaderStore.set(true)
 
@@ -85,17 +52,13 @@
 
   async function initLobbySocket() {
     return new Promise<void>((resolve, reject) => {
-      $localPlayerStore.name = $userStore ? $userStore.name : $guestUserNameStore
-      if (!$userStore) {
-        $localPlayerStore.ship = {
-          name: '',
-          shipVariant: 0,
-          level: 0,
-          userId: '',
-          id: '',
-          experience: 0,
-        }
-      }
+      $localPlayerStore.name = $userStore ? $userStore.name : $guestUser.name
+
+      // if ($userStore) {
+      //   if ($userStore.ships) {
+      //     $localPlayerStore.ship = $userStore.ships[0]
+      //   }
+      // }
 
       $socketStore.connect().then(() => {
         console.log(`Connected to websocket`)
@@ -126,15 +89,6 @@
               console.log(`${incomingUpdate.name} left the lobby`)
             } else if (incomingUpdate.messageType === MessageType.PING) {
               // handlePing(incomingUpdate, $socket)
-            } else if (incomingUpdate.messageType === MessageType.START_GAME) {
-              //Game init started by other player
-              const sess = incomingUpdate.sessionId
-              $localPlayerStore.isPlaying = true
-              info(`Resetting local player position to world start position`)
-              $localPlayerStore.cameraPosition = worldStartPosition
-              console.log(`${incomingUpdate.name}: Starting game with session id ${sess}`)
-              $socketStore.resetListeners()
-              navigate(`/play/${sess}`)
             } else if (incomingUpdate.messageType === MessageType.SERVICE) {
               log(`Service message: server version: ${incomingUpdate.serverVersion}`)
               $localPlayerStore.serverVersion = incomingUpdate.serverVersion
@@ -144,7 +98,9 @@
               }
             }
           },
-          () => {},
+          (su) => {
+            console.log(su)
+          },
         )
         .then(() => {
           updateSessions()
@@ -156,22 +112,9 @@
     })
   }
 
-  let showLobby = false
-
-  function createChosenShip(ship: Ship): ChosenShip {
-    const chosenShip: ChosenShip = {
-      name: ship.name,
-      userId: ship.userId,
-      level: ship.level,
-      shipVariant: ship.variant,
-      id: ship.id,
-      experience: ship.experience,
-    }
-    return chosenShip
-  }
-
-  onMount(() => {
+  onMount(async () => {
     const storedShipJson = localStorage.getItem('chosenShip')
+    await initLobbySocket()
 
     if (storedShipJson && $userStore) {
       console.log('storedShip', storedShipJson)
@@ -180,25 +123,13 @@
         $userStore.ships.find((ship) => {
           if (ship.id === storedShip.id) {
             chosenShip = ship
-            $localPlayerStore.ship = createChosenShip(ship)
+            $localPlayerStore.ship = ship
             console.log('ship:', $localPlayerStore.ship)
 
             return
           }
         })
       }
-    }
-
-    if ($userStore && !storedShipJson) {
-      shipModalOpen = true
-      if ($userStore.ships.length > 0) {
-        $localPlayerStore.ship = createChosenShip($userStore.ships[0])
-      }
-    } else {
-      initLobbySocket().then(() => {
-        showLobby = true
-        updateSessions()
-      })
     }
   })
 
@@ -248,6 +179,7 @@
 
   function joinSession_(sessionId: string) {
     if (sessionId) {
+      console.log($localPlayerStore)
       console.log(`${$localPlayerStore.name}: joining session ${sessionId}`)
       $localPlayerStore.sessionId = sessionId
       // send some update that localPlayer joined a/the session
@@ -289,98 +221,74 @@
 
   function handleChosenShip(ship: Ship) {
     console.log('clickedshipcallback')
-    shipModalOpen = false
     chosenShip = ship
-    $localPlayerStore.ship = {
-      level: ship.level,
-      name: ship.name,
-      userId: ship.userId,
-      shipVariant: ship.variant,
-      id: ship.id,
-      experience: ship.experience,
-    }
+    $localPlayerStore.ship = ship
     // initLobbySocket().then(() => {
     //   showLobby = true
     // })
-    showLobby = true
-    localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
-    $socketStore.send($localPlayerStore)
-    updateSessions()
   }
 </script>
 
-{#if $userStore}
-  {#if shipModalOpen}
-    {#if $userStore.ships.length === 0}
-      <AddShip openModal={!chosenShip} />
-    {:else}
-      <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
-        <Ships
-          changeShipOnClick={false}
-          clickedShipCallback={(ship) => {
-            handleChosenShip(ship)
+<Page>
+  <div class="lobbyWrapper">
+    <div class="left">
+      {#if sessions.length > 0}
+        <SessionList localPlayer={$localPlayerStore} joinSession={joinSession_} {sessions} />
+      {:else}
+        <h5 style="padding: 1em;">Servers are offline...play locally?</h5>
+        {@const offlineSessionId = 'Messier87'}
+        <Button90
+          addInfo="Play"
+          icon={Icons.StartGame}
+          buttonConfig={{
+            buttonText: 'Play',
+            clickCallback: () => startGame(offlineSessionId),
+            selected: false,
           }}
         />
-      </ModalSimple>
-    {/if}
-  {/if}
-{/if}
-{#if showLobby && $localPlayerStore.ship}
-  <Page>
-    <div class="lobbyWrapper">
-      <div class="left">
-        {#if sessions.length > 0}
-          <SessionList localPlayer={$localPlayerStore} joinSession={joinSession_} {sessions} />
-        {:else}
-          <h5 style="padding: 1em;">Servers are offline...play locally?</h5>
-          {@const offlineSessionId = 'Messier87'}
+      {/if}
+    </div>
+    {#if joinedSession}
+      <div class="center" in:fly={{ duration: 500, x: -500 }}>
+        <div class="sessionInfo">
+          <p style={$localPlayerStore.sessionId === joinedSession.id ? 'color: #c89' : 'color: var(--main-text-color)'}>
+            Server: {joinedSession.id}
+            <!-- {#if joinedSession.host.readyToPlay}
+                <span style="filter: hue-rotate(72deg)">
+                  <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
+                </span>
+              {/if} -->
+          </p>
+
+          <div class="shipCards" style="display: flex; flex-wrap: wrap">
+            <!-- <ShipCardInfo shipOwner={joinedSession.host.name} chosenShip={joinedSession.host.ship} /> -->
+            {#if $userStore}
+              {#each $userStore.ships as shippy}
+                <ShipCardInfo ship={shippy} clickedShip={(shippy) => ($localPlayerStore.ship = shippy)} />
+              {/each}
+            {:else}
+              <ShipCardInfo ship={$localPlayerStore.ship} clickedShip={(ship) => console.log(ship)} />
+            {/if}
+          </div>
+        </div>
+        <div class="buttonWrapper">
           <Button90
             addInfo="Play"
             icon={Icons.StartGame}
             buttonConfig={{
               buttonText: 'Play',
-              clickCallback: () => startGame(offlineSessionId),
+              clickCallback: () => startGame(),
               selected: false,
             }}
           />
-        {/if}
+        </div>
       </div>
-      {#if joinedSession}
-        <div class="center">
-          <div class="sessionInfo">
-            <p style={$localPlayerStore.sessionId === joinedSession.id ? 'color: #c89' : 'color: var(--main-text-color)'}>
-              Server: {joinedSession.id}
-              <!-- {#if joinedSession.host.readyToPlay}
-                <span style="filter: hue-rotate(72deg)">
-                  <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
-                </span>
-              {/if} -->
-            </p>
-
-            <div class="shipCards" style="display: flex; flex-wrap: wrap">
-              <!-- <ShipCardInfo shipOwner={joinedSession.host.name} chosenShip={joinedSession.host.ship} /> -->
-              <ShipCardInfo clickedShip={(ship) => (shipModalOpen = true)} shipOwner={$localPlayerStore.name} chosenShip={$localPlayerStore.ship} />
-            </div>
-          </div>
-          <div class="buttonWrapper">
-            <Button90
-              addInfo="Play"
-              icon={Icons.StartGame}
-              buttonConfig={{
-                buttonText: 'Play',
-                clickCallback: () => startGame(),
-                selected: false,
-              }}
-            />
-          </div>
-        </div>
-        <div class="right">
-          <Chat joinedSessionId={joinedSession?.id} />
-        </div>
-      {/if}
-    </div>
-  </Page>
-{/if}
+      <div class="right" in:fly={{ duration: 500, delay: 350, x: -500 }}>
+        <Chat joinedSessionId={joinedSession?.id} />
+      </div>
+    {/if}
+  </div>
+</Page>
 
 <style>
   .lobbyWrapper {

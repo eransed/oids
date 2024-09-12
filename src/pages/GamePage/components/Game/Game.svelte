@@ -1,7 +1,7 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import { GameMode, type ChosenShip, type Session, type Ship } from '../../../../lib/interface'
+  import { GameMode, type Session, type Ship } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
@@ -20,7 +20,7 @@
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
-  import { guestUserNameStore, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
+  import { guestUser, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { getPlayersInSession } from '../../../../lib/services/game/playersInSession'
   import { info } from 'mathil'
@@ -37,6 +37,7 @@
   import Button90 from '../../../../components/menu/Button90.svelte'
   import { Icons } from '../../../../style/icons'
   import { resetKeyMapToDefault } from '../Hotkeys/hotKeysChange'
+  import getProfile from '../../../../lib/services/user/profile'
 
   let game: Game
 
@@ -53,63 +54,42 @@
     e.preventDefault()
   })
 
-  async function players(): Promise<Session> {
-    const players: Session = await getPlayersInSession(sessionId).then((d) => d.data)
-
-    return players
-  }
-
-  function createChosenShip(ship: Ship): ChosenShip {
-    const chosenShip: ChosenShip = {
-      name: ship.name,
-      userId: ship.userId,
-      level: ship.level,
-      shipVariant: ship.variant,
-      id: ship.id,
-      experience: ship.experience,
+  async function players() {
+    try {
+      const response = await getPlayersInSession(sessionId)
+      return response.data
+    } catch (e) {
+      console.error(e)
+      return
     }
-    return chosenShip
   }
 
-  let chosenShip: ChosenShip
+  let chosenShip: Ship = $localPlayerStore.ship
   let shipModalOpen = false
 
   onMount(async () => {
     // cleanup = initSettingsControl()
-    if (!$userStore) {
-      $localPlayerStore.name = $guestUserNameStore
-    }
+
     if ($userStore) {
       if ($userStore.ships.length === 1) {
-        $localPlayerStore.ship = createChosenShip($userStore.ships[0])
+        $localPlayerStore.ship = $userStore.ships[0]
         chosenShip = $localPlayerStore.ship
-      } else {
-        const storedShipJson = localStorage.getItem('chosenShip')
-
-        if (storedShipJson) {
-          const localStorageShip = JSON.parse(storedShipJson)
-          const shipFromStorage = $userStore.ships.find((ship) => {
-            if (ship.id === localStorageShip.id) return ship
-          })
-
-          if (shipFromStorage) {
-            $localPlayerStore.ship = createChosenShip(shipFromStorage)
-            console.log('found ship in localstorage:', shipFromStorage)
-            chosenShip = $localPlayerStore.ship
-          }
-        }
       }
     }
 
     game = new Game(canvas, $localPlayerStore, $socketStore, showDeadMenu)
     gameRef(game)
     game.localPlayer.sessionId = sessionId
-    players().then((d) => {
+    await players().then((d) => {
+      if (!d) {
+        console.error('No players in session')
+        return
+      }
       const players = d.players
-      console.log(players)
+
       if (players.length === 0) {
         info(`You are the host!`)
-        game.localPlayer.isHost = true
+        game.localPlayer.isHost = false
       }
     })
     if (!$userStore || chosenShip) {
@@ -142,7 +122,7 @@
 
 <div class="shipWrapper" style="z-index: 1;">
   <div class="shipAvatar">
-    <img style="width: 80%;" draggable="false" src={getShipBundleCache($localPlayerStore.ship.shipVariant).svgUrl} alt={$localPlayerStore.ship.name} />
+    <img style="width: 80%;" draggable="false" src={getShipBundleCache($localPlayerStore.ship.variant).svgUrl} alt={$localPlayerStore.ship.name} />
     <div class="shipLevel">{$localPlayerStore.ship.level}</div>
   </div>
   <div class="shipInfo">
@@ -215,35 +195,6 @@
 
 {#if $shouldCelebrateLevelUp}
   <Celebration celebrationText={`You've reached level ${$localPlayerStore.ship.level}`} celebrationTimeoutCallback={() => ($shouldCelebrateLevelUp = false)} />
-{/if}
-
-{#if $userStore && $userStore.ships.length > 1 && !chosenShip}
-  {#if $userStore.ships.length === 0}
-    <AddShip openModal={!chosenShip} />
-  {:else}
-    <ModalSimple title="Playable ships" saveButton={false} cancelButton={!!chosenShip} closeBtn={() => (shipModalOpen = false)}>
-      <Ships
-        changeShipOnClick={false}
-        clickedShipCallback={(ship) => {
-          console.log('clickedshipcallback')
-          shipModalOpen = false
-          chosenShip = createChosenShip(ship)
-          $localPlayerStore.ship = {
-            level: ship.level,
-            name: ship.name,
-            userId: ship.userId,
-            shipVariant: ship.variant,
-            id: ship.id,
-            experience: ship.experience,
-          }
-          $localPlayerStore.name = $userStore.name
-          game.startGame(initRegularGame, renderFrame, nextFrame)
-          resetStars(game)
-          localStorage.setItem('chosenShip', JSON.stringify({ id: ship.id, userId: ship.userId }))
-        }}
-      />
-    </ModalSimple>
-  {/if}
 {/if}
 
 <!-- <canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} /> -->
