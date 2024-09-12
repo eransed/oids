@@ -30,6 +30,10 @@
   import ShipCardInfo from '../../components/ships/ShipCardInfo.svelte'
   import { worldStartPosition } from '../../lib/constants'
   import { fade, fly } from 'svelte/transition'
+  import { handleChatUpdate } from '../../lib/gameModes/handlers/incomingDataHandlers/handleChatUpdate'
+  import { handleIncomingChatMessage } from './handlers/handleChatMessages'
+  import Sessions from './components/Sessions/Sessions.svelte'
+  import ShipChoice from './components/ShipChoice/ShipChoice.svelte'
 
   pageHasHeaderStore.set(true)
 
@@ -62,7 +66,6 @@
 
       $socketStore.connect().then(() => {
         console.log(`Connected to websocket`)
-        // hostSession()
       })
 
       console.log('Adding lobby websocket listener...')
@@ -72,30 +75,21 @@
           (su) => {
             const incomingUpdate = su.dataObject
 
-            if (incomingUpdate.messageType === MessageType.SESSION_UPDATE) {
-              console.log(`Got an session update message from ${incomingUpdate.name}`)
-              updateSessions()
-            } else if (incomingUpdate.messageType === MessageType.CHAT_MESSAGE) {
-              console.log(incomingUpdate)
-              const msg = incomingUpdate.lastMessage
-              console.log(`${incomingUpdate.name} says: ${msg}`)
-              const newMsg: ChatMessage = {
-                message: incomingUpdate.lastMessage,
-                timeDate: new Date(),
-                user: incomingUpdate,
-              }
-              $chatMsgHistoryStore = [...$chatMsgHistoryStore, newMsg]
-            } else if (incomingUpdate.messageType === MessageType.LEFT_SESSION) {
-              console.log(`${incomingUpdate.name} left the lobby`)
-            } else if (incomingUpdate.messageType === MessageType.PING) {
-              // handlePing(incomingUpdate, $socket)
-            } else if (incomingUpdate.messageType === MessageType.SERVICE) {
-              log(`Service message: server version: ${incomingUpdate.serverVersion}`)
-              $localPlayerStore.serverVersion = incomingUpdate.serverVersion
-            } else {
-              if (incomingUpdate.messageType !== MessageType.GAME_UPDATE) {
+            switch (su.dataObject.messageType) {
+              case MessageType.SESSION_UPDATE:
+                console.log(`Got an session update message from ${incomingUpdate.name}`)
+                updateSessions()
+                break
+              case MessageType.SERVICE:
+                log(`Service message: server version: ${incomingUpdate.serverVersion}`)
+                $localPlayerStore.serverVersion = incomingUpdate.serverVersion
+                break
+              case MessageType.CHAT_MESSAGE:
+                handleIncomingChatMessage(incomingUpdate)
+                break
+              default:
                 warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
-              }
+                break
             }
           },
           (su) => {
@@ -206,75 +200,20 @@
     $socketStore.send($localPlayerStore)
     navigate(`/play/${$localPlayerStore.sessionId}`)
   }
-
-  function toggleReadyToPlay() {
-    setReadyToPlay(!$localPlayerStore.readyToPlay)
-  }
-
-  function setReadyToPlay(ready: boolean) {
-    console.log(`Sending ${ready ? 'ready' : 'not ready'} to play to session peers`)
-    $localPlayerStore.readyToPlay = ready
-    $localPlayerStore.messageType = MessageType.SESSION_UPDATE
-    $socketStore.send($localPlayerStore)
-    updateSessions()
-  }
-
-  function handleChosenShip(ship: Ship) {
-    console.log('clickedshipcallback')
-    chosenShip = ship
-    $localPlayerStore.ship = ship
-    // initLobbySocket().then(() => {
-    //   showLobby = true
-    // })
-  }
 </script>
 
 <Page>
   <div class="lobbyWrapper">
     <div class="left">
-      {#if sessions.length > 0}
-        <SessionList localPlayer={$localPlayerStore} joinSession={joinSession_} {sessions} />
-      {:else}
-        <h5 style="padding: 1em;">Servers are offline...play locally?</h5>
-        {@const offlineSessionId = 'Messier87'}
-        <Button90
-          addInfo="Play"
-          icon={Icons.StartGame}
-          buttonConfig={{
-            buttonText: 'Play',
-            clickCallback: () => startGame(offlineSessionId),
-            selected: false,
-          }}
-        />
-      {/if}
+      <Sessions {joinSession_} {startGame} {sessions} />
     </div>
     {#if joinedSession}
       <div class="center" in:fly={{ duration: 500, x: -500 }}>
-        <div class="sessionInfo">
-          <p style={$localPlayerStore.sessionId === joinedSession.id ? 'color: #c89' : 'color: var(--main-text-color)'}>
-            Server: {joinedSession.id}
-            <!-- {#if joinedSession.host.readyToPlay}
-                <span style="filter: hue-rotate(72deg)">
-                  <img draggable="false" class="readyFlag" src={Icons.Done} alt="Ready" />
-                </span>
-              {/if} -->
-          </p>
-
-          <div class="shipCards" style="display: flex; flex-wrap: wrap">
-            <!-- <ShipCardInfo shipOwner={joinedSession.host.name} chosenShip={joinedSession.host.ship} /> -->
-            {#if $userStore}
-              {#each $userStore.ships as shippy}
-                <ShipCardInfo ship={shippy} clickedShip={(shippy) => ($localPlayerStore.ship = shippy)} />
-              {/each}
-            {:else}
-              <ShipCardInfo ship={$localPlayerStore.ship} clickedShip={(ship) => console.log(ship)} />
-            {/if}
-          </div>
-        </div>
+        <ShipChoice {joinedSession} />
         <div class="buttonWrapper">
           <Button90
-            addInfo="Play"
-            icon={Icons.StartGame}
+            borderBottom
+            mouseTracking
             buttonConfig={{
               buttonText: 'Play',
               clickCallback: () => startGame(),
@@ -322,7 +261,8 @@
   }
 
   .center {
-    grid-template-rows: 1fr auto;
+    /* grid-template-columns: 1fr auto; */
+    grid-template-rows: auto auto;
   }
 
   .right {
@@ -331,27 +271,12 @@
   }
 
   .buttonWrapper {
-    display: flex;
-    flex-flow: row;
-    min-width: 34ch;
-    width: 80%;
-  }
-
-  .sessionInfo {
-    max-height: 235px;
-    overflow-x: auto;
+    justify-self: flex-end;
+    align-self: flex-end;
+    margin-bottom: 1em;
   }
 
   @media screen and (max-width: 1200px) {
-    .sessionInfo p {
-      padding: 0.2em;
-    }
-
-    .sessionInfo {
-      max-height: 33vh;
-      overflow-x: auto;
-    }
-
     .lobbyWrapper {
       width: 100%;
     }

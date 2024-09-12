@@ -64,7 +64,7 @@
         <img draggable="false" src={socialIcon} alt={socialIcon} />
       </div>
     {:else}
-      {buttonConfig.buttonText}
+      <h3 style=" align-self: center;">{buttonConfig.buttonText}</h3>
     {/if}
     <p class="addInfo">{addInfo}</p>
   </button>

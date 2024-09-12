@@ -25,6 +25,7 @@ import { handleGameBodies } from './handlers/handleGameBodies'
 import { handleRemotePlayers } from './handlers/handleRemotePlayers'
 import { renderRemotePlayerInSpaceMode } from '../render/renderRemotePlayers'
 import { initNetworkStats } from './handlers/handleNetStats'
+import { playerUpdate } from './handlers/handlePlayerUpdate'
 //Stores
 
 let activeKeyMap: KeyFunctionMap
@@ -150,47 +151,6 @@ export function initRegularGame(game: Game): void {
     }
   }
 
-  function handleGameUpdate(su: ServerUpdate<SpaceObject>) {
-    const so: SpaceObject = su.dataObject
-    handleNetworkStatisticUpdates(su)
-    for (let i = 0; i < game.remotePlayers.length; i++) {
-      if (so.name === game.remotePlayers[i].name) {
-        if (!so.online) {
-          console.log(`${so.name} went offline`)
-          game.remotePlayers.splice(i)
-          continue
-        }
-
-        game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
-
-        return
-      }
-    }
-    if (so.name !== game.localPlayer.name) {
-      game.remotePlayers.push(so)
-      log(`New ship online: ${so.name}`)
-    }
-  }
-
-  function playerUpdate(so: ServerUpdate<SpaceObject>) {
-    switch (so.dataObject.messageType) {
-      case MessageType.SHIP_UPDATE:
-        handleShipUpdate(so)
-        break
-      case MessageType.SERVICE:
-        handleServerInformationUpdate(so, game)
-        break
-      case MessageType.CHAT_MESSAGE:
-        handleChatUpdate(so)
-        break
-      default:
-        if (so.dataObject) {
-          handleGameUpdate(so)
-        }
-        break
-    }
-  }
-
   function handleNpcUpdate(npcUpdate: ServerUpdate<SpaceObject>) {
     // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
     if (!exists(npcUpdate.dataObject, game.bodies)) {
@@ -203,7 +163,12 @@ export function initRegularGame(game: Game): void {
     }
   }
 
-  game.websocket.addListener(playerUpdate, handleNpcUpdate)
+  function handlePlayerUpdate(su: ServerUpdate<SpaceObject>) {
+    handleNetworkStatisticUpdates(su)
+    playerUpdate(su, game)
+  }
+
+  game.websocket.addListener((su) => handlePlayerUpdate(su), handleNpcUpdate)
 }
 
 const every = new Every(25)
