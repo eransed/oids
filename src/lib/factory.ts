@@ -5,6 +5,8 @@ import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 // import type { Ship } from '@prisma/client'
 import type { Ship } from './interface'
 import { Towns } from './worlds/worldInterface'
+import { groundLevel } from './physics/physics'
+import { GameMode } from './interface'
 
 export function newPhotonLaser(): PhotonLaser {
   const shot: PhotonLaser = {
@@ -39,10 +41,7 @@ export function currentTimeDate(): string {
   return new Date().toLocaleString('sv-SE')
 }
 
-export function createSpaceObject(
-  name = 'SpaceObject',
-  msgType = MessageType.GAME_UPDATE
-): SpaceObject {
+export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GAME_UPDATE): SpaceObject {
   const initVel: Vec2 = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
   const initPos: Vec2 = {
     x: rndi(0, 100),
@@ -132,21 +131,25 @@ export function createSpaceObject(
     viewFramePosition: newVec2(),
     thrustFlames: [],
     ship: {
-      name: '',
+      id: name,
       level: 0,
-      userId: '',
-      shipVariant: 0,
-      id: '',
+      name: name,
+      updatedAt: new Date(),
+      createdAt: new Date(),
       experience: 0,
+      userId: '',
+      variant: 1,
+      played: 0,
     },
     moonType: 0,
     hometown: Towns.Coruscant,
-    ticksSinceLastSnapShot: 0
+    ticksSinceLastSnapShot: 0,
+    characterGlobalPosition: newVec2(500, groundLevel),
+    isJumping: false,
+    gameMode: GameMode.SPACE_MODE,
   }
 
-  spaceObject.hitRadius = Math.sqrt(
-    spaceObject.size.x ** 2 + spaceObject.size.y ** 2
-  )
+  spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)
 
   return spaceObject
 }

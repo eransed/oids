@@ -1,33 +1,25 @@
-import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, SpaceObject, TouchFunctionMap } from './interface'
+import type { GameState, KeyFunction, KeyFunctionMap, KeyFunctionStore, KeyMapManager, SpaceObject, TouchFunctionMap } from './interface'
 import { applyEngineThrust, applySteer, fire } from './mechanics'
 import { timeScale } from './constants'
 import { dist2, newVec2, type Vec2 } from 'mathil'
 import { writable, type Writable } from 'svelte/store'
 import { menuOpen } from '../components/menu/MenuStore'
+import { GameMode } from './interface'
+import { DefaultSpaceModeKeyMap } from './hotkeys/spaceHotkeys'
+import { DefaultArcadeModeKeyMap } from './hotkeys/arcadeHotkeys'
+import { createKeyMapManager } from './hotkeys/keyMapManager'
 
-export const activeKeyStates: Writable<KeyFunction[]> = writable()
+export const spaceKeyMapManagerStore: Writable<KeyMapManager> = writable(createKeyMapManager(DefaultSpaceModeKeyMap))
+export const arcadeKeyMapManagerStore: Writable<KeyMapManager> = writable(createKeyMapManager(DefaultArcadeModeKeyMap))
+
+let spaceKeyMapManager: KeyMapManager
+let arcadeKeyMapManager: KeyMapManager
+
+spaceKeyMapManagerStore.subscribe((v) => (spaceKeyMapManager = v))
+arcadeKeyMapManagerStore.subscribe((v) => (arcadeKeyMapManager = v))
+
+export const activeHotKeys: Writable<KeyFunctionStore[]> = writable()
 export const gameState: Writable<GameState> = writable()
-
-export const DefaultKeyMap: KeyFunctionMap = {
-  thrust: { activators: ['w', 'ArrowUp'], keyStatus: false },
-  reverseThrust: { activators: ['s', 'ArrowDown'], keyStatus: false },
-  boost: { activators: ['b'], keyStatus: false },
-  halt: { activators: ['h'], keyStatus: false, toggle: true },
-  turnLeft: { activators: ['a', 'ArrowLeft'], keyStatus: false },
-  turnRight: { activators: ['d', 'ArrowRight'], keyStatus: false },
-  strafeLeft: { activators: ['q', 'PageUp'], keyStatus: false },
-  strafeRight: { activators: ['e', 'PageDown'], keyStatus: false },
-  fire: { activators: [' '], keyStatus: false },
-  reload: { activators: ['r'], keyStatus: false },
-  selfDestroy: { activators: ['k'], keyStatus: false },
-  systemGraphs: { activators: ['g'], keyStatus: false, toggle: true },
-  leaderBoard: { activators: ['p'], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  hotKeys: { activators: ['o'], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  shipSettings: { activators: ['i'], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  shipDetails: { activators: ['y'], keyStatus: false, store: writable<boolean>(false), toggle: true },
-  chat: { activators: ['c'], keyStatus: false, store: writable<boolean>(true), toggle: true },
-  menu: { activators: ['Escape'], keyStatus: false, store: writable<boolean>(false), toggle: true },
-}
 
 const DefaultTouchMap: TouchFunctionMap = {
   thrust: false,
@@ -50,63 +42,58 @@ export function capitalFirstChar(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-Object.entries(DefaultKeyMap).forEach(([key, value]: [string, KeyFunction]) => {
-  value.displayText = capitalFirstChar(key)
-})
-
-
-
-let ActiveKeyMap: KeyFunctionMap = DefaultKeyMap
+export const ActiveKeyMapStore: Writable<KeyFunctionMap> = writable(DefaultSpaceModeKeyMap)
 const ActiveTouch: TouchFunctionMap = DefaultTouchMap
 
+let ActiveKeyMap: KeyFunctionMap
+
+ActiveKeyMapStore.subscribe((v) => (ActiveKeyMap = v))
+
 export function setKeyStateStore() {
-  activeKeyStates.set(keyFuncArrayFromKeyFunctionMap(ActiveKeyMap))
+  ActiveKeyMapStore.set(ActiveKeyMap)
+  activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(ActiveKeyMap))
 }
 
 setKeyStateStore()
-
-export function setKeyMap(Keys: KeyFunctionMap) {
-  ActiveKeyMap = Keys
-}
-
-export function getKeyMap(): KeyFunctionMap {
-  return ActiveKeyMap
-}
 
 export function getKeyBindings(): KeyFunction[] {
   return keyFuncArrayFromKeyFunctionMap(ActiveKeyMap)
 }
 
 export function keyFuncArrayFromKeyFunctionMap(kfm: KeyFunctionMap) {
-  const keyValues: KeyFunction[] = []
+  const keyValues: KeyFunctionStore[] = []
   Object.values(kfm).forEach((value) => {
-    keyValues.push(value)
+    if (typeof value !== 'string') {
+      keyValues.push(value)
+    }
   })
   return keyValues
 }
 
 function arrowControl(e: KeyboardEvent, keyUseState: boolean) {
   Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunctionStore) => {
-    keyFunction.activators.map((activator: string) => {
-      if (activator === e.key) {
-        if (keyFunction.toggle && keyUseState && e.type === 'keydown') {
-          keyFunction.keyStatus = !keyFunction.keyStatus
-        } else if (!keyFunction.toggle) {
-          keyFunction.keyStatus = keyUseState
-        }
+    if (typeof keyFunction !== 'string') {
+      keyFunction.activators.map((activator: string) => {
+        if (activator === e.key) {
+          if (keyFunction.toggle && keyUseState && e.type === 'keydown') {
+            keyFunction.keyStatus = !keyFunction.keyStatus
+          } else if (!keyFunction.toggle) {
+            keyFunction.keyStatus = keyUseState
+          }
 
-        if (keyFunction.store) {
-          keyFunction.store.set(keyFunction.keyStatus)
+          keyFunction.store = keyFunction.keyStatus
         }
-      }
-    })
+      })
+    }
   })
   setKeyStateStore()
 }
 
 function resetState() {
-  Object.values(ActiveKeyMap).forEach((keyFunction) => {
-    keyFunction.keyStatus = false
+  Object.values(ActiveKeyMap).forEach((keyFunction: KeyFunction | string) => {
+    if (typeof keyFunction !== 'string') {
+      keyFunction.keyStatus = false
+    }
   })
 }
 
@@ -125,10 +112,42 @@ function reloadSpaceObject(so: SpaceObject) {
   so.armedDelay = 0
 }
 
-export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
-  //so.afterBurnerEnabled = false
+export function arcadeModeKeyController(so: SpaceObject, dt = 1) {
+  if (ActiveKeyMap.turnRight.keyStatus) {
+    so.characterGlobalPosition.x += 1 * dt
+    so.acceleration.x = 0.0005 * dt
+  }
 
+  if (ActiveKeyMap.turnLeft.keyStatus) {
+    so.characterGlobalPosition.x -= 1 * dt
+    so.acceleration.x = -0.0005 * dt
+  }
+
+  if (ActiveKeyMap.jump.keyStatus) {
+    if (!so.isJumping) {
+      so.isJumping = true
+      so.acceleration.y = -2.3
+      so.characterGlobalPosition.y -= 1
+    }
+  }
+
+  if (ActiveKeyMap.changeMode.keyStatus) {
+    ActiveKeyMap.changeMode.keyStatus = false
+    so.gameMode = GameMode.SPACE_MODE
+    ActiveKeyMapStore.set(spaceKeyMapManager.getKeyMap())
+    activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(spaceKeyMapManager.getKeyMap()))
+  }
+}
+
+export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
   const dts: number = dt * timeScale
+
+  if (ActiveKeyMap.changeMode.keyStatus) {
+    ActiveKeyMap.changeMode.keyStatus = false
+    so.gameMode = GameMode.ARCADE_MODE
+    ActiveKeyMapStore.set(arcadeKeyMapManager.getKeyMap())
+    activeHotKeys.set(keyFuncArrayFromKeyFunctionMap(arcadeKeyMapManager.getKeyMap()))
+  }
 
   if (ActiveKeyMap.halt.keyStatus) {
     so.velocity = { x: 0, y: 0 }
@@ -141,11 +160,11 @@ export function spaceObjectKeyController(so: SpaceObject, dt = 1) {
 
   if (ActiveKeyMap.boost.keyStatus) {
     applyEngineThrust(so, 0, true)
-  } 
-  
+  }
+
   //Mockingbird the status for thrusters
   so.afterBurner = ActiveKeyMap.thrust.keyStatus
-  
+
   if (ActiveKeyMap.thrust.keyStatus) {
     applyEngineThrust(so, 0)
   }
@@ -219,9 +238,7 @@ export function removeTouchControls() {
   document.removeEventListener('touchmove', touchMoveHandler)
 }
 
-export function spaceTouchController(so: SpaceObject, dt = 1) {
-  const dts: number = dt * timeScale
-
+export function spaceTouchController(so: SpaceObject) {
   if (ActiveTouch.thrust) {
     applyEngineThrust(so, 0, false)
   }
@@ -284,7 +301,6 @@ function touchEndHandler(event: TouchEvent) {
 
   // Handle touch end
   for (let i = 0; i < touches.length; i++) {
-    const touch = touches[i]
     ActiveTouch.thrust = false
     ActiveTouch.reverseThrust = false
     ActiveTouch.fire = false

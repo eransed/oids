@@ -4,10 +4,26 @@ import { updateShapes, updateSpaceObject, updateSpaceObjects } from './physics/p
 import { clearScreen } from './render/render2d'
 import { addDataPoint, newDataStats } from './stats'
 import { renderFrameInfo } from './render/renderUI'
-import { Every } from './gameModes/regular'
 import { localPlayerStore } from '../stores/stores'
 import { MessageType, type SpaceObject } from './interface'
 import { reduceSoSize } from './websocket/util'
+
+export class Every {
+  private currentTick = 0
+  maxTicks = 1
+
+  constructor(maxTicks: number) {
+    this.maxTicks = maxTicks
+  }
+
+  tick(callback: () => void) {
+    this.currentTick++
+    if (this.currentTick >= this.maxTicks) {
+      callback()
+      this.currentTick = 0
+    }
+  }
+}
 
 const fps_list_max_entries = 12
 let prevTimestamp: number
@@ -104,7 +120,6 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     updateSpaceObjects(game.remotePlayers, dt)
     updateSpaceObject(game.localPlayer, dt)
     updateSpaceObjects(game.bodies, dt)
-    updateShapes(game.testShapes, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
       game.websocket.send(getSendableSpaceObject(game.localPlayer))
     }

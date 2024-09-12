@@ -3,6 +3,7 @@
 
   import CircularSpinner from '../loaders/circularSpinner.svelte'
 
+  // export let border: boolean = false
   export let addInfo: string = ''
   export let minWidth: string = '10em'
   export let width: string = ''
@@ -42,18 +43,13 @@
   $: minWidth = minWidth
 </script>
 
-<div
-  class="wrapper"
-  on:mousemove={handleMousemove}
-  on:mouseleave={handleMouseLeave}
->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="wrapper" on:mousemove={handleMousemove} on:mouseleave={handleMouseLeave}>
   <button
     type={buttonType}
     title={buttonConfig.buttonText}
     {disabled}
-    style="width: {width}; min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border-bottom: {buttonConfig.selected
-      ? border
-      : 'none'}"
+    style="width: {width}; min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border: {border}; border-radius: 0.8em"
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
@@ -89,8 +85,7 @@
   }
 
   .icon img {
-    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
-      brightness(83%) contrast(30%);
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(30%);
     width: 35px;
     height: 35px;
   }
@@ -122,8 +117,7 @@
     width: -moz-fit-content;
     width: fit-content;
     height: 4em;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
-      'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-weight: bold;
     font-size: 15px;
     letter-spacing: calc(var(--top) * 1.05 - var(--top));
@@ -138,13 +132,17 @@
   }
 
   button:hover img {
-    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
-      brightness(83%) contrast(125%);
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
     transform: scale(1.1);
     transition: all 0.3s ease-out;
   }
 
-  button img {
+  button:hover {
+    transform: scale(1.1);
+    transition: all 0.3s ease-out;
+  }
+
+  button {
     transition: all 0.3s;
   }
 
@@ -172,13 +170,11 @@
   }
 
   .selected img {
-    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
-      brightness(83%) contrast(125%);
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(125%);
   }
 
   button:disabled {
     cursor: not-allowed;
-    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg)
-      brightness(83%) contrast(1%);
+    filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(1%);
   }
 </style>

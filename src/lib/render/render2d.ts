@@ -1,4 +1,4 @@
-import { round2dec, type Line, type Vec2, sub2, add2, smul2, direction2, angle2, newVec2, rndi } from 'mathil'
+import { round2dec, type Line, type Vec2, sub2, add2, smul2, direction2, angle2, newVec2 } from 'mathil'
 import { screenScale } from '../constants'
 import { getScreenRect } from '../canvas_util'
 import type { SpaceObject } from '../interface'
@@ -34,15 +34,7 @@ export function getNamesAsString(sos: SpaceObject[], label = ''): string {
   return label + arr.join(', ')
 }
 
-export function renderVector(
-  v: Vec2,
-  origin: Vec2,
-  ctx: CanvasRenderingContext2D,
-  scale = 10000,
-  color = '#fff',
-  offset: Vec2 = { x: 0, y: 0 },
-  components = true
-) {
+export function renderVector(v: Vec2, origin: Vec2, ctx: CanvasRenderingContext2D, scale = 10000, color = '#fff', offset: Vec2 = { x: 0, y: 0 }, components = true) {
   ctx.save()
   ctx.translate(origin.x + offset.x, origin.y + offset.y)
   ctx.beginPath()

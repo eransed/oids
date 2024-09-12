@@ -1,9 +1,6 @@
 <script lang="ts">
   //Stores
-  import {
-    pageHasHeaderStore,
-    localPlayerStore,
-  } from '../../stores/stores'
+  import { pageHasHeaderStore, localPlayerStore } from '../../stores/stores'
   import { settingsComponent } from './SettingsButtons'
 
   //Components
@@ -17,8 +14,9 @@
 
   //Component
   import type { AlertType } from '../../components/alert/AlertType'
-  import HotKeys from '../GamePage/components/Hotkeys/hotKeys.svelte'
-  import { initKeyControllers, removeKeyControllers } from '../../lib/input'
+  import { arcadeKeyMapManagerStore, initKeyControllers, removeKeyControllers, spaceKeyMapManagerStore } from '../../lib/input'
+  import { GameMode } from '../../lib/interface'
+  import HotkeysPage from './HotkeysPage.svelte'
 
   onMount(() => {
     initKeyControllers()
@@ -27,7 +25,6 @@
   onDestroy(() => {
     removeKeyControllers()
   })
-
 
   pageHasHeaderStore.set(true)
 
@@ -42,38 +39,16 @@
     <div class="buttons">
       {#each Object.values(SettingsButtons) as button}
         <div>
-          <Button90
-            addInfo={button.config.buttonText}
-            icon={button.icon}
-            buttonConfig={button.config}
-            selected={$settingsComponent === button.config.routeParam}
-          />
+          <Button90 addInfo={button.config.buttonText} icon={button.icon} buttonConfig={button.config} selected={$settingsComponent === button.config.routeParam} />
         </div>
       {/each}
     </div>
-    <div class="content" style="padding: 1em; position: relative">
-      {#if $settingsComponent === SettingsButtons.controls.config.routeParam}
-        <table>
-          <tr>
-            <th>
-              <h3>Hotkeys</h3>
-            </th>
-          </tr>
-          <tr>
-            <td>
-              <HotKeys activeColor={$localPlayerStore.color} />
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              <hr
-                style="width: 100%; border-color: var(--main-accent-color); opacity: 0.5"
-              />
-            </td>
-          </tr>
-        </table>
-      {/if}
-    </div>
+    {#if $settingsComponent === SettingsButtons.controlsSpace.config.routeParam}
+      <HotkeysPage keyMapManager={$spaceKeyMapManagerStore} />
+    {/if}
+    {#if $settingsComponent === SettingsButtons.controlsArcade.config.routeParam}
+      <HotkeysPage keyMapManager={$arcadeKeyMapManagerStore} />
+    {/if}
   </div>
 </Page>
 

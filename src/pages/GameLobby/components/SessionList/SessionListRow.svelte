@@ -1,35 +1,23 @@
 <script lang="ts">
-  import { navigate } from 'svelte-routing/src/history'
-  import type { SpaceObject } from '../../../../lib/interface'
+  import Button90 from '../../../../components/menu/Button90.svelte'
+  import type { Session, SpaceObject } from '../../../../lib/interface'
 
-  export let player: SpaceObject | null = null
   export let header = false
   export let numberOfPlayers: number = 0
-  export let localPlayer: boolean = false
+  export let session: Session | undefined = undefined
+  export let localPlayer: SpaceObject | undefined = undefined
 
-  export let joinSession: ((so: SpaceObject | null) => void) | null = null
+  export let joinSession: ((sessionId: string) => void) | null = null
 </script>
 
 {#if header}
-  <th colspan="1">Host</th>
   <th colspan="1">Session</th>
   <th colspan="1">#players</th>
-{:else if player && localPlayer}
-  <td style="color:#f00;">{player.name}</td>
-  <td style="color:#f00;">{player.sessionId}</td>
-  <td style="color:#f00;">{numberOfPlayers}</td>
-  <td style="color:#f00;" />
-{:else if player}
-  <td>{player.name}</td>
-  <td>{player.sessionId}</td>
+{:else if session}
+  <td>{session.id}</td>
   <td>{numberOfPlayers}</td>
   <td style="color:#f00;">
-    <button
-      on:click={() => {
-        joinSession && joinSession(player)
-      }}
-      >Join game
-    </button>
+    <Button90 disabled={session.id === localPlayer?.sessionId} borderBottom buttonConfig={{ buttonText: 'Join Game', clickCallback: () => joinSession && joinSession(session.id), selected: false }} />
   </td>
 {/if}
 

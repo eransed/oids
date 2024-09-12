@@ -1,9 +1,9 @@
 <script lang="ts">
   //Svelte
-  import { slide } from "svelte/transition"
+  import { slide } from 'svelte/transition'
 
   //Component
-  import Modal from "../../../../components/modal/Modal.svelte"
+  import Modal from '../../../../components/modal/Modal.svelte'
 
   //Propts
   export let closedCallback: () => void = () => {}
@@ -11,14 +11,14 @@
   export let title: string
 </script>
 
-<style>
-  div {
-    /* overflow: auto; */
-  }
-</style>
-
 <Modal position="relative" {title} {showModal} {closedCallback} backDrop={false} closeBtn={false}>
   <div in:slide={{ duration: 500 }} out:slide>
     <slot />
   </div>
 </Modal>
+
+<style>
+  div {
+    /* overflow: auto; */
+  }
+</style>

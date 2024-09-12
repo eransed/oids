@@ -6,13 +6,13 @@
   import Game from '../GamePage/components/Game/Game.svelte'
 
   //Stores
-  import { gameSessionIdStore, pageHasHeaderStore, localPlayerStore, socketStore } from '../../stores/stores'
+  import { pageHasHeaderStore, localPlayerStore, socketStore } from '../../stores/stores'
 
   pageHasHeaderStore.set(false)
 
   export let gameIdParam: string
 
-  let sessionId: string = $gameSessionIdStore ? $gameSessionIdStore : gameIdParam
+  let sessionId: string = gameIdParam
 </script>
 
 <div class="gamePage" in:fade={{ delay: 300 }} out:fade>

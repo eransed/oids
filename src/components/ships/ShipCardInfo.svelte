@@ -1,42 +1,29 @@
 <script lang="ts">
-  import type { ChosenShip } from '../../lib/interface'
-  import { localPlayerStore } from '../../stores/stores'
+  import type { Ship } from '../../lib/interface'
+  import { localPlayerStore, userStore } from '../../stores/stores'
   // import Cursor from '../mouse/cursor.svelte'
   import ShipCardImg from './ShipImg.svelte'
 
-  export let chosenShip: ChosenShip
-  export let shipOwner: string
-  export let clickedShip: (ship: ChosenShip) => void = (ship) => {}
+  export let ship: Ship
+  export let clickedShip: (ship: Ship) => void = (ship) => {}
 
-  $: yourship = $localPlayerStore.ship.userId === chosenShip.userId
+  $: chosenShip = $localPlayerStore.ship.id === ship.id
+  $: width = chosenShip ? '8em' : '6em'
+  $: height = chosenShip ? '8em' : '6em'
 
   function handleClickShip() {
-    if (yourship) {
-      clickedShip(chosenShip)
-    }
+    clickedShip(ship)
   }
 </script>
 
-<div class="shipWrapper">
-  <button
-    on:click={() => handleClickShip()}
-    class="imgCard"
-    style="background-color: {yourship
-      ? 'var(--main-accent2-color)'
-      : 'var(--main-accent-color)'}"
-  >
-    <p>{shipOwner}</p>
-    <div class="level">{chosenShip.level}</div>
-    <ShipCardImg ship={chosenShip} />
+<div class="shipWrapper" style="width: {width}; height: {height}">
+  <button on:click={() => handleClickShip()} class="imgCard" style="background-color: {chosenShip ? 'var(--main-accent2-color)' : 'var(--main-accent-color)'}">
+    <div class="level">{ship.level}</div>
+    <ShipCardImg {ship} />
     <div class="shipDetails">
-      <table>
+      <table style="text-align: center;">
         <tr>
-          <td>Ship Name:</td>
-          <td>{chosenShip.name}</td>
-        </tr>
-        <tr>
-          <td>Variant:</td>
-          <td>{chosenShip.shipVariant}</td>
+          <td><b>{ship.name}</b></td>
         </tr>
       </table>
       <p />
@@ -48,12 +35,13 @@
   .shipWrapper {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column;
+    flex-direction: row;
     width: 8em;
     height: 8em;
     border-radius: 0.5em;
     margin: 1em;
     animation: fly 1s forwards;
+    transition: all 250ms;
   }
 
   @keyframes fly {
@@ -96,16 +84,17 @@
     transition: all 500ms;
     font-size: 0.7em;
     width: 100%;
-    text-align: left;
+    /* text-align: left; */
   }
 
   .shipDetails table {
     width: 100%;
   }
 
-  .imgCard:hover .shipDetails {
+  .imgCard .shipDetails {
     opacity: 1;
-    height: 20px;
+    /* height: 10px; */
+    padding-bottom: 1em;
     max-height: fit-content;
     transition: all 500ms;
   }

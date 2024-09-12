@@ -1,47 +1,37 @@
 import type { Game } from '../game'
-import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenCenterPosition, getScreenFromCanvas } from '../canvas_util'
-import { gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
-import {
-  add2,
-  direction2,
-  info,
-  log,
-  magnitude2,
-  newVec2,
-  rndfVec2,
-  rndi,
-  round2dec,
-  siPretty,
-  smul2,
-  sub2,
-  to_string2,
-  vec2Array,
-  type Vec2,
-  dist2,
-  warn,
-  error,
-} from 'mathil'
-import { handleDeathExplosion } from '../mechanics'
-import { friction, getRemotePosition, offScreen_mm, wrap_mm } from '../physics/physics'
-import { loadingText, renderHitRadius, renderInfoText, renderPoint } from '../render/render2d'
-import { fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, SpaceShape, type SpaceObject, MessageType } from '../interface'
-import { randomAnyColor } from '../color'
+import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenFromCanvas } from '../canvas_util'
+import { ActiveKeyMapStore, arcadeModeKeyController, gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
+import { add2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPretty, to_string2, type Vec2, warn, error } from 'mathil'
+import { friction } from '../physics/physics'
+import { loadingText, renderInfoText } from '../render/render2d'
+import { Every, fpsCounter } from '../time'
+import { GameType, getRenderableObjectCount, type SpaceObject, MessageType, type ServerUpdate, GameMode, type KeyFunctionMap } from '../interface'
 import { test } from '../test'
-import { explosionDuration, screenScale, worldSize, worldStartPosition } from '../constants'
-import { addDataPoint, getLatestValue, GRAPHS, msPretty, newDataStats, renderGraph } from '../stats'
+import { addDataPoint, getLatestValue, GRAPHS, newDataStats, renderGraph } from '../stats'
 import { newPhotonLaser } from '../factory'
-import { reduceShotSize, reduceSoSize } from '../websocket/util'
-import { earthMoonColor, earthMoonCraters, renderMoon } from '../render/renderMoon'
-import { renderShip } from '../render/renderShip'
-import { renderProgressBar, renderSpaceObjectStatusBar, renderVec2, renderViewport } from '../render/renderUI'
-import { renderExplosionFrame } from '../render/renderFx'
-import { chatMsgHistoryStore, localPlayerStore, shouldCelebrateLevelUp, userStore } from '../../stores/stores'
+import { reduceShotSize } from '../websocket/util'
+import { renderSpaceObjectStatusBar, renderVec2 } from '../render/renderUI'
+import { localPlayerStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
-import { getCurrentTheme } from '../../style/defaultColors'
 import { handleCollisions } from '../physics/handleCollisions'
-import { renderTrail } from '../render/renderShipTrail'
+import { renderCharacter } from '../render/renderCharacter'
+import { handleShipUpdate } from './handlers/incomingDataHandlers/handleShipUpdate'
+import { handleServerInformationUpdate } from './handlers/incomingDataHandlers/handleServerInformationUpdate'
+import { handleChatUpdate } from './handlers/incomingDataHandlers/handleChatUpdate'
+import { exists } from './handlers/incomingDataHandlers/handleNpcUpdate'
+import { handleStarBackdrop } from './handlers/handleStarBackDrop'
+import { handleLocalPlayer, initLocalPlayer } from './handlers/handleLocalPlayer'
+import { handleGameBodies } from './handlers/handleGameBodies'
+import { handleRemotePlayers } from './handlers/handleRemotePlayers'
+import { renderRemotePlayerInSpaceMode } from '../render/renderRemotePlayers'
+import { initNetworkStats } from './handlers/handleNetStats'
 //Stores
+
+let activeKeyMap: KeyFunctionMap
+
+ActiveKeyMapStore.subscribe((v) => {
+  activeKeyMap = v
+})
 
 let numberOfServerObjects = 0
 let ops = 0
@@ -51,76 +41,25 @@ let symbolsPerSec = 0
 let byteSpeed = 0
 let bitSpeed = 0
 let rxDataBytes = 0
+let bytesRecievedLastSecond = 0
+let startTime = 0
+
 const symbolByteSize = 2
 const byteSize = 8
-let bytesRecievedLastSecond = 0
-
-const timebuf = newDataStats()
-const downloadBuf = newDataStats()
+const angularVelocityGraph = newDataStats()
+const ammoGraph = newDataStats()
+const dataTest = newDataStats()
+const soSize = newDataStats()
+const shotSize = newDataStats()
+const speedbuf = newDataStats()
+const hpbuf = newDataStats()
 const packetSizeBuf = newDataStats()
 const rxByteDataBuf = newDataStats()
-const renderObjBuf = newDataStats()
 const ppsbuf = newDataStats()
-
-const speedbuf = newDataStats()
+const renderObjBuf = newDataStats()
+const timebuf = newDataStats()
+const downloadBuf = newDataStats()
 const batbuf = newDataStats()
-const hpbuf = newDataStats()
-const shotSize = newDataStats()
-const soSize = newDataStats()
-const dataTest = newDataStats()
-const angularVelocityGraph = newDataStats()
-angularVelocityGraph.baseUnit = 'mdeg/f'
-angularVelocityGraph.label = 'Angular Vel.'
-const ammoGraph = newDataStats()
-ammoGraph.label = 'Ammo'
-ammoGraph.baseUnit = ''
-
-dataTest.baseUnit = 'B'
-dataTest.label = 'Reduced So Size'
-
-soSize.baseUnit = 'B'
-soSize.label = 'SpaceObject Size'
-
-shotSize.baseUnit = 'B'
-shotSize.label = 'Shot size'
-
-speedbuf.baseUnit = 'm/s'
-speedbuf.accUnit = 'm'
-speedbuf.label = 'Speed'
-// speedbuf.maxSize = 500
-
-hpbuf.baseUnit = 'hp'
-hpbuf.label = 'Hp'
-// hpbuf.maxSize = 1000
-
-// symbuf.maxSize = 500
-packetSizeBuf.baseUnit = 'B'
-packetSizeBuf.label = 'Packet'
-
-rxByteDataBuf.baseUnit = 'B'
-rxByteDataBuf.label = 'Data downloaded'
-// rxByteDataBuf.maxSize = 1000
-
-ppsbuf.baseUnit = 'pps'
-ppsbuf.label = 'Packets/sec'
-// ppsbuf.maxSize = 1000
-
-// renderObjBuf.maxSize = 2000
-renderObjBuf.baseUnit = 'obj'
-renderObjBuf.label = 'Obj/frame'
-
-timebuf.baseUnit = 's'
-timebuf.prettyPrint = msPretty
-timebuf.maxSize = 60
-timebuf.label = 'Time'
-
-downloadBuf.label = 'Download'
-downloadBuf.baseUnit = 'bit/s'
-downloadBuf.accUnit = 'bit'
-downloadBuf.maxSize = 60
-
-batbuf.label = 'Battery'
-batbuf.baseUnit = '%'
 
 // const packetSize = newDataStats()
 // packetSize.maxSize = 1000
@@ -140,11 +79,11 @@ export function resetStars(game: Game | null) {
   }
 
   setTimeout(() => {
-    game.stars.forEach((s, i) => {
+    game.stars.forEach((s) => {
       const r = randomPositionInCurrentViewFrame(game.localPlayer, getScreenFromCanvas(game.ctx))
 
-      s.x = r.x
-      s.y = r.y
+      s.position.x = r.x
+      s.position.y = r.y
     })
   }, 250)
   info('reset stars')
@@ -156,7 +95,6 @@ export function initRegularGame(game: Game): void {
     return
   }
 
-  // game.clearBodies()
   game.reset()
 
   game.type = GameType.MultiPlayer
@@ -168,392 +106,111 @@ export function initRegularGame(game: Game): void {
   loadingText('Loading...', game.ctx)
   initKeyControllers()
   initTouchControls()
-
-  const offset = 500
+  initNetworkStats(angularVelocityGraph, ammoGraph, dataTest, soSize, shotSize, speedbuf, hpbuf, packetSizeBuf, rxByteDataBuf, ppsbuf, renderObjBuf, timebuf, downloadBuf, batbuf)
 
   setCanvasSizeToClientViewFrame(game.ctx)
 
   //Local player init
-  warn(`Resets local player position`)
-  game.reset()
-  game.localPlayer.mass = 1
-  game.localPlayer.missileDamage = 1
-  game.localPlayer.missileSpeed = 19
-  game.localPlayer.armedDelay = 10
-  game.localPlayer.shotsPerFrame = 1
-  game.localPlayer.ammo = 1000000
-  game.localPlayer.angleDegree = -120
-  game.localPlayer.health = 350
-  game.localPlayer.startHealth = game.localPlayer.health
-  game.localPlayer.batteryLevel = 5000
-  game.localPlayer.batteryCapacity = 5000
-  game.localPlayer.steeringPower = 1.5
-  game.localPlayer.enginePower = 0.25
-  game.localPlayer.photonColor = '#f00'
-  game.localPlayer.isLocal = true
-  game.localPlayer.color = '#db8'
-  game.localPlayer.worldSize = worldSize // server sends size of world
-  game.localPlayer.cameraPosition = worldStartPosition
-  game.localPlayer.viewFramePosition = rndfVec2(0, 0)
-  game.localPlayer.position = rndfVec2(0, 0)
-  // game.localPlayer.position = add2(getScreenCenterPosition(game.ctx), rndfVec2(-offset, offset))
+  initLocalPlayer(game)
 
   for (let i = 0; i < 400; i++) {
-    // create starts
-    const star = rndfVec2(0, 0)
+    // create stars
+    const star = { position: rndfVec2(0, 0), speedFactor: 1, size: rndi(2, 5) }
     game.stars.push(star)
   }
 
-  resetStars(game)
-
-  // game.stars.push(newVec2())
-  // game.stars.push(smul2(worldSize, 0.5))
-
   console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
-  //Shootable non-player objects
-  // const asteroidCount = 1
-  // for (let i = 0; i < asteroidCount; i++) {
-  //   const asteroid = createSpaceObject()
-  //   asteroid.position = rndfVec2(0, 1200)
-  //   asteroid.health = 1000
-  //   asteroid.name = 'asteroid-' + i
-  //   asteroid.hitRadius = 220
-  //   asteroid.size = newVec2(200, 200)
-  //   asteroid.mass = 10
-  //   game.bodies.push(asteroid)
-  // }
-
-  // game.remotePlayers = []
   game.all = game.all.concat(game.bodies)
   game.all.push(game.localPlayer)
   game.serverVersion = game.localPlayer.serverVersion
 
-  let startTime = 0
-
   info('Setting game socket listener...')
 
-  game.websocket.addListener(
-    (su) => {
-      // console.log(su)
-      //   info(`${so.name} shot count: ${so.shotsInFlight?.length}`)
-      if (su.dataObject.messageType === MessageType.SHIP_UPDATE) {
-        const oldLvl = game.localPlayer.ship.level
-        const newLvl = su.dataObject.ship.level
+  function handleNetworkStatisticUpdates(su: ServerUpdate<SpaceObject>) {
+    dataLen = su.unparsedDataLength
+    bytesRecievedLastSecond += dataLen
+    dataKeys = su.numberOfSpaceObjectKeys
+    rxDataBytes += dataLen * symbolByteSize
+    // addDataPoint(packetSize, su.spaceObjectByteSize)
+    if (performance.now() - startTime >= 1000) {
+      addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
+      ops = numberOfServerObjects
+      startTime = performance.now()
+      if (numberOfServerObjects > 0) {
+        symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
+        byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
+        bitSpeed = round2dec(byteSpeed * byteSize, 1)
+        addDataPoint(downloadBuf, bitSpeed)
+      }
+      numberOfServerObjects = 0
+      bytesRecievedLastSecond = 0
+    } else {
+      numberOfServerObjects++
+    }
+  }
 
-        if (oldLvl < newLvl) {
-          console.log('new lvl!')
-          shouldCelebrateLevelUp.set(true)
+  function handleGameUpdate(su: ServerUpdate<SpaceObject>) {
+    const so: SpaceObject = su.dataObject
+    handleNetworkStatisticUpdates(su)
+    for (let i = 0; i < game.remotePlayers.length; i++) {
+      if (so.name === game.remotePlayers[i].name) {
+        if (!so.online) {
+          console.log(`${so.name} went offline`)
+          game.remotePlayers.splice(i)
+          continue
         }
 
-        game.localPlayer.ship.experience = su.dataObject.ship.experience
-        game.localPlayer.ship.level = su.dataObject.ship.level
+        game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
 
-        userStore.update((user) => {
-          const chosenShip = user.ships.findIndex((ship) => ship.id === su.dataObject.ship.id)
-
-          user.ships[chosenShip].experience = su.dataObject.ship.experience
-          user.ships[chosenShip].level = su.dataObject.ship.level
-
-          return user
-        })
-      }
-
-      if (su.dataObject.messageType === MessageType.SERVICE) {
-        game.serverVersion = su.dataObject.serverVersion
-        info(`Service message: server version: ${su.dataObject.serverVersion}`)
         return
-      } else if (su.dataObject.messageType === MessageType.CHAT_MESSAGE) {
-        chatMsgHistoryStore.update((previousMessages) => [
-          ...previousMessages,
-          { message: su.dataObject.lastMessage, timeDate: new Date(), user: su.dataObject },
-        ])
-        return
-      } else if (su.dataObject) {
-        const so: SpaceObject = su.dataObject
-        dataLen = su.unparsedDataLength
-        bytesRecievedLastSecond += dataLen
-        dataKeys = su.numberOfSpaceObjectKeys
-        rxDataBytes += dataLen * symbolByteSize
-        // addDataPoint(packetSize, su.spaceObjectByteSize)
-        if (performance.now() - startTime >= 1000) {
-          addDataPoint(timebuf, getLatestValue(timebuf) + (performance.now() - startTime))
-          ops = numberOfServerObjects
-          startTime = performance.now()
-          if (numberOfServerObjects > 0) {
-            symbolsPerSec = round2dec(bytesRecievedLastSecond / numberOfServerObjects, 1)
-            byteSpeed = round2dec(symbolsPerSec * symbolByteSize, 1)
-            bitSpeed = round2dec(byteSpeed * byteSize, 1)
-            addDataPoint(downloadBuf, bitSpeed)
-          }
-          numberOfServerObjects = 0
-          bytesRecievedLastSecond = 0
-        } else {
-          numberOfServerObjects++
-        }
-        for (let i = 0; i < game.remotePlayers.length; i++) {
-          if (so.name === game.remotePlayers[i].name) {
-            if (!so.online) {
-              console.log(`${so.name} went offline`)
-              game.remotePlayers.splice(i)
-              continue
-            }
-
-            game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
-
-            return
-          }
-        }
-        if (so.name !== game.localPlayer.name) {
-          game.remotePlayers.push(so)
-          log(`New ship online: ${so.name}`)
-        }
-      }
-    },
-    (su) => {
-      // console.log (su.dataObject)
-      // info(`Number of server obj: ${game.bodies.length}`)
-      // console.log(su.dataObject)
-
-      // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
-      if (!exists(su.dataObject, game.bodies)) {
-        // info(`Adding ${su.dataObject.name}`)
-        game.bodies.push(su.dataObject)
-      } else {
-        game.bodies.forEach((b, i) => {
-          game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(su.dataObject, game.bodies[i])
-        })
       }
     }
-  )
-}
-
-function exists(entity: SpaceObject, entities: SpaceObject[]): boolean {
-  for (let i = 0; i < entities.length; i++) {
-    const b = entities[i]
-    // info(`bname: ${b.name}, ename ${entity.name} equal: ${b.name === entity.name}`)
-    if (b.name === entity.name) {
-      return true
+    if (so.name !== game.localPlayer.name) {
+      game.remotePlayers.push(so)
+      log(`New ship online: ${so.name}`)
     }
   }
-  return false
-}
 
-function handleLocalPlayer(game: Game) {
-  const localPlayer = game.localPlayer
+  function playerUpdate(so: ServerUpdate<SpaceObject>) {
+    switch (so.dataObject.messageType) {
+      case MessageType.SHIP_UPDATE:
+        handleShipUpdate(so)
+        break
+      case MessageType.SERVICE:
+        handleServerInformationUpdate(so, game)
+        break
+      case MessageType.CHAT_MESSAGE:
+        handleChatUpdate(so)
+        break
+      default:
+        if (so.dataObject) {
+          handleGameUpdate(so)
+        }
+        break
+    }
+  }
 
-  if (localPlayer.health <= 0) {
-    //Local player is dead
-
-    handleDeathExplosion(localPlayer, explosionDuration)
-    if (!localPlayer.obliterated) {
-      renderExplosionFrame(localPlayer, game.ctx)
+  function handleNpcUpdate(npcUpdate: ServerUpdate<SpaceObject>) {
+    // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
+    if (!exists(npcUpdate.dataObject, game.bodies)) {
+      // info(`Adding ${su.dataObject.name}`)
+      game.bodies.push(npcUpdate.dataObject)
     } else {
-      setTimeout(() => {
-        game.callBackWrapper()
-      }, 1000)
-    }
-
-    return
-  } else {
-    //Take away comment to activate health bar floating with ship
-    // if (localPlayer.health < localPlayer.startHealth) {
-    //   const theme = getCurrentTheme()
-    //   renderProgressBar(
-    //     add2(localPlayer.viewFramePosition, newVec2(-localPlayer.hitRadius / 0.5, localPlayer.hitRadius / 0.65)),
-    //     'Hp',
-    //     localPlayer.health,
-    //     localPlayer.startHealth,
-    //     game.ctx,
-    //     0,
-    //     false,
-    //     '#fff',
-    //     theme.accent,
-    //     theme.text,
-    //     localPlayer.hitRadius / 100
-    //   )
-    // }
-    if (game.keyFuncMap.systemGraphs.keyStatus) {
-      renderShip(localPlayer, game.ctx, true, game.style, null, true)
-    } else {
-      renderShip(localPlayer, game.ctx, true, game.style, null)
-    }
-
-    if (localPlayer.positionalTrace) {
-
-      for(let i = localPlayer.positionalTrace.length - 1; i >= 0; i--) {
-        const trace = localPlayer.positionalTrace[i]
-        const tracePos = getRemotePosition(trace, game.localPlayer)
-        if (localPlayer.afterBurner) {
-          renderTrail(localPlayer.positionalTrace[i], game.ctx, true, game.style, tracePos)
-        }
-      }
-
-    }
-
-  }
-}
-
-function handleRemotePlayers(remotes: SpaceObject[], game: Game): SpaceObject[] {
-  remotes.forEach((so) => {
-    so.framesSinceLastServerUpdate++
-  })
-
-  const stillPlaying = remotes.filter((so) => {
-    return so.isPlaying === true
-  })
-
-  const stoppedPlaying = remotes.filter((so) => {
-    return so.isPlaying === false
-  })
-
-  if (stoppedPlaying.length > 0) {
-    stoppedPlaying.forEach((s) => {
-      console.log(`${s.name} exited the game`)
-    })
-  }
-
-  stillPlaying.forEach((remotePlayer) => {
-    const remotePos = getRemotePosition(remotePlayer, game.localPlayer)
-
-    // hack: should not be done here...
-
-
-    if (remotePlayer.health <= 0) {
-      handleDeathExplosion(remotePlayer, explosionDuration)
-      if (!remotePlayer.obliterated) {
-        renderExplosionFrame(remotePlayer, game.ctx, remotePos)
-      }
-      return
-    } else {
-      renderShip(remotePlayer, game.ctx, false, game.style, remotePos)
-     
-      if (remotePlayer.positionalTrace) {
-
-        for(let i = remotePlayer.positionalTrace.length - 1; i >= 0; i--) {
-          const trace = remotePlayer.positionalTrace[i]
-          const tracePos = getRemotePosition(trace, game.localPlayer)
-          if (remotePlayer.afterBurner) {
-            renderTrail(remotePlayer.positionalTrace[i], game.ctx, true, game.style, tracePos)
-          }
-        }
-      }
-
-      if (game.keyFuncMap.systemGraphs.keyStatus) {
-        renderViewport(game.ctx, remotePlayer)
-        renderHitRadius(remotePlayer, game.ctx)
-      }
-      if (remotePlayer.health < remotePlayer.startHealth) {
-        const theme = getCurrentTheme()
-        renderProgressBar(
-          add2(remotePos, newVec2(-remotePlayer.hitRadius / 1, -remotePlayer.hitRadius / 0.65)),
-          'Hp',
-          remotePlayer.health,
-          remotePlayer.startHealth,
-          game.ctx,
-          0,
-          false,
-          '#fff',
-          theme.accent,
-          theme.text,
-          remotePlayer.hitRadius / 200
-        )
-      }
-    }
-  })
-
-  return stillPlaying
-}
-
-function handleGameBodies(game: Game): SpaceObject[] {
-  game.bodies.forEach((body) => {
-    const bodyPos = getRemotePosition(body, game.localPlayer)
-
-    if (body.health <= 0) {
-      handleDeathExplosion(body, explosionDuration)
-      if (!body.obliterated) {
-        renderExplosionFrame(body, game.ctx, bodyPos)
-      }
-    } else {
-      renderMoon(body, bodyPos, game.ctx, game.style)
-      if (game.keyFuncMap.systemGraphs.keyStatus) {
-        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
-        renderHitRadius(body, game.ctx)
-      }
-
-      if (body.health < body.startHealth) {
-        const theme = getCurrentTheme()
-        renderProgressBar(
-          add2(bodyPos, newVec2(-body.hitRadius / 1.5, -body.hitRadius / 0.8)),
-          'Hp',
-          body.health,
-          body.startHealth,
-          game.ctx,
-          0,
-          false,
-          '#fff',
-          theme.accent,
-          theme.text,
-          body.hitRadius / 350
-        )
-      }
-    }
-  })
-
-  game.bodies = game.bodies.filter((body) => {
-    return !body.obliterated
-  })
-
-  game.all = game.all.filter((body) => {
-    return !body.obliterated
-  })
-
-  return game.bodies
-}
-
-export class Every {
-  private currentTick = 0
-  maxTicks = 1
-
-  constructor(maxTicks: number) {
-    this.maxTicks = maxTicks
-  }
-
-  tick(callback: () => void) {
-    this.currentTick++
-    if (this.currentTick >= this.maxTicks) {
-      callback()
-      this.currentTick = 0
+      game.bodies.forEach((b, i) => {
+        game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(npcUpdate.dataObject, game.bodies[i])
+      })
     }
   }
+
+  game.websocket.addListener(playerUpdate, handleNpcUpdate)
 }
 
 const every = new Every(25)
-const every30 = new Every(60)
-
-const cameraLagSize = 1
-const cameraLag = vec2Array(cameraLagSize, 0, 0)
-
-function last(arr: Vec2[]): Vec2 {
-  return arr[arr.length - 1]
-}
-
-export function moveView(game: Game) {
-  // bound ship to viewframe
-  const center = getScreenCenterPosition(game.ctx)
-
-  // const d = dist2(center, game.localPlayer.position)
-  cameraLag.push(game.localPlayer.velocity)
-  if (cameraLag.length > cameraLagSize) {
-    game.localPlayer.viewFramePosition = add2(center, smul2(cameraLag[0], 5))
-  }
-  cameraLag.shift()
-  // every30.tick(() => {
-  //   console.log({ cameraLag, d })
-  // })
-}
 
 export function renderFrame(game: Game, dt: number): void {
+  // Heads up stuff
+
   every.tick(() => {
     game.localPlayer.viewport = getScreenRect(game.ctx)
     setCanvasSizeToClientViewFrame(game.ctx)
@@ -565,29 +222,36 @@ export function renderFrame(game: Game, dt: number): void {
 
     localPlayerStore.update((s) => ({ ...s, ship: s.ship }))
 
-    gameState.set({ scoreScreenData: { player: game.localPlayer, remotePlayers: remotePlayers, serverObjects: game.bodies } })
+    gameState.set({
+      scoreScreenData: {
+        player: game.localPlayer,
+        remotePlayers: remotePlayers,
+        serverObjects: game.bodies,
+      },
+    })
   })
 
-  const ctx = game.ctx
-  game.lightSource.position = game.localPlayer.position
-  game.lightSource.direction = direction2(game.localPlayer.angleDegree)
-
-  game.testShapes.forEach((s) => {
-    s.render(ctx)
-  })
-
-  if (game.keyFuncMap.systemGraphs.keyStatus) {
-    fpsCounter(ops, dt, game, ctx)
+  if (activeKeyMap.systemGraphs.keyStatus) {
+    fpsCounter(ops, dt, game, game.ctx)
   }
 
+  if (game.localPlayer.gameMode === GameMode.ARCADE_MODE) {
+    // Render arcade style game
+    renderCharacter(game.localPlayer, game.ctx)
+  } else {
+    // Render space style game
+    handleStarBackdrop(game)
+    game.remotePlayers = handleRemotePlayers(game.remotePlayers)
+    renderRemotePlayerInSpaceMode(game.remotePlayers, game, activeKeyMap)
+    handleGameBodies(game, activeKeyMap)
+    handleLocalPlayer(game, activeKeyMap)
+  }
+
+  // Stats - G
   let objCount = 0
   game.remotePlayers.forEach((p) => {
     objCount += getRenderableObjectCount(p)
   })
-
-  handleStarBackdrop(game)
-  game.remotePlayers = handleRemotePlayers(game.remotePlayers, game)
-  handleGameBodies(game)
 
   addDataPoint(renderObjBuf, objCount + getRenderableObjectCount(game.localPlayer))
   addDataPoint(ppsbuf, ops)
@@ -600,86 +264,54 @@ export function renderFrame(game: Game, dt: number): void {
   addDataPoint(ammoGraph, game.localPlayer.ammo)
   try {
     addDataPoint(shotSize, new TextEncoder().encode(JSON.stringify(Object.values(reduceShotSize(newPhotonLaser())))).length)
-    addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(game.localPlayer)).length)
-    addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(game.localPlayer))).length)
+    // addDataPoint(soSize, new TextEncoder().encode(JSON.stringify(game.localPlayer)).length)
+    // addDataPoint(dataTest, new TextEncoder().encode(JSON.stringify(reduceSoSize(game.localPlayer))).length)
   } catch (e) {
-    /* empty */
+    warn(`${e}`)
   }
 
-  if (game.keyFuncMap.systemGraphs.keyStatus) {
+  if (activeKeyMap.systemGraphs.keyStatus) {
     GRAPHS.forEach((g, i) => {
       const half = Math.floor(GRAPHS.length / 2)
       const h = 130
       const w = 250
       const space = 200
-      const startx = 110
-      if (i < half) renderGraph(g, { x: 400, y: startx + i * space }, { x: w, y: h }, ctx)
-      else renderGraph(g, { x: 1300, y: startx + (i - half) * space }, { x: w, y: h }, ctx)
+      const startx = 300
+      if (i < half) renderGraph(g, { x: 400, y: startx + i * space }, { x: w, y: h }, game.ctx)
+      else renderGraph(g, { x: 1300, y: startx + (i - half) * space }, { x: w, y: h }, game.ctx)
     })
 
-    renderInfoText(`packets/sec: ${ops}`, 450, ctx)
-    renderInfoText(`packet symbol count: ${dataLen}`, 500, ctx)
-    renderInfoText(`object key count: ${dataKeys}`, 550, ctx)
-    renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, ctx)
-    renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, ctx)
-    renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, ctx)
-    renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, ctx)
+    renderInfoText(`packets/sec: ${ops}`, 450, game.ctx)
+    renderInfoText(`packet symbol count: ${dataLen}`, 500, game.ctx)
+    renderInfoText(`object key count: ${dataKeys}`, 550, game.ctx)
+    renderInfoText(`sym/sec: ${symbolsPerSec}`, 600, game.ctx)
+    renderInfoText(`rx byte speed: ${siPretty(byteSpeed, 'B/s')}`, 650, game.ctx)
+    renderInfoText(`rx bit speed: ${siPretty(bitSpeed, 'bit/s')}`, 700, game.ctx)
+    renderInfoText(`rx data: ${siPretty(rxDataBytes, 'B')}`, 750, game.ctx)
 
-    // renderRoundIndicator()
-
-    renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, ctx)
+    renderSpaceObjectStatusBar(game.remotePlayers, game.localPlayer, game.ctx)
 
     // Position info for debugging
-    renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(-100, -100)), ctx, game.style)
-    renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(200, -150)), ctx, game.style)
-    renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add2(game.localPlayer.viewFramePosition, newVec2(-400, -200)), ctx, game.style)
-    renderVec2(
-      `world: ${to_string2(add2(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`,
-      add2(game.localPlayer.viewFramePosition, newVec2(0, 100)),
-      ctx,
-      game.style
-    )
-    renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), ctx, game.style)
-  }
-
-  //HandleLocalPlayer
-
-  handleLocalPlayer(game)
-
-  moveView(game)
-}
-
-function handleStarBackdrop(game: Game): void {
-  // move star ref with inverted view frame position and factor
-  for (let i = 0; i < game.stars.length; i++) {
-    if (offScreen_mm(game.stars[i], game.localPlayer.cameraPosition, add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)))) {
-      // just wrapping the stars looks better:
-      // but this causes the stars to bunch up in a line or grid pattern after flying around some
-      // so add some randomness when wrapping and regenerate them outside of the screen...
-      const minRand = 0
-      const maxRand = 500
-      wrap_mm(
-        game.stars[i],
-        sub2(game.localPlayer.cameraPosition, rndfVec2(minRand, maxRand)),
-        add2(add2(game.localPlayer.cameraPosition, getScreenFromCanvas(game.ctx)), rndfVec2(minRand, maxRand))
-      )
-    }
-
-    const starpos = sub2(game.stars[i], smul2(game.localPlayer.cameraPosition, 1))
-    renderPoint(game.ctx, starpos, game.style.starColor, screenScale * 1.5)
+    renderVec2(`camera: ${to_string2(game.localPlayer.cameraPosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(-100, -100)), game.ctx, game.style)
+    renderVec2(`view: ${to_string2(game.localPlayer.viewFramePosition)}`, add2(game.localPlayer.viewFramePosition, newVec2(200, -150)), game.ctx, game.style)
+    renderVec2(`position: ${to_string2(game.localPlayer.position)}`, add2(game.localPlayer.viewFramePosition, newVec2(-400, -200)), game.ctx, game.style)
+    renderVec2(`world: ${to_string2(add2(game.localPlayer.viewFramePosition, game.localPlayer.cameraPosition))}`, add2(game.localPlayer.viewFramePosition, newVec2(0, 100)), game.ctx, game.style)
+    renderVec2(`velocity: ${to_string2(game.localPlayer.velocity)}`, add2(game.localPlayer.viewFramePosition, newVec2(300, 200)), game.ctx, game.style)
   }
 }
 
 export function nextFrame(game: Game, dt: number): void {
   if (!game.localPlayer.isDead) {
-    spaceObjectKeyController(game.localPlayer, dt)
-    spaceTouchController(game.localPlayer, dt)
+    if (game.localPlayer.gameMode === GameMode.SPACE_MODE) {
+      spaceObjectKeyController(game.localPlayer, dt)
+      spaceTouchController(game.localPlayer)
+    } else {
+      arcadeModeKeyController(game.localPlayer, dt)
+      // arcadeTouchController(game.localPlayer, dt)
+    }
   }
 
   friction(game.localPlayer)
-  game.testShapes.forEach((s) => {
-    friction(s)
-  })
 
   if (game.remotePlayers.length === 0) {
     ops = 0

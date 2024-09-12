@@ -35,4 +35,5 @@ export const routes = {
   test: <Route>{ path: '/test', displayText: 'Test', inHeader: false },
   settings: <Route>{ path: '/settings', displayText: 'Settings', inHeader: true, icon: Icons.Settings },
   admin: <Route>{ path: '/admin', displayText: 'Admin', inHeader: true, icon: Icons.Admin },
+  register: <Route>{ path: '/register', displayText: 'Register', inHeader: false },
 }

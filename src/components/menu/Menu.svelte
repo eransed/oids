@@ -16,7 +16,7 @@
     <h3 class="menuHeader">{menuHeader}</h3>
     {#each buttons as button}
       <li class="button">
-        <Button90 borderBottom buttonConfig={button} />
+        <Button90 buttonConfig={button} />
       </li>
     {/each}
   </ul>

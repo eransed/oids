@@ -16,6 +16,7 @@ import Delete from '../assets/icons/Delete.svg'
 import Play from '../assets/icons/play.svg'
 import Add from '../assets/icons/add.svg'
 import Google from '../assets/icons/google.svg'
+import Reset from '../assets/icons/reset.svg'
 
 export const Icons = {
   Admin,
@@ -36,6 +37,7 @@ export const Icons = {
   Play,
   Add,
   Google,
+  Reset,
 }
 
 export const IconColor = '#D2B48C'

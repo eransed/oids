@@ -113,7 +113,7 @@
     <input on:focus={() => handleFocus(true)} on:blur={() => handleFocus(false)} bind:value={chatMsg} placeholder={`Aa`} type="text" />
     <!-- <button type="submit">Send</button> -->
 
-    <Button90 minWidth="2em" borderBottom buttonType="submit" icon={Icons.Send} />
+    <Button90 minWidth="2em" buttonType="submit" icon={Icons.Send} />
   </form>
 </div>
 
@@ -159,7 +159,7 @@
     max-height: 12.5em;
     overflow-y: auto;
     overflow-x: hidden;
-    max-width: 100%;
+    width: 350px;
     padding: 0.5em;
   }
 

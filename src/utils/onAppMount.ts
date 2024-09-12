@@ -9,6 +9,8 @@ import { validateToken } from '../lib/services/utils/Token'
 export const onAppMount = async (): Promise<void> => {
   info('onAppmount')
 
+  // checkHotkeys()
+
   return new Promise<void>((resolve, reject) => {
     validateToken()
       .then(() => {

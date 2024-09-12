@@ -1,23 +1,12 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import type {
-    ChosenShip,
-    Session,
-    Ship,
-    SpaceObject,
-  } from '../../../../lib/interface'
+  import { GameMode, type Session, type Ship } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
   import { Game } from '../../../../lib/game'
-  import {
-    getKeyMap,
-    initKeyControllers,
-    initTouchControls,
-    removeKeyControllers,
-    removeTouchControls,
-  } from '../../../../lib/input'
+  import { ActiveKeyMapStore, arcadeKeyMapManagerStore, removeKeyControllers, removeTouchControls, spaceKeyMapManagerStore } from '../../../../lib/input'
 
   //Components
   import GameMenu from '../Menu/GameMenu.svelte'
@@ -30,20 +19,8 @@
   import ScoreScreen from '../LeaderBoardScreen/ScoreScreen.svelte'
 
   // Game variants
-  import {
-    initRegularGame,
-    nextFrame,
-    renderFrame,
-    resetStars,
-  } from '../../../../lib/gameModes/regular'
-  import {
-    guestUserNameStore,
-    isLoggedInStore,
-    localPlayerStore,
-    socketStore,
-    userStore,
-    shouldCelebrateLevelUp,
-  } from '../../../../stores/stores'
+  import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
+  import { guestUser, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { getPlayersInSession } from '../../../../lib/services/game/playersInSession'
   import { info } from 'mathil'
@@ -54,26 +31,18 @@
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
   import ProgressBar from '../../../../components/progress/progressBar.svelte'
-  import { screenScale } from '../../../../lib/constants'
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
   import Celebration from '../../../../components/celebration/celebration.svelte'
-  import ProfileModal from '../../../../components/profile/ProfileModal.svelte'
-  import ShipCardInfo from '../../../../components/ships/ShipCardInfo.svelte'
   import { getShipBundleCache } from '../../../../style/ships'
-
-  const showScoreScreen = getKeyMap().leaderBoard.store
-  const showHotKeys = getKeyMap().hotKeys.store
-  const shipSettings = getKeyMap().shipSettings.store
-  const showShipDetails = getKeyMap().shipDetails.store
-  const showChat = getKeyMap().chat.store
-  const showMenu = getKeyMap().menu.store
+  import Button90 from '../../../../components/menu/Button90.svelte'
+  import { Icons } from '../../../../style/icons'
+  import { resetKeyMapToDefault } from '../Hotkeys/hotKeysChange'
+  import getProfile from '../../../../lib/services/user/profile'
 
   let game: Game
 
   //Props
   export let sessionId: string
-
-  console.log(sessionId)
 
   let canvas: HTMLCanvasElement
   // let cleanup: () => void
@@ -85,73 +54,45 @@
     e.preventDefault()
   })
 
-  async function players(): Promise<Session> {
-    const players: Session = await getPlayersInSession(sessionId).then(
-      (d) => d.data
-    )
-
-    return players
-  }
-
-  function createChosenShip(ship: Ship): ChosenShip {
-    const chosenShip: ChosenShip = {
-      name: ship.name,
-      userId: ship.userId,
-      level: ship.level,
-      shipVariant: ship.variant,
-      id: ship.id,
-      experience: ship.experience,
+  async function players() {
+    try {
+      const response = await getPlayersInSession(sessionId)
+      return response.data
+    } catch (e) {
+      console.error(e)
+      return
     }
-    return chosenShip
   }
 
-  let chosenShip: ChosenShip
+  let chosenShip: Ship = $localPlayerStore.ship
   let shipModalOpen = false
 
   onMount(async () => {
     // cleanup = initSettingsControl()
-    if (!$isLoggedInStore) {
-      $localPlayerStore.name = $guestUserNameStore
-    }
 
-    if ($isLoggedInStore && $userStore.ships.length === 1) {
-      $localPlayerStore.ship = createChosenShip($userStore.ships[0])
-      chosenShip = $localPlayerStore.ship
-    } else {
-      const storedShipJson = localStorage.getItem('chosenShip')
-
-      if (storedShipJson && $isLoggedInStore) {
-        const localStorageShip = JSON.parse(storedShipJson)
-        const shipFromStorage = $userStore.ships.find((ship) => {
-          if (ship.id === localStorageShip.id) return ship
-        })
-
-        if (shipFromStorage) {
-          $localPlayerStore.ship = createChosenShip(shipFromStorage)
-          console.log('found ship in localstorage:', shipFromStorage)
-          chosenShip = $localPlayerStore.ship
-        }
+    if ($userStore) {
+      if ($userStore.ships.length === 1) {
+        $localPlayerStore.ship = $userStore.ships[0]
+        chosenShip = $localPlayerStore.ship
       }
     }
 
-    game = new Game(
-      canvas,
-      $localPlayerStore,
-      $socketStore,
-      getKeyMap(),
-      showDeadMenu
-    )
+    game = new Game(canvas, $localPlayerStore, $socketStore, showDeadMenu)
     gameRef(game)
     game.localPlayer.sessionId = sessionId
-    players().then((d) => {
+    await players().then((d) => {
+      if (!d) {
+        console.error('No players in session')
+        return
+      }
       const players = d.players
-      console.log(players)
+
       if (players.length === 0) {
         info(`You are the host!`)
-        game.localPlayer.isHost = true
+        game.localPlayer.isHost = false
       }
     })
-    if (!$isLoggedInStore || chosenShip) {
+    if (!$userStore || chosenShip) {
       game.startGame(initRegularGame, renderFrame, nextFrame)
       resetStars(game)
     }
@@ -181,12 +122,7 @@
 
 <div class="shipWrapper" style="z-index: 1;">
   <div class="shipAvatar">
-    <img
-      style="width: 80%;"
-      draggable="false"
-      src={getShipBundleCache($localPlayerStore.ship.shipVariant).svgUrl}
-      alt={$localPlayerStore.ship.name}
-    />
+    <img style="width: 80%;" draggable="false" src={getShipBundleCache($localPlayerStore.ship.variant).svgUrl} alt={$localPlayerStore.ship.name} />
     <div class="shipLevel">{$localPlayerStore.ship.level}</div>
   </div>
   <div class="shipInfo">
@@ -194,111 +130,71 @@
       {$localPlayerStore.ship.name}
     </div>
     <div class="shipHealth">
-      <ProgressBar
-        progressColor="#50aa50"
-        progress={$localPlayerStore.health}
-        max={$localPlayerStore.startHealth}
-      />
+      <ProgressBar progressColor="#50aa50" progress={$localPlayerStore.health} max={$localPlayerStore.startHealth} />
     </div>
     <div class="shipEnergy">
-      <ProgressBar
-        progressColor="#4040ff"
-        progress={$localPlayerStore.batteryLevel}
-        max={$localPlayerStore.batteryCapacity}
-      />
+      <ProgressBar progressColor="#4040ff" progress={$localPlayerStore.batteryLevel} max={$localPlayerStore.batteryCapacity} />
     </div>
   </div>
 </div>
 
-<div class="gameInfo">
-  <InGameInfo title={'Leaderboard'} showModal={$showScoreScreen}>
-    <div class="scoreScreen">
-      <ScoreScreen />
-    </div>
-  </InGameInfo>
+{#if game}
+  <div class="gameInfo">
+    <InGameInfo title={'Leaderboard'} showModal={$ActiveKeyMapStore.leaderBoard.store}>
+      <div class="scoreScreen">
+        <ScoreScreen />
+      </div>
+    </InGameInfo>
 
-  <InGameInfo title={'Key Map'} showModal={$showHotKeys}>
-    <div class="hotKeys">
-      <HotKeys activeColor={$localPlayerStore.color} />
-    </div>
-  </InGameInfo>
+    <InGameInfo title={`Key Map - ${$ActiveKeyMapStore.name}`} showModal={$ActiveKeyMapStore.hotKeys.store}>
+      <div class="hotKeys">
+        <!-- {#if keyMapManager.getKeyMap().name !== 'Space' && keyMapManager.getKeyMap().name !== 'Arcade'}
+          <Button90
+            buttonType="button"
+            icon={Icons.Reset}
+            addInfo={`Reset default to: ${keyMapManager.getDefault().name}`}
+            buttonConfig={{ buttonText: `Reset to default: ${keyMapManager.getDefault().name}`, clickCallback: () => resetKeyMapToDefault(keyMapManager), selected: false }}
+          />
+        {/if} -->
+        <HotKeys
+          Mode={game.localPlayer.gameMode}
+          activeColor={$localPlayerStore.color}
+          keyMapManager={$localPlayerStore.gameMode === GameMode.SPACE_MODE ? $spaceKeyMapManagerStore : $arcadeKeyMapManagerStore}
+        />
+      </div>
+    </InGameInfo>
 
-  <InGameInfo title={'Ship Settings'} showModal={$shipSettings}>
-    <div class="hotKeys">
-      <ShipSettings />
-    </div>
-  </InGameInfo>
-</div>
+    <InGameInfo title={'Ship Settings'} showModal={$ActiveKeyMapStore.shipSettings.store}>
+      <div class="hotKeys">
+        <ShipSettings />
+      </div>
+    </InGameInfo>
+  </div>
+{/if}
 
 <div class="bottomInterface">
-  {#if $showChat}
+  {#if $ActiveKeyMapStore.chat.store}
     <div class="chat">
       <Chat chatTitle={false} joinedSessionId={sessionId} inGameChat />
     </div>
     <div class="xp">
-      <ProgressBar
-        progress={$localPlayerStore.ship.experience}
-        max={getShipXpRequirement($localPlayerStore.ship.level)}
-      />
+      <ProgressBar progress={$localPlayerStore.ship.experience} max={getShipXpRequirement($localPlayerStore.ship.level)} />
     </div>
   {/if}
 </div>
 
-{#if $showShipDetails}
-  <ModalSimple
-    closeBtn={() => ($showShipDetails = !$showShipDetails)}
-    saveButton={false}
-  >
+{#if $ActiveKeyMapStore.shipDetails.store}
+  <ModalSimple closeBtn={() => ($ActiveKeyMapStore.shipDetails.store = !$ActiveKeyMapStore.shipDetails.store)} saveButton={false}>
     <ShipDetails ship={$localPlayerStore.ship} />
   </ModalSimple>
 {/if}
 
-{#if $showMenu}
+{#if $ActiveKeyMapStore.menu.store}
   <GameMenu currentGame={game} />
 {/if}
 
 {#if $shouldCelebrateLevelUp}
-  <Celebration
-    celebrationText={`You've reached level ${$localPlayerStore.ship.level}`}
-    celebrationTimeoutCallback={() => ($shouldCelebrateLevelUp = false)}
-  />
-{/if}
-
-{#if $isLoggedInStore && $userStore.ships.length > 1 && !chosenShip}
-  {#if $userStore.ships.length === 0}
-    <AddShip openModal={!chosenShip} />
-  {:else}
-    <ModalSimple
-      title="Playable ships"
-      saveButton={false}
-      cancelButton={!!chosenShip}
-      closeBtn={() => (shipModalOpen = false)}
-    >
-      <Ships
-        changeShipOnClick={false}
-        clickedShipCallback={(ship) => {
-          console.log('clickedshipcallback')
-          shipModalOpen = false
-          chosenShip = createChosenShip(ship)
-          $localPlayerStore.ship = {
-            level: ship.level,
-            name: ship.name,
-            userId: ship.userId,
-            shipVariant: ship.variant,
-            id: ship.id,
-            experience: ship.experience,
-          }
-          $localPlayerStore.name = $userStore.name
-          game.startGame(initRegularGame, renderFrame, nextFrame)
-          resetStars(game)
-          localStorage.setItem(
-            'chosenShip',
-            JSON.stringify({ id: ship.id, userId: ship.userId })
-          )
-        }}
-      />
-    </ModalSimple>
-  {/if}
+  <Celebration celebrationText={`You've reached level ${$localPlayerStore.ship.level}`} celebrationTimeoutCallback={() => ($shouldCelebrateLevelUp = false)} />
 {/if}
 
 <!-- <canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} /> -->
@@ -321,12 +217,7 @@
     height: 50px;
     border-radius: 50%;
     background-color: var(--main-card-color);
-    border: 2px solid
-      color-mix(
-        in srgb,
-        var(--main-accent-color) 20%,
-        var(--main-text-color) 10%
-      );
+    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
 
     z-index: 1;
     /* margin-right: -0.4em; */
@@ -340,12 +231,7 @@
     height: 50px;
     border-radius: 0.5em;
     background-color: var(--main-card-color);
-    border: 2px solid
-      color-mix(
-        in srgb,
-        var(--main-accent-color) 20%,
-        var(--main-text-color) 10%
-      );
+    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
 
     display: flex;
     flex-direction: column;
@@ -356,12 +242,7 @@
   .shipLevel {
     position: absolute;
     background-color: var(--main-card-color);
-    border: 2px solid
-      color-mix(
-        in srgb,
-        var(--main-accent-color) 20%,
-        var(--main-text-color) 10%
-      );
+    border: 2px solid color-mix(in srgb, var(--main-accent-color) 20%, var(--main-text-color) 10%);
     border-radius: 50%;
     text-align: center;
     justify-content: center;

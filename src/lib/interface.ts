@@ -1,8 +1,12 @@
-import type { Writable } from 'svelte/store'
 import { newVec2, type Vec2 } from 'mathil'
 import type { Steerable } from './traits/Steerable'
 import type { ShipVariant } from '../style/ships'
 import type { Towns } from './worlds/worldInterface'
+
+export enum GameMode {
+  SPACE_MODE,
+  ARCADE_MODE,
+}
 
 export enum GameType {
   SinglePlayer,
@@ -43,15 +47,6 @@ export interface MoonType {
 
 export interface Shapable {
   shape: SpaceShape
-}
-
-export interface ChosenShip {
-  name: string
-  level: number
-  userId: string
-  shipVariant: ShipVariant
-  id: string
-  experience: number
 }
 
 export interface Colorable {
@@ -103,6 +98,16 @@ export interface Local {
 export interface Positionable {
   position: Vec2
   viewFramePosition: Vec2
+}
+
+export interface Crashable {
+  crashed: boolean
+}
+
+export interface Landable {
+  // Stepable, Oribitable, Planetable, Groundable, Terrable, Globeable (Capable of being landed)
+  // You are so freaking landable!!
+  characterGlobalPosition: Vec2
 }
 
 export interface Physical extends Positionable {
@@ -210,13 +215,20 @@ export enum MessageType {
 }
 
 export interface PlayingShip {
-  ship: ChosenShip
+  ship: Ship
 }
 
 export interface Belonging {
   hometown: Towns
 }
 
+export interface Jumpable {
+  isJumping: boolean
+}
+
+export interface GameModable {
+  gameMode: GameMode
+}
 export interface SpaceObject
   extends PlayingShip,
     Shapable,
@@ -243,7 +255,10 @@ export interface SpaceObject
     Bounded,
     MoonType,
     Belonging,
-    Traceable {}
+    Traceable,
+    Landable,
+    Jumpable,
+    GameModable {}
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number
@@ -256,21 +271,10 @@ export interface Ageable {
   age: number
 }
 
-export interface PhotonLaser
-  extends Damager,
-    Physical,
-    Damageable,
-    Rotatable,
-    Colorable,
-    Ageable {}
+export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable, Ageable {}
 
 export function getRenderableObjectCount(so: SpaceObject): number {
-  return (
-    1 +
-    so.shotsInFlight.length +
-    so.collidingWith.length +
-    so.shotsInFlightNew.length
-  )
+  return 1 + so.shotsInFlight.length + so.collidingWith.length + so.shotsInFlightNew.length
 }
 
 // export function applySteer(o: Steerable, deltaTime: number): void {
@@ -283,7 +287,15 @@ export interface GameSettings {
   hotKeys: KeyFunction
 }
 
+export interface KeyMapManager {
+  getDefault: () => KeyFunctionMap
+  resetKeyMap: () => void
+  setKeyMap: (map: KeyFunctionMap) => void
+  getKeyMap: () => KeyFunctionMap
+}
+
 export interface KeyFunctionMap {
+  name: string
   thrust: KeyFunction
   reverseThrust: KeyFunction
   boost: KeyFunction
@@ -302,6 +314,9 @@ export interface KeyFunctionMap {
   shipDetails: KeyFunctionStore
   chat: KeyFunctionStore
   menu: KeyFunctionStore
+  jump: KeyFunctionStore
+  changeMode: KeyFunctionStore
+  tractorBeam: KeyFunctionStore
 }
 
 export interface TouchFunctionMap {
@@ -326,12 +341,12 @@ export interface TouchFunctionMap {
 export interface KeyFunction {
   activators: string[]
   keyStatus: boolean
-  displayText?: string
+  displayText: string
   toggle?: boolean
 }
 
 export interface KeyFunctionStore extends KeyFunction {
-  store: Writable<boolean>
+  store: boolean
 }
 
 export interface GameState {
@@ -353,7 +368,7 @@ export interface Unique {
 }
 
 export interface Session {
-  host: SpaceObject
+  // host: SpaceObject
   id: string
   players: SpaceObject[]
 }
@@ -460,4 +475,10 @@ export interface Game {
   win: boolean
   played: Date
   userId: string | null
+}
+
+export interface Star {
+  position: Vec2
+  speedFactor: number
+  size: number
 }

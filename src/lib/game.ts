@@ -1,18 +1,15 @@
-import { GameType, type SpaceObject, type KeyFunctionMap } from './interface'
+import { GameType, type SpaceObject } from './interface'
 import { getContext } from './canvas_util'
 import { LightSource, LineSegment } from './shapes'
 import { renderLoop } from './time'
 // import * as WelcomeScreen from './gameModes/welcomeScreen'
-import type { Shape } from './shapes/Shape'
 import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
 import type { OidsSocket } from './websocket/ws'
-import type { Vec2 } from 'mathil'
 import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
-import type { UIStyle } from './interface'
+import type { Star, UIStyle } from './interface'
 
 export class Game {
   websocket: OidsSocket
-  testShapes: Shape[] = []
   running = false
   type: GameType = GameType.SinglePlayer
   ctx: CanvasRenderingContext2D
@@ -26,26 +23,18 @@ export class Game {
   all: SpaceObject[] = []
   shouldSendToServer = false
   hasCalledCallback = false
-  keyFuncMap: KeyFunctionMap
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
   serverVersion = '_unknown_server_version_'
   style: UIStyle = getCurrentStyle()
-  stars: Vec2[] = []
+  stars: Star[] = []
 
-  constructor(
-    _canvas: HTMLCanvasElement,
-    _localPlayer: SpaceObject,
-    _websocket: OidsSocket,
-    keyFuncMap: KeyFunctionMap,
-    _OnDeadLocalPlayerCallBack: () => void
-  ) {
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _websocket: OidsSocket, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
     this.websocket = _websocket
     this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
     this.ctx = getContext(this.canvas)
-    this.keyFuncMap = keyFuncMap
     syncThemeWithCss()
   }
 
