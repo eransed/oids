@@ -34,6 +34,8 @@
   import { handleIncomingChatMessage } from './handlers/handleChatMessages'
   import Sessions from './components/Sessions/Sessions.svelte'
   import ShipChoice from './components/ShipChoice/ShipChoice.svelte'
+  import Info from '../../components/info/info.svelte'
+  import type { AlertType } from '../../components/alert/AlertType'
 
   pageHasHeaderStore.set(true)
 
@@ -204,12 +206,30 @@
 
 <Page>
   <div class="lobbyWrapper">
-    <div class="left">
-      <Sessions {joinSession_} {startGame} {sessions} />
-    </div>
+    {#if !joinedSession}
+      <div class="left" in:fly={{ duration: 500, x: -500 }}>
+        <Info text="Servers" />
+        <Sessions {joinSession_} {startGame} {sessions} />
+      </div>
+    {/if}
     {#if joinedSession}
+      <Button90
+        addInfo="Back to servers"
+        icon={Icons.Exit}
+        buttonConfig={{
+          buttonText: 'Back to servers',
+          clickCallback: () => {
+            joinedSession = null
+            $localPlayerStore.sessionId = ''
+            $socketStore.send($localPlayerStore)
+            updateSessions()
+          },
+          selected: false,
+        }}
+      />
       <div class="center" in:fly={{ duration: 500, x: -500 }}>
-        <ShipChoice {joinedSession} />
+        <Info text={`Shipstation @ ${joinedSession.id}`} />
+        <ShipChoice />
         <div class="buttonWrapper">
           <Button90
             borderBottom
@@ -231,7 +251,8 @@
 
 <style>
   .lobbyWrapper {
-    display: grid;
+    justify-content: center;
+    display: flex;
     grid-template-columns: 1fr 2fr 1fr;
     max-width: 85%;
     min-height: 20em;
@@ -252,10 +273,9 @@
     color: var(--main-text-color);
     padding: 0.5em;
     line-break: anywhere;
-    background-color: var(--main-card-color);
+    /* background-color: var(--main-card-color); */
   }
 
-  .center,
   .right {
     min-width: 13em;
   }
@@ -263,11 +283,17 @@
   .center {
     /* grid-template-columns: 1fr auto; */
     grid-template-rows: auto auto;
+    border-left: 1px solid var(--main-accent2-color);
+    border-radius: 0;
+    min-width: 30em;
   }
 
   .right {
     grid-template-rows: 1fr auto auto;
     width: 350px;
+    border-left: 1px solid var(--main-accent2-color);
+    border-radius: 0;
+    /* background-color: var(--main-card-color); */
   }
 
   .buttonWrapper {
@@ -279,6 +305,13 @@
   @media screen and (max-width: 1200px) {
     .lobbyWrapper {
       width: 100%;
+      top: 1.5em;
+    }
+
+    .left,
+    .center,
+    .right {
+      min-width: 13em;
     }
     .left {
       grid-column-start: 1;
@@ -307,6 +340,12 @@
       height: 100vh;
       grid-template-columns: auto;
       zoom: 0.8;
+    }
+
+    .left,
+    .center,
+    .right {
+      min-width: 13em;
     }
 
     .left {

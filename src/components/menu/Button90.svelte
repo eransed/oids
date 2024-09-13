@@ -4,6 +4,7 @@
   import CircularSpinner from '../loaders/circularSpinner.svelte'
 
   // export let border: boolean = false
+  export let textColor: string = ''
   export let addInfo: string = ''
   export let minWidth: string = '10em'
   export let width: string = ''
@@ -41,6 +42,8 @@
 
   $: border = borderBottom ? '1px solid var(--main-accent-color)' : 'none'
   $: minWidth = minWidth
+
+  $: color = textColor ?? 'var(--main-text-color)'
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -49,7 +52,7 @@
     type={buttonType}
     title={buttonConfig.buttonText}
     {disabled}
-    style="width: {width}; min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border: {border}; border-radius: 0.8em"
+    style="width: {width}; min-Width: {minWidth}; --left: {m.x}; --top: {m.y}; border: {border}; border-radius: 0.8em; color: {color}"
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >

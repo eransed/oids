@@ -168,7 +168,7 @@
               mouseTracking={false}
               buttonConfig={{
                 buttonText: 'Add Ship',
-                clickCallback: async () => {
+                clickCallback: () => {
                   openModal = true
                 },
                 selected: false,
@@ -176,7 +176,18 @@
             />
           </div>
           {#if openModal}
-            <AddShip {openModal} closeModal={() => (openModal = false)} />
+            <AddShip
+              {openModal}
+              closeModal={(newShip) => {
+                openModal = false
+                if (newShip) {
+                  alert = {
+                    severity: 'success',
+                    text: `Save successful!`,
+                  }
+                }
+              }}
+            />
           {/if}
           <Ships />
         {/if}

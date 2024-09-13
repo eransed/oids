@@ -6,7 +6,6 @@
 
   //Components
   import Button90 from '../menu/Button90.svelte'
-  import Cursor from '../mouse/cursor.svelte'
 
   interface Step {
     //Desc = description

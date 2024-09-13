@@ -29,6 +29,7 @@
       justify-content: center;
       width: 100%;
       max-height: 90vh;
+      margin-top: 2em;
     }
   }
 
@@ -54,6 +55,7 @@
       top: 55px;
       padding: 0px;
       margin: 0px;
+      margin-top: 2em;
     }
   }
 </style>

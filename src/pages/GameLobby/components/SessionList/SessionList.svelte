@@ -7,39 +7,31 @@
   export let localPlayer: SpaceObject | undefined
 </script>
 
-<div class="scoreTable">
-  <table>
-    <thead>
-      <tr>
-        <SessionListRow header={true} />
-      </tr>
-    </thead>
+<table>
+  <thead>
+    <tr>
+      <SessionListRow header={true} />
+    </tr>
+  </thead>
 
-    {#each sessions as session}
-      <tbody>
-        <tr>
-          <SessionListRow {joinSession} {session} {localPlayer} numberOfPlayers={session.players.length} />
-        </tr>
-      </tbody>
-    {/each}
-  </table>
-</div>
+  {#each sessions as session}
+    <tbody>
+      <tr>
+        <SessionListRow {joinSession} {session} {localPlayer} numberOfPlayers={session.players.length} />
+      </tr>
+    </tbody>
+  {/each}
+</table>
 
 <style>
-  .scoreTable {
-    display: flex;
-    justify-content: left;
-    flex-wrap: wrap;
-    position: relative;
-    inset: 0;
-  }
-
   table {
-    max-height: 70%;
+    /* max-height: 70%; */
     display: block;
     padding: 8px;
     font-weight: bold;
     font-size: 14px;
+    margin-top: 1em;
+    border-left: 1px solid var(--main-accent2-color);
   }
 
   @media screen and (max-width: 750px) {

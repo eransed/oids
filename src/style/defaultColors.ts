@@ -25,7 +25,7 @@ export const alertColors = {
 export const DeepMidnight: Theme = {
   name: 'DeepMidnight',
   bg: '#000033',
-  card: '#000022',
+  card: '#000029',
   text: '#CCCCCC',
   accent: '#8B7BFF',
 }

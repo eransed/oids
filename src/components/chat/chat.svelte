@@ -13,6 +13,7 @@
   import { Icons } from '../../style/icons'
   import Button90 from '../menu/Button90.svelte'
   import { initKeyControllers, initTouchControls, removeKeyControllers, removeTouchControls } from '../../lib/input'
+  import Info from '../info/info.svelte'
 
   let chatMsg: string
 
@@ -85,7 +86,7 @@
 </script>
 
 {#if chatTitle}
-  <p style="margin-left: 0.5em">Chat - {joinedSessionId}</p>
+  <Info text={`Chat @ ${joinedSessionId}`} />
 {/if}
 
 <div class="messages" id="messagesDiv">

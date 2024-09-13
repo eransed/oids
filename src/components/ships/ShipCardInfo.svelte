@@ -16,7 +16,7 @@
   }
 </script>
 
-<div class="shipWrapper" style="width: {width}; height: {height}">
+<div class="shipWrapper" style="width: {width}; height: {height};">
   <button on:click={() => handleClickShip()} class="imgCard" style="background-color: {chosenShip ? 'var(--main-accent2-color)' : 'var(--main-accent-color)'}">
     <div class="level">{ship.level}</div>
     <ShipCardImg {ship} />

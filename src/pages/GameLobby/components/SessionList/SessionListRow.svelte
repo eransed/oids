@@ -11,12 +11,12 @@
 </script>
 
 {#if header}
-  <th colspan="1">Session</th>
-  <th colspan="1">#players</th>
+  <th colspan="1">Name</th>
+  <th colspan="1">Players</th>
 {:else if session}
   <td>{session.id}</td>
   <td>{numberOfPlayers}</td>
-  <td style="color:#f00;">
+  <td style="color:#f00; transform: scale(0.8)">
     <Button90 disabled={session.id === localPlayer?.sessionId} borderBottom buttonConfig={{ buttonText: 'Join Game', clickCallback: () => joinSession && joinSession(session.id), selected: false }} />
   </td>
 {/if}

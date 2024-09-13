@@ -18,13 +18,12 @@ export const apiServer = () => {
   const useGoogleAuth = false
 
   if (useGoogleAuth) {
-
     router.use(
       session({
         secret: process.env.SESSION_SECRET || '',
         resave: false,
         saveUninitialized: true,
-      })
+      }),
     )
 
     useGoogleStrategy()
