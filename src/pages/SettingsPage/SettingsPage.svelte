@@ -35,7 +35,7 @@
   <Alert severity={alerto.severity} text={alerto.text} />
 {/if}
 <Page>
-  <div class="profileWrapper">
+  <div class="settingsWrapper">
     <div class="buttons">
       {#each Object.values(SettingsButtons) as button}
         <div>
@@ -53,22 +53,11 @@
 </Page>
 
 <style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
   :scope {
     --opacity: 0.5;
   }
 
-  td,
-  th {
-    text-align: left;
-    padding: 8px;
-  }
-
-  .profileWrapper {
+  .settingsWrapper {
     display: grid;
     justify-self: center;
     align-self: center;
@@ -78,22 +67,6 @@
     background-color: var(--main-card-color);
     border-radius: 0.5em;
     padding: 2em;
-  }
-
-  .content {
-    color: var(--main-text-color);
-    padding: 1em;
-    min-width: 500px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 80vh;
-    transition: all;
-    transition-duration: 2s;
-    border-left-style: ridge;
-    border-left-width: 2px;
-    border-left-color: var(--main-accent2-color);
-    display: grid;
-    max-width: 500px;
   }
 
   @keyframes spin {
@@ -121,11 +94,7 @@
   }
 
   @media screen and (max-width: 750px) {
-    .content {
-      min-width: 0px;
-      border: none;
-    }
-    .profileWrapper {
+    .settingsWrapper {
       grid-template-columns: 1fr;
     }
 
@@ -135,7 +104,7 @@
   }
 
   @media screen and (max-width: 750px) and (min-width: 100px) {
-    .profileWrapper {
+    .settingsWrapper {
       width: 100%;
       justify-items: center;
       grid-template-rows: auto 1fr;

@@ -4,9 +4,10 @@ import axios, { type AxiosResponse } from 'axios'
 // import type { Prisma, User } from '@prisma/client'
 import { getLocationURL } from '../../../utils/utils'
 import type { User } from '../../interface'
+import { getAccessTokenFromLocalStorage } from '../utils/Token'
 
 const updateUser = async (user: User): Promise<AxiosResponse<User | Error>> => {
-  const token = localStorage.getItem('accessToken')
+  const token = getAccessTokenFromLocalStorage()
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },

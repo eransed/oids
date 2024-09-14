@@ -242,7 +242,7 @@
           />
         </div>
       </div>
-      <div class="right" in:fly={{ duration: 500, delay: 350, x: -500 }}>
+      <div class="right" in:fly={{ duration: 500, x: 500 }}>
         <Chat joinedSessionId={joinedSession?.id} />
       </div>
     {/if}
@@ -297,9 +297,12 @@
   }
 
   .buttonWrapper {
-    justify-self: flex-end;
+    position: absolute;
     align-self: flex-end;
-    margin-bottom: 1em;
+    justify-self: flex-end;
+    /* justify-self: flex-end;
+    align-self: flex-end;
+    margin-bottom: 1em; */
   }
 
   @media screen and (max-width: 1200px) {

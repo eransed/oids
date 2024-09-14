@@ -10,5 +10,6 @@
     width: fit-content;
     position: absolute;
     top: 0;
+    z-index: 5;
   }
 </style>

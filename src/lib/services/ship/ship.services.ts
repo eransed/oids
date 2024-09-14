@@ -3,6 +3,7 @@ import axios, { type AxiosResponse } from 'axios'
 import type { ShipVariant } from '../../../style/ships'
 import { getLocationURL } from '../../../utils/utils'
 import type { Ship } from '../../interface'
+import { getAccessTokenFromLocalStorage } from '../utils/Token'
 
 export interface newShip {
   name: string
@@ -19,10 +20,8 @@ export interface newShip {
 //   userId: string
 // }
 
-export const createShipService = async (
-  newShip: Ship
-): Promise<AxiosResponse<Ship>> => {
-  const token = localStorage.getItem('accessToken')
+export const createShipService = async (newShip: Ship): Promise<AxiosResponse<Ship>> => {
+  const token = getAccessTokenFromLocalStorage()
 
   const config = {
     headers: {
@@ -42,13 +41,11 @@ export const createShipService = async (
   return response
 }
 
-export const getShips = async (
-  testToken?: string
-): Promise<AxiosResponse<Ship[]>> => {
+export const getShips = async (testToken?: string): Promise<AxiosResponse<Ship[]>> => {
   let token = ''
 
   if (!testToken) {
-    const savedToken = localStorage.getItem('accessToken')
+    const savedToken = getAccessTokenFromLocalStorage()
     if (savedToken) {
       token = savedToken
     }
@@ -75,7 +72,7 @@ export const getShips = async (
 }
 
 export const deleteShip = async (id: string): Promise<AxiosResponse<Ship>> => {
-  const token = localStorage.getItem('accessToken')
+  const token = getAccessTokenFromLocalStorage()
 
   const config = {
     headers: {
@@ -95,12 +92,8 @@ export const deleteShip = async (id: string): Promise<AxiosResponse<Ship>> => {
   return response
 }
 
-export const updateShip = async (
-  name: string,
-  variant: ShipVariant,
-  id: string
-): Promise<AxiosResponse<Ship>> => {
-  const token = localStorage.getItem('accessToken')
+export const updateShip = async (name: string, variant: ShipVariant, id: string): Promise<AxiosResponse<Ship>> => {
+  const token = getAccessTokenFromLocalStorage()
 
   const config = {
     headers: {

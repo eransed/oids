@@ -1,10 +1,11 @@
 // import type { Game } from '@prisma/client'
 import axios, { type AxiosResponse } from 'axios'
 import { getLocationURL } from '../../../utils/utils'
-import { Game } from '../../interface'
+import type { Game } from '../../interface'
+import { getAccessTokenFromLocalStorage } from '../utils/Token'
 
 export const saveGame = async (game: Game) => {
-  const token = localStorage.getItem('accessToken')
+  const token = getAccessTokenFromLocalStorage()
 
   const config = {
     headers: {

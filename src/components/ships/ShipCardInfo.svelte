@@ -10,13 +10,14 @@
   $: chosenShip = $localPlayerStore.ship.id === ship.id
   $: width = chosenShip ? '8em' : '6em'
   $: height = chosenShip ? '8em' : '6em'
+  $: boxShadow = chosenShip ? 'box-shadow: 0px 0px 2em var(--main-accent2-color);' : ''
 
   function handleClickShip() {
     clickedShip(ship)
   }
 </script>
 
-<div class="shipWrapper" style="width: {width}; height: {height};">
+<div class="shipWrapper" style="width: {width}; height: {height}; boxShadow: {boxShadow}">
   <button on:click={() => handleClickShip()} class="imgCard" style="background-color: {chosenShip ? 'var(--main-accent2-color)' : 'var(--main-accent-color)'}">
     <div class="level">{ship.level}</div>
     <ShipCardImg {ship} />

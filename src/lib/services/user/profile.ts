@@ -9,14 +9,17 @@ import { localPlayerStore, userStore } from '../../../stores/stores'
 import { setCssFromSettings } from '../../../style/defaultColors'
 import { getLocationURL } from '../../../utils/utils'
 import type { User } from '../../interface'
+import { getAccessTokenFromLocalStorage } from '../utils/Token'
 
 const getProfile = async (testToken?: string): Promise<AxiosResponse<User>> => {
   let token = ''
 
   if (!testToken) {
-    const savedToken = localStorage.getItem('accessToken')
+    const savedToken = getAccessTokenFromLocalStorage()
     if (savedToken) {
       token = savedToken
+    } else {
+      throw new Error('No token found in storage')
     }
   } else {
     token = testToken

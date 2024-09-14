@@ -31,9 +31,12 @@
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import { getThemeNumber, themes } from '../../style/defaultColors'
   import type { Theme } from '../../lib/interface'
+  import { getAccessTokenFromLocalStorage } from '../../lib/services/utils/Token'
 
   onMount(async () => {
-    if (!$userStore) {
+    const token = getAccessTokenFromLocalStorage()
+
+    if (!$userStore && token) {
       const user = await getProfile()
       if (user.data) {
         chosenTheme = themes[user.data.theme]

@@ -4,9 +4,10 @@ import axios, { AxiosError, type AxiosResponse } from 'axios'
 import type { Tokens } from '../../interface'
 
 import { getLocationURL } from '../../../utils/utils'
+import { getAccessTokenFromLocalStorage } from '../utils/Token'
 
 const register = async (email: string, name: string, password: string): Promise<AxiosResponse<Tokens>> => {
-  const token = localStorage.getItem('accessToken')
+  const token = getAccessTokenFromLocalStorage()
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },

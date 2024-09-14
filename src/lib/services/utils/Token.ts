@@ -59,3 +59,8 @@ export const validateToken = async () => {
       localStorage.removeItem('accessToken')
     })
 }
+
+export function getAccessTokenFromLocalStorage(): string | null {
+  const accesToken = localStorage.getItem('accessToken')
+  return accesToken
+}
