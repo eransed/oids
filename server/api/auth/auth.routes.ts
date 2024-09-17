@@ -11,7 +11,7 @@ export const auth = express.Router()
 
 import { createUser, findUserByEmail } from '../users/users.services'
 
-import { createNewUser } from '../utils/factory'
+import { createHashedPassword, createNewUser } from '../utils/factory'
 import { User } from '@prisma/client'
 import { Tokens } from '../../../src/lib/interface'
 //Register endpoint
@@ -30,9 +30,10 @@ auth.post('/register', async (req, res, next) => {
       throw new Error('Email already in use.')
     }
 
-    const newUser = createNewUser(email, name, password)
+    const newUser = createNewUser(email, name)
+    const hashedPassword = createHashedPassword(password)
 
-    const user = await createUser(newUser)
+    const user = await createUser(newUser, hashedPassword)
     const jti = uuidv4()
     const { accessToken, refreshToken } = generateTokens(user, jti)
     await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id })
@@ -64,7 +65,12 @@ auth.post('/login', async (req, res, next) => {
     }
 
     //Check incoming password against existing users password
-    const validPassword = await bcrypt.compare(password, existingUser.password)
+    if (!existingUser.password?.hashedValue) {
+      res.status(403)
+      throw new Error('Invalid login credentials.')
+    }
+
+    const validPassword = await bcrypt.compare(password, existingUser.password.hashedValue)
     if (!validPassword) {
       res.status(403)
       throw new Error('Invalid login credentials.')

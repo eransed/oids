@@ -15,7 +15,7 @@ export const apiServer = () => {
 
   /** Routes */
 
-  const useGoogleAuth = false
+  const useGoogleAuth = true
 
   if (useGoogleAuth) {
     router.use(

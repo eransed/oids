@@ -2,13 +2,15 @@ import { User, Ship } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { randomUUID } from 'crypto'
 
-export function createNewUser(email: string, name: string, password: string): User {
+export function createHashedPassword(password: string) {
   const hashedPw = bcrypt.hashSync(password, 12)
+  return hashedPw
+}
 
+export function createNewUser(email: string, name: string): User {
   const newUser: User = {
     id: randomUUID(),
     email: email,
-    password: hashedPw,
     name: name,
     createdAt: new Date(),
     updatedAt: new Date(),

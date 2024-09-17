@@ -24,10 +24,6 @@ users.get('/profile', isAuthenticated, async (req: Request, res: Response, next:
 
       const user: User | null = await findUserById(payLoadFromJWt.payload.userId)
 
-      if (user) {
-        user.password = ''
-      }
-
       if (!user) {
         res.status(404)
         throw new Error('No user found')

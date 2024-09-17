@@ -1,35 +1,33 @@
 import db from '../utils/db'
 
 // import { User, newUser } from '../types/user'
-import { Prisma, User } from '@prisma/client'
+import { Prisma, User, Password } from '@prisma/client'
 import { randomUUID } from 'crypto'
 
 // Exclude keys from user
-function exclude(user: User, keys: string[]): UserNoPassword {
-  const userNoPw: UserNoPassword = {} as UserNoPassword
 
-  Object.entries(user).forEach(([key, value]) => {
-    if (!keys.includes(key)) {
-      userNoPw[key as keyof UserNoPassword] = value as never
-    }
-  })
-
-  return userNoPw
-}
 export const findUserByEmail = (email: string) => {
   return db.user.findUnique({
     where: {
       email,
     },
+    include: { password: true },
   })
 }
 
-export const createUser = (user: User) => {
-  user.id = randomUUID()
-
-  return db.user.create({
+export const createUser = async (user: User, password: string) => {
+  const newUser = await db.user.create({
     data: user,
   })
+
+  await db.password.create({
+    data: {
+      id: randomUUID(),
+      hashedValue: password,
+      userId: newUser.id,
+    },
+  })
+  return newUser
 }
 
 export const findUserById = (id: string) => {
@@ -79,16 +77,10 @@ export const updateUser = async (user: User): Promise<User> => {
     })
 }
 
-type UserNoPassword = Omit<User, 'password'>
-
 export const getUsers = async () => {
   const users = await db.user.findMany({})
-  const filtered: UserNoPassword[] = []
-  users.forEach((u) => {
-    filtered.push(exclude(u, ['password']))
-  })
-  return filtered
-  // return users
+
+  return users
 }
 
 /**

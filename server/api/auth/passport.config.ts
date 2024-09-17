@@ -43,7 +43,7 @@ export function useGoogleStrategy() {
             console.log('User found: ', user)
             done(null, user)
           } else {
-            const newUser = await createUser(createNewUser(profile._json.email, profile._json.given_name, ''))
+            const newUser = await createUser(createNewUser(profile._json.email, profile._json.given_name), '')
             console.log('Created new user: ', newUser)
             done(null, newUser)
           }
@@ -51,8 +51,8 @@ export function useGoogleStrategy() {
           console.error(err)
           done()
         }
-      }
-    )
+      },
+    ),
   )
 
   passport.serializeUser(function (user: Express.User, done) {
