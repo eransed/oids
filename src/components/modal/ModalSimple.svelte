@@ -6,6 +6,7 @@
 
   //Components
   import Button90 from '../menu/Button90.svelte'
+  import { fade } from 'svelte/transition'
 
   interface Step {
     //Desc = description
@@ -19,7 +20,7 @@
   export let disabled: boolean = false
   export let title: string = ''
   export let steps: Step[] = []
-  export let doneCallback: () => void = () => {}
+  export let doneCallback: (done: boolean) => void = () => {}
 
   /**
    *
@@ -60,7 +61,9 @@
     }).length
 
     if (stepProgress === steps.length) {
-      doneCallback()
+      doneCallback(true)
+    } else {
+      doneCallback(false)
     }
   }
 </script>
@@ -73,12 +76,19 @@
     <div class="dialogButtons">
       {#if steps.length > 0}
         <ol style="text-align: left;">
-          <p>
-            Done: {stepProgress}/{steps.length}
+          <p style="text-align: left;">
+            Progress: {stepProgress}/{steps.length}
           </p>
 
           {#each steps as step}
-            <li style="color: {step.completed ? 'var(--main-accent2-color)' : ''}">{step.desc}</li>
+            <li style="color: {step.completed ? 'var(--main-accent2-color)' : ''}">
+              {step.desc}
+              {#if step.completed}
+                ☑️
+              {:else}
+                ◼️
+              {/if}
+            </li>
           {/each}
         </ol>
         <br />

@@ -177,6 +177,7 @@
   }
 
   button:disabled {
+    opacity: 0.2;
     cursor: not-allowed;
     filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(1%);
   }

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { AlertType } from '../../../../components/alert/AlertType'
+  import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../../../components/menu/Button90.svelte'
   import ShipCardInfo from '../../../../components/ships/ShipCardInfo.svelte'
   import { localPlayerStore, userStore } from '../../../../stores/stores'
@@ -8,7 +9,7 @@
 
   let alert: AlertType | undefined = undefined
 
-  let openModal = false
+  let openModal = $userStore?.ships.length === 0 ? true : false
 </script>
 
 <div class="sessionInfo">
@@ -18,25 +19,32 @@
         <ShipCardInfo ship={shippy} clickedShip={(shippy) => ($localPlayerStore.ship = shippy)} />
       {/each}
       <!-- New ship button to create ship -->
-      <div class="newShipButton">
-        <Button90
-          textColor="#000"
-          icon={Icons.Add}
-          addInfo="New Ship"
-          buttonConfig={{
-            buttonText: 'New ship',
-            clickCallback: () => {
-              openModal = true
-            },
-            selected: false,
-          }}
-        />
-      </div>
+      {#if !openModal}
+        <button class="newShipButton" on:click={() => (openModal = true)}>
+          <Button90
+            textColor="#000"
+            icon={Icons.Add}
+            addInfo="New Ship"
+            buttonConfig={{
+              buttonText: 'New ship',
+              clickCallback: () => {
+                //
+              },
+              selected: false,
+            }}
+          />
+        </button>
+      {:else}
+        <div class="newShipButton modalOpen">
+          <CircularSpinner />
+        </div>
+      {/if}
       <AddShip
         {openModal}
         closeModal={(newShip) => {
           openModal = false
           if (newShip) {
+            $localPlayerStore.ship = newShip
             alert = {
               severity: 'success',
               text: `Save successful!`,
@@ -67,9 +75,25 @@
     align-content: center;
     flex-wrap: wrap;
     background-color: var(--main-accent-color);
-    border-radius: 1.5em;
-    transform: scale(0.8);
-    height: 8.5em;
+    border: none;
+    border-radius: 2em;
+    height: 8em;
+    margin-top: 1.3em;
+    width: 7em;
+    transition: all 500ms;
+  }
+
+  .newShipButton:hover {
+    background-color: var(--main-accent2-color);
+    height: 10.3em;
+    width: 9em;
+    transition: all 500ms;
+  }
+
+  .modalOpen {
+    background-color: var(--main-accent2-color);
+
+    transition: all 500ms;
   }
   .shipCards {
     max-width: 45em;

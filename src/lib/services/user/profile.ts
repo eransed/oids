@@ -8,21 +8,19 @@ import { localPlayerStore, userStore } from '../../../stores/stores'
 // import type { Prisma, User } from '@prisma/client'
 import { setCssFromSettings } from '../../../style/defaultColors'
 import { getLocationURL } from '../../../utils/utils'
-import type { User } from '../../interface'
+import type { Ship, User } from '../../interface'
 import { getAccessTokenFromLocalStorage } from '../utils/Token'
 
-const getProfile = async (testToken?: string): Promise<AxiosResponse<User>> => {
+const getProfile = async (chosenShip?: Ship): Promise<AxiosResponse<User>> => {
   let token = ''
 
-  if (!testToken) {
-    const savedToken = getAccessTokenFromLocalStorage()
-    if (savedToken) {
-      token = savedToken
-    } else {
-      throw new Error('No token found in storage')
-    }
+  console.log('newShip ', chosenShip)
+
+  const savedToken = getAccessTokenFromLocalStorage()
+  if (savedToken) {
+    token = savedToken
   } else {
-    token = testToken
+    throw new Error('No token found in storage')
   }
 
   const config = {
@@ -35,14 +33,17 @@ const getProfile = async (testToken?: string): Promise<AxiosResponse<User>> => {
       userStore.set(response.data)
 
       const user = response.data
+
       const defaultShip = user.ships[0]
 
-      localPlayerStore.update((v) => ({ ...v, id: user.id, ship: defaultShip ?? [] }))
+      const chosenUserShip = user.ships.find((ship) => ship.name === chosenShip?.name)
+
+      localPlayerStore.update((v) => ({ ...v, id: user.id, ship: chosenUserShip ?? defaultShip }))
 
       console.log('Welcome: ', response.data.name, response.data)
-      if (!testToken) {
-        setCssFromSettings(response.data.theme)
-      }
+
+      setCssFromSettings(response.data.theme)
+
       return response
     })
     .catch((err) => {

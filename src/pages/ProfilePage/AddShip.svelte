@@ -12,12 +12,13 @@
   import { localPlayerStore, userStore } from '../../stores/stores'
   import { createShip } from '../../lib/factory'
   import type { Ship } from '../../lib/interface'
-  import Alert from '../../components/alert/Alert.svelte'
+  import { ShipVariant } from '../../style/ships'
 
   //Props
   export let loading: boolean = false
   export let openModal: boolean = false
   export let closeModal: (newShip?: Ship) => void = () => {}
+  export let cancelButton: boolean = true
 
   let newShipDone: boolean = false
 
@@ -39,7 +40,7 @@
             loading = false
             openModal = false
             closeModal(newShip)
-            getProfile().then(() => {
+            getProfile(newShip).then(() => {
               resolve()
             })
           }
@@ -50,15 +51,22 @@
     })
   }
 
-  // steps={Object.values(newShip).map((v, i) => {
-  //     const key = Object.keys(newShip)[i]
+  interface Step {
+    //Desc = description
+    desc: string
+    completed: boolean
+  }
 
-  //     return { desc: `${key}`, completed: !!v }
-  //   })}
+  let chosenType = false
+
+  $: nameStep = { desc: 'Name', completed: newShip.name.length > 1 ? true : false } as Step
+  $: shipType = { desc: 'Ship Type', completed: chosenType } as Step
 </script>
 
 {#if openModal}
   <ModalSimple
+    {cancelButton}
+    steps={[nameStep, shipType]}
     title="Add a new ship to your collection"
     disabled={loading || !newShipDone}
     closeBtn={() => {
@@ -66,11 +74,17 @@
       openModal = false
     }}
     saveBtn={async () => handleNewShip()}
-    doneCallback={() => (newShipDone = true)}
+    doneCallback={(done) => {
+      if (done) {
+        newShipDone = true
+      } else {
+        newShipDone = false
+      }
+    }}
   >
     <div style="display: flex; text-align:center; color: var(--main-text-color); display: flex; width: 100%" in:fade={{ duration: 250, delay: 50 }}>
-      <h3 style="align-self: center">Name your new ship 🚀:</h3>
-      <input disabled={loading} bind:value={newShip.name} placeholder="Name" />
+      <h3 style="align-self: center">Name your ship:</h3>
+      <input disabled={loading} bind:value={newShip.name} placeholder="Name 🚀 - Min 2 chars" />
     </div>
     <div style="width: 100%; color: var(--main-text-color)">
       <h3 style="align-self: center">Choose your ship type</h3>
@@ -78,10 +92,16 @@
 
     {#each Object.values(ShipBundles) as Ship, i}
       <button
+        title={ShipVariant[Ship.type]}
         class="imgCard"
-        style="background: {Ship.type === newShip.variant ? 'var(--main-accent2-color)' : ''};
+        style="background: {Ship.type === newShip.variant && chosenType ? 'var(--main-accent2-color)' : ''};
   animation-delay: {150 * i}ms;"
-        on:click={() => (newShip.variant = Ship.type)}><img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
+        on:click={() => {
+          newShip.variant = Ship.type
+          chosenType = true
+        }}
+      >
+        <img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
       >
     {/each}
   </ModalSimple>

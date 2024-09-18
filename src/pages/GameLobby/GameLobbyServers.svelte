@@ -19,7 +19,6 @@
   import { onDestroy, onMount } from 'svelte'
   import { navigate } from 'svelte-routing'
   import { info, log, warn } from 'mathil'
-  import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
 
   //Assets
