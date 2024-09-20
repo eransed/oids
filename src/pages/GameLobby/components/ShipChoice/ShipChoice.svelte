@@ -1,14 +1,10 @@
 <script lang="ts">
-  import Alert from '../../../../components/alert/Alert.svelte'
-  import type { AlertType } from '../../../../components/alert/AlertType'
   import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../../../components/menu/Button90.svelte'
   import ShipCardInfo from '../../../../components/ships/ShipCardInfo.svelte'
-  import { localPlayerStore, userStore } from '../../../../stores/stores'
+  import { alertStore, localPlayerStore, userStore } from '../../../../stores/stores'
   import { Icons } from '../../../../style/icons'
   import AddShip from '../../../../components/ships/AddShip.svelte'
-
-  let alert: AlertType | undefined = undefined
 
   let openModal = $userStore?.ships.length === 0 ? true : false
 </script>
@@ -46,10 +42,10 @@
           closeModal={(newShip) => {
             openModal = false
             if (newShip) {
-              alert = {
+              alertStore.set({
                 severity: 'success',
                 text: `Save successful!`,
-              }
+              })
             }
           }}
         />
@@ -59,7 +55,6 @@
     {/if}
   </div>
 </div>
-<Alert severity={alert?.severity} text={alert?.text} />
 
 <style>
   @keyframes fly {

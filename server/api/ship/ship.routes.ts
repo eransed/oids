@@ -13,33 +13,15 @@ import { ApiError } from '../utils/apiError'
 export const ship = express.Router()
 
 ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
-  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
-
   try {
-    const { authorization } = req.headers
     const newShip: Ship = req.body
+    const callerId = req.params.userId //Coming from isAuthenticated middleware
 
-    if (!authorization) {
-      res.status(401).send('You are not logged in.')
-      throw new Error('No authorization')
+    if (!callerId) {
+      throw new ApiError('No user found.', StatusCodes.NOT_FOUND)
     }
 
-    const token = authorization.split(' ')[1]
-    const payLoadFromJWt = await getPayLoadFromJwT(token, process.env.JWT_ACCESS_SECRET).catch(() => {
-      res.status(401).send('Error on getting payload from JwT')
-    })
-
-    if (!payLoadFromJWt) return
-
-    const caller: User | null = await findUserById(payLoadFromJWt.payload.userId)
-
-    if (!caller) {
-      res.status(401).send('No user found, cant create ship')
-      throw new Error('No user found.')
-    }
-
-    const ship = createNewShip(newShip.name, newShip.variant, caller.id)
-
+    const ship = createNewShip(newShip.name, newShip.variant, callerId)
     const createdShip = await createShip(ship)
 
     res.json(createdShip)

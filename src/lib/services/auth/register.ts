@@ -5,24 +5,20 @@ import type { Tokens } from '../../interface'
 
 import { getLocationURL } from '../../../utils/utils'
 import { getAccessTokenFromLocalStorage } from '../utils/Token'
-
-const register = async (email: string, name: string, password: string): Promise<AxiosResponse<Tokens>> => {
+import { handleAxiosError } from '../utils/errorHandler'
+const register = async (email: string, name: string, password: string) => {
   const token = getAccessTokenFromLocalStorage()
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   }
 
-  const response: AxiosResponse<Tokens> = await axios
-    .post(`http://${getLocationURL()}:6060/api/v1/auth/register`, { email, name, password }, config)
-    .then((data: AxiosResponse<Tokens>) => {
-      return data
-    })
-    .catch((err: AxiosError) => {
-      throw new Error(err.message)
-    })
-
-  return response
+  try {
+    const response: AxiosResponse<Tokens> = await axios.post(`http://${getLocationURL()}:6060/api/v1/auth/register`, { email, name, password }, config)
+    return response.data
+  } catch (err: any) {
+    handleAxiosError(err)
+  }
 }
 
 export default register

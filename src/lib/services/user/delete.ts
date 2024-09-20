@@ -3,6 +3,7 @@ import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { getLocationURL } from '../../../utils/utils'
 import type { User } from '../../interface'
 import { getAccessTokenFromLocalStorage } from '../utils/Token'
+import { alertStore } from '../../../stores/stores'
 
 export async function deleteUser(email: string): Promise<AxiosResponse<User>> {
   const token = getAccessTokenFromLocalStorage()
@@ -16,6 +17,10 @@ export async function deleteUser(email: string): Promise<AxiosResponse<User>> {
   const response: AxiosResponse<User> = await axios
     .post(`http://${getLocationURL()}:6060/api/v1/users/deleteUser`, { email }, config)
     .then((response: AxiosResponse<User>) => {
+      alertStore.set({
+        severity: 'success',
+        text: `Your account has been deleted forever :(`,
+      })
       return response
     })
     .catch((err) => {

@@ -7,8 +7,6 @@
   import Page from '../../components/page/page.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
   import { SettingsButtons } from './SettingsButtons'
-  import Alert from '../../components/alert/Alert.svelte'
-
   //Util
   import { onDestroy, onMount } from 'svelte'
 
@@ -27,13 +25,8 @@
   })
 
   pageHasHeaderStore.set(true)
-
-  let alerto: AlertType
 </script>
 
-{#if alerto}
-  <Alert severity={alerto.severity} text={alerto.text} />
-{/if}
 <Page>
   <div class="settingsWrapper">
     <div class="buttons">

@@ -12,8 +12,7 @@
   import { createShip } from '../../lib/factory'
   import type { Ship } from '../../lib/interface'
   import { ShipVariant } from '../../style/ships'
-  import type { AlertType } from '../alert/AlertType'
-  import Alert from '../alert/Alert.svelte'
+
   import { handleAxiosError } from '../../lib/services/utils/errorHandler'
 
   //Props
@@ -47,8 +46,7 @@
       }
     } catch (err: any) {
       loading = false
-      const errorMessage = handleAxiosError(err)
-      alert = { severity: 'error', text: errorMessage }
+      handleAxiosError(err)
     }
   }
 
@@ -62,8 +60,6 @@
 
   $: nameStep = { desc: 'Name', completed: newShip.name.length > 1 ? true : false } as Step
   $: shipType = { desc: 'Ship Type', completed: chosenType } as Step
-
-  let alert: AlertType | undefined = undefined
 </script>
 
 {#if openModal && newShip}
@@ -107,7 +103,6 @@
         <img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
       >
     {/each}
-    <Alert severity={alert?.severity} text={alert?.text} />
   </ModalSimple>
 {/if}
 

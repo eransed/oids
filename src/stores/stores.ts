@@ -7,10 +7,13 @@ import { getWsUrl } from '../lib/websocket/ws'
 import type { Settings } from '../lib/interface'
 import { cnvTheme, DeepMidnight } from '../style/defaultColors'
 import { gUser, createdGuestName } from '../utils/utils'
+import type { AlertType } from '../components/alert/AlertType'
 
 // export const userIncludes = Prisma.validator<Prisma.UserArgs>()({
 //   include: { ships: true, gameHistory: true },
 // })
+
+export const alertStore: Writable<AlertType | undefined> = writable(undefined)
 
 export const userStore: Writable<User | undefined> = writable(undefined)
 

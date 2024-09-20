@@ -34,7 +34,6 @@
   import Sessions from './components/Sessions/Sessions.svelte'
   import ShipChoice from './components/ShipChoice/ShipChoice.svelte'
   import Info from '../../components/info/info.svelte'
-  import type { AlertType } from '../../components/alert/AlertType'
   import { getProfile } from '../../lib/services/user/profile'
 
   pageHasHeaderStore.set(true)

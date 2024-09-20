@@ -6,7 +6,7 @@
   import { logOutButton, loginButton, loginGoogle } from './profileButtons'
 
   //Stores
-  import { userStore } from '../../stores/stores'
+  import { alertStore, userStore } from '../../stores/stores'
 
   //Svelte
   import { fade } from 'svelte/transition'
@@ -16,17 +16,10 @@
   import { getProfile } from '../../lib/services/user/profile'
 
   //Assets
-  import Alert from '../alert/Alert.svelte'
-  import type { AlertType } from '../alert/AlertType'
   import { navigate } from 'svelte-routing'
   import { Icons } from '../../style/icons'
 
   let loading: boolean = false
-
-  let alert: AlertType = {
-    severity: 'error',
-    text: '',
-  }
 
   const handleSubmit = async (e: Event): Promise<void> => {
     loading = true
@@ -45,10 +38,7 @@
           loading = false
         })
         .catch(() => {
-          alert = {
-            severity: 'error',
-            text: 'Wrong email or password, try again!',
-          }
+          alertStore.set({ severity: 'error', text: 'Wrong email or password, try again!' })
           loading = false
         })
     }
@@ -71,7 +61,6 @@
         <Button90 buttonType="button" buttonConfig={loginGoogle} mouseTracking={false} socialIcon={Icons.Google} addInfo="Login with Google" />
       </div>
     </form>
-    <Alert severity={alert.severity} text={alert.text} />
   </div>
 {/if}
 {#if $userStore}

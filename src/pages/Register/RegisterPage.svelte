@@ -12,11 +12,13 @@
 
   async function handleSubmit() {
     try {
-      const tokens = await register(email, name, password).then((d) => d.data)
+      const tokens = await register(email, name, password)
 
-      loginHandler(tokens.accessToken, tokens.refreshToken)
-    } catch (e) {
-      console.error(e)
+      if (tokens) {
+        await loginHandler(tokens.accessToken, tokens.refreshToken)
+      }
+    } catch (e: any) {
+      console.log(e.response)
     }
   }
 </script>

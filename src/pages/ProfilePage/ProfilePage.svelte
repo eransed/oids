@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { pageHasHeaderStore, userStore, settingsStore, localPlayerStore } from '../../stores/stores'
+  import { pageHasHeaderStore, userStore, settingsStore, localPlayerStore, alertStore } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -8,7 +8,7 @@
   import Page from '../../components/page/page.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
   import { ProfileButtons } from './ProfileButtons'
-  import Alert from '../../components/alert/Alert.svelte'
+
   import AddShip from '../../components/ships/AddShip.svelte'
   import Ships from './Ships.svelte'
 
@@ -27,7 +27,7 @@
   import updateUser from '../../lib/services/user/updateUser'
 
   //Component
-  import type { AlertType } from '../../components/alert/AlertType'
+
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import { getThemeNumber, themes } from '../../style/defaultColors'
   import type { Theme } from '../../lib/interface'
@@ -66,7 +66,6 @@
   pageHasHeaderStore.set(true)
 
   let openModal: boolean = false
-  let alert: AlertType | undefined = undefined
 
   let loading: boolean = false
   let editSettings: boolean = false
@@ -91,10 +90,10 @@
           .then((res) => {
             if (res.status === 200) {
               handleLogout($localPlayerStore.sessionId)
-              alert = {
+              alertStore.set({
                 severity: 'success',
                 text: `Your account has been deleted forever :(`,
-              }
+              })
               loading = false
             }
           })
@@ -141,25 +140,22 @@
       .then((d) => {
         avatarDialog = false
 
-        alert = {
+        alertStore.set({
           severity: 'success',
           text: 'Your avatar is now updated!',
-        }
+        })
       })
       .catch((err: Error) => {
         console.error(err)
         avatarDialog = false
-        alert = {
+        alertStore.set({
           severity: 'error',
           text: err.message,
-        }
+        })
       })
   }
 </script>
 
-{#if alert}
-  <Alert severity={alert.severity} text={alert.text} />
-{/if}
 <Page>
   <div class="profileWrapper">
     {#if $userStore}
@@ -195,10 +191,10 @@
               closeModal={(newShip) => {
                 openModal = false
                 if (newShip) {
-                  alert = {
+                  alertStore.set({
                     severity: 'success',
                     text: `Save successful!`,
-                  }
+                  })
                   getProfile()
                 }
               }}

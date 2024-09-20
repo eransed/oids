@@ -4,7 +4,6 @@
 
   //Components
   import Page from '../../components/page/page.svelte'
-  import Alert from '../../components/alert/Alert.svelte'
   import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../components/menu/Button90.svelte'
 
@@ -20,7 +19,6 @@
 
   //Interfaces
   // import type { Prisma, User } from '@prisma/client'
-  import type { AlertType } from '../../components/alert/AlertType'
   import { fade } from 'svelte/transition'
   import { deleteUser } from '../../lib/services/user/delete'
 
@@ -54,7 +52,6 @@
   let name = ''
   let email = ''
   let role = 'guest'
-  let alert: AlertType | undefined = undefined
   let addNewUser = false
   let users: User[] = []
   let loading = false
@@ -85,10 +82,6 @@
         .then((res) => {
           if (res.status === 200) {
             loading = false
-            alert = {
-              severity: 'success',
-              text: `User updated successfully to ${editedUser.name}, ${editedUser.email}, ${editedUser.role} `,
-            }
             editingUser = undefined
             edit = false
             if ($userStore && $userStore.id === editedUser.id) {
@@ -99,19 +92,11 @@
             console.log(error)
             if (axios.isAxiosError(error)) {
               getUsers()
-              alert = {
-                severity: 'error',
-                text: `${error.response?.data}`,
-              }
             }
           }
         })
         .catch((err: AxiosError) => {
           loading = false
-          alert = {
-            severity: 'error',
-            text: err.message,
-          }
           throw new Error(err.message)
         })
     }
@@ -121,32 +106,17 @@
     loading = true
     await register(newUser.email, newUser.name, newUser.password)
       .then((res) => {
-        if (res.status === 200) {
+        if (res) {
           loading = false
 
-          alert = {
-            severity: 'success',
-            text: `New user ${newUser.name} added!`,
-          }
           addNewUser = false
           getUsers()
         } else {
           loading = false
-          const error = res
-          if (axios.isAxiosError(error)) {
-            alert = {
-              severity: 'warning',
-              text: `Could not save: ${error.response?.data}`,
-            }
-          }
         }
       })
       .catch((error: AxiosError) => {
         loading = false
-        alert = {
-          severity: 'warning',
-          text: `Could not save: ${error.response?.data}`,
-        }
       })
   }
 
@@ -164,20 +134,11 @@
                 editingUser = undefined
                 loading = false
                 console.log(res)
-                alert = {
-                  severity: 'success',
-                  text: `${res.data.name} deleted!`,
-                }
+
                 getUsers()
               } else {
                 loading = false
                 const error = res
-                if (axios.isAxiosError(error)) {
-                  alert = {
-                    severity: 'warning',
-                    text: `Could not delete user: ${error.response?.data}`,
-                  }
-                }
               }
             })
             .catch((err) => {
@@ -195,10 +156,6 @@
     }
   }
 </script>
-
-{#if alert}
-  <Alert severity={alert.severity} text={alert.text} />
-{/if}
 
 {#if $userStore}
   {#if $userStore.role === 'admin'}
