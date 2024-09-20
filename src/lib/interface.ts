@@ -481,3 +481,10 @@ export interface Star {
   speedFactor: number
   size: number
 }
+
+//Step to be completed in any task given
+export interface Step {
+  //Desc = description
+  desc: string
+  completed: boolean
+}

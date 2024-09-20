@@ -10,7 +10,7 @@
   // import type { Ship } from '@prisma/client'
   import { localPlayerStore, userStore } from '../../stores/stores'
   import { createShip } from '../../lib/factory'
-  import type { Ship } from '../../lib/interface'
+  import type { Ship, Step } from '../../lib/interface'
   import { ShipVariant } from '../../style/ships'
 
   import { handleAxiosError } from '../../lib/services/utils/errorHandler'
@@ -48,12 +48,6 @@
       loading = false
       handleAxiosError(err)
     }
-  }
-
-  interface Step {
-    //Desc = description
-    desc: string
-    completed: boolean
   }
 
   let chosenType = false

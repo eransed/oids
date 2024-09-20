@@ -7,12 +7,7 @@
   //Components
   import Button90 from '../menu/Button90.svelte'
   import { fade } from 'svelte/transition'
-
-  interface Step {
-    //Desc = description
-    desc: string
-    completed: boolean
-  }
+  import type { Step } from '../../lib/interface'
 
   //Props
   export let closeBtn = () => {}
