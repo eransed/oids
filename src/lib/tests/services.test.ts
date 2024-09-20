@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import login from '../services/auth/login'
-import getProfile from '../services/user/profile'
+import { getProfile } from '../services/user/profile'
 import { getShips } from '../services/ship/ship.services'
 import { getActiveSessions } from '../services/game/activeSessions'
 // import type { User, Prisma, Ship } from '@prisma/client'
@@ -19,7 +19,7 @@ describe('Services tests', () => {
   })
 
   it('getProfile service', async () => {
-    const result = await getProfile(accessToken)
+    const result = await getProfile()
     expect(result.status).toBe(200)
     expectTypeOf(result.data).toMatchTypeOf<User>()
   })

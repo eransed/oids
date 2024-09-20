@@ -3,7 +3,7 @@
   import type { Tokens } from '../../lib/interface'
 
   import queryString from 'query-string'
-  import getProfile from '../../lib/services/user/profile'
+  import { getProfile } from '../../lib/services/user/profile'
   import Page from '../../components/page/page.svelte'
   import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
 

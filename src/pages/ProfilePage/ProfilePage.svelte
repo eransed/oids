@@ -14,7 +14,7 @@
 
   //Util
   import { formatDate } from '../../utils/utils'
-  import getProfile from '../../lib/services/user/profile'
+  import { getProfile } from '../../lib/services/user/profile'
   import { onMount } from 'svelte'
   import { handleLogout } from '../../utils/logoutHandler'
 
@@ -45,6 +45,17 @@
 
     if ($userStore) {
       chosenTheme = themes[$userStore.theme]
+    }
+
+    try {
+      const userProfile = await getProfile(false)
+      if (JSON.stringify(userProfile.data) !== JSON.stringify($userStore)) {
+        await getProfile()
+      } else {
+        console.log('ok')
+      }
+    } catch (err) {
+      console.error(err)
     }
   })
 
@@ -188,6 +199,7 @@
                     severity: 'success',
                     text: `Save successful!`,
                   }
+                  getProfile()
                 }
               }}
             />

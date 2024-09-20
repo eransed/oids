@@ -2,7 +2,7 @@
   // import type { Ship } from '@prisma/client'
   import { formatDate } from '../../utils/utils'
   import { deleteShip, updateShip } from '../../lib/services/ship/ship.services'
-  import getProfile from '../../lib/services/user/profile'
+  import { getProfile } from '../../lib/services/user/profile'
   import { userStore } from '../../stores/stores'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   import { ShipBundles, getShipBundleCache } from '../../style/ships'

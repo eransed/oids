@@ -64,7 +64,7 @@ model Player {
 model Ship {
   id         String   @id @unique @default(uuid())
   level      Int      @default(1)
-  name       String
+  name       String   @unique
   updatedAt  DateTime @updatedAt
   createdAt  DateTime @default(now())
   experience Int      @default(0)

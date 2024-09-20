@@ -1,4 +1,4 @@
-import axios, { type AxiosResponse } from 'axios'
+import axios, { AxiosError, type AxiosResponse } from 'axios'
 // import type { Ship } from '@prisma/client'
 import type { ShipVariant } from '../../../style/ships'
 import { getLocationURL } from '../../../utils/utils'
@@ -29,13 +29,13 @@ export const createShipService = async (newShip: Ship): Promise<AxiosResponse<Sh
     },
   }
 
-  const response: AxiosResponse<Ship> = await axios
+  const response: AxiosResponse<Ship, AxiosError> = await axios
     .post(`http://${getLocationURL()}:6060/api/v1/ship/create`, newShip, config)
     .then((response: AxiosResponse<Ship>) => {
       return response
     })
-    .catch((err) => {
-      throw new Error(err)
+    .catch((err: AxiosError) => {
+      throw new Error(err.message)
     })
 
   return response

@@ -26,11 +26,6 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
   return next()
 }
 
-module.exports = {
-  // ... other modules
-  isAuthenticated,
-}
-
 export const jwtAuth = (req: Request, next: NextFunction) => {
   const token = req.header('Authorization')
   if (!token) {
@@ -48,4 +43,19 @@ export const jwtAuth = (req: Request, next: NextFunction) => {
   }
 
   next()
+}
+
+export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err)
+  if (err.message) {
+    res.status(500).send({ errors: [{ message: err.message }] })
+  } else {
+    res.status(500).send({ errors: [{ message: 'Something went wrong' }] })
+  }
+}
+
+module.exports = {
+  // ... other modules
+  isAuthenticated,
+  errorHandler,
 }

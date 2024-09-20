@@ -6,13 +6,14 @@
 
   //Services
   import { createShipService } from '../../lib/services/ship/ship.services'
-  import getProfile from '../../lib/services/user/profile'
   import { ShipBundles } from '../../style/ships'
   // import type { Ship } from '@prisma/client'
   import { localPlayerStore, userStore } from '../../stores/stores'
   import { createShip } from '../../lib/factory'
   import type { Ship } from '../../lib/interface'
   import { ShipVariant } from '../../style/ships'
+  import type { AlertType } from '../../components/alert/AlertType'
+  import Alert from '../../components/alert/Alert.svelte'
 
   //Props
   export let loading: boolean = false
@@ -24,7 +25,7 @@
 
   let newShip: Ship = createShip('new')
 
-  async function handleNewShip(): Promise<void> {
+  async function handleNewShip() {
     if (!$userStore) {
       throw new Error("Can't create a new ship if user not logged in")
     }
@@ -32,23 +33,21 @@
     newShip.id = $userStore.id
     loading = true
 
-    return new Promise<void>((resolve, reject) => {
-      createShipService(newShip)
-        .then((response) => {
-          if (response.status === 200) {
-            $localPlayerStore.ship = response.data
-            loading = false
-            openModal = false
-            closeModal(newShip)
-            getProfile(newShip).then(() => {
-              resolve()
-            })
-          }
-        })
-        .catch((err) => {
-          reject(err)
-        })
-    })
+    try {
+      const response = await createShipService(newShip)
+      const createdShip = response.data
+
+      if (createdShip) {
+        $localPlayerStore.ship = response.data
+        $userStore.ships.push(response.data)
+        closeModal(response.data)
+        loading = false
+        openModal = false
+      }
+    } catch (err: any) {
+      console.log(err)
+      alert = { severity: 'error', text: err }
+    }
   }
 
   interface Step {
@@ -61,9 +60,11 @@
 
   $: nameStep = { desc: 'Name', completed: newShip.name.length > 1 ? true : false } as Step
   $: shipType = { desc: 'Ship Type', completed: chosenType } as Step
+
+  let alert: AlertType | undefined = undefined
 </script>
 
-{#if openModal}
+{#if openModal && newShip}
   <ModalSimple
     {cancelButton}
     steps={[nameStep, shipType]}
@@ -73,7 +74,7 @@
       closeModal()
       openModal = false
     }}
-    saveBtn={async () => handleNewShip()}
+    saveBtn={() => handleNewShip()}
     doneCallback={(done) => {
       if (done) {
         newShipDone = true
@@ -104,6 +105,7 @@
         <img draggable="false" src={Ship.svgUrl} alt={Ship.svgUrl} style=" margin: 1em" /></button
       >
     {/each}
+    <Alert severity={alert?.severity} text={alert?.text} />
   </ModalSimple>
 {/if}
 

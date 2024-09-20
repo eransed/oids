@@ -37,7 +37,7 @@
   import Button90 from '../../../../components/menu/Button90.svelte'
   import { Icons } from '../../../../style/icons'
   import { resetKeyMapToDefault } from '../Hotkeys/hotKeysChange'
-  import getProfile from '../../../../lib/services/user/profile'
+  import { getProfile } from '../../../../lib/services/user/profile'
 
   let game: Game
 

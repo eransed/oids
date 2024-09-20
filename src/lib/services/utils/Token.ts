@@ -2,7 +2,7 @@
 
 import axios from 'axios'
 import type { AxiosError, AxiosResponse } from 'axios'
-import getProfile from '../user/profile'
+import { getProfile } from '../user/profile'
 
 import { userLoadingStore } from '../../../stores/stores'
 

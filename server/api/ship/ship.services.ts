@@ -1,11 +1,26 @@
 import { getShipXpRequirement } from '../../../src/lib/services/utils/shipLevels'
 import db from '../utils/db'
-import { Ship } from '@prisma/client'
+import { Prisma, Ship } from '@prisma/client'
 
 export async function createShip(ship: Ship) {
-  return await db.ship.create({
-    data: ship,
-  })
+  try {
+    const newShip = await db.ship.create({
+      data: ship,
+    })
+
+    return newShip
+  } catch (err: any) {
+    // Handle specific database errors
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === 'P2002') {
+        // P2002 is a Prisma error for uniqueness constraint violation
+        throw new Error('Ship name already taken. Please choose another.')
+      }
+    }
+
+    // If it's another error, rethrow it
+    throw new Error('Failed to create ship: ' + err.message)
+  }
 }
 
 export async function updateShip(ship: Ship) {
@@ -39,7 +54,6 @@ export async function findShip(shipId: string): Promise<Ship | null> {
 }
 
 export async function updateShipExperienceAndLevel(shipId: string, xpIncrementValue = 50): Promise<Ship | undefined> {
-
   return await findShip(shipId).then((ship) => {
     if (ship) {
       let level = ship.level

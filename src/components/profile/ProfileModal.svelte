@@ -13,7 +13,7 @@
 
   //Services
   import login from '../../lib/services/auth/login'
-  import getProfile from '../../lib/services/user/profile'
+  import { getProfile } from '../../lib/services/user/profile'
 
   //Assets
   import Alert from '../alert/Alert.svelte'

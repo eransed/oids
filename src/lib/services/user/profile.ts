@@ -11,10 +11,8 @@ import { getLocationURL } from '../../../utils/utils'
 import type { Ship, User } from '../../interface'
 import { getAccessTokenFromLocalStorage } from '../utils/Token'
 
-const getProfile = async (chosenShip?: Ship): Promise<AxiosResponse<User>> => {
+export const getProfile = async (update = true): Promise<AxiosResponse<User>> => {
   let token = ''
-
-  console.log('newShip ', chosenShip)
 
   const savedToken = getAccessTokenFromLocalStorage()
   if (savedToken) {
@@ -30,19 +28,9 @@ const getProfile = async (chosenShip?: Ship): Promise<AxiosResponse<User>> => {
   const response: AxiosResponse<User> = await axios
     .get(`http://${getLocationURL()}:6060/api/v1/users/profile`, config)
     .then((response: AxiosResponse<User>) => {
-      userStore.set(response.data)
-
-      const user = response.data
-
-      const defaultShip = user.ships[0]
-
-      const chosenUserShip = user.ships.find((ship) => ship.name === chosenShip?.name)
-
-      localPlayerStore.update((v) => ({ ...v, id: user.id, ship: chosenUserShip ?? defaultShip }))
-
-      console.log('Welcome: ', response.data.name, response.data)
-
-      setCssFromSettings(response.data.theme)
+      if (update) {
+        updateUser(response.data)
+      }
 
       return response
     })
@@ -53,4 +41,14 @@ const getProfile = async (chosenShip?: Ship): Promise<AxiosResponse<User>> => {
   return response
 }
 
-export default getProfile
+export function updateUser(userData: User) {
+  userStore.set(userData)
+
+  const defaultShip = userData.ships[0]
+
+  localPlayerStore.update((v) => ({ ...v, id: userData.id, ship: defaultShip }))
+
+  console.log('Welcome: ', userData.name, userData)
+
+  setCssFromSettings(userData.theme)
+}

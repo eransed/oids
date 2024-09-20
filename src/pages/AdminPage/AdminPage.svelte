@@ -11,7 +11,7 @@
   import updateUser from '../../lib/services/user/updateUser'
   import userList from '../../lib/services/user/userList'
   import register from '../../lib/services/auth/register'
-  import getProfile from '../../lib/services/user/profile'
+  import { getProfile } from '../../lib/services/user/profile'
   import axios from 'axios'
   import type { AxiosError } from 'axios'
 

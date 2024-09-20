@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Alert from '../../../../components/alert/Alert.svelte'
   import type { AlertType } from '../../../../components/alert/AlertType'
   import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../../../components/menu/Button90.svelte'
@@ -39,24 +40,26 @@
           <CircularSpinner />
         </div>
       {/if}
-      <AddShip
-        {openModal}
-        closeModal={(newShip) => {
-          openModal = false
-          if (newShip) {
-            $localPlayerStore.ship = newShip
-            alert = {
-              severity: 'success',
-              text: `Save successful!`,
+      {#if openModal}
+        <AddShip
+          {openModal}
+          closeModal={(newShip) => {
+            openModal = false
+            if (newShip) {
+              alert = {
+                severity: 'success',
+                text: `Save successful!`,
+              }
             }
-          }
-        }}
-      />
+          }}
+        />
+      {/if}
     {:else}
       <ShipCardInfo ship={$localPlayerStore.ship} clickedShip={() => {}} />
     {/if}
   </div>
 </div>
+<Alert severity={alert?.severity} text={alert?.text} />
 
 <style>
   @keyframes fly {

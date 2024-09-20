@@ -9,6 +9,7 @@ import { good, log } from 'mathil'
 import session from 'express-session'
 import passport from 'passport'
 import { useGoogleStrategy } from './api/auth/passport.config'
+import { errorHandler } from './api/middleware'
 
 export const apiServer = () => {
   const router: Express = express()
@@ -62,6 +63,8 @@ export const apiServer = () => {
       message: error.message,
     })
   })
+
+  router.use(errorHandler)
 
   /** Server */
   const httpServer = http.createServer(router)

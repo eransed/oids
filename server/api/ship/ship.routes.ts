@@ -37,11 +37,12 @@ ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: 
 
     const ship = createNewShip(newShip.name, newShip.variant, caller.id)
 
-    await createShip(ship).then((ship) => {
-      res.json(ship)
-    })
+    const createdShip = await createShip(ship)
+
+    res.json(createdShip)
   } catch (err) {
-    next(err)
+    const error = new Error('Ship name already taken')
+    next(error)
   }
 })
 
