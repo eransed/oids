@@ -14,7 +14,7 @@
     color = alertColors[severity]
     setTimeout(() => {
       text = ''
-    }, 3500)
+    }, 5000)
   }
 
   let color = alertColors[severity]
@@ -45,8 +45,8 @@
     max-height: 300px;
     font-size: 12px;
     border-radius: 0.8em;
-    z-index: 2;
-    opacity: 0.9;
+    z-index: 4;
+    opacity: 1;
     inset: 0;
     margin: auto;
     margin-top: 300px;

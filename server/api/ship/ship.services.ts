@@ -1,6 +1,8 @@
 import { getShipXpRequirement } from '../../../src/lib/services/utils/shipLevels'
+import { ApiError } from '../utils/apiError'
 import db from '../utils/db'
 import { Prisma, Ship } from '@prisma/client'
+import { StatusCodes } from 'http-status-codes'
 
 export async function createShip(ship: Ship) {
   try {
@@ -14,25 +16,37 @@ export async function createShip(ship: Ship) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       if (err.code === 'P2002') {
         // P2002 is a Prisma error for uniqueness constraint violation
-        throw new Error('Ship name already taken. Please choose another.')
+        throw new ApiError('Ship name already taken. Please choose another.', StatusCodes.BAD_REQUEST, 'Unique constraint error')
       }
     }
 
     // If it's another error, rethrow it
-    throw new Error('Failed to create ship: ' + err.message)
+    throw new ApiError('Failed to create ship', StatusCodes.INTERNAL_SERVER_ERROR)
   }
 }
 
 export async function updateShip(ship: Ship) {
-  return await db.ship.update({
-    where: {
-      id: ship.id,
-    },
-    data: {
-      name: ship.name,
-      variant: ship.variant,
-    },
-  })
+  try {
+    const updatedShip = await db.ship.update({
+      where: {
+        id: ship.id,
+      },
+      data: {
+        name: ship.name,
+        variant: ship.variant,
+      },
+    })
+
+    return updatedShip
+  } catch (err: any) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if ((err.code = 'P2002')) {
+        throw new ApiError('Cant update to that name, its already taken!', StatusCodes.BAD_REQUEST)
+      }
+    }
+
+    throw new ApiError('Failed to update ship', StatusCodes.INTERNAL_SERVER_ERROR)
+  }
 }
 
 export async function findShip(shipId: string): Promise<Ship | null> {
@@ -80,7 +94,7 @@ export async function updateShipExperienceAndLevel(shipId: string, xpIncrementVa
           return ship
         })
         .catch((err) => {
-          throw new Error(err)
+          throw new ApiError('Failed to update ship', StatusCodes.INTERNAL_SERVER_ERROR)
         })
     }
   })

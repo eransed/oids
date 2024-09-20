@@ -29,16 +29,18 @@ export const createShipService = async (newShip: Ship): Promise<AxiosResponse<Sh
     },
   }
 
-  const response: AxiosResponse<Ship, AxiosError> = await axios
-    .post(`http://${getLocationURL()}:6060/api/v1/ship/create`, newShip, config)
-    .then((response: AxiosResponse<Ship>) => {
-      return response
-    })
-    .catch((err: AxiosError) => {
-      throw new Error(err.message)
-    })
-
-  return response
+  try {
+    const response = await axios.post<Ship>(`http://${getLocationURL()}:6060/api/v1/ship/create`, newShip, config)
+    return response
+  } catch (err: any) {
+    // Forward the error to be handled in the component
+    if (err instanceof AxiosError) {
+      throw err
+    } else {
+      // For non-Axios errors, throw a generic error
+      throw new Error('An unexpected error occurred.')
+    }
+  }
 }
 
 export const getShips = async (testToken?: string): Promise<AxiosResponse<Ship[]>> => {
@@ -103,14 +105,12 @@ export const updateShip = async (name: string, variant: ShipVariant, id: string)
 
   const body = { name, variant, id }
 
-  const response: AxiosResponse<Ship> = await axios
-    .post(`http://${getLocationURL()}:6060/api/v1/ship/update`, body, config)
-    .then((response: AxiosResponse<Ship>) => {
-      return response
-    })
-    .catch((err) => {
-      throw new Error(err)
-    })
-
-  return response
+  try {
+    const response = await axios.post(`http://${getLocationURL()}:6060/api/v1/ship/update`, body, config)
+    return response
+  } catch (err: any) {
+    if (err instanceof AxiosError) {
+      throw err
+    } else throw new Error('An unexpected error occurred.')
+  }
 }

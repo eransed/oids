@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { getPayLoadFromJwT } from './utils/jwt'
 import jwt from 'jsonwebtoken'
+import { AxiosError } from 'axios'
+import { ApiError } from './utils/apiError'
 
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
   if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
@@ -45,13 +47,16 @@ export const jwtAuth = (req: Request, next: NextFunction) => {
   next()
 }
 
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (err: ApiError, req: Request, res: Response, next: NextFunction) => {
   console.error(err)
-  if (err.message) {
-    res.status(500).send({ errors: [{ message: err.message }] })
-  } else {
-    res.status(500).send({ errors: [{ message: 'Something went wrong' }] })
-  }
+  const statusCode = err.statusCode || 500
+  res.statusMessage = err.message
+  res.status(statusCode).send({
+    error: {
+      message: err.message,
+      details: err.details || 'Internal Server Error',
+    },
+  })
 }
 
 module.exports = {

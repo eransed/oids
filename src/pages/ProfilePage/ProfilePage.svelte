@@ -9,7 +9,7 @@
   import Button90 from '../../components/menu/Button90.svelte'
   import { ProfileButtons } from './ProfileButtons'
   import Alert from '../../components/alert/Alert.svelte'
-  import AddShip from './AddShip.svelte'
+  import AddShip from '../../components/ships/AddShip.svelte'
   import Ships from './Ships.svelte'
 
   //Util

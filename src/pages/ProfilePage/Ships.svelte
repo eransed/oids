@@ -86,7 +86,7 @@
 {/if}
 
 {#if changeShip}
-  <ModalSimple disabled={loading} doneCallback={() => (updatedShipDone = true)} title="Change your ship" saveBtn={async () => await handleSaveAvatar()} closeBtn={() => (changeShip = undefined)}>
+  <ModalSimple disabled={loading} doneCallback={() => (updatedShipDone = true)} title="Change your ship" saveBtn={() => handleSaveAvatar()} closeBtn={() => (changeShip = undefined)}>
     <div class="shipActions" style="position: absolute; top: 0; right: 0">
       <Button90
         disabled={loading}

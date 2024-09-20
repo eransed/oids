@@ -6,7 +6,7 @@
   import ShipCardInfo from '../../../../components/ships/ShipCardInfo.svelte'
   import { localPlayerStore, userStore } from '../../../../stores/stores'
   import { Icons } from '../../../../style/icons'
-  import AddShip from '../../../ProfilePage/AddShip.svelte'
+  import AddShip from '../../../../components/ships/AddShip.svelte'
 
   let alert: AlertType | undefined = undefined
 

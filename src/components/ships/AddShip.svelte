@@ -2,7 +2,7 @@
   import { fade } from 'svelte/transition'
 
   //Components
-  import ModalSimple from '../../components/modal/ModalSimple.svelte'
+  import ModalSimple from '../modal/ModalSimple.svelte'
 
   //Services
   import { createShipService } from '../../lib/services/ship/ship.services'
@@ -12,8 +12,9 @@
   import { createShip } from '../../lib/factory'
   import type { Ship } from '../../lib/interface'
   import { ShipVariant } from '../../style/ships'
-  import type { AlertType } from '../../components/alert/AlertType'
-  import Alert from '../../components/alert/Alert.svelte'
+  import type { AlertType } from '../alert/AlertType'
+  import Alert from '../alert/Alert.svelte'
+  import { handleAxiosError } from '../../lib/services/utils/errorHandler'
 
   //Props
   export let loading: boolean = false
@@ -45,8 +46,9 @@
         openModal = false
       }
     } catch (err: any) {
-      console.log(err)
-      alert = { severity: 'error', text: err }
+      loading = false
+      const errorMessage = handleAxiosError(err)
+      alert = { severity: 'error', text: errorMessage }
     }
   }
 

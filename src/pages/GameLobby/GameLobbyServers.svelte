@@ -25,7 +25,7 @@
   import { Icons } from '../../style/icons'
   import ModalSimple from '../../components/modal/ModalSimple.svelte'
   // import type { Ship } from '@prisma/client'
-  import AddShip from '../ProfilePage/AddShip.svelte'
+  import AddShip from '../../components/ships/AddShip.svelte'
   import ShipCardInfo from '../../components/ships/ShipCardInfo.svelte'
   import { worldStartPosition } from '../../lib/constants'
   import { fade, fly } from 'svelte/transition'

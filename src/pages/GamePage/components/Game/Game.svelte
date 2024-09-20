@@ -27,7 +27,7 @@
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
   import Ships from '../../../ProfilePage/Ships.svelte'
   // import type { Ship } from '@prisma/client'
-  import AddShip from '../../../ProfilePage/AddShip.svelte'
+  import AddShip from '../../../../components/ships/AddShip.svelte'
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
   import ProgressBar from '../../../../components/progress/progressBar.svelte'

@@ -14,20 +14,21 @@ import { createUser, findUserByEmail } from '../users/users.services'
 import { createHashedPassword, createNewUser } from '../utils/factory'
 import { User } from '@prisma/client'
 import { Tokens } from '../../../src/lib/interface'
+import { ApiError } from '../utils/apiError'
+import { StatusCodes } from 'http-status-codes'
 //Register endpoint
 auth.post('/register', async (req, res, next) => {
   try {
     const { email, password, name } = req.body
     if (!email || !password || !name) {
       res.status(400).send('You must provide a name, email and a password.')
-      throw new Error('You must provide a name, email and a password.')
+      throw new ApiError('You must provide a name, email and a password.', StatusCodes.BAD_REQUEST)
     }
 
     const existingUser = await findUserByEmail(email)
 
     if (existingUser) {
-      res.status(400).send('Email already in use!')
-      throw new Error('Email already in use.')
+      throw new ApiError('Email already in use.', StatusCodes.BAD_REQUEST)
     }
 
     const newUser = createNewUser(email, name)
@@ -52,28 +53,24 @@ auth.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body
     if (!email || !password) {
-      res.status(400)
-      throw new Error('You must provide an email and a password.')
+      throw new ApiError('You must provide an email and a password.', StatusCodes.BAD_REQUEST)
     }
 
     //Find user by email
     const existingUser = await findUserByEmail(email)
 
     if (!existingUser) {
-      res.status(403)
-      throw new Error('Invalid login credentials.')
+      throw new ApiError('Invalid login credentials.', StatusCodes.FORBIDDEN)
     }
 
     //Check incoming password against existing users password
     if (!existingUser.password?.hashedValue) {
-      res.status(403)
-      throw new Error('Invalid login credentials.')
+      throw new ApiError('Invalid login credentials.', StatusCodes.FORBIDDEN)
     }
 
     const validPassword = await bcrypt.compare(password, existingUser.password.hashedValue)
     if (!validPassword) {
-      res.status(403)
-      throw new Error('Invalid login credentials.')
+      throw new ApiError('Invalid login credentials.', StatusCodes.FORBIDDEN)
     }
 
     const jti = uuidv4()
@@ -100,8 +97,7 @@ auth.post('/refreshToken', async (req, res, next) => {
   try {
     const { refreshToken } = req.body
     if (!refreshToken) {
-      res.status(400)
-      throw new Error('Missing refresh token.')
+      throw new ApiError('Missing refresh token.', StatusCodes.BAD_REQUEST)
     }
 
     const payLoadFromJWt = await getPayLoadFromJwT(refreshToken, process.env.JWT_REFRESH_SECRET).catch((e) => {
@@ -115,20 +111,17 @@ auth.post('/refreshToken', async (req, res, next) => {
     const savedRefreshToken = await findRefreshTokenById(payLoadFromJWt.payload.jti)
 
     if (!savedRefreshToken || savedRefreshToken.revoked === true) {
-      res.status(401)
-      throw new Error('Unauthorized')
+      throw new ApiError('Unauthorized', StatusCodes.UNAUTHORIZED)
     }
 
     const hashedToken = hashToken(refreshToken)
     if (hashedToken !== savedRefreshToken.hashedToken) {
-      res.status(401)
-      throw new Error('Unauthorized')
+      throw new ApiError('Unauthorized', StatusCodes.UNAUTHORIZED)
     }
 
     const user = await findUserById(payLoadFromJWt.payload.userId)
     if (!user) {
-      res.status(401)
-      throw new Error('Unauthorized')
+      throw new ApiError('Unauthorized', StatusCodes.UNAUTHORIZED)
     }
 
     await deleteRefreshToken(savedRefreshToken.id)

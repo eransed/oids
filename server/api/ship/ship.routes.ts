@@ -6,6 +6,9 @@ import { findUserById } from '../users/users.services'
 import { createNewShip } from '../utils/factory'
 import { Ship, User } from '@prisma/client'
 import { getPayLoadFromJwT } from '../utils/jwt'
+import { AxiosError } from 'axios'
+import { StatusCodes } from 'http-status-codes'
+import { ApiError } from '../utils/apiError'
 
 export const ship = express.Router()
 
@@ -40,9 +43,8 @@ ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: 
     const createdShip = await createShip(ship)
 
     res.json(createdShip)
-  } catch (err) {
-    const error = new Error('Ship name already taken')
-    next(error)
+  } catch (err: any) {
+    next(err)
   }
 })
 
@@ -135,8 +137,7 @@ ship.post('/update', isAuthenticated, async (req: Request, res: Response, next: 
     const caller: User | null = await findUserById(payloadFromJwT.payload.userId)
 
     if (!caller) {
-      res.status(401).send('No user found, cant create ship')
-      throw new Error('No user found.')
+      throw new ApiError('No user found.', StatusCodes.NOT_FOUND)
     }
 
     const ship = createNewShip(name, variant, caller.id, id)
