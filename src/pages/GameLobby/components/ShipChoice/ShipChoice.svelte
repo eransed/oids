@@ -2,9 +2,10 @@
   import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
   import Button90 from '../../../../components/menu/Button90.svelte'
   import ShipCardInfo from '../../../../components/ships/ShipCardInfo.svelte'
-  import { alertStore, localPlayerStore, userStore } from '../../../../stores/stores'
+  import { localPlayerStore, userStore } from '../../../../stores/stores'
   import { Icons } from '../../../../style/icons'
   import AddShip from '../../../../components/ships/AddShip.svelte'
+  import { addAlert } from '../../../../stores/alertHandler'
 
   let openModal = $userStore?.ships.length === 0 ? true : false
 </script>
@@ -42,7 +43,7 @@
           closeModal={(newShip) => {
             openModal = false
             if (newShip) {
-              alertStore.set({
+              addAlert({
                 severity: 'success',
                 text: `Save successful!`,
               })

@@ -1,6 +1,6 @@
 <script lang="ts">
   //Stores
-  import { pageHasHeaderStore, userStore, settingsStore, localPlayerStore, alertStore } from '../../stores/stores'
+  import { pageHasHeaderStore, userStore, settingsStore, localPlayerStore } from '../../stores/stores'
   import { profileComponent } from './ProfileButtons'
 
   //Components
@@ -32,6 +32,7 @@
   import { getThemeNumber, themes } from '../../style/defaultColors'
   import type { Theme } from '../../lib/interface'
   import { getAccessTokenFromLocalStorage } from '../../lib/services/utils/Token'
+  import { addAlert } from '../../stores/alertHandler'
 
   onMount(async () => {
     const token = getAccessTokenFromLocalStorage()
@@ -45,17 +46,14 @@
 
     if ($userStore) {
       chosenTheme = themes[$userStore.theme]
-    }
-
-    try {
-      const userProfile = await getProfile(false)
-      if (JSON.stringify(userProfile.data) !== JSON.stringify($userStore)) {
-        await getProfile()
-      } else {
-        console.log('ok')
+      try {
+        const userProfile = await getProfile(false)
+        if (JSON.stringify(userProfile.data) !== JSON.stringify($userStore)) {
+          await getProfile()
+        }
+      } catch (err) {
+        console.error(err)
       }
-    } catch (err) {
-      console.error(err)
     }
   })
 
@@ -90,10 +88,7 @@
           .then((res) => {
             if (res.status === 200) {
               handleLogout($localPlayerStore.sessionId)
-              alertStore.set({
-                severity: 'success',
-                text: `Your account has been deleted forever :(`,
-              })
+
               loading = false
             }
           })
@@ -140,7 +135,7 @@
       .then((d) => {
         avatarDialog = false
 
-        alertStore.set({
+        addAlert({
           severity: 'success',
           text: 'Your avatar is now updated!',
         })
@@ -148,7 +143,7 @@
       .catch((err: Error) => {
         console.error(err)
         avatarDialog = false
-        alertStore.set({
+        addAlert({
           severity: 'error',
           text: err.message,
         })
@@ -191,7 +186,7 @@
               closeModal={(newShip) => {
                 openModal = false
                 if (newShip) {
-                  alertStore.set({
+                  addAlert({
                     severity: 'success',
                     text: `Save successful!`,
                   })

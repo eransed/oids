@@ -4,7 +4,7 @@
   import Page from '../../components/page/page.svelte'
   import register from '../../lib/services/auth/register'
   import { loginHandler } from '../../utils/loginHandler'
-  import { alertStore, userStore } from '../../stores/stores'
+  import { userStore } from '../../stores/stores'
   import { handleAxiosError } from '../../lib/services/utils/errorHandler'
   import ProfilePage from '../ProfilePage/ProfilePage.svelte'
   import { navigate } from 'svelte-routing'
@@ -13,6 +13,7 @@
   import type { Step } from '../../lib/interface'
   import Ships from '../ProfilePage/Ships.svelte'
   import ProfileModal from '../../components/profile/ProfileModal.svelte'
+  import { addAlert } from '../../stores/alertHandler'
 
   let name: string
   let email: string
@@ -29,7 +30,7 @@
 
       if (tokens) {
         await loginHandler(tokens.accessToken, tokens.refreshToken)
-        alertStore.set({ severity: 'success', text: `Welcome to Oids - ${name}` })
+        addAlert({ severity: 'success', text: `Welcome to Oids - ${name}` })
         onboardingSteps[0].completed = true
       }
     } catch (e: any) {

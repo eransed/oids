@@ -2,38 +2,36 @@
   import { fade } from 'svelte/transition'
   import { alertColors } from '../../style/defaultColors'
   import type { AlertType } from './AlertType'
+  import { alertStore } from '../../stores/alertHandler'
 
   /**
    * @param severity - error, warning, info, success
    * @description An alert popup with different colors
    */
-  export let severity: AlertType['severity'] = 'info'
-  export let text: AlertType['text'] = ''
 
-  $: if (text) {
-    color = alertColors[severity]
-    setTimeout(() => {
-      text = ''
-    }, 5000)
+  interface InternalAlert extends AlertType {
+    active: boolean
   }
 
-  let color = alertColors[severity]
+  $: alertList = $alertStore as InternalAlert[]
 </script>
 
-{#if text}
-  <div in:fade={{ delay: 50, duration: 250 }} style="display: grid">
-    <div class="alertBox" style="--theme-color: {color}">
-      <button style="position: absolute; right: 0; padding: 0.4em; margin: 0.2em; top: 0" on:click={() => (text = '')}>x</button>
-      <p><b>{severity.toUpperCase()}</b></p>
-      <p>{text}</p>
+{#each alertList.filter((alert) => alert.active) as alert, i}
+  {#if alert.active}
+    <div in:fade={{ delay: 50, duration: 250 }} style=" display: grid">
+      <div class="alertBox" style="position: absolute; bottom: {i * 20 + 'px'};--theme-color: {alertColors[alert.severity]}">
+        <button style="position: absolute; right: 0; padding: 0.4em; margin: 0.2em; top: 0" on:click={() => (alert.active = false)}>x</button>
+        <p><b>{alert.severity.toUpperCase()}</b></p>
+        <p>{alert.text}</p>
+      </div>
     </div>
-  </div>
-{/if}
+  {/if}
+{/each}
 
 <style>
   .alertBox {
-    position: fixed;
-    justify-self: center;
+    position: absolute;
+    justify-self: felx;
     background-color: var(--theme-color);
     color: #000;
     padding: 1em;
@@ -47,8 +45,9 @@
     border-radius: 0.8em;
     z-index: 4;
     opacity: 1;
-    inset: 0;
-    margin: auto;
+    right: 0;
+    /* inset: 0;
+    margin: auto; */
     margin-top: 300px;
   }
 

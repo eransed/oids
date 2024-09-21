@@ -18,7 +18,7 @@ export const getProfile = async (update = true): Promise<AxiosResponse<User>> =>
   if (savedToken) {
     token = savedToken
   } else {
-    throw new Error('No token found in storage')
+    throw new Error('No token')
   }
 
   const config = {

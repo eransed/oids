@@ -6,7 +6,7 @@
   import { logOutButton, loginButton, loginGoogle } from './profileButtons'
 
   //Stores
-  import { alertStore, userStore } from '../../stores/stores'
+  import { userStore } from '../../stores/stores'
 
   //Svelte
   import { fade } from 'svelte/transition'
@@ -18,6 +18,7 @@
   //Assets
   import { navigate } from 'svelte-routing'
   import { Icons } from '../../style/icons'
+  import { addAlert } from '../../stores/alertHandler'
 
   let loading: boolean = false
 
@@ -38,7 +39,7 @@
           loading = false
         })
         .catch(() => {
-          alertStore.set({ severity: 'error', text: 'Wrong email or password, try again!' })
+          addAlert({ severity: 'error', text: 'Wrong email or password, try again!' })
           loading = false
         })
     }

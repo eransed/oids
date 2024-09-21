@@ -35,6 +35,7 @@
   import ShipChoice from './components/ShipChoice/ShipChoice.svelte'
   import Info from '../../components/info/info.svelte'
   import { getProfile } from '../../lib/services/user/profile'
+  import { handleAxiosError } from '../../lib/services/utils/errorHandler'
 
   pageHasHeaderStore.set(true)
 
@@ -108,7 +109,9 @@
   }
 
   onMount(async () => {
-    await getProfile()
+    if ($userStore) {
+      await getProfile()
+    }
 
     const storedShipJson = localStorage.getItem('chosenShip')
     await initLobbySocket()
