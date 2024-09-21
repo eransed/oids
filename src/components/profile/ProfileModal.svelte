@@ -39,7 +39,7 @@
           loading = false
         })
         .catch(() => {
-          addAlert({ severity: 'error', text: 'Wrong email or password, try again!' })
+          addAlert('error', 'Wrong email or password, try again!')
           loading = false
         })
     }

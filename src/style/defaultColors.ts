@@ -16,7 +16,7 @@ export function getThemeNumber(theme: Theme): number {
 }
 
 export const alertColors = {
-  error: '#d2b48c',
+  error: '#feabab',
   warning: '#fff4e5',
   info: '#e5f6fd',
   success: '#b9d3c2',

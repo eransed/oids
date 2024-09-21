@@ -15,7 +15,7 @@ export const ship = express.Router()
 ship.post('/create', isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const newShip: Ship = req.body
-    const callerId = req.params.userId //Coming from isAuthenticated middleware
+    const callerId = req.params.userId //Coming from isAuthenticated handler
 
     if (!callerId) {
       throw new ApiError('No user found.', StatusCodes.NOT_FOUND)

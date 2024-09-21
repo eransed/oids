@@ -17,10 +17,7 @@ export async function deleteUser(email: string): Promise<AxiosResponse<User>> {
   const response: AxiosResponse<User> = await axios
     .post(`http://${getLocationURL()}:6060/api/v1/users/deleteUser`, { email }, config)
     .then((response: AxiosResponse<User>) => {
-      addAlert({
-        severity: 'success',
-        text: `Your account has been deleted forever :(`,
-      })
+      addAlert('success', `Your account has been deleted forever :(`)
       return response
     })
     .catch((err) => {

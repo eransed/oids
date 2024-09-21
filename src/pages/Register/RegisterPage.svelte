@@ -30,7 +30,7 @@
 
       if (tokens) {
         await loginHandler(tokens.accessToken, tokens.refreshToken)
-        addAlert({ severity: 'success', text: `Welcome to Oids - ${name}` })
+        addAlert('success', `Welcome to Oids - ${name}`)
         onboardingSteps[0].completed = true
       }
     } catch (e: any) {

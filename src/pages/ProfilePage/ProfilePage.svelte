@@ -135,18 +135,12 @@
       .then((d) => {
         avatarDialog = false
 
-        addAlert({
-          severity: 'success',
-          text: 'Your avatar is now updated!',
-        })
+        addAlert('success', 'Your avatar is now updated!')
       })
       .catch((err: Error) => {
         console.error(err)
         avatarDialog = false
-        addAlert({
-          severity: 'error',
-          text: err.message,
-        })
+        addAlert('error', err.message)
       })
   }
 </script>
@@ -186,10 +180,7 @@
               closeModal={(newShip) => {
                 openModal = false
                 if (newShip) {
-                  addAlert({
-                    severity: 'success',
-                    text: `Save successful!`,
-                  })
+                  addAlert('success', `Save successful!`)
                   getProfile()
                 }
               }}

@@ -11,7 +11,6 @@
   import { onDestroy, onMount } from 'svelte'
 
   //Component
-  import type { AlertType } from '../../components/alert/AlertType'
   import { arcadeKeyMapManagerStore, initKeyControllers, removeKeyControllers, spaceKeyMapManagerStore } from '../../lib/input'
   import { GameMode } from '../../lib/interface'
   import HotkeysPage from './HotkeysPage.svelte'

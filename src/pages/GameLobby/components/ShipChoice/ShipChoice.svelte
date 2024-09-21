@@ -43,10 +43,7 @@
           closeModal={(newShip) => {
             openModal = false
             if (newShip) {
-              addAlert({
-                severity: 'success',
-                text: `Save successful!`,
-              })
+              addAlert('success', `Save successful!`)
             }
           }}
         />

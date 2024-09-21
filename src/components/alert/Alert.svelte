@@ -1,22 +1,10 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
   import { alertColors } from '../../style/defaultColors'
-  import type { AlertType } from './AlertType'
   import { alertStore } from '../../stores/alertHandler'
-
-  /**
-   * @param severity - error, warning, info, success
-   * @description An alert popup with different colors
-   */
-
-  interface InternalAlert extends AlertType {
-    active: boolean
-  }
-
-  $: alertList = $alertStore as InternalAlert[]
 </script>
 
-{#each alertList.filter((alert) => alert.active) as alert, i}
+{#each $alertStore.filter((alert) => alert.active) as alert, i}
   {#if alert.active}
     <div in:fade={{ delay: 50, duration: 250 }} style=" display: grid">
       <div class="alertBox" style="position: absolute; bottom: {i * 20 + 'px'};--theme-color: {alertColors[alert.severity]}">
@@ -31,7 +19,6 @@
 <style>
   .alertBox {
     position: absolute;
-    justify-self: felx;
     background-color: var(--theme-color);
     color: #000;
     padding: 1em;
