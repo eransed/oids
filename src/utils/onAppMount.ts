@@ -11,7 +11,7 @@ export const onAppMount = async (): Promise<void> => {
   updateAlertStoreFromLocalStorage()
   info('onAppmount')
   addAlert('success', 'Welcome to Oids :)')
-  logInfo('Hey')
+  logInfo('Hey - This is a silent log message')
 
   // checkHotkeys()
 
