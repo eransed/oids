@@ -36,6 +36,8 @@
   import Info from '../../components/info/info.svelte'
   import { getProfile } from '../../lib/services/user/profile'
   import { handleAxiosError } from '../../lib/services/utils/errorHandler'
+  import { logError, logInfo, logWarning } from '../../stores/alertHandler'
+  import login from '../../lib/services/auth/login'
 
   pageHasHeaderStore.set(true)
 
@@ -67,10 +69,10 @@
       // }
 
       $socketStore.connect().then(() => {
-        console.log(`Connected to websocket`)
+        logInfo(`Connected to websocket`)
       })
 
-      console.log('Adding lobby websocket listener...')
+      logInfo('Adding lobby websocket listener...')
 
       $socketStore
         .addListener(
@@ -79,18 +81,18 @@
 
             switch (su.dataObject.messageType) {
               case MessageType.SESSION_UPDATE:
-                console.log(`Got an session update message from ${incomingUpdate.name}`)
+                logInfo(`Got an session update message from ${incomingUpdate.name}`)
                 updateSessions()
                 break
               case MessageType.SERVICE:
-                log(`Service message: server version: ${incomingUpdate.serverVersion}`)
+                logInfo(`Service message: server version: ${incomingUpdate.serverVersion}`)
                 $localPlayerStore.serverVersion = incomingUpdate.serverVersion
                 break
               case MessageType.CHAT_MESSAGE:
                 handleIncomingChatMessage(incomingUpdate)
                 break
               default:
-                warn(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
+                // logWarning(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
                 break
             }
           },
@@ -138,7 +140,7 @@
     $socketStore.resetListeners()
 
     if (pingTimer) {
-      console.log(`Clears ping timer ${pingTimer}`)
+      logInfo(`Clears ping timer ${pingTimer}`)
       clearInterval(pingTimer)
     }
   })
@@ -164,11 +166,11 @@
           sessions = s.data
           checkJoinedSession()
         } else {
-          console.error(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
+          logError(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
         }
       })
       .catch((e) => {
-        console.error(`Failed to fetch sessions: ${e}`)
+        logError(`Failed to fetch sessions: ${e}`)
       })
   }
 
@@ -180,7 +182,7 @@
   function joinSession_(sessionId: string) {
     if (sessionId) {
       console.log($localPlayerStore)
-      console.log(`${$localPlayerStore.name}: joining session ${sessionId}`)
+      logInfo(`${$localPlayerStore.name}: joining session ${sessionId}`)
       $localPlayerStore.sessionId = sessionId
       // send some update that localPlayer joined a/the session
       $localPlayerStore.messageType = MessageType.SESSION_UPDATE
@@ -192,7 +194,7 @@
         updateSessions()
       }, 400)
     } else {
-      console.error('Join null session not possible...')
+      logError('Join null session not possible...')
     }
   }
 

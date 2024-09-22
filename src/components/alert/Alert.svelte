@@ -7,7 +7,7 @@
 {#each $alertStore.filter((alert) => alert.active) as alert, i}
   {#if alert.active}
     <div in:fade={{ delay: 50, duration: 250 }} style=" display: grid">
-      <div class="alertBox" style="position: absolute; bottom: {i * 20 + 'px'};--theme-color: {alertColors[alert.severity]}">
+      <div class="alertBox" style="position: absolute; bottom: {i * 80 + 'px'};--theme-color: {alertColors[alert.severity]}">
         <button style="position: absolute; right: 0; padding: 0.4em; margin: 0.2em; top: 0" on:click={() => (alert.active = false)}>x</button>
         <p><b>{alert.severity.toUpperCase()}</b></p>
         <p>{alert.text}</p>

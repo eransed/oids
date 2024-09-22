@@ -20,7 +20,8 @@
     flex-wrap: wrap;
     justify-content: center;
     color: #fff;
-    max-height: 95vh;
+    max-height: 70vh;
+    overflow-y: scroll;
   }
 
   @media screen and (max-width: 1000px) {

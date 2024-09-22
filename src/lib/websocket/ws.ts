@@ -1,7 +1,7 @@
 // import { info, warn } from 'mathil'
-import { warn } from 'mathil'
 import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
+import { logError, logInfo, logWarning } from '../../stores/alertHandler'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
   if (typeof window !== 'undefined') {
@@ -37,7 +37,7 @@ export function sender(ws: WebSocket, messageObject: object): boolean {
     ws.send(JSON.stringify(messageObject))
     return true
   } else {
-    console.error('Socket not open, readyState=' + ws.readyState)
+    logError('Socket not open, readyState=' + ws.readyState)
     return false
   }
 }
@@ -50,7 +50,7 @@ export class OidsSocket {
   private connectInitialized = false
 
   constructor(url: URL) {
-    console.log('New socket created')
+    logInfo('New socket created')
     this.wsurl = url
   }
 
@@ -88,25 +88,25 @@ export class OidsSocket {
       try {
         await this.connectPromise()
           .then((ws) => {
-            console.log(`WebSocket connected with status ${getReadyStateText(ws)}`)
+            logInfo(`WebSocket connected with status ${getReadyStateText(ws)}`)
             this.prettyStatusString = ''
           })
           .catch((err) => {
-            console.error(`WebSocket failed to connect: ${err}`)
+            logWarning(`WebSocket failed to connect: ${err}`)
             this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed 1`
           })
       } catch (error) {
         this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed 2`
       }
     } else {
-      console.log('Already connected to websocket')
+      logInfo('Already connected to websocket')
     }
   }
 
   send(messageObject: object): void {
     if (!this.ws) {
       if (this.connectInitialized) {
-        warn(`connectPromise already started!`)
+        logWarning(`connectPromise already started!`)
       }
       console.log('Connecting websocket...')
       this.connectPromise()
@@ -114,7 +114,7 @@ export class OidsSocket {
           sender(ws, messageObject)
         })
         .catch((err) => {
-          console.error('Failed to send ', err)
+          logError('Failed to send ', err)
         })
     } else {
       sender(this.ws, messageObject)
@@ -143,7 +143,7 @@ export class OidsSocket {
   addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<SpaceObject>) => void): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!this.ws) {
-        console.log('trying to connect')
+        logInfo('trying to connect')
         this.connect()
       }
 
@@ -187,10 +187,10 @@ export class OidsSocket {
 
   resetListeners(): void {
     if (this.sockMsgListener) {
-      console.log('Resetting socket listeners...')
+      logInfo('Resetting socket listeners...')
       this.ws?.removeEventListener(this.sockMsgListener.event, this.sockMsgListener.fn)
     } else {
-      console.log('Did not remove any listeners')
+      logInfo('Did not remove any listeners')
     }
   }
 }

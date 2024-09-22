@@ -1,3 +1,4 @@
+import { logInfo } from '../../../stores/alertHandler'
 import type { SpaceObject } from '../../interface'
 
 export function handleRemotePlayers(remotes: SpaceObject[]): SpaceObject[] {
@@ -15,7 +16,7 @@ export function handleRemotePlayers(remotes: SpaceObject[]): SpaceObject[] {
 
   if (stoppedPlaying.length > 0) {
     stoppedPlaying.forEach((s) => {
-      console.log(`${s.name} exited the game`)
+      logInfo(`${s.name} exited the game`)
     })
   }
 

@@ -1,4 +1,3 @@
-import { game } from '../../../pages/GamePage/components/Game/Utils/mainGame'
 import type { Game } from '../../game'
 import { type ServerUpdate, type SpaceObject, MessageType } from '../../interface'
 import { handleGameUpdate } from './handleGameUpdate'

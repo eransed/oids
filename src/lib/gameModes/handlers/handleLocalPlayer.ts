@@ -1,4 +1,4 @@
-import { rndfVec2, warn } from 'mathil'
+import { rndfVec2 } from 'mathil'
 import { explosionDuration, worldSize, worldStartPosition } from '../../constants'
 import type { Game } from '../../game'
 import type { KeyFunctionMap } from '../../interface'
@@ -9,6 +9,7 @@ import { renderExplosionFrame } from '../../render/renderFx'
 import { renderShip } from '../../render/renderShip'
 import { renderTrail } from '../../render/renderShipTrail'
 import { handleMoveView } from './handleMoveView'
+import { logWarning } from '../../../stores/alertHandler'
 
 export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
   const localPlayer = game.localPlayer
@@ -81,7 +82,7 @@ export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
 }
 
 export function initLocalPlayer(game: Game) {
-  warn(`Resets local player position`)
+  logWarning(`Resets local player position`)
   game.reset()
   game.localPlayer.mass = 1
   game.localPlayer.missileDamage = 1

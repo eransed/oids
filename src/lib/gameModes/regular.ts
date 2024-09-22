@@ -26,7 +26,7 @@ import { handleRemotePlayers } from './handlers/handleRemotePlayers'
 import { renderRemotePlayerInSpaceMode } from '../render/renderRemotePlayers'
 import { initNetworkStats } from './handlers/handleNetStats'
 import { playerUpdate } from './handlers/handlePlayerUpdate'
-import { addAlert } from '../../stores/alertHandler'
+import { addAlert, logError, logInfo, logWarning } from '../../stores/alertHandler'
 //Stores
 
 let activeKeyMap: KeyFunctionMap
@@ -76,7 +76,7 @@ function randomPositionInCurrentViewFrame(so: SpaceObject, screenSize: Vec2): Ve
 
 export function resetStars(game: Game | null) {
   if (!game) {
-    error('game is null')
+    logError('game is null')
     return
   }
 
@@ -88,12 +88,12 @@ export function resetStars(game: Game | null) {
       s.position.y = r.y
     })
   }, 250)
-  info('reset stars')
+  logInfo('reset stars')
 }
 
 export function initRegularGame(game: Game): void {
   if (game.isRunning()) {
-    warn(`Game already running`)
+    logWarning(`Game already running`)
     return
   }
 
@@ -101,7 +101,7 @@ export function initRegularGame(game: Game): void {
 
   game.type = GameType.MultiPlayer
   if (!test()) {
-    warn(`Test failed...`)
+    logWarning(`Test failed...`)
     return
   }
 
@@ -121,13 +121,13 @@ export function initRegularGame(game: Game): void {
     game.stars.push(star)
   }
 
-  console.log('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
+  logInfo('Your ship name is: ' + game.localPlayer.name + '\nAnd your color is: ' + game.localPlayer.color)
 
   game.all = game.all.concat(game.bodies)
   game.all.push(game.localPlayer)
   game.serverVersion = game.localPlayer.serverVersion
 
-  info('Setting game socket listener...')
+  logWarning('Setting game socket listener...')
 
   function handleNetworkStatisticUpdates(su: ServerUpdate<SpaceObject>) {
     dataLen = su.unparsedDataLength
