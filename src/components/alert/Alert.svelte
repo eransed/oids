@@ -3,16 +3,24 @@
   import { alertColors } from '../../style/defaultColors'
   import { alertStore } from '../../stores/alertHandler'
 
-  $: alerts = $alertStore.filter((alert) => alert.active)
+  $: alerts = $alertStore.filter((v) => v.active).reverse()
+
+  $: spacing = alerts.length
 </script>
 
-{#each alerts as alert, i}
-  <div in:fly={{ duration: 1000, y: 300 }} class="alertBox" style="z-index: {100 - i}; bottom: {i * 20 + 'px'}; --theme-color: {alertColors[alert.severity]}">
-    <button style="position: absolute; right: 0; padding: 0.4em; margin: 0.2em; top: 0" on:click={() => (alert.active = false)}>x</button>
-    <p><b>{alert.severity.toUpperCase()}</b></p>
-    <p>{alert.text}</p>
-  </div>
-{/each}
+<div class="alertBoxWrapper">
+  {#each alerts as alert, i}
+    <div
+      in:fly={{ duration: 350, y: 300 }}
+      class="alertBox"
+      style="z-index: {100 + i}; bottom: {spacing / ((i === 0 ? 1 : i + spacing / 50) * 0.1) + 'px'}; --theme-color: {alertColors[alert.severity]}"
+    >
+      <button style="position: absolute; right: 0; padding: 0.4em; margin: 0.2em; top: 0" on:click={() => (alert.active = false)}>x</button>
+      <p><b>{alert.severity.toUpperCase()}</b></p>
+      <p>{alert.text}</p>
+    </div>
+  {/each}
+</div>
 
 <style>
   .alertBox {
@@ -31,7 +39,7 @@
     z-index: 4;
     opacity: 1;
     right: 5px;
-    bottom: 5px;
+    transition: bottom 250ms ease-in-out;
     /* inset: 0;
     margin: auto; */
     margin-top: 300px;

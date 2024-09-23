@@ -19,7 +19,7 @@
         buttonText: 'Clear Log',
         clickCallback: () => {
           // clearAlerts()
-          logInfo(`hey ${testlognr}`)
+          logInfo(`hey ${testlognr}`, false)
           testlognr++
         },
         selected: false,
