@@ -1,11 +1,13 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
-  import { alertStore, clearAlerts } from '../../stores/alertHandler'
-  import { alertColors } from '../../style/defaultColors'
+  import { alertStore, clearAlerts, logInfo } from '../../stores/alertHandler'
+
   import { Icons } from '../../style/icons'
   import Button90 from '../menu/Button90.svelte'
   import Page from '../page/page.svelte'
   import AlertListItem from './AlertListItem.svelte'
+  import Table from '../table/Table.svelte'
+  let testlognr = 0
 </script>
 
 <Page>
@@ -16,7 +18,9 @@
       buttonConfig={{
         buttonText: 'Clear Log',
         clickCallback: () => {
-          clearAlerts()
+          // clearAlerts()
+          logInfo(`hey ${testlognr}`)
+          testlognr++
         },
         selected: false,
       }}
@@ -26,6 +30,8 @@
       {#each $alertStore as alert, i}
         <AlertListItem {alert} />
       {/each}
+      <!-- Working on Table component -->
+      <!-- <Table data={$alertStore} /> -->
     </ul>
   {:else}
     <p>Nothing logged yet - Thats good I guess?</p>
