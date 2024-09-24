@@ -1,52 +1,65 @@
 <script lang="ts">
-  import { fly } from 'svelte/transition'
+  import { fade, fly, slide } from 'svelte/transition'
   import { alertColors } from '../../style/defaultColors'
-  import { alertStore } from '../../stores/alertHandler'
+  import { alertStore, handleAlertTimeOut } from '../../stores/alertHandler'
+  import AlertItem from './AlertItem.svelte'
+  import { timeOutList } from '../../stores/alertHandler'
 
-  $: alerts = $alertStore.filter((v) => v.active).reverse()
+  const baseBottom = 0
+  const paddingScaler = 10
+  const sizeScaler = 10
+  let isHovered = false
 
-  $: spacing = alerts.length
+  let hoveringAlertsTime: NodeJS.Timeout | null = null
+
+  function hoverOnAlertWrapper() {
+    if (hoveringAlertsTime) {
+      clearTimeout(hoveringAlertsTime)
+    }
+    console.log('AlertWrapper')
+    isHovered = true
+    timeOutList.forEach((v) => clearTimeout(v))
+    timeOutList.splice(0, timeOutList.length)
+  }
+
+  function resetAlertTimers() {
+    isHovered = false
+    hoveringAlertsTime = setTimeout(() => {
+      $alertStore
+        .filter((v) => v.active)
+        .forEach((alert, i) => {
+          handleAlertTimeOut((i + 1) * 500, alert)
+        })
+    }, 2000)
+  }
+
+  //
 </script>
 
-<div class="alertBoxWrapper">
-  {#each alerts as alert, i}
-    <div
-      in:fly={{ duration: 350, y: 300 }}
-      class="alertBox"
-      style="z-index: {100 + i}; bottom: {spacing / ((i === 0 ? 1 : i + spacing / 50) * 0.1) + 'px'}; --theme-color: {alertColors[alert.severity]}"
-    >
-      <button style="position: absolute; right: 0; padding: 0.4em; margin: 0.2em; top: 0" on:click={() => (alert.active = false)}>x</button>
-      <p><b>{alert.severity.toUpperCase()}</b></p>
-      <p>{alert.text}</p>
-    </div>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="alertWrapper" in:fade={{ duration: 500 }} class:hovering={isHovered} on:mouseenter={() => hoverOnAlertWrapper()} on:mouseleave={() => resetAlertTimers()}>
+  {#each $alertStore.filter((v) => v.active).reverse() as alert, i}
+    {@const alertLength = $alertStore.filter((v) => v.active).length}
+    {@const spacing = baseBottom - (i - alertLength) * paddingScaler}
+    {@const scaleSize = 1.1 - (alertLength - i) / sizeScaler}
+    <AlertItem {alert} {spacing} {scaleSize} {isHovered} clickCloseCallback={() => (alert.active = false)} />
   {/each}
 </div>
 
 <style>
-  .alertBox {
+  .hovering {
     position: absolute;
-    background-color: var(--theme-color);
-    color: #000;
-    padding: 1em;
-    min-width: 300px;
-    width: -moz-fit-content;
+    right: 0;
+    bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    transition: all 350ms ease-in-out;
     width: fit-content;
-    max-width: 30%;
-    height: fit-content;
-    max-height: 300px;
-    font-size: 12px;
-    border-radius: 0.8em;
-    z-index: 4;
-    opacity: 1;
-    right: 5px;
-    transition: bottom 250ms ease-in-out;
-    /* inset: 0;
-    margin: auto; */
-    margin-top: 300px;
-    border: 1px gray solid;
-  }
-
-  .alertBox p {
-    padding: 0.2em;
+    height: 100vh;
+    justify-content: flex-end;
+    z-index: 100;
   }
 </style>

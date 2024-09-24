@@ -7,7 +7,6 @@
   import Page from '../page/page.svelte'
   import AlertListItem from './AlertListItem.svelte'
   import Table from '../table/Table.svelte'
-  let testlognr = 0
 </script>
 
 <Page>
@@ -18,9 +17,7 @@
       buttonConfig={{
         buttonText: 'Clear Log',
         clickCallback: () => {
-          // clearAlerts()
-          logInfo(`hey ${testlognr}`, false)
-          testlognr++
+          clearAlerts()
         },
         selected: false,
       }}

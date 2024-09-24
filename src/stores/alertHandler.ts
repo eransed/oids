@@ -3,6 +3,7 @@ import type { AlertType } from '../components/alert/AlertType'
 import { error, info, warn } from 'mathil'
 
 export const alertStore: Writable<AlertType[]> = writable([])
+export let timeOutList: NodeJS.Timeout[] = []
 
 // before anyone can call any log function
 updateAlertStoreFromLocalStorage()
@@ -50,9 +51,7 @@ export function addAlert(severity: AlertType['severity'], text: string, timeoutM
   // alertStore.update((alerts) => [...alerts, alert])
 
   if (!silent) {
-    setTimeout(() => {
-      alertStore.update((alerts) => alerts.map((a) => (a === alert ? { ...alert, active: false } : a)))
-    }, timeoutMs)
+    handleAlertTimeOut(timeoutMs, alert)
   }
 
   let allAlerts: AlertType[] = []
@@ -99,4 +98,12 @@ export function clearAlerts() {
   alertStore.set([])
   localStorage.removeItem('alerts')
   logInfo('clear alerts')
+}
+
+export function handleAlertTimeOut(timeoutMs: number, alert: AlertType) {
+  timeOutList.push(
+    setTimeout(() => {
+      alertStore.update((alerts) => alerts.map((a) => (a === alert ? { ...alert, active: false } : a)))
+    }, timeoutMs),
+  )
 }
