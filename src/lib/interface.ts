@@ -317,6 +317,7 @@ export interface KeyFunctionMap {
   jump: KeyFunctionStore
   changeMode: KeyFunctionStore
   tractorBeam: KeyFunctionStore
+  healthBar: KeyFunctionStore
 }
 
 export interface TouchFunctionMap {

@@ -120,23 +120,25 @@
   })
 </script>
 
-<div class="shipWrapper" style="z-index: 1;">
-  <div class="shipAvatar">
-    <img style="width: 80%;" draggable="false" src={getShipBundleCache($localPlayerStore.ship.variant).svgUrl} alt={$localPlayerStore.ship.name} />
-    <div class="shipLevel">{$localPlayerStore.ship.level}</div>
+{#if $ActiveKeyMapStore.healthBar.keyStatus}
+  <div class="shipWrapper" style="z-index: 1;">
+    <div class="shipAvatar">
+      <img style="width: 80%;" draggable="false" src={getShipBundleCache($localPlayerStore.ship.variant).svgUrl} alt={$localPlayerStore.ship.name} />
+      <div class="shipLevel">{$localPlayerStore.ship.level}</div>
+    </div>
+    <div class="shipInfo">
+      <div class="shipName">
+        {$localPlayerStore.ship.name}
+      </div>
+      <div class="shipHealth">
+        <ProgressBar progressColor="#50aa50" progress={$localPlayerStore.health} max={$localPlayerStore.startHealth} />
+      </div>
+      <div class="shipEnergy">
+        <ProgressBar progressColor="#4040ff" progress={$localPlayerStore.batteryLevel} max={$localPlayerStore.batteryCapacity} />
+      </div>
+    </div>
   </div>
-  <div class="shipInfo">
-    <div class="shipName">
-      {$localPlayerStore.ship.name}
-    </div>
-    <div class="shipHealth">
-      <ProgressBar progressColor="#50aa50" progress={$localPlayerStore.health} max={$localPlayerStore.startHealth} />
-    </div>
-    <div class="shipEnergy">
-      <ProgressBar progressColor="#4040ff" progress={$localPlayerStore.batteryLevel} max={$localPlayerStore.batteryCapacity} />
-    </div>
-  </div>
-</div>
+{/if}
 
 {#if game}
   <div class="gameInfo">

@@ -17,7 +17,5 @@ export function setGameSettings(settings: Settings): void {
     logInfo(`Applies game settings:`)
     console.log(settings)
     game.style = settings.uiStyle
-  } else {
-    logWarning('No game instance!')
   }
 }

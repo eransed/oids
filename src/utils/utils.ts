@@ -1,8 +1,16 @@
-import { rndi } from 'mathil'
+import { rndi, usPretty2 } from 'mathil'
 import { localPlayerStore, userStore } from '../stores/stores'
 // import type { Prisma, User } from '@prisma/client'
 import { createSpaceObject } from '../lib/factory'
 import type { User } from '../lib/interface'
+
+export function timeAgo(d: Date, minMsForNow = 1000, justNowStr = 'just now', appendStr = 'ago') {
+  const now = new Date()
+  const diffMs = now.getTime() - d.getTime()
+  if (diffMs < minMsForNow) return justNowStr
+  const prettyStr = usPretty2(diffMs * 1e3, 0, 0)
+  return `${prettyStr.value}${prettyStr.unit} ${appendStr}`
+}
 
 export function getLocationURL() {
   if (typeof window !== 'undefined') {
@@ -35,7 +43,6 @@ export const gUser: User = {
   id: createdGuestName,
   email: '',
   name: createdGuestName,
-  password: '',
   createdAt: new Date(),
   updatedAt: new Date(),
   role: 'guest',

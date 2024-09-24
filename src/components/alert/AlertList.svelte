@@ -7,6 +7,17 @@
   import Page from '../page/page.svelte'
   import AlertListItem from './AlertListItem.svelte'
   import Table from '../table/Table.svelte'
+  import type { AlertType } from './AlertType'
+
+  let x = 0
+
+  function alertItemConverter(alert: AlertType) {
+    return {
+      tid: alert.timeStamp.toLocaleTimeString(),
+      text: alert.text,
+      type: alert.severity,
+    }
+  }
 </script>
 
 <Page>
@@ -22,13 +33,25 @@
         selected: false,
       }}
     />
+    <Button90
+      icon={Icons.Add}
+      addInfo="Add test log"
+      buttonConfig={{
+        buttonText: 'Add test log',
+        clickCallback: () => {
+          logInfo(`Hej ransed ${x}`)
+          x++
+        },
+        selected: false,
+      }}
+    />
     <ul>
       <li class="listHeader">Messages: {$alertStore.length}</li>
-      {#each $alertStore as alert, i}
+      <!-- {#each $alertStore as alert, i}
         <AlertListItem {alert} />
-      {/each}
+      {/each} -->
       <!-- Working on Table component -->
-      <!-- <Table data={$alertStore} /> -->
+      <Table data={$alertStore} converter={alertItemConverter} />
     </ul>
   {:else}
     <p>Nothing logged yet - Thats good I guess?</p>
@@ -39,6 +62,7 @@
   .listHeader {
     opacity: 0.8;
     font-size: 14px;
+    color: var(--main-text-color);
   }
   ul {
     min-width: 30%;

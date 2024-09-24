@@ -5,27 +5,34 @@ import { error, info, warn } from 'mathil'
 export const alertStore: Writable<AlertType[]> = writable([])
 export let timeOutList: NodeJS.Timeout[] = []
 
+let alertLength = 1
+const alertRemovalInterval = 1000
+
+alertStore.subscribe((v) => {
+  alertLength = v.filter((v) => v.active).length
+})
+
 // before anyone can call any log function
 updateAlertStoreFromLocalStorage()
 
 export function logInfo(text: string, silent = false) {
-  addAlert('info', text, 7000, silent)
+  addAlert('info', text, 5000, silent)
 }
 
 export function logWarning(text: string, silent = false) {
-  addAlert('warning', text, 10000, silent)
+  addAlert('warning', text, 5000, silent)
 }
 
 export function logError(text: string, silent = false) {
-  addAlert('error', text, 20000, silent)
+  addAlert('error', text, 5000, silent)
 }
 
 export function addAlert(severity: AlertType['severity'], text: string, timeoutMs = 5000, silent = false) {
   const alert: AlertType = {
+    timeStamp: new Date(),
     severity: severity,
     text: text,
     active: !silent,
-    timeStamp: new Date(),
   }
 
   switch (severity) {
@@ -51,7 +58,8 @@ export function addAlert(severity: AlertType['severity'], text: string, timeoutM
   // alertStore.update((alerts) => [...alerts, alert])
 
   if (!silent) {
-    handleAlertTimeOut(timeoutMs, alert)
+    console.log(alertLength)
+    handleAlertTimeOut(timeoutMs + alertLength * alertRemovalInterval, alert)
   }
 
   let allAlerts: AlertType[] = []

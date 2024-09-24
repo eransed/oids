@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
+
   //Svelte-fx
   import { slide } from 'svelte/transition'
 </script>
@@ -8,20 +10,23 @@
 </div>
 
 <style>
+  :root {
+    --topBarHeight: 0;
+    --innerHeight: 0;
+  }
+
   .pageWrapper {
-    height: 100vh;
     width: 100vw;
-    top: 88px;
+    top: 118px;
     display: flex;
-    margin-top: 2em;
     position: relative;
     align-content: flex-start;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
     color: #fff;
-    max-height: 70vh;
-    overflow-y: scroll;
+    max-height: 95vh;
+    overflow-y: auto;
   }
 
   @media screen and (max-width: 1000px) {
@@ -59,4 +64,10 @@
       margin-top: 2em;
     }
   }
+
+  /* @media screen and (max-height: 1200px) {
+    .pageWrapper {
+      height: 85vh;
+    }
+  } */
 </style>

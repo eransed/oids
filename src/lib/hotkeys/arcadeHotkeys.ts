@@ -43,8 +43,8 @@ export const DefaultArcadeModeKeyMap: KeyFunctionMap = {
   },
   chat: {
     activators: ['c'],
-    keyStatus: true,
-    store: true,
+    keyStatus: false,
+    store: false,
     toggle: true,
     displayText: 'Chat',
   },
@@ -75,6 +75,13 @@ export const DefaultArcadeModeKeyMap: KeyFunctionMap = {
     store: false,
     toggle: true,
     displayText: 'Tractor Beam',
+  },
+  healthBar: {
+    activators: ['l'],
+    keyStatus: false,
+    store: false,
+    toggle: true,
+    displayText: 'Healthbar',
   },
   name: 'Arcade',
 }

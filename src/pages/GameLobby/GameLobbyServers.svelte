@@ -262,7 +262,7 @@
     grid-template-columns: 1fr 2fr 1fr;
     max-width: 85%;
     min-height: 20em;
-    max-height: 20em;
+    /* max-height: 20em; */
     /* place-items: center; */
   }
 

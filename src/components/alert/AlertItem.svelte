@@ -3,6 +3,7 @@
   import { alertStore } from '../../stores/alertHandler'
   import { alertColors } from '../../style/defaultColors'
   import type { AlertType } from './AlertType'
+  import { timeAgo } from '../../utils/utils'
 
   export let alert: AlertType
 
@@ -22,7 +23,7 @@
   style="position: {isHovered ? 'relative' : 'absolute'}; --scaleSize: {isHovered ? 1 : scaleSize}; --spacing: {isHovered ? 0 : spacing}px;  --theme-color: {alertColors[alert.severity]}"
 >
   <button style="position: absolute; right: 0; padding: 0.4em; margin: 0.2em; top: 0" on:click={() => clickCloseCallback()}>x</button>
-  <p><b>{alert.severity.toUpperCase()}</b></p>
+  <p><b>{alert.severity.toUpperCase()} - {timeAgo(alert.timeStamp)}</b></p>
   <p>{alert.text}</p>
 </div>
 

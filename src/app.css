@@ -1,7 +1,6 @@
 body {
   background-color: var(--main-bg-color);
   overflow-x: hidden;
-  overflow-y: hidden;
   font-family: 'Courier New', Courier, monospace;
   height: 100vh;
   /*  */

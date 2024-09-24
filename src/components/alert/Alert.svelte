@@ -8,15 +8,10 @@
   const baseBottom = 0
   const paddingScaler = 10
   const sizeScaler = 10
+  const nrOfVisibleAlerts = 5
   let isHovered = false
 
-  let hoveringAlertsTime: NodeJS.Timeout | null = null
-
   function hoverOnAlertWrapper() {
-    if (hoveringAlertsTime) {
-      clearTimeout(hoveringAlertsTime)
-    }
-    console.log('AlertWrapper')
     isHovered = true
     timeOutList.forEach((v) => clearTimeout(v))
     timeOutList.splice(0, timeOutList.length)
@@ -24,7 +19,7 @@
 
   function resetAlertTimers() {
     isHovered = false
-    hoveringAlertsTime = setTimeout(() => {
+    setTimeout(() => {
       $alertStore
         .filter((v) => v.active)
         .forEach((alert, i) => {
@@ -40,8 +35,11 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="alertWrapper" in:fade={{ duration: 500 }} class:hovering={isHovered} on:mouseenter={() => hoverOnAlertWrapper()} on:mouseleave={() => resetAlertTimers()}>
-  {#each $alertStore.filter((v) => v.active).reverse() as alert, i}
-    {@const alertLength = $alertStore.filter((v) => v.active).length}
+  {#each $alertStore
+    .filter((v) => v.active)
+    .filter((v, i) => i < nrOfVisibleAlerts)
+    .reverse() as alert, i}
+    {@const alertLength = $alertStore.filter((v) => v.active).filter((v, i) => i < nrOfVisibleAlerts).length}
     {@const spacing = baseBottom - (i - alertLength) * paddingScaler}
     {@const scaleSize = 1.1 - (alertLength - i) / sizeScaler}
     <AlertItem {alert} {spacing} {scaleSize} {isHovered} clickCloseCallback={() => (alert.active = false)} />
