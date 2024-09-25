@@ -3,6 +3,8 @@ import express from 'express'
 
 // import { getActiveSessions } from "./game.services"
 import { getPlayersFromSessionId, getSessions } from '../../main.js'
+import { ApiError } from '../utils/apiError.js'
+import { StatusCodes } from 'http-status-codes'
 
 export const game = express.Router()
 
@@ -11,8 +13,7 @@ game.post('/players', async (req: Request, res: Response, next: NextFunction) =>
     const sessionId = req.query.sessionId
 
     if (!sessionId) {
-      res.status(400)
-      throw new Error('You must provide a sessionId.')
+      throw new ApiError('You must provide a sessionId.', StatusCodes.BAD_REQUEST)
     }
 
     const players = getPlayersFromSessionId(sessionId.toString())

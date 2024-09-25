@@ -5,6 +5,8 @@ import passportGoogle from 'passport-google-oauth20'
 import { createUser, findUserByEmail } from '../users/users.services'
 import { createNewUser } from '../utils/factory'
 import { env } from 'process'
+import { ApiError } from '../utils/apiError'
+import { StatusCodes } from 'http-status-codes'
 
 const GoogleStrategy = passportGoogle.Strategy
 
@@ -34,22 +36,19 @@ export function useGoogleStrategy() {
           if (!profile._json.given_name) throw 'User does not have a name'
 
           const foundUser = await findUserByEmail(profile._json.email)
+
           if (foundUser) {
-            if (!foundUser) throw 'No user found with that email'
             const user: googleUser = {
               email: foundUser.email,
               id: foundUser.id,
             }
-            console.log('User found: ', user)
             done(null, user)
           } else {
             const newUser = await createUser(createNewUser(profile._json.email, profile._json.given_name), '')
-            console.log('Created new user: ', newUser)
             done(null, newUser)
           }
         } catch (err) {
-          console.error(err)
-          done()
+          throw new ApiError('User could not be created with google auth', StatusCodes.INTERNAL_SERVER_ERROR)
         }
       },
     ),

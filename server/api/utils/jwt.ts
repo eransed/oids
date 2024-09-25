@@ -4,10 +4,12 @@ import { DecodedJwt } from '../../interfaces'
 
 import { warn } from 'mathil'
 import { User } from '@prisma/client'
+import { ApiError } from './apiError'
+import { StatusCodes } from 'http-status-codes'
 
 //Token valid time
 export const generateAccessToken = (user: User) => {
-  if (!process.env.JWT_ACCESS_SECRET) throw new Error('No JWT_ACCESS_SECRET')
+  if (!process.env.JWT_ACCESS_SECRET) throw new ApiError('No JWT_ACCESS_SECRET', StatusCodes.UNAUTHORIZED)
 
   return jwt.sign({ userId: user.id }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: '8h',
@@ -16,7 +18,7 @@ export const generateAccessToken = (user: User) => {
 
 //How long a session will be until forced to login
 export const generateRefreshToken = (user: User, jti: string) => {
-  if (!process.env.JWT_REFRESH_SECRET) throw new Error('No JWT_REFRESH_SECRET')
+  if (!process.env.JWT_REFRESH_SECRET) throw new ApiError('No JWT_REFRESH_SECRET', StatusCodes.UNAUTHORIZED)
 
   return jwt.sign(
     {
@@ -26,7 +28,7 @@ export const generateRefreshToken = (user: User, jti: string) => {
     process.env.JWT_REFRESH_SECRET,
     {
       expiresIn: '8h', //Set to 8 hour to gimmick a working day!
-    }
+    },
   )
 }
 
@@ -40,18 +42,15 @@ export const generateTokens = (user: User, jti: string) => {
   }
 }
 
-export const getPayLoadFromJwT = async (token: string, secret: string): Promise<DecodedJwt | undefined> => {
+export const getPayLoadFromJwT = async (token: string, secret: string) => {
   let p: DecodedJwt | undefined
 
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, secret, { complete: true }, (error, decoded) => {
-      if (error) {
-        warn('Token not valid')
-        reject(error)
-      } else if (decoded) {
-        p = decoded as DecodedJwt
-        resolve(p)
-      }
-    })
-  })
+  try {
+    const decodedPayload = jwt.verify(token, secret, { complete: true })
+
+    p = decodedPayload as DecodedJwt
+    return p
+  } catch (err: any) {
+    throw new ApiError('Token not valid', 403, 'JWT payload could not be decoded')
+  }
 }

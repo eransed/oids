@@ -3,54 +3,67 @@ import db from '../utils/db'
 // import { User, newUser } from '../types/user'
 import { Prisma, User, Password } from '@prisma/client'
 import { randomUUID } from 'crypto'
+import { ApiError } from '../utils/apiError'
+import { StatusCodes } from 'http-status-codes'
 
 // Exclude keys from user
 
-export const findUserByEmail = (email: string) => {
-  return db.user.findUnique({
-    where: {
-      email,
-    },
-    include: { password: true },
-  })
+export const findUserByEmail = async (email: string) => {
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+      include: { password: true },
+    })
+    return user
+  } catch (err) {
+    throw new ApiError('A problem occured fetching user by email from db', StatusCodes.INTERNAL_SERVER_ERROR)
+  }
 }
 
 export const createUser = async (user: User, password: string) => {
-  const newUser = await db.user.create({
-    data: user,
-  })
+  try {
+    const newUser = await db.user.create({
+      data: user,
+    })
+    await db.password.create({
+      data: {
+        id: randomUUID(),
+        hashedValue: password,
+        userId: newUser.id,
+      },
+    })
+    return newUser
+  } catch (err: any) {
+    // Handle specific database errors
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === 'P2002') {
+        // P2002 is a Prisma error for uniqueness constraint violation
+        throw new ApiError('Email already exists. Please use another.', StatusCodes.BAD_REQUEST, 'Unique constraint error')
+      }
+    }
 
-  await db.password.create({
-    data: {
-      id: randomUUID(),
-      hashedValue: password,
-      userId: newUser.id,
-    },
-  })
-  return newUser
+    // If it's another error, rethrow it
+    throw new ApiError('Failed to create user', StatusCodes.INTERNAL_SERVER_ERROR)
+  }
 }
 
-export const findUserById = (id: string) => {
-  return db.user.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      gameHistory: true,
-      ships: true,
-    },
-  })
-}
-
-export const saveGame = async (id: string, win: boolean, played: Date, sessionId: string) => {
-  await db.game.create({
-    data: {
-      userId: id,
-      win: win,
-      played: played,
-      sessionId: sessionId,
-    },
-  })
+export const findUserById = async (id: string) => {
+  try {
+    const foundUserById = await db.user.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        gameHistory: true,
+        ships: true,
+      },
+    })
+    return foundUserById
+  } catch (err) {
+    throw new ApiError('A problem occured fetching user by id from db', StatusCodes.INTERNAL_SERVER_ERROR)
+  }
 }
 
 export const updateUser = async (user: User): Promise<User> => {

@@ -14,6 +14,8 @@ import { GameHandler } from './game_handler'
 import { findShip, updateShipExperienceAndLevel } from './api/ship/ship.services'
 import dotenv from 'dotenv'
 import { sessionHandler } from './sessions'
+import { ApiError } from './api/utils/apiError'
+import { StatusCodes } from 'http-status-codes'
 dotenv.config()
 
 // start ApiServer
@@ -486,17 +488,21 @@ export function getActivePlayersFromSession(sessionId: string): SpaceObject[] {
 export function getSessions(): Session[] {
   const sessions: Session[] = []
 
-  for (let i = 0; game_handlers.length > i; i++) {
-    const game_handler = game_handlers[i]
+  try {
+    for (let i = 0; game_handlers.length > i; i++) {
+      const game_handler = game_handlers[i]
 
-    if (game_handler.tied_session_id) {
-      const players = getPlayersFromSessionId(game_handler.tied_session_id)
+      if (game_handler.tied_session_id) {
+        const players = getPlayersFromSessionId(game_handler.tied_session_id)
 
-      sessions.push({ id: game_handler.tied_session_id, players: players })
+        sessions.push({ id: game_handler.tied_session_id, players: players })
+      }
     }
-  }
 
-  return sessions
+    return sessions
+  } catch (err) {
+    throw new ApiError('Could not get sessions', StatusCodes.INTERNAL_SERVER_ERROR)
+  }
 }
 
 server.on('connection', function connection(clientConnection: WebSocket, req: IncomingMessage) {

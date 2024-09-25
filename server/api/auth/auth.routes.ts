@@ -25,12 +25,6 @@ auth.post('/register', async (req, res, next) => {
       throw new ApiError('You must provide a name, email and a password.', StatusCodes.BAD_REQUEST)
     }
 
-    const existingUser = await findUserByEmail(email)
-
-    if (existingUser) {
-      throw new ApiError('Email already in use.', StatusCodes.BAD_REQUEST)
-    }
-
     const newUser = createNewUser(email, name)
     const hashedPassword = createHashedPassword(password)
 
@@ -92,7 +86,7 @@ auth.post('/login', async (req, res, next) => {
 
 //Refreshtoken
 auth.post('/refreshToken', async (req, res, next) => {
-  if (!process.env.JWT_REFRESH_SECRET) throw new Error('Missing Secret')
+  if (!process.env.JWT_REFRESH_SECRET) throw new ApiError('Missing Secret', StatusCodes.FORBIDDEN)
 
   try {
     const { refreshToken } = req.body
@@ -100,11 +94,7 @@ auth.post('/refreshToken', async (req, res, next) => {
       throw new ApiError('Missing refresh token.', StatusCodes.BAD_REQUEST)
     }
 
-    const payLoadFromJWt = await getPayLoadFromJwT(refreshToken, process.env.JWT_REFRESH_SECRET).catch((e) => {
-      if (e) {
-        res.status(401).send('Refreshtoken not valid')
-      }
-    })
+    const payLoadFromJWt = await getPayLoadFromJwT(refreshToken, process.env.JWT_REFRESH_SECRET)
 
     if (!payLoadFromJWt) return
 
@@ -159,18 +149,22 @@ auth.get('/google', passport.authenticate('google', { scope: ['profile', 'email'
 
 //Please fix failureRedirect to
 auth.get('/google/callback', passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }), async (req, res) => {
-  if (!req.user) {
-    return
+  try {
+    if (!req.user) {
+      return
+    }
+
+    const user = req.user as User
+
+    const jti = uuidv4()
+    const { accessToken, refreshToken } = generateTokens(user, jti)
+    await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id })
+
+    // res.cookie('accesToken', accessToken)
+    // res.cookie('refreshToken', refreshToken)
+
+    res.redirect(`http://localhost:5173/auth-callback?accessToken=${accessToken}&refreshToken=${refreshToken}`)
+  } catch (err) {
+    throw new ApiError('Google auth could not authorize user', StatusCodes.INTERNAL_SERVER_ERROR)
   }
-
-  const user = req.user as User
-
-  const jti = uuidv4()
-  const { accessToken, refreshToken } = generateTokens(user, jti)
-  await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id })
-
-  // res.cookie('accesToken', accessToken)
-  // res.cookie('refreshToken', refreshToken)
-
-  res.redirect(`http://localhost:5173/auth-callback?accessToken=${accessToken}&refreshToken=${refreshToken}`)
 })
