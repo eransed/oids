@@ -36,8 +36,9 @@ export function sender(ws: WebSocket, messageObject: object): boolean {
   if (ws.readyState === 1) {
     // log("Sending message...")
     // ws.send(JSON.stringify(messageObject))
-    console.log(encode(messageObject))
-    ws.send(encode(messageObject))
+    const encoded = encode(messageObject)
+
+    ws.send(encoded)
     return true
   } else {
     logError('Socket not open, readyState=' + ws.readyState)
@@ -67,8 +68,8 @@ export class OidsSocket {
     this.connectInitialized = true
     return new Promise((resolve, reject) => {
       const wsUrl: URL = this.wsurl
-
       this.ws = new WebSocket(wsUrl)
+      this.ws.binaryType = 'arraybuffer'
       this.ws.onopen = () => {
         if (this.ws) {
           resolve(this.ws)
@@ -154,12 +155,16 @@ export class OidsSocket {
         event: 'message',
         fn: (event: MessageEvent) => {
           // const data = JSON.parse(event.data)
-          const data = decode(event.data) as any
+          console.log(event.data)
+          console.log(decode(event.data))
+          const data = decode(new Uint8Array(event.data)) as any
 
           // if (!data.messageType) {
           //   console.error(data)
           //   throw new Error('Unvalid json')
           // }
+
+          console.log('Decoded date with msgpack', data)
 
           function serverUpdateObject<T extends SpaceObject>(data: T): ServerUpdate<T> {
             const serverUpdate: ServerUpdate<T> = {
