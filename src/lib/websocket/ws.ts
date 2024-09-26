@@ -2,6 +2,7 @@
 import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
 import { logError, logInfo, logWarning } from '../../stores/alertHandler'
+import { decode, encode } from '@msgpack/msgpack'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
   if (typeof window !== 'undefined') {
@@ -34,7 +35,9 @@ export function getReadyStateText(socket: WebSocket): string {
 export function sender(ws: WebSocket, messageObject: object): boolean {
   if (ws.readyState === 1) {
     // log("Sending message...")
-    ws.send(JSON.stringify(messageObject))
+    // ws.send(JSON.stringify(messageObject))
+    console.log(encode(messageObject))
+    ws.send(encode(messageObject))
     return true
   } else {
     logError('Socket not open, readyState=' + ws.readyState)
@@ -150,7 +153,8 @@ export class OidsSocket {
       this.sockMsgListener = {
         event: 'message',
         fn: (event: MessageEvent) => {
-          const data = JSON.parse(event.data)
+          // const data = JSON.parse(event.data)
+          const data = decode(event.data) as any
 
           // if (!data.messageType) {
           //   console.error(data)

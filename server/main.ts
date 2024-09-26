@@ -16,6 +16,7 @@ import dotenv from 'dotenv'
 import { sessionHandler } from './sessions'
 import { ApiError } from './api/utils/apiError'
 import { StatusCodes } from 'http-status-codes'
+import { decode, encode } from '@msgpack/msgpack'
 dotenv.config()
 
 // start ApiServer
@@ -158,7 +159,8 @@ export class Client {
       }
 
       try {
-        const so: SpaceObject = JSON.parse(event.data)
+        // const so: SpaceObject = JSON.parse(event.data)
+        const so: SpaceObject = decode(new Uint8Array(event.data)) as SpaceObject
         // debugData(so)
         this.lastDataObject = so
         this.sessionId = so.sessionId
@@ -333,13 +335,15 @@ function broadcastToAllClients(skipSourceClient: Client, connectedClients: Clien
       if (data.messageType === MessageType.LEFT_SESSION) {
         info(`${data.name} left the session -> ${client.name}`)
       }
-      client.ws.send(JSON.stringify(data))
+      // client.ws.send(JSON.stringify(data))
+      client.ws.send(encode(data))
     }
   }
 }
 
 function broadcastToOneClient(data: SpaceObject, client: Client): void {
-  client.ws.send(JSON.stringify(data))
+  // client.ws.send(JSON.stringify(data))
+  client.ws.send(encode(data))
 }
 
 //Checking distance between two players: sending client and recieving client.
@@ -379,10 +383,12 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
       if (sendingClient.sessionId === client.sessionId) {
         if (data.messageType === MessageType.GAME_UPDATE) {
           if (shouldSendToClientInGame(sendingClient, client)) {
-            client.ws.send(JSON.stringify(data))
+            // client.ws.send(JSON.stringify(data))
+            client.ws.send(encode(data))
           }
         } else {
-          client.ws.send(JSON.stringify(data))
+          // client.ws.send(JSON.stringify(data))
+          client.ws.send(encode(data))
         }
       }
     }
@@ -416,14 +422,18 @@ function serverBroadcast<T extends SpaceObject>(data: T, connectedClients: Clien
   let sendCount = 0
   if (sessionId === null) {
     for (const client of connectedClients) {
-      client.ws.send(JSON.stringify(data))
+      // client.ws.send(JSON.stringify(data))
+      client.ws.send(encode(data))
+
       sendCount++
     }
   } else {
     for (const client of connectedClients) {
       if (client.sessionId === sessionId) {
         // info(`Sending to ${client.name} with session ${sessionId}`)
-        client.ws.send(JSON.stringify(data))
+        // client.ws.send(JSON.stringify(data))
+        client.ws.send(encode(data))
+
         sendCount++
       }
     }
@@ -509,7 +519,7 @@ server.on('connection', function connection(clientConnection: WebSocket, req: In
   const soService = createSpaceObject()
   soService.messageType = MessageType.SERVICE
   soService.serverVersion = name_ver
-  clientConnection.send(JSON.stringify(soService))
+  clientConnection.send(encode(soService))
 
   globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
 
