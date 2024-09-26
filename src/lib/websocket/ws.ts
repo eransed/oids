@@ -155,34 +155,33 @@ export class OidsSocket {
         event: 'message',
         fn: (event: MessageEvent) => {
           // const data = JSON.parse(event.data)
-          console.log(event.data)
-          console.log(decode(event.data))
-          const data = decode(new Uint8Array(event.data)) as any
+
+          const incomingData = decode(event.data) as any
 
           // if (!data.messageType) {
           //   console.error(data)
           //   throw new Error('Unvalid json')
           // }
 
-          console.log('Decoded date with msgpack', data)
-
           function serverUpdateObject<T extends SpaceObject>(data: T): ServerUpdate<T> {
             const serverUpdate: ServerUpdate<T> = {
               spaceObjectByteSize: new TextEncoder().encode(JSON.stringify(data)).length,
-              unparsedDataLength: event.data.length,
+              unparsedDataLength: new Uint8Array(event.data).length,
               numberOfSpaceObjectKeys: Object.keys(data).length,
               dataObject: data,
             }
 
+            console.log(serverUpdate)
+
             return serverUpdate
           }
 
-          if (data.messageType === MessageType.SERVER_GAME_UPDATE) {
-            const su = serverUpdateObject<SpaceObject>(data)
+          if (incomingData.messageType === MessageType.SERVER_GAME_UPDATE) {
+            const su = serverUpdateObject<SpaceObject>(incomingData)
             callbackNpc(su)
           } else {
-            const su = serverUpdateObject<SpaceObject>(data)
-            su.dataObject = data
+            const su = serverUpdateObject<SpaceObject>(incomingData)
+            su.dataObject = incomingData
             su.dataObject.isLocal = false
             callbackSo(su)
           }

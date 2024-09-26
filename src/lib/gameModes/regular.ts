@@ -15,9 +15,6 @@ import { localPlayerStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 import { handleCollisions } from '../physics/handleCollisions'
 import { renderCharacter } from '../render/renderCharacter'
-import { handleShipUpdate } from './handlers/incomingDataHandlers/handleShipUpdate'
-import { handleServerInformationUpdate } from './handlers/incomingDataHandlers/handleServerInformationUpdate'
-import { handleChatUpdate } from './handlers/incomingDataHandlers/handleChatUpdate'
 import { exists } from './handlers/incomingDataHandlers/handleNpcUpdate'
 import { handleStarBackdrop } from './handlers/handleStarBackDrop'
 import { handleLocalPlayer, initLocalPlayer } from './handlers/handleLocalPlayer'
@@ -130,6 +127,7 @@ export function initRegularGame(game: Game): void {
   logWarning('Setting game socket listener...')
 
   function handleNetworkStatisticUpdates(su: ServerUpdate<SpaceObject>) {
+    // console.log(su.dataObject.isLocal, su.unparsedDataLength)
     dataLen = su.unparsedDataLength
     bytesRecievedLastSecond += dataLen
     dataKeys = su.numberOfSpaceObjectKeys
