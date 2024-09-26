@@ -171,8 +171,6 @@ export class OidsSocket {
               dataObject: data,
             }
 
-            console.log(serverUpdate)
-
             return serverUpdate
           }
 
