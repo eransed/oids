@@ -3,6 +3,7 @@ import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
 import { logError, logInfo, logWarning } from '../../stores/alertHandler'
 import { decode, encode } from '@msgpack/msgpack'
+import { partialSend } from './deltaUpdates'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
   if (typeof window !== 'undefined') {
@@ -32,11 +33,13 @@ export function getReadyStateText(socket: WebSocket): string {
   }
 }
 
-export function sender(ws: WebSocket, messageObject: object): boolean {
+export function sender(ws: WebSocket, messageObject: SpaceObject): boolean {
+  const sendObj = partialSend(messageObject)
+
   if (ws.readyState === 1) {
     // log("Sending message...")
     // ws.send(JSON.stringify(messageObject))
-    const encoded = encode(messageObject)
+    const encoded = encode(sendObj)
 
     ws.send(encoded)
     return true
@@ -107,7 +110,7 @@ export class OidsSocket {
     }
   }
 
-  send(messageObject: object): void {
+  send(messageObject: SpaceObject): void {
     if (!this.ws) {
       if (this.connectInitialized) {
         logWarning(`connectPromise already started!`)

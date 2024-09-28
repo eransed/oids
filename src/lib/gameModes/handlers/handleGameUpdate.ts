@@ -4,6 +4,7 @@ import type { Game } from '../../game'
 import { logInfo } from '../../../stores/alertHandler'
 
 export function handleGameUpdate(su: ServerUpdate<SpaceObject>, game: Game) {
+  console.log(su)
   const so: SpaceObject = su.dataObject
   for (let i = 0; i < game.remotePlayers.length; i++) {
     if (so.name === game.remotePlayers[i].name) {

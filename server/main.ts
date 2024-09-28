@@ -6,8 +6,8 @@ import { getLocalIp, ipport } from './net'
 
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
-import { MessageType, Session, SpaceObject } from '../src/lib/interface'
-import { dist2, error, info, warn } from 'mathil'
+import { Collidable, MessageType, PhotonLaser, Session, Ship, SpaceObject, ThrustFlameAtom } from '../src/lib/interface'
+import { dist2, error, info, Vec2, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
 
@@ -160,9 +160,22 @@ export class Client {
 
       try {
         // const so: SpaceObject = JSON.parse(event.data)
-        const so: SpaceObject = decode(new Uint8Array(event.data)) as SpaceObject
+        const so = decode(new Uint8Array(event.data)) as SpaceObject
+        if (!so.sessionId || !so.id || !so.name) {
+          throw new Error('Need atleast sessionId, id and name from Spaceobject')
+        }
+
+        // Find the matching client in globalConnectedClients
+        globalConnectedClients.find((client) => {
+          if (client.lastDataObject) {
+            for (const key in so) {
+              client.lastDataObject[key as keyof SpaceObject] = so[key as keyof unknown]
+            }
+          }
+        })
+
         // debugData(so)
-        this.lastDataObject = so
+        // this.lastDataObject = so
         this.sessionId = so.sessionId
         so.serverVersion = name_ver
 
