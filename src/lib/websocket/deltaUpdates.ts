@@ -1,38 +1,19 @@
-import type { Vec2 } from 'mathil'
-import { MessageType, type Collidable, type PhotonLaser, type Ship, type SpaceObject, type ThrustFlameAtom } from '../interface'
+import { type SpaceObject } from '../interface'
 
-type NullableSpaceObject = {
-  [K in keyof SpaceObject]: SpaceObject[K] | string | number | boolean | Ship | Vec2 | ThrustFlameAtom[] | string[] | PhotonLaser[] | Collidable[] | null
-}
-
-let savedSo: SpaceObject | undefined = undefined
-let firstGame = true
-
-export function partialSend(newSo: SpaceObject): Partial<NullableSpaceObject> {
-  if (!savedSo || firstGame) {
-    if (newSo.messageType === MessageType['GAME_UPDATE']) {
-      firstGame = false
-    }
-
-    savedSo = newSo
-    return newSo
-  }
-
-  let partialObject: Partial<NullableSpaceObject> = {}
+export function partialSend(oldSo: SpaceObject, newSo: SpaceObject): Partial<SpaceObject> {
+  let partialObject: Partial<SpaceObject> = {}
 
   for (const key in newSo) {
     const newValue = newSo[key as keyof SpaceObject]
-    const oldValue = savedSo[key as keyof SpaceObject]
+    const oldValue = oldSo[key as keyof SpaceObject]
     if (!deepEqual(newValue, oldValue)) {
-      partialObject[key as keyof SpaceObject] = newValue
+      partialObject[key as keyof SpaceObject] = newValue as keyof unknown
     }
   }
 
   partialObject.id = newSo.id
   partialObject.sessionId = newSo.sessionId
   partialObject.name = newSo.name
-
-  savedSo = newSo
 
   return partialObject
 }
@@ -54,4 +35,12 @@ function deepEqual(obj1: any, obj2: any): boolean {
   }
 
   return true
+}
+
+export function partialResolve(so: SpaceObject, update: Partial<SpaceObject>) {
+  for (const key in update) {
+    so[key as keyof SpaceObject] = update[key as keyof unknown]
+  }
+
+  return so
 }

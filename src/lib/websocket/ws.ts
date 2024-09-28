@@ -3,7 +3,8 @@ import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
 import { logError, logInfo, logWarning } from '../../stores/alertHandler'
 import { decode, encode } from '@msgpack/msgpack'
-import { partialSend } from './deltaUpdates'
+import { partialResolve, partialSend } from './deltaUpdates'
+import { localPlayerStore } from '../../stores/stores'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
   if (typeof window !== 'undefined') {
@@ -34,7 +35,17 @@ export function getReadyStateText(socket: WebSocket): string {
 }
 
 export function sender(ws: WebSocket, messageObject: SpaceObject): boolean {
-  const sendObj = partialSend(messageObject)
+  let localSoStore: SpaceObject | undefined = undefined
+
+  let sendObj: Partial<SpaceObject> | SpaceObject = messageObject
+
+  if (localPlayerStore) {
+    localPlayerStore.subscribe((v) => (localSoStore = v))
+  }
+
+  if (localSoStore) {
+    sendObj = partialSend(localSoStore, messageObject)
+  }
 
   if (ws.readyState === 1) {
     // log("Sending message...")
@@ -55,6 +66,7 @@ export class OidsSocket {
   private prettyStatusString = 'Just created!'
   private sockMsgListener: SocketListener<'message'> | null = null
   private connectInitialized = false
+  private playerList: SpaceObject[] = []
 
   constructor(url: URL) {
     logInfo('New socket created')
@@ -159,7 +171,16 @@ export class OidsSocket {
         fn: (event: MessageEvent) => {
           // const data = JSON.parse(event.data)
 
-          const incomingData = decode(event.data) as any
+          const incomingData = decode(event.data) as Partial<SpaceObject>
+
+          const foundPlayerInPlayerList = this.playerList.find((v) => incomingData.name === v.name)
+
+          if (foundPlayerInPlayerList) {
+            partialResolve(foundPlayerInPlayerList, incomingData)
+          } else {
+            console.log('New player in playerlist: ', incomingData.name)
+            this.playerList.push(incomingData as SpaceObject)
+          }
 
           // if (!data.messageType) {
           //   console.error(data)
@@ -178,11 +199,11 @@ export class OidsSocket {
           }
 
           if (incomingData.messageType === MessageType.SERVER_GAME_UPDATE) {
-            const su = serverUpdateObject<SpaceObject>(incomingData)
+            const su = serverUpdateObject<SpaceObject>(incomingData as SpaceObject)
             callbackNpc(su)
           } else {
-            const su = serverUpdateObject<SpaceObject>(incomingData)
-            su.dataObject = incomingData
+            const su = serverUpdateObject<SpaceObject>(incomingData as SpaceObject)
+            su.dataObject = incomingData as SpaceObject
             su.dataObject.isLocal = false
             callbackSo(su)
           }
