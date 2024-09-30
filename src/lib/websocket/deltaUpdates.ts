@@ -1,19 +1,22 @@
 import { type SpaceObject } from '../interface'
+import { getSendableSpaceObject, shotHandler } from '../time'
 
-export function partialSend(oldSo: SpaceObject, newSo: SpaceObject): Partial<SpaceObject> {
+export function getPartialSo(oldSo: SpaceObject, newSo: SpaceObject): Partial<SpaceObject> {
   let partialObject: Partial<SpaceObject> = {}
 
   for (const key in newSo) {
     const newValue = newSo[key as keyof SpaceObject]
     const oldValue = oldSo[key as keyof SpaceObject]
+
     if (!deepEqual(newValue, oldValue)) {
       partialObject[key as keyof SpaceObject] = newValue as keyof unknown
     }
   }
 
-  partialObject.id = newSo.id
   partialObject.sessionId = newSo.sessionId
   partialObject.name = newSo.name
+  partialObject.serverVersion = newSo.serverVersion
+  partialObject.id = newSo.id
 
   return partialObject
 }
@@ -35,12 +38,4 @@ function deepEqual(obj1: any, obj2: any): boolean {
   }
 
   return true
-}
-
-export function partialResolve(so: SpaceObject, update: Partial<SpaceObject>) {
-  for (const key in update) {
-    so[key as keyof SpaceObject] = update[key as keyof unknown]
-  }
-
-  return so
 }

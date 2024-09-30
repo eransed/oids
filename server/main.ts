@@ -17,6 +17,7 @@ import { sessionHandler } from './sessions'
 import { ApiError } from './api/utils/apiError'
 import { StatusCodes } from 'http-status-codes'
 import { decode, encode } from '@msgpack/msgpack'
+
 dotenv.config()
 
 // start ApiServer
@@ -90,7 +91,7 @@ export class Client {
   req: IncomingMessage
   name: string
   dateAdded: Date
-  lastDataObject: SpaceObject | null = null
+  lastDataObject: SpaceObject
   sessionId: string | null = null
   sendClientHistory: clientUpdated[] = []
   userId: string
@@ -104,6 +105,7 @@ export class Client {
     this.dateAdded = _dateAdded
     this.addEventListeners()
     this.userId = _userId
+    this.lastDataObject = createSpaceObject(_name)
   }
 
   setSessionId(id: string) {
@@ -161,23 +163,15 @@ export class Client {
       try {
         // const so: SpaceObject = JSON.parse(event.data)
         const so = decode(new Uint8Array(event.data)) as SpaceObject
-        if (!so.sessionId || !so.id || !so.name) {
-          throw new Error('Need atleast sessionId, id and name from Spaceobject')
-        }
-
-        // Find the matching client in globalConnectedClients
-        globalConnectedClients.find((client) => {
-          if (client.lastDataObject) {
-            for (const key in so) {
-              client.lastDataObject[key as keyof SpaceObject] = so[key as keyof unknown]
-            }
-          }
-        })
 
         // debugData(so)
-        // this.lastDataObject = so
-        this.sessionId = so.sessionId
         so.serverVersion = name_ver
+
+        for (const key in so) {
+          this.lastDataObject[key as keyof SpaceObject] = so[key as keyof unknown]
+        }
+
+        this.sessionId = so.sessionId
 
         if (so.id !== this.userId) {
           this.updateIdOnce(so.id)
@@ -191,20 +185,21 @@ export class Client {
               }
             })
             so.online = true
-            broadcastToSessionClients(this, globalConnectedClients, so)
+            this.lastDataObject.online = true
+            broadcastToSessionClients(this, globalConnectedClients, this.lastDataObject)
           } else {
             info('No clients connected')
           }
         } else {
           if (serverGameEnabled) {
-            handleGameLogic(so)
+            handleGameLogic(this.lastDataObject)
 
-            startGameOnRequest(so)
+            startGameOnRequest(this.lastDataObject)
             removeStoppedGames()
           }
 
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
-            broadcastToAllClients(this, globalConnectedClients, so)
+            broadcastToAllClients(this, globalConnectedClients, this.lastDataObject)
           } else {
             broadcastToSessionClients(this, globalConnectedClients, so)
             //  info(`${this.name} with ${this.sessionId} broadcasts game info to possible ${globalConnectedClients.length}`)
@@ -388,7 +383,7 @@ class Every {
 }
 // broadcastToAllClients
 
-function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: SpaceObject): void {
+function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: Partial<SpaceObject>): void {
   // info(`Sending:`)
   // debugData(data)
   for (const client of connectedClients) {

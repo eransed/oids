@@ -205,7 +205,7 @@
     }
 
     $localPlayerStore.isPlaying = true
-    $socketStore.send($localPlayerStore)
+
     navigate(`/play/${$localPlayerStore.sessionId}`)
   }
 </script>

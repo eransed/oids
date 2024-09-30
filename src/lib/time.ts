@@ -7,6 +7,7 @@ import { renderFrameInfo } from './render/renderUI'
 import { localPlayerStore } from '../stores/stores'
 import { MessageType, type SpaceObject } from './interface'
 import { reduceSoSize } from './websocket/util'
+import { getPartialSo } from './websocket/deltaUpdates'
 
 export class Every {
   private currentTick = 0
@@ -73,11 +74,12 @@ export function fpsCounter(ops: number, frameTimeMs: number, game: Game, ctx: Ca
 }
 
 function moveNewShotsToLocalBuffer(so: SpaceObject): void {
+  // console.log(so.shotsInFlight)
   so.shotsInFlight = [...so.shotsInFlight, ...so.shotsInFlightNew]
   so.shotsInFlightNew = []
 }
 
-function shotHandler(so: SpaceObject): SpaceObject {
+export function shotHandler(so: SpaceObject): SpaceObject {
   so.shotsFiredThisFrame = false
   so.shotsInFlight = []
   if (so.shotsInFlightNew.length > 0) {
@@ -96,7 +98,7 @@ export function copyObject(obj: SpaceObject): SpaceObject {
   return JSON.parse(JSON.stringify(obj))
 }
 
-function getSendableSpaceObject(so: SpaceObject): SpaceObject {
+export function getSendableSpaceObject(so: SpaceObject): SpaceObject {
   so.collidingWith = []
   const so_copy: SpaceObject = <SpaceObject>copyObject(so)
   so_copy.messageType = MessageType.GAME_UPDATE
@@ -112,6 +114,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   let fid: number
 
   function update(timestamp: number): void {
+    const oldSo = { ...game.localPlayer }
     frameCount++
     every20.tick(() => localPlayerStore.set(game.localPlayer))
     const dt: number = getFrameTimeMs(timestamp)
@@ -121,7 +124,12 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     updateSpaceObject(game.localPlayer, dt)
     updateSpaceObjects(game.bodies, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
-      game.websocket.send(getSendableSpaceObject(game.localPlayer))
+      const sendAbleSpaceObject = getSendableSpaceObject(game.localPlayer)
+      const partialSo = getPartialSo(oldSo, sendAbleSpaceObject)
+      if (partialSo.shotsInFlight) {
+        console.log(partialSo.shotsInFlight)
+      }
+      game.websocket.send(partialSo)
     }
     moveNewShotsToLocalBuffer(game.localPlayer)
     fid = requestAnimationFrame(update)

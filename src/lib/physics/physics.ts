@@ -6,6 +6,7 @@ import type { Shape } from '../shapes/Shape'
 import { updateShots } from './updateShots'
 import { createSpaceObject } from '../factory'
 import { GameMode } from '../interface'
+import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
 
 const traceLength = 1
 
@@ -76,7 +77,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   if (so.health <= 0) {
     handleDeathExplosion(so, explosionDuration)
   }
-  if (so.shotsInFlight) {
+  if (so.shotsInFlight.length > 0) {
     updateShots(so, deltaTime)
   }
 

@@ -20,24 +20,16 @@
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
-  import { guestUser, localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
+  import { localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { getPlayersInSession } from '../../../../lib/services/game/playersInSession'
-  import { info } from 'mathil'
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
-  import Ships from '../../../ProfilePage/Ships.svelte'
-  // import type { Ship } from '@prisma/client'
-  import AddShip from '../../../../components/ships/AddShip.svelte'
   import ShipDetails from '../ShipSettings/ShipDetails.svelte'
   import Chat from '../../../../components/chat/chat.svelte'
   import ProgressBar from '../../../../components/progress/progressBar.svelte'
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
   import Celebration from '../../../../components/celebration/celebration.svelte'
   import { getShipBundleCache } from '../../../../style/ships'
-  import Button90 from '../../../../components/menu/Button90.svelte'
-  import { Icons } from '../../../../style/icons'
-  import { resetKeyMapToDefault } from '../Hotkeys/hotKeysChange'
-  import { getProfile } from '../../../../lib/services/user/profile'
 
   let game: Game
 
@@ -45,6 +37,7 @@
   export let sessionId: string
 
   let canvas: HTMLCanvasElement
+
   // let cleanup: () => void
 
   const noContext = document.getElementById('noContextMenu')
@@ -53,16 +46,6 @@
     console.log('what')
     e.preventDefault()
   })
-
-  async function players() {
-    try {
-      const response = await getPlayersInSession(sessionId)
-      return response.data
-    } catch (e) {
-      console.error(e)
-      return
-    }
-  }
 
   let chosenShip: Ship = $localPlayerStore.ship
   let shipModalOpen = false
@@ -77,24 +60,30 @@
       }
     }
 
+    $socketStore.send($localPlayerStore)
+
     game = new Game(canvas, $localPlayerStore, $socketStore, showDeadMenu)
     gameRef(game)
     game.localPlayer.sessionId = sessionId
-    await players().then((d) => {
-      if (!d) {
-        console.error('No players in session')
-        return
-      }
-      const players = d.players
 
-      if (players.length === 0) {
-        info(`You are the host!`)
-        game.localPlayer.isHost = false
+    try {
+      const response = await getPlayersInSession(sessionId)
+      const playerList = response.data
+      if (playerList) {
+        console.log(playerList)
+        playerList.players.forEach((player) => {
+          if (player.name !== $localPlayerStore.name) {
+            game.remotePlayers.push(player)
+          }
+        })
+        if (!$userStore || chosenShip) {
+          game.startGame(initRegularGame, renderFrame, nextFrame)
+          resetStars(game)
+        }
+      } else {
       }
-    })
-    if (!$userStore || chosenShip) {
-      game.startGame(initRegularGame, renderFrame, nextFrame)
-      resetStars(game)
+    } catch (err: any) {
+      console.error(err)
     }
 
     window.addEventListener('resize', handleResize)
@@ -200,6 +189,7 @@
 {/if}
 
 <!-- <canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} /> -->
+
 <canvas class="game_canvas" id="noContextMenu" bind:this={canvas} />
 
 <style>

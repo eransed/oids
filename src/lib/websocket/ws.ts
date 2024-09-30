@@ -3,7 +3,7 @@ import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
 import { logError, logInfo, logWarning } from '../../stores/alertHandler'
 import { decode, encode } from '@msgpack/msgpack'
-import { partialResolve, partialSend } from './deltaUpdates'
+import { getPartialSo } from './deltaUpdates'
 import { localPlayerStore } from '../../stores/stores'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
@@ -34,23 +34,13 @@ export function getReadyStateText(socket: WebSocket): string {
   }
 }
 
-export function sender(ws: WebSocket, messageObject: SpaceObject): boolean {
-  let localSoStore: SpaceObject | undefined = undefined
-
-  let sendObj: Partial<SpaceObject> | SpaceObject = messageObject
-
-  if (localPlayerStore) {
-    localPlayerStore.subscribe((v) => (localSoStore = v))
-  }
-
-  if (localSoStore) {
-    sendObj = partialSend(localSoStore, messageObject)
-  }
+export function sender(ws: WebSocket, messageObject: Partial<SpaceObject>): boolean {
+  // console.log('sending obj', messageObject)
 
   if (ws.readyState === 1) {
     // log("Sending message...")
     // ws.send(JSON.stringify(messageObject))
-    const encoded = encode(sendObj)
+    const encoded = encode(messageObject)
 
     ws.send(encoded)
     return true
@@ -66,7 +56,6 @@ export class OidsSocket {
   private prettyStatusString = 'Just created!'
   private sockMsgListener: SocketListener<'message'> | null = null
   private connectInitialized = false
-  private playerList: SpaceObject[] = []
 
   constructor(url: URL) {
     logInfo('New socket created')
@@ -122,7 +111,7 @@ export class OidsSocket {
     }
   }
 
-  send(messageObject: SpaceObject): void {
+  send(messageObject: Partial<SpaceObject>): void {
     if (!this.ws) {
       if (this.connectInitialized) {
         logWarning(`connectPromise already started!`)
@@ -172,15 +161,6 @@ export class OidsSocket {
           // const data = JSON.parse(event.data)
 
           const incomingData = decode(event.data) as Partial<SpaceObject>
-
-          const foundPlayerInPlayerList = this.playerList.find((v) => incomingData.name === v.name)
-
-          if (foundPlayerInPlayerList) {
-            partialResolve(foundPlayerInPlayerList, incomingData)
-          } else {
-            console.log('New player in playerlist: ', incomingData.name)
-            this.playerList.push(incomingData as SpaceObject)
-          }
 
           // if (!data.messageType) {
           //   console.error(data)
