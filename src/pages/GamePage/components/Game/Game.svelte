@@ -67,8 +67,8 @@
     game.localPlayer.sessionId = sessionId
 
     try {
-      const response = await getPlayersInSession(sessionId)
-      const playerList = response.data
+      const playerList = await getPlayersInSession(sessionId)
+
       if (playerList) {
         console.log(playerList)
         playerList.players.forEach((player) => {

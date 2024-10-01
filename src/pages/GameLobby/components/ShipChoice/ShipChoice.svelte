@@ -5,7 +5,7 @@
   import { localPlayerStore, userStore } from '../../../../stores/stores'
   import { Icons } from '../../../../style/icons'
   import AddShip from '../../../../components/ships/AddShip.svelte'
-  import { addAlert } from '../../../../stores/alertHandler'
+  import { addAlert } from '../../../../components/alert/alertHandler'
 
   let openModal = $userStore?.ships.length === 0 ? true : false
 </script>

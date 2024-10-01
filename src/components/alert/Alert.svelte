@@ -1,9 +1,9 @@
 <script lang="ts">
   import { fade, fly, slide } from 'svelte/transition'
   import { alertColors } from '../../style/defaultColors'
-  import { alertStore, handleAlertTimeOut } from '../../stores/alertHandler'
+  import { alertStore, handleAlertTimeOut } from './alertHandler'
   import AlertItem from './AlertItem.svelte'
-  import { timeOutList } from '../../stores/alertHandler'
+  import { timeOutList } from './alertHandler'
 
   const baseBottom = 0
   const paddingScaler = 10

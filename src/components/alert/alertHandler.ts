@@ -1,5 +1,5 @@
 import { writable, type Writable } from 'svelte/store'
-import type { AlertType } from '../components/alert/AlertType'
+import type { AlertType } from './AlertType'
 import { error, info, warn } from 'mathil'
 
 export const alertStore: Writable<AlertType[]> = writable([])

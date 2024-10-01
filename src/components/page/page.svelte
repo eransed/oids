@@ -26,7 +26,7 @@
     justify-content: center;
     color: #fff;
     max-height: 95vh;
-    overflow-y: auto;
+    /* overflow-y: auto; */
   }
 
   @media screen and (max-width: 1000px) {

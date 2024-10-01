@@ -13,7 +13,7 @@
   import type { Step } from '../../lib/interface'
   import Ships from '../ProfilePage/Ships.svelte'
   import ProfileModal from '../../components/profile/ProfileModal.svelte'
-  import { addAlert } from '../../stores/alertHandler'
+  import { addAlert } from '../../components/alert/alertHandler'
 
   let name: string
   let email: string

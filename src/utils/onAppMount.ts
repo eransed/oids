@@ -1,5 +1,5 @@
 import { validateToken } from '../lib/services/utils/Token'
-import { addAlert, alertStore, getAllAlerts, logInfo, updateAlertStoreFromLocalStorage } from '../stores/alertHandler'
+import { addAlert, alertStore, getAllAlerts, logInfo, updateAlertStoreFromLocalStorage } from '../components/alert/alertHandler'
 
 /**
  * Asynchronous function that runs at startup.

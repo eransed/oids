@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade, fly } from 'svelte/transition'
-  import { alertStore } from '../../stores/alertHandler'
+  import { alertStore } from './alertHandler'
   import { alertColors } from '../../style/defaultColors'
   import type { AlertType } from './AlertType'
   import { timeAgo } from '../../utils/utils'

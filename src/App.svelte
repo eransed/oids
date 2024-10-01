@@ -8,7 +8,6 @@
   import Routes from './Routes.svelte'
   import Star from './components/animations/star.svelte'
   import Alert from './components/alert/Alert.svelte'
-
   // import Cursor from './components/mouse/cursor.svelte'
 </script>
 

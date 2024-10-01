@@ -1,6 +1,6 @@
 import type { ServerUpdate, SpaceObject } from '../../../interface'
 import type { Game } from '../../../game'
-import { logInfo } from '../../../../stores/alertHandler'
+import { logInfo } from '../../../../components/alert/alertHandler'
 
 export function handleServerInformationUpdate(playerUpdate: ServerUpdate<SpaceObject>, game: Game) {
   game.serverVersion = playerUpdate.dataObject.serverVersion

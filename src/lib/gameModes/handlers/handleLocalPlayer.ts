@@ -9,7 +9,7 @@ import { renderExplosionFrame } from '../../render/renderFx'
 import { renderShip } from '../../render/renderShip'
 import { renderTrail } from '../../render/renderShipTrail'
 import { handleMoveView } from './handleMoveView'
-import { logWarning } from '../../../stores/alertHandler'
+import { logWarning } from '../../../components/alert/alertHandler'
 
 export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
   const localPlayer = game.localPlayer

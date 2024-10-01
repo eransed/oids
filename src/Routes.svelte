@@ -19,6 +19,7 @@
   import GameLobbyServers from './pages/GameLobby/GameLobbyServers.svelte'
   import RegisterPage from './pages/Register/RegisterPage.svelte'
   import AlertList from './components/alert/AlertList.svelte'
+  import DevPage from './pages/DevPage/DevPage.svelte'
 </script>
 
 <Router>
@@ -44,4 +45,5 @@
   <Route path={routes.settings.path}><SettingsPage /></Route>
   <Route path={routes.register.path}><RegisterPage /></Route>
   <Route path={routes.alerts.path}><AlertList /></Route>
+  <Route path={routes.dev.path}><DevPage /></Route>
 </Router>

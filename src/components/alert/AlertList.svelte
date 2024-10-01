@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
-  import { alertStore, clearAlerts, logInfo } from '../../stores/alertHandler'
+  import { alertStore, clearAlerts, logInfo } from './alertHandler'
 
   import { Icons } from '../../style/icons'
   import Button90 from '../menu/Button90.svelte'
@@ -51,7 +51,7 @@
         <AlertListItem {alert} />
       {/each} -->
       <!-- Working on Table component -->
-      <Table data={$alertStore} converter={alertItemConverter} />
+      <Table pagination itemsPerPage={20} data={$alertStore} converter={alertItemConverter} />
     </ul>
   {:else}
     <p>Nothing logged yet - Thats good I guess?</p>

@@ -1,4 +1,4 @@
-import { logInfo } from '../../../stores/alertHandler'
+import { logInfo } from '../../../components/alert/alertHandler'
 import type { SpaceObject } from '../../interface'
 
 export function handleRemotePlayers(remotes: SpaceObject[]): SpaceObject[] {

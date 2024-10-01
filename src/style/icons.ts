@@ -18,6 +18,13 @@ import Add from '../assets/icons/add.svg'
 import Google from '../assets/icons/google.svg'
 import Reset from '../assets/icons/reset.svg'
 import Alert from '../assets/icons/alert.svg'
+import First from '../assets/icons/first.svg'
+import Previous from '../assets/icons/previous.svg'
+import Next from '../assets/icons/next.svg'
+import Last from '../assets/icons/last.svg'
+import Login from '../assets/icons/login.svg'
+import Logout from '../assets/icons/logout.svg'
+import Code from '../assets/icons/code.svg'
 
 export const Icons = {
   Admin,
@@ -40,6 +47,13 @@ export const Icons = {
   Google,
   Reset,
   Alert,
+  First,
+  Previous,
+  Next,
+  Last,
+  Login,
+  Code,
+  Logout,
 }
 
 export const IconColor = '#D2B48C'

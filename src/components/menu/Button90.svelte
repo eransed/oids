@@ -84,7 +84,7 @@
     position: absolute;
     /* display: flex; */
     bottom: 0;
-    margin-bottom: -1.3em;
+    margin-bottom: -0.6em;
   }
 
   .icon img {
@@ -110,6 +110,7 @@
   }
 
   button {
+    align-items: center;
     justify-content: center;
     align-content: center;
     display: flex;
@@ -119,7 +120,7 @@
     padding: 10px;
     width: -moz-fit-content;
     width: fit-content;
-    height: 4em;
+    height: fit-content;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-weight: bold;
     font-size: 15px;
@@ -177,7 +178,7 @@
   }
 
   button:disabled {
-    opacity: 0.2;
+    opacity: 0.5;
     cursor: not-allowed;
     filter: invert(100%) sepia(15%) saturate(6959%) hue-rotate(307deg) brightness(83%) contrast(1%);
   }

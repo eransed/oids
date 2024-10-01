@@ -23,7 +23,7 @@ import { handleRemotePlayers } from './handlers/handleRemotePlayers'
 import { renderRemotePlayerInSpaceMode } from '../render/renderRemotePlayers'
 import { initNetworkStats } from './handlers/handleNetStats'
 import { playerUpdate } from './handlers/handlePlayerUpdate'
-import { addAlert, logError, logInfo, logWarning } from '../../stores/alertHandler'
+import { addAlert, logError, logInfo, logWarning } from '../../components/alert/alertHandler'
 //Stores
 
 let activeKeyMap: KeyFunctionMap

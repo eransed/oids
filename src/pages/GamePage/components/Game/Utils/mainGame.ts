@@ -1,6 +1,6 @@
 import type { Game } from '../../../../../lib/game'
 import type { Settings } from '../../../../../lib/interface'
-import { logInfo, logWarning } from '../../../../../stores/alertHandler'
+import { logInfo, logWarning } from '../../../../../components/alert/alertHandler'
 
 export let game: Game
 export function gameRef(g: Game): void {

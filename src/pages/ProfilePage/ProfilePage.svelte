@@ -32,7 +32,7 @@
   import { getThemeNumber, themes } from '../../style/defaultColors'
   import type { Theme } from '../../lib/interface'
   import { getAccessTokenFromLocalStorage } from '../../lib/services/utils/Token'
-  import { addAlert } from '../../stores/alertHandler'
+  import { addAlert } from '../../components/alert/alertHandler'
 
   onMount(async () => {
     const token = getAccessTokenFromLocalStorage()
@@ -313,10 +313,7 @@
         {/if}
       </div>
     {:else}
-      <div>
-        <p style="color: var(--main-text-color)">Please login to see your profile</p>
-        <ProfileModal />
-      </div>
+      <ProfileModal />
     {/if}
   </div>
 </Page>
@@ -358,7 +355,7 @@
   }
 
   .profileWrapper {
-    display: grid;
+    display: flex;
     justify-self: center;
     align-self: center;
     flex-wrap: wrap;

@@ -1,7 +1,7 @@
 // import { info, warn } from 'mathil'
 import { OIDS_WS_PORT } from '../../../server/pub_config'
 import { MessageType, type ServerUpdate, type SpaceObject } from '../interface'
-import { logError, logInfo, logWarning } from '../../stores/alertHandler'
+import { logError, logInfo, logWarning } from '../../components/alert/alertHandler'
 import { decode, encode } from '@msgpack/msgpack'
 import { getPartialSo } from './deltaUpdates'
 import { localPlayerStore } from '../../stores/stores'

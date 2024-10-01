@@ -1,7 +1,7 @@
 import { MessageType, type ServerUpdate, type SpaceObject } from '../../interface'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../../websocket/shotOptimizer'
 import type { Game } from '../../game'
-import { logInfo } from '../../../stores/alertHandler'
+import { logInfo } from '../../../components/alert/alertHandler'
 import { createSpaceObject } from '../../factory'
 
 export function handleGameUpdate(su: ServerUpdate<SpaceObject>, game: Game) {

@@ -3,7 +3,7 @@ import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { getLocationURL } from '../../../utils/utils'
 import type { User } from '../../interface'
 import { getAccessTokenFromLocalStorage } from '../utils/Token'
-import { addAlert } from '../../../stores/alertHandler'
+import { addAlert } from '../../../components/alert/alertHandler'
 
 export async function deleteUser(email: string): Promise<AxiosResponse<User>> {
   const token = getAccessTokenFromLocalStorage()

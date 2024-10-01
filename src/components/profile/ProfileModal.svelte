@@ -18,7 +18,8 @@
   //Assets
   import { navigate } from 'svelte-routing'
   import { Icons } from '../../style/icons'
-  import { addAlert } from '../../stores/alertHandler'
+  import { addAlert } from '../alert/alertHandler'
+  import { handleAxiosError } from '../../lib/services/utils/errorHandler'
 
   let loading: boolean = false
 
@@ -31,17 +32,16 @@
     const password = formData.get('password')?.toString()
 
     if (email && password) {
-      await login(email, password)
-        .then(async (response) => {
-          localStorage.setItem('accessToken', response.data.accessToken)
-          localStorage.setItem('refreshToken', response.data.refreshToken)
-          await getProfile()
-          loading = false
-        })
-        .catch(() => {
-          addAlert('error', 'Wrong email or password, try again!')
-          loading = false
-        })
+      try {
+        const response = await login(email, password)
+        localStorage.setItem('accessToken', response.data.accessToken)
+        localStorage.setItem('refreshToken', response.data.refreshToken)
+        await getProfile()
+        loading = false
+      } catch (e) {
+        handleAxiosError(e)
+        loading = false
+      }
     }
   }
 
@@ -56,10 +56,10 @@
 
       <input placeholder="Password" name="password" type="password" autocomplete="current-password" />
       <div class="button">
-        <Button90 buttonType="submit" {loading} buttonConfig={loginButton} mouseTracking={false} />
+        <Button90 addInfo="Login" icon={Icons.Login} buttonType="submit" {loading} buttonConfig={loginButton} />
       </div>
-      <div class="button">
-        <Button90 buttonType="button" buttonConfig={loginGoogle} mouseTracking={false} socialIcon={Icons.Google} addInfo="Login with Google" />
+      <div class="button google">
+        <Button90 buttonType="button" buttonConfig={loginGoogle} socialIcon={Icons.Google} addInfo="Login with Google" />
       </div>
     </form>
   </div>
@@ -92,21 +92,32 @@
     </div>
 
     <div class="button">
-      <Button90 buttonConfig={logOutButton} mouseTracking={false} />
+      <Button90 icon={Icons.Logout} addInfo="Logout" buttonConfig={logOutButton} mouseTracking={false} />
     </div>
   </div>
 {/if}
 
 <style>
   .profileModal {
-    display: grid;
+    display: flex;
     flex-direction: column;
     width: 100%;
-    margin: 0.85em;
+    /* margin: 0.85em; */
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    justify-items: center;
+    padding: 1em;
   }
 
-  .row1 {
+  /* form {
     display: grid;
+    justify-content: center;
+    align-items: center;
+  } */
+
+  .row1 {
+    display: flex;
     grid-template-columns: 1fr 4fr;
     flex-direction: row;
     flex-wrap: wrap;
@@ -114,7 +125,7 @@
   }
 
   .row2 {
-    display: grid;
+    display: flex;
     grid-template-columns: 1fr;
     flex-direction: row;
     flex-wrap: wrap;
@@ -138,6 +149,10 @@
     width: fit-content;
     justify-self: center;
     margin-top: 10px;
+  }
+
+  .google {
+    border-top: 1px solid var(--main-accent-color);
   }
 
   input {

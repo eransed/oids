@@ -36,7 +36,7 @@
   import Info from '../../components/info/info.svelte'
   import { getProfile } from '../../lib/services/user/profile'
   import { handleAxiosError } from '../../lib/services/utils/errorHandler'
-  import { logError, logInfo, logWarning } from '../../stores/alertHandler'
+  import { logError, logInfo, logWarning } from '../../components/alert/alertHandler'
   import login from '../../lib/services/auth/login'
 
   pageHasHeaderStore.set(true)
@@ -160,18 +160,12 @@
   }
 
   async function updateSessions() {
-    await getActiveSessions()
-      .then((s) => {
-        if (s.status === 200) {
-          sessions = s.data
-          checkJoinedSession()
-        } else {
-          logError(`Sessions endpoint returned status ${s.status} ${s.statusText}`)
-        }
-      })
-      .catch((e) => {
-        logError(`Failed to fetch sessions: ${e}`)
-      })
+    try {
+      sessions = await getActiveSessions()
+      checkJoinedSession()
+    } catch (e) {
+      handleAxiosError(e)
+    }
   }
 
   /**
@@ -212,12 +206,6 @@
 
 <Page>
   <div class="lobbyWrapper">
-    {#if !joinedSession}
-      <div class="left" in:fly={{ duration: 500, x: -500 }}>
-        <Info text="Servers" />
-        <Sessions {joinSession_} {startGame} {sessions} />
-      </div>
-    {/if}
     {#if joinedSession}
       <Button90
         addInfo="Back to servers"
@@ -250,6 +238,11 @@
       </div>
       <div class="right" in:fly={{ duration: 500, x: 500 }}>
         <Chat joinedSessionId={joinedSession?.id} />
+      </div>
+    {:else}
+      <div class="left" in:fly={{ duration: 500, x: -500 }}>
+        <Info text="Servers" />
+        <Sessions {joinSession_} {startGame} {sessions} />
       </div>
     {/if}
   </div>
