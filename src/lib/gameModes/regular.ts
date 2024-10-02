@@ -171,9 +171,14 @@ export function initRegularGame(game: Game): void {
 }
 
 const every = new Every(25)
+const every2000 = new Every(200)
 
 export function renderFrame(game: Game, dt: number): void {
   // Heads up stuff
+
+  every2000.tick(() => {
+    console.log(game.remotePlayers)
+  })
 
   every.tick(() => {
     game.localPlayer.viewport = getScreenRect(game.ctx)

@@ -108,7 +108,6 @@ export function getSendableSpaceObject(so: SpaceObject): SpaceObject {
 }
 
 const every20: Every = new Every(20)
-const every200: Every = new Every(200)
 
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
@@ -126,10 +125,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     if (game.websocket.isConnected() && game.shouldSendToServer) {
       const sendAbleSpaceObject = getSendableSpaceObject(game.localPlayer)
       const partialSo = getPartialSo(oldSo, sendAbleSpaceObject)
-      if (partialSo.shotsInFlight) {
-        console.log(partialSo.shotsInFlight)
-      }
-      game.websocket.send(partialSo)
+      game.websocket.send(sendAbleSpaceObject)
     }
     moveNewShotsToLocalBuffer(game.localPlayer)
     fid = requestAnimationFrame(update)

@@ -64,6 +64,5 @@
     color: var(--main-text-color);
     display: flex;
     align-items: center;
-    justify-content: center;
   }
 </style>

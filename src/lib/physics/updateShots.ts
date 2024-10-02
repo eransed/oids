@@ -7,8 +7,6 @@ import { alignHeadingToVelocity } from './physics'
 export function updateShots(so: SpaceObject, dts: number): void {
   if (isNaN(dts)) return
 
-  console.log(so.shotsInFlight)
-
   decayDeadShots(so)
 
   coolDown(so)
