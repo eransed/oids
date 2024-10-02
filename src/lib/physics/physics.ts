@@ -18,7 +18,7 @@ export function updateShape(shape: Shape, dt: number): void {
   shape.velocity = add2(shape.velocity, a)
   shape.position = add2(shape.position, v)
   shape.acceleration = { x: 0, y: 0 }
-  shape.velocity = limitVec2(shape.velocity, { x: 200, y: 200 })
+  shape.velocity = limitVec2(shape.velocity, { x: 2, y: 2 })
 }
 
 export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
@@ -43,36 +43,44 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
     applyFriction(so, 0.9)
   }
 
+  function limit(n: number, max: number): number {
+    return Math.abs(n) >= Math.abs(max) ? (n < 0 ? -max : max) : n
+  }
+
+  function limitVec2_(v: Vec2, max: Vec2): Vec2 {
+    return { x: limit(v.x, max.x), y: limit(v.y, max.y) }
+  }
+
   so.velocity = add2(so.velocity, a)
   so.position = add2(so.position, v)
   so.cameraVelocity = smul2(v, 1)
   so.cameraPosition = add2(so.cameraPosition, so.cameraVelocity)
   so.acceleration = { x: 0, y: 0 }
-  so.velocity = limitVec2(so.velocity, { x: 250, y: 250 })
+  so.velocity = limitVec2_(so.velocity, { x: 5, y: 5 })
   so.angleDegree += so.angularVelocity * deltaTime
   so.ticksSinceLastSnapShot++
-  if (so.positionalTrace && so.ticksSinceLastSnapShot > ticksBetweenSnapshots) {
-    so.ticksSinceLastSnapShot = 0
-    const trace = createSpaceObject()
-    trace.position = so.position
-    trace.viewFramePosition = so.viewFramePosition
-    trace.angleDegree = so.angleDegree
-    trace.cameraPosition = add2(so.cameraPosition, rndfVec2(-20, 20))
-    trace.cameraVelocity = so.cameraVelocity
-    trace.velocity = so.velocity
-    trace.positionalTrace = null
-    so.positionalTrace.push(trace)
+  // if (so.positionalTrace && so.ticksSinceLastSnapShot > ticksBetweenSnapshots) {
+  //   so.ticksSinceLastSnapShot = 0
+  //   const trace = createSpaceObject()
+  //   trace.position = so.position
+  //   trace.viewFramePosition = so.viewFramePosition
+  //   trace.angleDegree = so.angleDegree
+  //   trace.cameraPosition = add2(so.cameraPosition, rndfVec2(-20, 20))
+  //   trace.cameraVelocity = so.cameraVelocity
+  //   trace.velocity = so.velocity
+  //   trace.positionalTrace = null
+  //   so.positionalTrace.push(trace)
 
-    if (so.positionalTrace.length > traceLength) {
-      so.positionalTrace.shift()
-    }
+  //   if (so.positionalTrace.length > traceLength) {
+  //     so.positionalTrace.shift()
+  //   }
 
-    so.positionalTrace.forEach((t) => {
-      applyFriction(t, 0.7)
-      // alignHeadingToVelocity(t)
-      updateSpaceObject(t, dt)
-    })
-  }
+  //   so.positionalTrace.forEach((t) => {
+  //     applyFriction(t, 0.7)
+  //     // alignHeadingToVelocity(t)
+  //     updateSpaceObject(t, dt)
+  //   })
+  // }
 
   if (so.health <= 0) {
     handleDeathExplosion(so, explosionDuration)

@@ -20,7 +20,7 @@
   transition: all;
   transition-duration: 0s;
   transition-timing-function: cubic-bezier(1, -1.53, 0.26, 1.1);
-  /* background: linear-gradient(rgba(50, 82, 225, 0.1), rgba(0, 0, 0, 0.4)); */
+  background-color: var(--main-bg-color);
 }
 
 .header > * {
@@ -160,7 +160,7 @@ nav {
   z-index: 1;
 }
 
-@media screen and (max-width: 950px) {
+@media screen and (max-width: 1150px) {
   .header {
     overflow: visible;
   }

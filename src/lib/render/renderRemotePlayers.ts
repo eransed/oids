@@ -37,7 +37,7 @@ export function renderRemotePlayerInSpaceMode(remotes: SpaceObject[], game: Game
       }
 
       if (activeKeyMap.systemGraphs.keyStatus) {
-        renderViewport(game.ctx, remotePlayer)
+        // renderViewport(game.ctx, remotePlayer)
         renderHitRadius(remotePlayer, game.ctx)
       }
       if (remotePlayer.health < remotePlayer.startHealth) {

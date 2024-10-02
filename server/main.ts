@@ -167,10 +167,11 @@ export class Client {
         // debugData(so)
         so.serverVersion = name_ver
 
-        for (const key in so) {
-          this.lastDataObject[key as keyof SpaceObject] = so[key as keyof unknown]
-        }
+        // for (const key in so) {
+        //   this.lastDataObject[key as keyof SpaceObject] = so[key as keyof unknown]
+        // }
 
+        this.lastDataObject = so
         this.sessionId = so.sessionId
 
         if (so.id !== this.userId) {
@@ -344,14 +345,14 @@ function broadcastToAllClients(skipSourceClient: Client, connectedClients: Clien
         info(`${data.name} left the session -> ${client.name}`)
       }
       // client.ws.send(JSON.stringify(data))
-      client.ws.send(encode(data))
+      client.ws.send(encode(data, { forceFloat32: true }))
     }
   }
 }
 
 function broadcastToOneClient(data: SpaceObject, client: Client): void {
   // client.ws.send(JSON.stringify(data))
-  client.ws.send(encode(data))
+  client.ws.send(encode(data, { forceFloat32: true }))
 }
 
 //Checking distance between two players: sending client and recieving client.
@@ -392,11 +393,11 @@ function broadcastToSessionClients(sendingClient: Client, connectedClients: Clie
         if (data.messageType === MessageType.GAME_UPDATE) {
           if (shouldSendToClientInGame(sendingClient, client)) {
             // client.ws.send(JSON.stringify(data))
-            client.ws.send(encode(data))
+            client.ws.send(encode(data, { forceFloat32: true }))
           }
         } else {
           // client.ws.send(JSON.stringify(data))
-          client.ws.send(encode(data))
+          client.ws.send(encode(data, { forceFloat32: true }))
         }
       }
     }
@@ -431,7 +432,7 @@ function serverBroadcast<T extends SpaceObject>(data: T, connectedClients: Clien
   if (sessionId === null) {
     for (const client of connectedClients) {
       // client.ws.send(JSON.stringify(data))
-      client.ws.send(encode(data))
+      client.ws.send(encode(data, { forceFloat32: true }))
 
       sendCount++
     }
@@ -440,7 +441,7 @@ function serverBroadcast<T extends SpaceObject>(data: T, connectedClients: Clien
       if (client.sessionId === sessionId) {
         // info(`Sending to ${client.name} with session ${sessionId}`)
         // client.ws.send(JSON.stringify(data))
-        client.ws.send(encode(data))
+        client.ws.send(encode(data, { forceFloat32: true }))
 
         sendCount++
       }
@@ -527,7 +528,7 @@ server.on('connection', function connection(clientConnection: WebSocket, req: In
   const soService = createSpaceObject()
   soService.messageType = MessageType.SERVICE
   soService.serverVersion = name_ver
-  clientConnection.send(encode(soService))
+  clientConnection.send(encode(soService, { forceFloat32: true }))
 
   globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
 

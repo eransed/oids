@@ -51,7 +51,7 @@
         <AlertListItem {alert} />
       {/each} -->
       <!-- Working on Table component -->
-      <Table pagination itemsPerPage={20} data={$alertStore} converter={alertItemConverter} />
+      <Table itemsPerPage={20} data={$alertStore} converter={alertItemConverter} />
     </ul>
   {:else}
     <p>Nothing logged yet - Thats good I guess?</p>

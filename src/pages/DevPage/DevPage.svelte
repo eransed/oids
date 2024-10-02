@@ -12,7 +12,7 @@
   import { handleAxiosError } from '../../lib/services/utils/errorHandler'
 
   function encodedMsg() {
-    console.log(encode($localPlayerStore))
+    console.log(encode($localPlayerStore, { forceFloat32: true }))
   }
 
   function sessionConverter(session: Session) {

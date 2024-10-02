@@ -17,7 +17,7 @@
 
   .pageWrapper {
     width: 100vw;
-    top: 118px;
+    top: 150px;
     display: flex;
     position: relative;
     align-content: flex-start;

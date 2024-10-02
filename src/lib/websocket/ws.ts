@@ -40,7 +40,8 @@ export function sender(ws: WebSocket, messageObject: Partial<SpaceObject>): bool
   if (ws.readyState === 1) {
     // log("Sending message...")
     // ws.send(JSON.stringify(messageObject))
-    const encoded = encode(messageObject)
+
+    const encoded = encode(messageObject, { forceFloat32: true })
 
     ws.send(encoded)
     return true

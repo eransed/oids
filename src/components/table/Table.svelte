@@ -23,15 +23,17 @@
   }
 </script>
 
-{#if pagination}
-  <div class="pagination">
+<div class="pagination">
+  <!-- <Button90 addInfo="Pagination" icon={Icons.Settings} buttonConfig={{ buttonText: 'Pagination', clickCallback: () => (pagination = !pagination), selected: false }} /> -->
+  {#if pagination}
     <Button90 disabled={currentPage === 1} addInfo="First" icon={Icons.First} buttonConfig={{ buttonText: 'First', clickCallback: () => goToPage(1), selected: false }} />
     <Button90 disabled={currentPage === 1} addInfo="Previous" icon={Icons.Previous} buttonConfig={{ buttonText: 'Previous', clickCallback: () => goToPage(currentPage - 1), selected: false }} />
     <Button90 disabled={currentPage === totalPages} addInfo="Next" icon={Icons.Next} buttonConfig={{ buttonText: 'Next', clickCallback: () => goToPage(currentPage + 1), selected: false }} />
     <Button90 disabled={currentPage === totalPages} addInfo="Last" icon={Icons.Last} buttonConfig={{ buttonText: 'Last', clickCallback: () => goToPage(totalPages), selected: false }} />
     <span>Page {currentPage} of {totalPages}</span>
-  </div>
-{/if}
+  {/if}
+</div>
+
 <table>
   <thead>
     <tr>
