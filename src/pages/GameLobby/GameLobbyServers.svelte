@@ -181,6 +181,7 @@
       // send some update that localPlayer joined a/the session
       $localPlayerStore.messageType = MessageType.SESSION_UPDATE
       $localPlayerStore.isHost = false
+
       $chatMsgHistoryStore = []
       $chatMsgHistoryStore = [...$chatMsgHistoryStore, createJoinMsg(sessionId)]
       $socketStore.send($localPlayerStore)

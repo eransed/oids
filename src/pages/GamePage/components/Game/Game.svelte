@@ -30,6 +30,10 @@
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
   import Celebration from '../../../../components/celebration/celebration.svelte'
   import { getShipBundleCache } from '../../../../style/ships'
+  import Page from '../../../../components/page/page.svelte'
+  import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
+  import { fly } from 'svelte/transition'
+  import { logInfo } from '../../../../components/alert/alertHandler'
 
   let game: Game
 
@@ -49,8 +53,12 @@
 
   let chosenShip: Ship = $localPlayerStore.ship
   let shipModalOpen = false
+  let loadingGame = true
+  $: loadingText = ''
 
   onMount(async () => {
+    loadingText = 'Starting OIDS'
+    loadingGame = true
     // cleanup = initSettingsControl()
 
     if ($userStore) {
@@ -67,6 +75,7 @@
     game.localPlayer.sessionId = sessionId
 
     try {
+      loadingText = 'Anybody out there'
       const playerList = await getPlayersInSession(sessionId)
 
       if (playerList) {
@@ -80,9 +89,12 @@
           game.startGame(initRegularGame, renderFrame, nextFrame)
           resetStars(game)
         }
-      } else {
       }
+      loadingGame = false
     } catch (err: any) {
+      loadingGame = false
+      game.startGame(initRegularGame, renderFrame, nextFrame)
+      resetStars(game)
       console.error(err)
     }
 
@@ -108,6 +120,12 @@
     window.removeEventListener('resize', handleResize)
   })
 </script>
+
+{#if loadingGame}
+  <div in:fly={{ duration: 400 }} style="z-index: 1000;">
+    <CircularSpinner ship text={loadingText} />
+  </div>
+{/if}
 
 {#if $ActiveKeyMapStore.healthBar.keyStatus}
   <div class="shipWrapper" style="z-index: 1;">

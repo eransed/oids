@@ -47,6 +47,7 @@ export class Game {
   }
 
   stopGame = async (): Promise<void> => {
+    this.localPlayer.isPlaying = false
     this.running = false
     this.shouldSendToServer = false
     this.localPlayer.isPlaying = false

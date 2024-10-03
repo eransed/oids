@@ -2,7 +2,7 @@
   import { navigate } from 'svelte-routing'
   import type { Button90Config } from '../../../../lib/interface'
   import type { Game } from '../../../../lib/game'
-  import { settingsStore } from '../../../../stores/stores'
+  import { localPlayerStore, settingsStore } from '../../../../stores/stores'
   import { toggleAndGetTheme } from '../../../../style/defaultColors'
   import { ActiveKeyMapStore, initKeyControllers, removeKeyControllers } from '../../../../lib/input'
   import { onMount } from 'svelte'
@@ -62,6 +62,7 @@
     buttonText: 'Quit Game (Q)',
     clickCallback() {
       $ActiveKeyMapStore.menu.store = false
+
       currentGame.stopGame()
 
       navigate('/play')

@@ -13,18 +13,29 @@
   export let text: string = ''
 </script>
 
-{#if text} 
-<p style="text-align: center;"><TypeWriter loadingDots text={text}/></p>
-{/if}
-{#if ship}
-  <div class="ship">
-    <img draggable="false" alt="Ship" src={Ship} />
-  </div>
-{:else}
-  <div class="circle" />
-{/if}
+<div class="wrapper">
+  {#if ship}
+    {#if text}
+      <p class="text" style="text-align: center;"><TypeWriter loadingDots {text} /></p>
+    {/if}
+    <div class="ship">
+      <img draggable="false" alt="Ship" src={Ship} />
+    </div>
+  {:else}
+    <div class="circle" />
+  {/if}
+</div>
 
 <style>
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .text {
+    min-height: 14px;
+  }
+
   .circle {
     width: 25px;
     height: 25px;

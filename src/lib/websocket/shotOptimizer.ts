@@ -8,9 +8,6 @@ export function spaceObjectUpdateAndShotReciverOptimizer(possibleNewShots: Space
     // the new shots
     const newShotsThisUpdate = possibleNewShots.shotsInFlight
 
-    // update the remote player data object
-    storedSpaceObject = possibleNewShots
-
     // concat the old and the new shots
     storedSpaceObject.shotsInFlight = [...cachePhotonLasers, ...newShotsThisUpdate]
   }

@@ -82,7 +82,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     inverseFireRate: 6,
     isDead: false,
     isLocal: false,
-    isPlaying: true,
+    isPlaying: false,
     killedByName: '',
     kills: [],
     killCount: 0,

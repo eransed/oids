@@ -56,7 +56,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   so.cameraVelocity = smul2(v, 1)
   so.cameraPosition = add2(so.cameraPosition, so.cameraVelocity)
   so.acceleration = { x: 0, y: 0 }
-  so.velocity = limitVec2_(so.velocity, { x: 5, y: 5 })
+  so.velocity = limitVec2_(so.velocity, { x: 100, y: 100 })
   so.angleDegree += so.angularVelocity * deltaTime
   so.ticksSinceLastSnapShot++
   // if (so.positionalTrace && so.ticksSinceLastSnapShot > ticksBetweenSnapshots) {

@@ -3,9 +3,16 @@ import { spaceObjectUpdateAndShotReciverOptimizer } from '../../websocket/shotOp
 import type { Game } from '../../game'
 import { addAlert, logInfo } from '../../../components/alert/alertHandler'
 import { createSpaceObject } from '../../factory'
+import { Every } from '../../time'
+
+const every200 = new Every(200)
 
 export function handleGameUpdate(su: ServerUpdate<SpaceObject>, game: Game) {
   const so: SpaceObject = su.dataObject
+
+  every200.tick(() => {
+    console.log(so)
+  })
 
   if (so.name !== game.localPlayer.name) {
     if (!game.remotePlayers.find((v) => v.name === so.name)) {
@@ -15,15 +22,17 @@ export function handleGameUpdate(su: ServerUpdate<SpaceObject>, game: Game) {
 
     for (let i = 0; i < game.remotePlayers.length; i++) {
       if (so.name === game.remotePlayers[i].name) {
-        // for (const key in so) {
-        //   game.remotePlayers[i][key as keyof SpaceObject] = so[key as keyof unknown]
-        // }
+        //Loops through the keys of incoming partialSo and adds the values to the right key of stored so
+        //If the key is shotsInFlight we want to concatenate the shots
+        for (const key in so) {
+          if (key === ('shotsInFlight' as keyof SpaceObject)) {
+            game.remotePlayers[i].shotsInFlight = [...game.remotePlayers[i].shotsInFlight, ...so.shotsInFlight]
+          } else {
+            game.remotePlayers[i][key as keyof SpaceObject] = so[key as keyof unknown]
+          }
+        }
 
-        console.log(so)
-
-        game.remotePlayers[i] = spaceObjectUpdateAndShotReciverOptimizer(so, game.remotePlayers[i])
-
-        if (!game.remotePlayers[i].online) {
+        if (!game.remotePlayers[i].online || !game.remotePlayers[i].isPlaying) {
           logInfo(`${so.name} went offline`)
           game.remotePlayers.splice(i)
           continue

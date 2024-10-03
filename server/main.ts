@@ -17,6 +17,7 @@ import { sessionHandler } from './sessions'
 import { ApiError } from './api/utils/apiError'
 import { StatusCodes } from 'http-status-codes'
 import { decode, encode } from '@msgpack/msgpack'
+import { getPartialSo } from '../src/lib/websocket/deltaUpdates'
 
 dotenv.config()
 
@@ -163,15 +164,15 @@ export class Client {
       try {
         // const so: SpaceObject = JSON.parse(event.data)
         const so = decode(new Uint8Array(event.data)) as SpaceObject
+        const oldSo = this.lastDataObject
 
         // debugData(so)
         so.serverVersion = name_ver
 
-        // for (const key in so) {
-        //   this.lastDataObject[key as keyof SpaceObject] = so[key as keyof unknown]
-        // }
+        for (const key in so) {
+          this.lastDataObject[key as keyof SpaceObject] = so[key as keyof unknown]
+        }
 
-        this.lastDataObject = so
         this.sessionId = so.sessionId
 
         if (so.id !== this.userId) {
@@ -200,9 +201,10 @@ export class Client {
           }
 
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
+            // this.lastDataObject.isPlaying = false
             broadcastToAllClients(this, globalConnectedClients, this.lastDataObject)
           } else {
-            broadcastToSessionClients(this, globalConnectedClients, so)
+            broadcastToSessionClients(this, globalConnectedClients, getPartialSo(oldSo, so))
             //  info(`${this.name} with ${this.sessionId} broadcasts game info to possible ${globalConnectedClients.length}`)
           }
         }
