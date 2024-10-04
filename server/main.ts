@@ -164,7 +164,6 @@ export class Client {
       try {
         // const so: SpaceObject = JSON.parse(event.data)
         const so = decode(new Uint8Array(event.data)) as SpaceObject
-        const oldSo = this.lastDataObject
 
         // debugData(so)
         so.serverVersion = name_ver
@@ -188,7 +187,8 @@ export class Client {
             })
             so.online = true
             this.lastDataObject.online = true
-            broadcastToSessionClients(this, globalConnectedClients, this.lastDataObject)
+            this.lastDataObject.messageType = MessageType.SESSION_UPDATE
+            broadcastToAllClients(this, globalConnectedClients, this.lastDataObject)
           } else {
             info('No clients connected')
           }
@@ -203,9 +203,11 @@ export class Client {
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
             // this.lastDataObject.isPlaying = false
             broadcastToAllClients(this, globalConnectedClients, this.lastDataObject)
-          } else {
-            broadcastToSessionClients(this, globalConnectedClients, getPartialSo(oldSo, so))
+          } else if (so.messageType === MessageType.GAME_UPDATE) {
+            broadCastToInGameClients(this, globalConnectedClients, so)
             //  info(`${this.name} with ${this.sessionId} broadcasts game info to possible ${globalConnectedClients.length}`)
+          } else {
+            broadcastToLobbyClients(this, globalConnectedClients, this.lastDataObject)
           }
         }
       } catch (e) {
@@ -386,20 +388,30 @@ class Every {
 }
 // broadcastToAllClients
 
-function broadcastToSessionClients(sendingClient: Client, connectedClients: Client[], data: Partial<SpaceObject>): void {
+const every300 = new Every(300)
+
+function broadcastToLobbyClients(sendingClient: Client, connectedClients: Client[], data: Partial<SpaceObject>): void {
   // info(`Sending:`)
   // debugData(data)
   for (const client of connectedClients) {
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
-        if (data.messageType === MessageType.GAME_UPDATE) {
+        client.ws.send(encode(data, { forceFloat32: true }))
+      }
+    }
+  }
+}
+
+function broadCastToInGameClients(sendingClient: Client, connectedClients: Client[], data: Partial<SpaceObject>): void {
+  // info(`Sending:`)
+  // debugData(data)
+  for (const client of connectedClients) {
+    if (sendingClient !== client && sendingClient.name !== client.name) {
+      if (sendingClient.sessionId === client.sessionId) {
+        if (data.messageType === MessageType.GAME_UPDATE && client.lastDataObject.isPlaying) {
           if (shouldSendToClientInGame(sendingClient, client)) {
-            // client.ws.send(JSON.stringify(data))
             client.ws.send(encode(data, { forceFloat32: true }))
           }
-        } else {
-          // client.ws.send(JSON.stringify(data))
-          client.ws.send(encode(data, { forceFloat32: true }))
         }
       }
     }

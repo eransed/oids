@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fade, fly } from 'svelte/transition'
   import Button90 from '../../../../components/menu/Button90.svelte'
   import type { Session, SpaceObject } from '../../../../lib/interface'
 

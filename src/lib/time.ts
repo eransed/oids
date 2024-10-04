@@ -8,6 +8,7 @@ import { localPlayerStore } from '../stores/stores'
 import { MessageType, type SpaceObject } from './interface'
 import { reduceSoSize } from './websocket/util'
 import { getPartialSo } from './websocket/deltaUpdates'
+import { handleAxiosError } from './services/utils/errorHandler'
 
 export class Every {
   private currentTick = 0
@@ -112,6 +113,7 @@ const every300: Every = new Every(300)
 
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
+  let gameStopped: boolean = false
 
   function update(timestamp: number): void {
     const oldSo = { ...game.localPlayer }
@@ -135,23 +137,24 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
 
   update(0)
 
-  function stopper(): Promise<number> {
-    return new Promise<number>((resolve) => {
-      if (game.websocket.isConnected()) {
-        game.localPlayer.isPlaying = false
-        // Game updates goes only to session peers
-        game.localPlayer.messageType = MessageType.GAME_UPDATE
+  async function stopper() {
+    try {
+      game.localPlayer.isPlaying = false
+      // Game updates goes only to session peers
+      game.localPlayer.messageType = MessageType.GAME_UPDATE
+      if (!gameStopped) {
+        console.log(game.localPlayer)
         game.websocket.send(game.localPlayer)
-        // sendSpaceObjectToBroadcastServer(game.localPlayer)
       }
-      cancelAnimationFrame(fid)
-      resolve(fid)
+      // sendSpaceObjectToBroadcastServer(game.localPlayer)
 
-      // setTimeout(() => {
-      //   cancelAnimationFrame(fid)
-      //   resolve(fid)
-      // }, 1000)
-    })
+      cancelAnimationFrame(fid)
+      gameStopped = true
+      return fid
+    } catch (err) {
+      handleAxiosError(err)
+      throw new Error('')
+    }
   }
 
   return stopper

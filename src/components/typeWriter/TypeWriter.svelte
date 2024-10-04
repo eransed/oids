@@ -100,19 +100,22 @@
       if (i === 0) {
         startCallback()
       }
-      setTimeout(() => {
-        if (i < text.length) {
-          typeWriterText += text.charAt(i)
-          i++
-          if (i === text.length) {
-            finished = true
-            doneCallback()
+      setTimeout(
+        () => {
+          if (i < text.length) {
+            typeWriterText += text.charAt(i)
+            i++
+            if (i === text.length) {
+              finished = true
+              doneCallback()
+              typeWriter()
+              if (!deleteMessage) return
+            }
             typeWriter()
-            if (!deleteMessage) return
           }
-          typeWriter()
-        }
-      }, speed * (humanRandomeness ? rndi(0.5, 2) : 1))
+        },
+        speed * (humanRandomeness ? rndi(0.5, 3) : 1),
+      )
     }
 
     if (finished && loadingDots) {

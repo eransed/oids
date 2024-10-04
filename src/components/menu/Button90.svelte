@@ -56,6 +56,7 @@
     class={buttonConfig.selected || selected ? 'selected' : 'notSelected'}
     on:click={buttonConfig.clickCallback}
   >
+    <slot />
     {#if loading}
       <CircularSpinner />
     {:else if icon}

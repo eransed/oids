@@ -3,45 +3,38 @@
   import { guestUser, userStore, localPlayerStore, pageHasHeaderStore, socketStore, chatMsgHistoryStore } from '../../stores/stores'
 
   //Interfaces
-  import { MessageType, type SpaceObject } from '../../lib/interface'
+  import { MessageType } from '../../lib/interface'
 
   //Components
   import Page from '../../components/page/page.svelte'
-  import Ships from '../ProfilePage/Ships.svelte'
   import Chat from '../../components/chat/chat.svelte'
 
   //Services
-  import type { ChatMessage, ServerUpdate, Session, Ship } from '../../lib/interface'
-  import { createSessionId } from '../../utils/utils'
+  import type { ChatMessage, Session, Ship } from '../../lib/interface'
   import { getActiveSessions } from '../../lib/services/game/activeSessions'
-  import SessionList from './components/SessionList/SessionList.svelte'
 
   import { onDestroy, onMount } from 'svelte'
   import { navigate } from 'svelte-routing'
-  import { info, log, warn } from 'mathil'
   import Button90 from '../../components/menu/Button90.svelte'
 
   //Assets
   import { Icons } from '../../style/icons'
-  import ModalSimple from '../../components/modal/ModalSimple.svelte'
   // import type { Ship } from '@prisma/client'
-  import AddShip from '../../components/ships/AddShip.svelte'
-  import ShipCardInfo from '../../components/ships/ShipCardInfo.svelte'
-  import { worldStartPosition } from '../../lib/constants'
-  import { fade, fly } from 'svelte/transition'
-  import { handleChatUpdate } from '../../lib/gameModes/handlers/incomingDataHandlers/handleChatUpdate'
+  import { fly } from 'svelte/transition'
   import { handleIncomingChatMessage } from './handlers/handleChatMessages'
   import Sessions from './components/Sessions/Sessions.svelte'
   import ShipChoice from './components/ShipChoice/ShipChoice.svelte'
   import Info from '../../components/info/info.svelte'
   import { getProfile } from '../../lib/services/user/profile'
   import { handleAxiosError } from '../../lib/services/utils/errorHandler'
-  import { logError, logInfo, logWarning } from '../../components/alert/alertHandler'
-  import login from '../../lib/services/auth/login'
+  import { logInfo } from '../../components/alert/alertHandler'
+  import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
+  import SessionList from './components/SessionList/SessionList.svelte'
+  import SessionListRow from './components/SessionList/SessionListRow.svelte'
 
   pageHasHeaderStore.set(true)
 
-  let sessions: Session[] = []
+  $: sessions = [] as Session[]
 
   function createJoinMsg(session: string) {
     const msg: ChatMessage = {
@@ -56,7 +49,7 @@
 
   let pingTimer: ReturnType<typeof setInterval>
   let chosenShip: Ship
-  let shipModalOpen: boolean = false
+  let loadingSessions = true
 
   async function initLobbySocket() {
     return new Promise<void>((resolve, reject) => {
@@ -68,9 +61,12 @@
       //   }
       // }
 
-      $socketStore.connect().then(() => {
-        logInfo(`Connected to websocket`)
-      })
+      try {
+        $socketStore.connect()
+        logInfo('Connected to Websocket')
+      } catch (err) {
+        //error handled by ws.ts
+      }
 
       logInfo('Adding lobby websocket listener...')
 
@@ -78,6 +74,7 @@
         .addListener(
           (su) => {
             const incomingUpdate = su.dataObject
+            console.log({ msgtype: MessageType[su.dataObject.messageType], so: su.dataObject })
 
             switch (su.dataObject.messageType) {
               case MessageType.SESSION_UPDATE:
@@ -89,7 +86,7 @@
                 $localPlayerStore.serverVersion = incomingUpdate.serverVersion
                 break
               case MessageType.CHAT_MESSAGE:
-                handleIncomingChatMessage(incomingUpdate)
+                handleIncomingChatMessage(incomingUpdate, $localPlayerStore.name)
                 break
               default:
                 // logWarning(`Message (${MessageType[incomingUpdate.messageType]}) from ${incomingUpdate.name} not handled`)
@@ -133,20 +130,21 @@
         })
       }
     }
+    console.log('onMount lobby', $localPlayerStore)
   })
 
   onDestroy(() => {
     // setReadyToPlay(false)
     $socketStore.resetListeners()
 
+    console.log('destroying lobby')
     if (pingTimer) {
       logInfo(`Clears ping timer ${pingTimer}`)
       clearInterval(pingTimer)
     }
   })
 
-  let joinedSession: Session | null
-  $: joinedSession = null
+  $: joinedSession = null as Session | null
 
   function checkJoinedSession(): void {
     for (let i = 0; i < sessions.length; i++) {
@@ -161,10 +159,14 @@
 
   async function updateSessions() {
     try {
+      if (sessions.length === 0) {
+        loadingSessions = true
+      }
       sessions = await getActiveSessions()
       checkJoinedSession()
+      loadingSessions = false
     } catch (e) {
-      handleAxiosError(e)
+      loadingSessions = false
     }
   }
 
@@ -173,23 +175,23 @@
    * Share game lobby link -> use as a param to get into lobby directly.
    */
 
-  function joinSession_(sessionId: string) {
-    if (sessionId) {
-      console.log($localPlayerStore)
+  async function joinSession_(sessionId: string) {
+    try {
       logInfo(`${$localPlayerStore.name}: joining session ${sessionId}`)
+
       $localPlayerStore.sessionId = sessionId
-      // send some update that localPlayer joined a/the session
+
       $localPlayerStore.messageType = MessageType.SESSION_UPDATE
-      $localPlayerStore.isHost = false
+
+      // send some update that localPlayer joined a/the session
 
       $chatMsgHistoryStore = []
       $chatMsgHistoryStore = [...$chatMsgHistoryStore, createJoinMsg(sessionId)]
+      // console.log($localPlayerStore)
       $socketStore.send($localPlayerStore)
-      setTimeout(() => {
-        updateSessions()
-      }, 400)
-    } else {
-      logError('Join null session not possible...')
+      updateSessions()
+    } catch (e) {
+      handleAxiosError(e)
     }
   }
 
@@ -208,22 +210,37 @@
 <Page>
   <div class="lobbyWrapper">
     {#if joinedSession}
-      <Button90
-        addInfo="Back to servers"
-        icon={Icons.Exit}
-        buttonConfig={{
-          buttonText: 'Back to servers',
-          clickCallback: () => {
-            joinedSession = null
-            $localPlayerStore.sessionId = ''
-            $socketStore.send($localPlayerStore)
-            updateSessions()
-          },
-          selected: false,
-        }}
-      />
+      <div class="actionList">
+        <Button90
+          addInfo="Back to servers"
+          icon={Icons.Exit}
+          buttonConfig={{
+            buttonText: 'Back to servers',
+            clickCallback: () => {
+              joinedSession = null
+              $localPlayerStore.sessionId = ''
+              $localPlayerStore.messageType = MessageType.SESSION_UPDATE
+              $socketStore.send($localPlayerStore)
+              updateSessions()
+            },
+            selected: false,
+          }}
+        />
+
+        <tbody class="playerList" in:fly={{ delay: 0, duration: 750, x: -1000 }}>
+          <th>
+            Online({joinedSession.players.length})
+          </th>
+
+          {#each joinedSession.players.reverse() as player, i}
+            <tr class="playerListItem" in:fly|global={{ delay: (i + 1) * 300, duration: 750, x: -1000 }} out:fly={{ duration: 750, x: -1000 }}>
+              <Button90 borderBottom buttonConfig={{ buttonText: '🚀' + player.name, clickCallback: () => console.log(player), selected: false }} />
+            </tr>
+          {/each}
+        </tbody>
+      </div>
       <div class="center" in:fly={{ duration: 500, x: -500 }}>
-        <Info text={`Shipstation @ ${joinedSession.id}`} />
+        <Info text={`Shipstation @ ${joinedSession.id}(${joinedSession.players.length})`} />
         <ShipChoice />
         <div class="buttonWrapper">
           <Button90
@@ -238,12 +255,15 @@
         </div>
       </div>
       <div class="right" in:fly={{ duration: 500, x: 500 }}>
-        <Chat joinedSessionId={joinedSession?.id} />
+        <Chat joinedSessionId={joinedSession?.id} possibleMentions={joinedSession.players.filter((v) => v.name !== $localPlayerStore.name)} />
       </div>
     {:else}
       <div class="left" in:fly={{ duration: 500, x: -500 }}>
-        <Info text="Servers" />
-        <Sessions {joinSession_} {startGame} {sessions} />
+        {#if !loadingSessions}
+          <Sessions {joinSession_} {startGame} {sessions} />
+        {:else}
+          <CircularSpinner ship text="Locating planets..." />
+        {/if}
       </div>
     {/if}
   </div>
@@ -258,6 +278,29 @@
     min-height: 20em;
     /* max-height: 20em; */
     /* place-items: center; */
+  }
+
+  .actionList {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 1em;
+  }
+
+  .playerList {
+    opacity: 0.8;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+  }
+
+  .playerListItem {
+    opacity: 0.5;
+    transition: all 500ms;
+  }
+
+  .playerListItem:hover {
+    opacity: 1;
   }
 
   .left {

@@ -1,24 +1,24 @@
+import { handleIncomingChatMessage } from '../../../pages/GameLobby/handlers/handleChatMessages'
 import type { Game } from '../../game'
 import { type ServerUpdate, type SpaceObject, MessageType } from '../../interface'
 import { handleGameUpdate } from './handleGameUpdate'
-import { handleChatUpdate } from './incomingDataHandlers/handleChatUpdate'
 import { handleServerInformationUpdate } from './incomingDataHandlers/handleServerInformationUpdate'
 import { handleShipUpdate } from './incomingDataHandlers/handleShipUpdate'
 
-export function playerUpdate(so: ServerUpdate<SpaceObject>, game: Game) {
-  switch (so.dataObject.messageType) {
+export function playerUpdate(serverUpdate: ServerUpdate<SpaceObject>, game: Game) {
+  switch (serverUpdate.dataObject.messageType) {
     case MessageType.SHIP_UPDATE:
-      handleShipUpdate(so)
+      handleShipUpdate(serverUpdate)
       break
     case MessageType.SERVICE:
-      handleServerInformationUpdate(so, game)
+      handleServerInformationUpdate(serverUpdate, game)
       break
     case MessageType.CHAT_MESSAGE:
-      handleChatUpdate(so)
+      handleIncomingChatMessage(serverUpdate.dataObject, game.localPlayer.name)
       break
     default:
-      if (so.dataObject) {
-        handleGameUpdate(so, game)
+      if (serverUpdate.dataObject) {
+        handleGameUpdate(serverUpdate, game)
       }
       break
   }

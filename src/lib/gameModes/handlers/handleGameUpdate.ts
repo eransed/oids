@@ -32,7 +32,7 @@ export function handleGameUpdate(su: ServerUpdate<SpaceObject>, game: Game) {
           }
         }
 
-        if (!game.remotePlayers[i].online || !game.remotePlayers[i].isPlaying) {
+        if (!game.remotePlayers[i].online) {
           logInfo(`${so.name} went offline`)
           game.remotePlayers.splice(i)
           continue

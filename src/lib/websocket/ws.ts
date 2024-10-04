@@ -5,6 +5,7 @@ import { logError, logInfo, logWarning } from '../../components/alert/alertHandl
 import { decode, encode } from '@msgpack/msgpack'
 import { getPartialSo } from './deltaUpdates'
 import { localPlayerStore } from '../../stores/stores'
+import { handleAxiosError } from '../services/utils/errorHandler'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
   if (typeof window !== 'undefined') {
@@ -101,7 +102,7 @@ export class OidsSocket {
             this.prettyStatusString = ''
           })
           .catch((err) => {
-            logWarning(`WebSocket failed to connect: ${err}`)
+            logWarning(`WebSocket failed to connect.`)
             this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed 1`
           })
       } catch (error) {
@@ -112,12 +113,13 @@ export class OidsSocket {
     }
   }
 
-  send(messageObject: Partial<SpaceObject>): void {
+  send(messageObject: Partial<SpaceObject>) {
     if (!this.ws) {
       if (this.connectInitialized) {
         logWarning(`connectPromise already started!`)
       }
       console.log('Connecting websocket...')
+
       this.connectPromise()
         .then((ws) => {
           sender(ws, messageObject)
@@ -149,8 +151,8 @@ export class OidsSocket {
     return this.prettyStatusString
   }
 
-  addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<SpaceObject>) => void): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  async addListener(callbackSo: (su: ServerUpdate<SpaceObject>) => void, callbackNpc: (su: ServerUpdate<SpaceObject>) => void): Promise<void> {
+    try {
       if (!this.ws) {
         logInfo('trying to connect')
         this.connect()
@@ -192,8 +194,9 @@ export class OidsSocket {
       }
 
       this.ws?.addEventListener(this.sockMsgListener.event, this.sockMsgListener.fn)
-      resolve()
-    })
+    } catch (err) {
+      handleAxiosError(err)
+    }
   }
 
   resetListeners(): void {

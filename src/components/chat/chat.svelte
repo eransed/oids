@@ -7,7 +7,7 @@
 
   //Components
   import TypeWriter from '../typeWriter/TypeWriter.svelte'
-  import { MessageType, type ChatMessage } from '../../lib/interface'
+  import { MessageType, type ChatMessage, type SpaceObject } from '../../lib/interface'
 
   //Assets
   import { Icons } from '../../style/icons'
@@ -15,11 +15,13 @@
   import { initKeyControllers, initTouchControls, removeKeyControllers, removeTouchControls } from '../../lib/input'
   import Info from '../info/info.svelte'
 
-  let chatMsg: string
+  $: chatMsg = '' as string
 
   export let joinedSessionId: string
   export let inGameChat: boolean = false
   export let chatTitle: boolean = true
+  export let possibleMentions: SpaceObject[] = []
+  $: showPossibleMentions = false
 
   function dateTimeFormat(d: Date): string {
     const ms = ('' + d.getMilliseconds()).padStart(3, '0')
@@ -83,6 +85,14 @@
       }
     }
   }
+
+  $: if (chatMsg !== undefined) {
+    const firstWord = chatMsg.split(' ')[0]
+    if (firstWord.charAt(0) === '@' && chatMsg.length === 1) {
+      showPossibleMentions = true
+      console.log(possibleMentions)
+    }
+  }
 </script>
 
 {#if chatTitle}
@@ -113,7 +123,11 @@
   <form on:submit|preventDefault={sendChatMessage}>
     <input on:focus={() => handleFocus(true)} on:blur={() => handleFocus(false)} bind:value={chatMsg} placeholder={`Aa`} type="text" />
     <!-- <button type="submit">Send</button> -->
-
+    {#if showPossibleMentions}
+      {#each possibleMentions as chatter}
+        <button type="button" on:click={() => (chatMsg += chatter.name)}>{chatter.name}</button>
+      {/each}
+    {/if}
     <Button90 minWidth="2em" buttonType="submit" icon={Icons.Send} />
   </form>
 </div>

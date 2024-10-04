@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fade, fly } from 'svelte/transition'
   import type { Session, SpaceObject } from '../../../../lib/interface'
   import SessionListRow from './SessionListRow.svelte'
 

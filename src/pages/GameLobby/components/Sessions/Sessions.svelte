@@ -4,6 +4,8 @@
   import { Icons } from '../../../../style/icons'
   import SessionList from '../SessionList/SessionList.svelte'
   import type { Session } from '../../../../lib/interface'
+  import Info from '../../../../components/info/info.svelte'
+  import { fade } from 'svelte/transition'
 
   export let sessions: Session[]
   export let joinSession_: ((sessionId: string) => void) | null = null
@@ -11,6 +13,7 @@
 </script>
 
 {#if sessions.length > 0}
+  <Info text="Space locations (Servers)" />
   <SessionList localPlayer={$localPlayerStore} joinSession={joinSession_} {sessions} />
 {:else}
   <h5 style="padding: 1em;">Servers are offline...play locally?</h5>

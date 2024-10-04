@@ -84,6 +84,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
 
   if (so.health <= 0) {
     handleDeathExplosion(so, explosionDuration)
+    game.stopGame()
   }
   if (so.shotsInFlight.length > 0) {
     // console.log(so.name, so.shotsInFlight.length)

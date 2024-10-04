@@ -109,7 +109,7 @@
     removeKeyControllers()
     removeTouchControls()
     game.stopGame()
-    game.websocket.resetListeners()
+    // game.websocket.resetListeners()
     navigate('/play')
   }
 

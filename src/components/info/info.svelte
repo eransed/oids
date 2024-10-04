@@ -1,8 +1,17 @@
 <script lang="ts">
+  import TypeWriter from '../typeWriter/TypeWriter.svelte'
+
   export let text: string
+  export let typeWriter = true
 </script>
 
-<p class="info">{text}</p>
+<p class="info">
+  {#if typeWriter}
+    <TypeWriter {text} speed={30} humanRandomeness />
+  {:else}
+    {text}
+  {/if}
+</p>
 
 <style>
   .info {

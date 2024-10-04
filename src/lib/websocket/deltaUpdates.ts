@@ -1,7 +1,6 @@
 import { type SpaceObject } from '../interface'
 
 const chosenKeys: Array<keyof SpaceObject> = [
-  'isDead',
   'serverVersion',
   'color',
   'velocity',
@@ -54,6 +53,6 @@ function deepEqual(obj1: any, obj2: any) {
   }
 
   if (typeof obj1 === 'boolean' && typeof obj2 === 'boolean') {
-    return obj1 !== obj2
+    return obj1 === obj2
   }
 }

@@ -21,15 +21,35 @@
       players: Object.values(session.players).map((v) => v.name),
     }
   }
+
+  $: sessions = [] as Session[]
+  let loadingSessions = false
+
+  onMount(async () => {
+    await getUpdatedActiveSessions()
+  })
+
+  async function getUpdatedActiveSessions() {
+    loadingSessions = true
+    try {
+      const sessionResponse = await getActiveSessions()
+      console.log(sessionResponse)
+      sessions = sessionResponse
+      loadingSessions = false
+    } catch (err) {
+      //
+    }
+  }
 </script>
 
 <Page>
   <div class="buttonList">
     <Button90 borderBottom buttonConfig={{ buttonText: 'Get Binary Message', clickCallback: encodedMsg, selected: false }} />
-    {#await getActiveSessions()}
+    <Button90 borderBottom buttonConfig={{ buttonText: 'Refresh Active Sessions', clickCallback: getUpdatedActiveSessions, selected: false }} />
+    {#await onMount}
       <p>Loading Sessions</p>
       <CircularSpinner />
-    {:then sessions}
+    {:then}
       <p>Sessions</p>
       <Table data={sessions} converter={sessionConverter} />
     {:catch error}
