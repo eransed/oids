@@ -86,6 +86,8 @@
     /* display: flex; */
     bottom: 0;
     margin-bottom: -0.6em;
+    background-color: var(--main-bg-color);
+    padding: 0em 0.5em 0em 0.5em;
   }
 
   .icon img {

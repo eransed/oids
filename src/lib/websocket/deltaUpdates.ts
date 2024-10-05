@@ -1,6 +1,21 @@
 import { type SpaceObject } from '../interface'
 
 const chosenKeys: Array<keyof SpaceObject> = [
+  // 'killedByName',
+  // 'pingId',
+  // 'pingResponse',
+  // 'afterBurner',
+  // // 'canonOverHeat',
+  // 'didHit',
+  // 'motivatorBroken',
+  // 'online',
+  // 'obliterated',
+  // 'shotsFiredThisFrame',
+  // 'ping',
+  // 'isPlaying',
+  // 'isLocal',
+  // 'isJumping',
+  // 'isDead',
   'serverVersion',
   'color',
   'velocity',

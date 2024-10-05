@@ -123,7 +123,6 @@ export interface Rotatable extends Positionable {
 }
 
 export interface Collidable extends Positionable {
-  colliding: boolean
   hitRadius: number
   collidingWith: Collidable[]
 }
@@ -188,14 +187,6 @@ export interface Chatable {
   lastMessage: string
 }
 
-export interface LobbyWaiter {
-  readyToPlay: boolean
-}
-
-export interface Hoster {
-  isHost: boolean
-}
-
 export interface Typable {
   // readonly messageType: MessageType
   messageType: MessageType
@@ -249,8 +240,6 @@ export interface SpaceObject
     Nameable,
     Unique,
     Chatable,
-    LobbyWaiter,
-    Hoster,
     Typable,
     Bounded,
     MoonType,

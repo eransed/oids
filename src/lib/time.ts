@@ -145,6 +145,8 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
       if (!gameStopped) {
         console.log(game.localPlayer)
         game.websocket.send(game.localPlayer)
+        game.localPlayer.messageType = MessageType.SESSION_UPDATE
+        game.websocket.send(game.localPlayer)
       }
       // sendSpaceObjectToBroadcastServer(game.localPlayer)
 

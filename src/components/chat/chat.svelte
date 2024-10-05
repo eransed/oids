@@ -22,6 +22,7 @@
   export let chatTitle: boolean = true
   export let possibleMentions: SpaceObject[] = []
   $: showPossibleMentions = false
+  let inputRef: HTMLInputElement
 
   function dateTimeFormat(d: Date): string {
     const ms = ('' + d.getMilliseconds()).padStart(3, '0')
@@ -75,6 +76,7 @@
   }
 
   function handleFocus(state: boolean) {
+    checkIfToShowPossibleMentions()
     if (inGameChat) {
       if (state) {
         removeKeyControllers()
@@ -87,11 +89,22 @@
   }
 
   $: if (chatMsg !== undefined) {
+    checkIfToShowPossibleMentions()
+  }
+
+  function checkIfToShowPossibleMentions() {
     const firstWord = chatMsg.split(' ')[0]
     if (firstWord.charAt(0) === '@' && chatMsg.length === 1) {
       showPossibleMentions = true
-      console.log(possibleMentions)
+      // console.log(possibleMentions)
+    } else {
+      showPossibleMentions = false
     }
+  }
+
+  function handleMention(chatterName: string) {
+    chatMsg += chatterName + ' '
+    inputRef.focus()
   }
 </script>
 
@@ -121,18 +134,24 @@
 </div>
 <div class="msgInput">
   <form on:submit|preventDefault={sendChatMessage}>
-    <input on:focus={() => handleFocus(true)} on:blur={() => handleFocus(false)} bind:value={chatMsg} placeholder={`Aa`} type="text" />
+    <div class="mentionButton">
+      {#if showPossibleMentions}
+        {#each possibleMentions as chatter}
+          <button type="button" on:click={() => handleMention(chatter.name)}>{chatter.name}</button>
+        {/each}
+      {/if}
+    </div>
+    <input bind:this={inputRef} on:focus={() => handleFocus(true)} on:blur={() => handleFocus(false)} bind:value={chatMsg} placeholder={`Aa - @ to mention someone`} type="text" />
     <!-- <button type="submit">Send</button> -->
-    {#if showPossibleMentions}
-      {#each possibleMentions as chatter}
-        <button type="button" on:click={() => (chatMsg += chatter.name)}>{chatter.name}</button>
-      {/each}
-    {/if}
     <Button90 minWidth="2em" buttonType="submit" icon={Icons.Send} />
   </form>
 </div>
 
 <style>
+  .msgInput {
+    position: relative;
+  }
+
   .msgInput input {
     height: 3em;
     margin: auto;
@@ -144,7 +163,7 @@
     background-color: var(--main-bg-color);
     color: var(--main-text-color);
     border-bottom: 1px solid var(--main-bg-color);
-    border-radius: 0.8em;
+    /* border-radius: 0.8em; */
     border-bottom-left-radius: 0px;
     border-top-right-radius: 0px;
     border-bottom: 1px solid var(--main-accent-color);
@@ -159,6 +178,28 @@
     width: 95%;
     opacity: 1;
     border-bottom: 1px solid var(--main-accent-color);
+  }
+
+  .mentionButton {
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    /* position: relative; */
+    bottom: 0;
+    z-index: 1;
+    gap: 0.2em;
+    margin-bottom: -2em;
+  }
+
+  .mentionButton button {
+    background: var(--main-accent-color);
+    border: none;
+    padding: 0.5em;
+    border-radius: 1em;
+  }
+
+  .mentionButton button:hover {
+    background-color: var(--main-accent2-color);
   }
 
   ::placeholder {

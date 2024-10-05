@@ -14,7 +14,9 @@ export function handleIncomingChatMessage(incomingUpdate: SpaceObject, localPlay
   console.log(firstWord + localPlayerName)
 
   if (firstWord.includes('@') && firstWord.includes(localPlayerName)) {
-    newMsg.message = incomingUpdate.lastMessage.substring(incomingUpdate.lastMessage.indexOf(' ') + 1)
+    // newMsg.message = incomingUpdate.lastMessage.substring(incomingUpdate.lastMessage.indexOf(' ') + 1)
+    newMsg.message = incomingUpdate.lastMessage
+
     logInfo(`${incomingUpdate.name} mentioned you: ${newMsg.message}`)
   }
 

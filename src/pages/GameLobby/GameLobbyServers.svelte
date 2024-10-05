@@ -134,7 +134,6 @@
   })
 
   onDestroy(() => {
-    // setReadyToPlay(false)
     $socketStore.resetListeners()
 
     console.log('destroying lobby')
@@ -200,8 +199,9 @@
     if (offlineGameId) {
       $localPlayerStore.sessionId = offlineGameId
     }
-
+    $localPlayerStore.messageType = MessageType.SESSION_UPDATE
     $localPlayerStore.isPlaying = true
+    $socketStore.send($localPlayerStore)
 
     navigate(`/play/${$localPlayerStore.sessionId}`)
   }
@@ -232,9 +232,13 @@
             Online({joinedSession.players.length})
           </th>
 
-          {#each joinedSession.players.reverse() as player, i}
+          {#each joinedSession.players as player, i}
             <tr class="playerListItem" in:fly|global={{ delay: (i + 1) * 300, duration: 750, x: -1000 }} out:fly={{ duration: 750, x: -1000 }}>
-              <Button90 borderBottom buttonConfig={{ buttonText: '🚀' + player.name, clickCallback: () => console.log(player), selected: false }} />
+              <Button90
+                addInfo={`${player.isPlaying ? 'In-game' : 'Lobby'}`}
+                borderBottom
+                buttonConfig={{ buttonText: '🚀' + player.name, clickCallback: () => console.log(player), selected: false }}
+              />
             </tr>
           {/each}
         </tbody>

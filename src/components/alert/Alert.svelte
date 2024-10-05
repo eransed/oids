@@ -84,22 +84,36 @@
   .alertWrapper {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: row;
+    flex-direction: column;
     gap: 0.5em;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    height: fit-content;
+    border-radius: 0.8em;
   }
 
   .hovering {
-    position: absolute;
+    /* background-color: rgb(0, 0, 51, 1); */
+    position: fixed;
     right: 0;
-    bottom: 10px;
+    /* bottom: 10px; */
+    padding-bottom: 10px;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     transition: all 350ms ease-in-out;
     width: fit-content;
-    height: 100vh;
+    padding-left: 6.5em;
+    padding-top: 5em;
+    height: 400px;
+    /* padding: 5em; */
     justify-content: flex-end;
     z-index: 100;
+    /* background-color: var(--main-accent-color); */
+    /* background-color: red; */
+    opacity: 1;
   }
 
   .alertFunctions {
@@ -107,5 +121,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    align-content: flex-end;
+    /* background-color: var(--main-bg-color); */
   }
 </style>

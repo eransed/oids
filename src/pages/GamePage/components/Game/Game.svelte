@@ -1,7 +1,7 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import { GameMode, type Session, type Ship } from '../../../../lib/interface'
+  import { GameMode, MessageType, type Session, type Ship } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'

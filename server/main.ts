@@ -17,7 +17,6 @@ import { sessionHandler } from './sessions'
 import { ApiError } from './api/utils/apiError'
 import { StatusCodes } from 'http-status-codes'
 import { decode, encode } from '@msgpack/msgpack'
-import { getPartialSo } from '../src/lib/websocket/deltaUpdates'
 
 dotenv.config()
 

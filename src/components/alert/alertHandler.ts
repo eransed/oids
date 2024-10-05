@@ -6,7 +6,7 @@ export const alertStore: Writable<AlertType[]> = writable([])
 export let timeOutList: NodeJS.Timeout[] = []
 
 let alertLength = 1
-const alertRemovalInterval = 1000
+const alertRemovalInterval = 250
 
 alertStore.subscribe((v) => {
   alertLength = v.filter((v) => v.active).length

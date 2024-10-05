@@ -231,7 +231,6 @@ export function getRemotePosition(remoteObject: SpaceObject, localObject: SpaceO
 
 export function resetCollisions(spaceObjects: Collidable[]) {
   for (const npc of spaceObjects) {
-    npc.colliding = false
     npc.collidingWith = []
   }
 }

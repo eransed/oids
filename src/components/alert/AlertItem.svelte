@@ -1,6 +1,5 @@
 <script lang="ts">
   import { fade, fly } from 'svelte/transition'
-  import { alertStore } from './alertHandler'
   import { alertColors } from '../../style/defaultColors'
   import type { AlertType } from './AlertType'
   import { timeAgo } from '../../utils/utils'
@@ -22,9 +21,7 @@
   out:fade={{ duration: 150 }}
   class:hovering={isHovered}
   class="alertBox"
-  style=" position: {isHovered ? 'absolute' : 'absolute'}; --scaleSize: {isHovered ? 1 : scaleSize}; --spacing: {isHovered
-    ? spacing * defaultSpacingMultiplier
-    : spacing}px;  --theme-color: {alertColors[alert.severity]}"
+  style="--scaleSize: {isHovered ? 1 : scaleSize}; --spacing: {isHovered ? spacing * defaultSpacingMultiplier : spacing}px;  --theme-color: {alertColors[alert.severity]}"
 >
   <button style="position: absolute; right: 0; padding: 0.4em; margin: 0.2em; top: 0" on:click={() => clickCloseCallback()}>x</button>
   <p><b>{alert.severity.toUpperCase()} - {timeAgo(alert.timeStamp)}</b></p>

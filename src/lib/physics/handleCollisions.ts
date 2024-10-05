@@ -7,8 +7,6 @@ import { resetCollisions, isWithinRadiusWorld, getWorldCoordinates, isWithinRadi
 import { circleBounce } from './CircleBounce'
 
 export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D | null = null): void {
-
-
   resetCollisions(spaceObjects)
   for (const npc0 of spaceObjects) {
     if (npc0.isDead) continue
@@ -18,15 +16,12 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
 
       if (isWithinRadiusWorld(npc0, npc1, npc1.hitRadius) && npc0.name !== npc1.name) {
         // good(`collision!`)
-        npc0.colliding = true
-        npc1.colliding = true
         npc0.collidingWith.push(npc1)
         npc1.collidingWith.push(npc0)
         // npc0.health -= collisionFrameDamage
         // npc1.health -= collisionFrameDamage
 
         circleBounce(npc0, npc1)
-
 
         if (ctx) {
           const relative0 = sub2(getWorldCoordinates(npc0), cameraPosition)
