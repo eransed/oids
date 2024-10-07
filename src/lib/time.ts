@@ -109,6 +109,7 @@ export function getSendableSpaceObject(so: SpaceObject): SpaceObject {
 }
 
 const every20: Every = new Every(20)
+const every300: Every = new Every(300)
 
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
@@ -118,6 +119,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     const oldSo = { ...game.localPlayer }
     frameCount++
     every20.tick(() => localPlayerStore.set(game.localPlayer))
+    every300.tick(() => console.log('remotes:', game.remotePlayers))
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx, game.style)
     renderFrame(game, dt)

@@ -79,6 +79,7 @@ export class Game {
     this.localPlayer.isDead = false
     this.localPlayer.obliterated = false
     this.localPlayer.deadFrameCount = 0
+
     this.clearBodies()
   }
 
@@ -100,6 +101,11 @@ export class Game {
     initFn(this)
 
     this.running = true
+
+    //Sending a full spaceObject to initialize all values
+    if (this.websocket.isConnected()) {
+      this.websocket.send(this.localPlayer)
+    }
 
     // start the animation loop
     this.stopper = renderLoop(this, renderFn, nextFn)

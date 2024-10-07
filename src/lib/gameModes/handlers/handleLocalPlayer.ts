@@ -10,6 +10,7 @@ import { renderShip } from '../../render/renderShip'
 import { renderTrail } from '../../render/renderShipTrail'
 import { handleMoveView } from './handleMoveView'
 import { logWarning } from '../../../components/alert/alertHandler'
+import { localPlayerStore } from '../../../stores/stores'
 
 export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
   const localPlayer = game.localPlayer
@@ -99,9 +100,11 @@ export function initLocalPlayer(game: Game) {
   game.localPlayer.enginePower = 0.25
   game.localPlayer.photonColor = '#f00'
   game.localPlayer.isLocal = true
+  game.localPlayer.isDead = false
   game.localPlayer.color = '#db8'
   game.localPlayer.worldSize = worldSize // server sends size of world
   game.localPlayer.cameraPosition = worldStartPosition
   game.localPlayer.viewFramePosition = rndfVec2(0, 0)
   game.localPlayer.position = rndfVec2(0, 0)
+  localPlayerStore.set(game.localPlayer)
 }

@@ -33,7 +33,7 @@
   import Page from '../../../../components/page/page.svelte'
   import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
   import { fly } from 'svelte/transition'
-  import { logInfo } from '../../../../components/alert/alertHandler'
+  import { logError, logInfo } from '../../../../components/alert/alertHandler'
 
   let game: Game
 
@@ -70,7 +70,7 @@
 
     $socketStore.send($localPlayerStore)
 
-    game = new Game(canvas, $localPlayerStore, $socketStore, showDeadMenu)
+    game = new Game(canvas, $localPlayerStore, $socketStore, onDeathCallBack)
     gameRef(game)
     game.localPlayer.sessionId = sessionId
 
@@ -93,6 +93,7 @@
       loadingGame = false
     } catch (err: any) {
       loadingGame = false
+      logError('Error on loading game...')
       game.startGame(initRegularGame, renderFrame, nextFrame)
       resetStars(game)
       console.error(err)
@@ -105,11 +106,11 @@
     resetStars(game)
   }
 
-  const showDeadMenu = (): void => {
+  const onDeathCallBack = (): void => {
     removeKeyControllers()
     removeTouchControls()
     game.stopGame()
-    // game.websocket.resetListeners()
+    game.websocket.resetListeners()
     navigate('/play')
   }
 
