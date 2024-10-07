@@ -6,7 +6,7 @@ import type { Shape } from '../shapes/Shape'
 import { updateShots } from './updateShots'
 import { createSpaceObject } from '../factory'
 import { GameMode } from '../interface'
-import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
+// import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
 
 const traceLength = 1
 
@@ -84,7 +84,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
 
   if (so.health <= 0) {
     handleDeathExplosion(so, explosionDuration)
-    game.stopGame()
+    // game.stopGame()
   }
   if (so.shotsInFlight.length > 0) {
     // console.log(so.name, so.shotsInFlight.length)
