@@ -58,7 +58,7 @@ export function addAlert(severity: AlertType['severity'], text: string, timeoutM
   // alertStore.update((alerts) => [...alerts, alert])
 
   if (!silent) {
-    console.log(alertLength)
+    // console.log(alertLength)
     handleAlertTimeOut(timeoutMs + alertLength * alertRemovalInterval, alert)
   }
 

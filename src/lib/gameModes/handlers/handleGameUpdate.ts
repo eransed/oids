@@ -14,10 +14,12 @@ export function handleGameUpdate(su: ServerUpdate<SpaceObject>, game: Game) {
     console.log(so)
   })
 
-  if (so.name !== game.localPlayer.name) {
+  if (so.name !== game.localPlayer.name && so.sessionId === game.localPlayer.sessionId) {
     if (!game.remotePlayers.find((v) => v.name === so.name)) {
       addAlert('info', `New player online: ${so.name}`)
+      console.log('new player online: ', so)
       game.remotePlayers.push(createSpaceObject(so.name, MessageType.GAME_UPDATE))
+      console.log(game.remotePlayers, game.remotePlayers.length)
     }
 
     for (let i = 0; i < game.remotePlayers.length; i++) {

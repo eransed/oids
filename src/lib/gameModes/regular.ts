@@ -210,7 +210,8 @@ export function renderFrame(game: Game, dt: number): void {
   } else {
     // Render space style game
     handleStarBackdrop(game)
-    game.remotePlayers = handleRemotePlayers(game.remotePlayers)
+
+    handleRemotePlayers(game.remotePlayers, game)
     renderRemotePlayerInSpaceMode(game.remotePlayers, game, activeKeyMap)
     handleGameBodies(game, activeKeyMap)
     handleLocalPlayer(game, activeKeyMap)

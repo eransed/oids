@@ -18,8 +18,8 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
         // good(`collision!`)
         npc0.collidingWith.push(npc1)
         npc1.collidingWith.push(npc0)
-        // npc0.health -= collisionFrameDamage
-        // npc1.health -= collisionFrameDamage
+        npc0.health -= 0.01
+        npc1.health -= 0.01
 
         circleBounce(npc0, npc1)
 

@@ -7,7 +7,7 @@
 </script>
 
 <!-- <p class="title">{title}</p> -->
-<div class="bar" style="background-color: {progressColor}; width: {(progress / max) * 100}%" />
+<div class="bar" style="background-color: {progressColor}; width: {(progress / max) * 100}%"></div>
 
 <style>
   .bar::before {

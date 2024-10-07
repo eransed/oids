@@ -1,21 +1,53 @@
 import { type SpaceObject } from '../interface'
 
 const chosenKeys: Array<keyof SpaceObject> = [
-  // 'killedByName',
-  // 'pingId',
-  // 'pingResponse',
-  // 'afterBurner',
-  // // 'canonOverHeat',
-  // 'didHit',
-  // 'motivatorBroken',
-  // 'online',
-  // 'obliterated',
-  // 'shotsFiredThisFrame',
-  // 'ping',
-  // 'isPlaying',
-  // 'isLocal',
-  // 'isJumping',
-  // 'isDead',
+  'viewportScale',
+  'ttl',
+  'steeringPower',
+  'startHealth',
+  'shotsPerFrame',
+  'shotBlowFrame',
+  'shape',
+  'rtt',
+  'moonType',
+  'missileSpeed',
+
+  'missileDamage',
+  'mass',
+  'inverseFireRate',
+  'hops',
+  'hometown',
+  'hitRadius',
+  'health',
+  'enginePower',
+  'deadFrameCount',
+  'damage',
+  'canonHeatAddedPerShot',
+  'canonCoolDownSpeed',
+  'canonCoolDown',
+  'bounceCount',
+  'booster',
+  'batteryLevel',
+  'batteryCapacity',
+  'armedDelay',
+  'angularVelocity',
+  'angleDegree',
+  'ammo',
+  'killedByName',
+  'pingId',
+  'pingResponse',
+  'afterBurner',
+  'canonOverHeat',
+  'didHit',
+  'motivatorBroken',
+  'online',
+  'obliterated',
+  'shotsFiredThisFrame',
+  'ping',
+  'isPlaying',
+  'isLocal',
+  'isJumping',
+  'isDead',
   'serverVersion',
   'color',
   'velocity',
@@ -63,11 +95,18 @@ function deepEqual(obj1: any, obj2: any) {
     return JSON.stringify(obj1) === JSON.stringify(obj2)
   }
 
+  //Strings
   if (typeof obj1 === 'string' && typeof obj2 === 'string') {
     return obj1 === obj2
   }
 
+  //Booleans
   if (typeof obj1 === 'boolean' && typeof obj2 === 'boolean') {
+    return obj1 === obj2
+  }
+
+  // If both values are numbers
+  if (typeof obj1 === 'number' && typeof obj2 === 'number') {
     return obj1 === obj2
   }
 }
