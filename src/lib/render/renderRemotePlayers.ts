@@ -1,8 +1,8 @@
-import { add2, dist2, equal2, newVec2, type Vec2 } from 'mathil'
+import { add2, dist2, equal2, magnitude2, newVec2, smul2, wrap2_mm, type Vec2 } from 'mathil'
 import { getCurrentTheme } from '../../style/defaultColors'
-import { explosionDuration } from '../constants'
+import { explosionDuration, timeScale } from '../constants'
 import type { Game } from '../game'
-import type { KeyFunctionMap } from '../interface'
+import type { KeyFunctionMap, SpaceObject } from '../interface'
 import { handleDeathExplosion } from '../mechanics'
 import { getRemotePosition } from '../physics/physics'
 import { renderHitRadius } from './render2d'
@@ -17,7 +17,24 @@ function lerp(a: number, b: number, t: number): number {
 }
 
 let previousPositions: Map<string, Vec2> = new Map()
-let previosViewFramePos: Map<string, Vec2> = new Map()
+
+function interpolate(remotePlayer: SpaceObject, currentPos: Vec2, dt: number): Vec2 {
+  let prevpos = previousPositions.get(remotePlayer.name)
+
+  if (!prevpos) {
+    prevpos = newVec2(currentPos.x, currentPos.y)
+    previousPositions.set(remotePlayer.name, prevpos)
+  }
+
+  // Should be dynamic I guess and its not really working with position based on remote and localplayer
+  const smoothing = 0.1
+  const interpolatedPosX = lerp(prevpos.x, currentPos.x, smoothing)
+  const interpolatedPosY = lerp(prevpos.y, currentPos.y, smoothing)
+  const interpolatedPos = newVec2(interpolatedPosX, interpolatedPosY)
+  previousPositions.set(remotePlayer.name, interpolatedPos)
+
+  return interpolatedPos
+}
 
 export function renderRemotePlayerInSpaceMode(game: Game, activeKeyMap: KeyFunctionMap, dt: number): void {
   for (let i = 0; i < game.remotePlayers.length; i++) {
@@ -27,35 +44,7 @@ export function renderRemotePlayerInSpaceMode(game: Game, activeKeyMap: KeyFunct
 
     const currentPos = getRemotePosition(remotePlayer, game.localPlayer)
 
-    let prevpos = previousPositions.get(remotePlayer.name)
-    let prevViewFramePos = previosViewFramePos.get(remotePlayer.name)
-
-    if (!prevViewFramePos) {
-      previosViewFramePos.set(remotePlayer.name, remotePlayer.viewFramePosition)
-    }
-
-    if (!prevpos) {
-      prevpos = newVec2(currentPos.x, currentPos.y)
-      previousPositions.set(remotePlayer.name, prevpos)
-    }
-
-    // Calculate the distance between the current position and previous position
-
-    // Only update positions if the player has moved beyond the stationary threshold
-
-    const maxFrames = Math.max(1, Math.floor(100 / getFps(dt))) // Adjust based on your frame rate
-    const t = Math.min(1, remotePlayer.framesSinceLastServerUpdate / maxFrames)
-    const smoothingFactor = 0.5
-    const cappedT = Math.min(t * smoothingFactor, 0.1)
-
-    const interpolatedPosX = lerp(prevpos.x, currentPos.x, cappedT)
-    const interpolatedPosY = lerp(prevpos.y, currentPos.y, cappedT)
-
-    const interpolatedPos = newVec2(interpolatedPosX, interpolatedPosY)
-
-    // Update the previous position to the interpolated position after rendering
-    previousPositions.set(remotePlayer.name, interpolatedPos)
-    previosViewFramePos.set(remotePlayer.name, remotePlayer.viewFramePosition)
+    const interpolatedPos = interpolate(remotePlayer, currentPos, dt)
 
     if (remotePlayer.health <= 0) {
       console.log(remotePlayer.name, ' is dead')
