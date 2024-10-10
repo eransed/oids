@@ -3,8 +3,11 @@ import { maxShotAge } from '../constants'
 import type { SpaceObject } from '../interface'
 import { decayDeadShots, coolDown } from '../mechanics'
 import { alignHeadingToVelocity } from './physics'
+import { timeScale } from '../constants'
 
 export function updateShots(so: SpaceObject, dts: number): void {
+  const deltaTime = dts * timeScale
+
   if (isNaN(dts)) return
 
   decayDeadShots(so)
@@ -15,17 +18,17 @@ export function updateShots(so: SpaceObject, dts: number): void {
   }
 
   for (const shot of so.shotsInFlight) {
-    const v: Vec2 = scalarMultiply2(shot.velocity, dts)
-    const a: Vec2 = scalarMultiply2(shot.acceleration, dts)
+    const v: Vec2 = scalarMultiply2(shot.velocity, deltaTime)
+    const a: Vec2 = scalarMultiply2(shot.acceleration, deltaTime)
     shot.velocity = add2(shot.velocity, a)
     shot.position = add2(shot.position, v)
-    shot.angleDegree += shot.angularVelocity * dts
+    shot.angleDegree += shot.angularVelocity * deltaTime
     // alignVelocityToHeading(shot)
     alignHeadingToVelocity(shot)
 
     shot.acceleration = { x: 0, y: 0 }
     shot.armedDelay--
-    shot.age += Math.floor(dts * 100)
+    shot.age += Math.floor(deltaTime * 100)
     if (shot.age > maxShotAge) {
       shot.health = -1
     }

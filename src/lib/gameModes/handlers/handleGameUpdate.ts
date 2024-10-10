@@ -10,9 +10,9 @@ const every200 = new Every(200)
 export function handleGameUpdate(su: ServerUpdate<SpaceObject>, game: Game) {
   const so: SpaceObject = su.dataObject
 
-  every200.tick(() => {
-    console.log(so)
-  })
+  // every200.tick(() => {
+  //   console.log(so)
+  // })
 
   if (so.name !== game.localPlayer.name && so.sessionId === game.localPlayer.sessionId) {
     if (!game.remotePlayers.find((v) => v.name === so.name)) {

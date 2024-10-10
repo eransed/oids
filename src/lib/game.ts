@@ -102,11 +102,6 @@ export class Game {
 
     this.running = true
 
-    //Sending a full spaceObject to initialize all values
-    if (this.websocket.isConnected()) {
-      this.websocket.send(this.localPlayer)
-    }
-
     // start the animation loop
     this.stopper = renderLoop(this, renderFn, nextFn)
   }

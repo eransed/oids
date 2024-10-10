@@ -96,7 +96,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     online: true,
     photonColor: '#f00',
     position: initPos,
-    positionalTrace: [],
+    // positionalTrace: [],
     serverVersion: '',
     shape: SpaceShape.SmallShip,
     shotBlowFrame: 16,

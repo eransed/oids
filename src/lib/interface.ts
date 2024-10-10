@@ -169,7 +169,7 @@ export interface Damager extends Positionable {
 }
 
 export interface Traceable extends Positionable {
-  positionalTrace: SpaceObject[] | null
+  // positionalTrace: SpaceObject[] | null
   ticksSinceLastSnapShot: number
 }
 

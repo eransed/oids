@@ -88,7 +88,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   }
   if (so.shotsInFlight.length > 0) {
     // console.log(so.name, so.shotsInFlight.length)
-    updateShots(so, deltaTime)
+    updateShots(so, dt)
   }
 
   // if (npc.angleDegree < 0) npc.angleDegree = 360

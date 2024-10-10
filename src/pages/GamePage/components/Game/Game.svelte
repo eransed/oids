@@ -34,6 +34,7 @@
   import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
   import { fly } from 'svelte/transition'
   import { logError, logInfo } from '../../../../components/alert/alertHandler'
+  import { initLocalPlayer } from '../../../../lib/gameModes/handlers/handleLocalPlayer'
 
   let game: Game
 
@@ -68,11 +69,20 @@
       }
     }
 
-    $socketStore.send($localPlayerStore)
-
     game = new Game(canvas, $localPlayerStore, $socketStore, onDeathCallBack)
     gameRef(game)
     game.localPlayer.sessionId = sessionId
+
+    initLocalPlayer(game)
+
+    try {
+      await $socketStore.connect()
+      await $socketStore.send(game.localPlayer)
+    } catch (err) {
+      navigate('/play')
+      logError('Could not connect to the game server')
+      return
+    }
 
     try {
       loadingText = 'Anybody out there'
@@ -90,6 +100,7 @@
           resetStars(game)
         }
       }
+
       loadingGame = false
     } catch (err: any) {
       loadingGame = false

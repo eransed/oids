@@ -104,16 +104,18 @@ export class OidsSocket {
           .catch((err) => {
             logWarning(`WebSocket failed to connect.`)
             this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed 1`
+            throw new Error(err)
           })
-      } catch (error) {
+      } catch (error: any) {
         this.prettyStatusString = ` - Connection to ${this.wsurl.href} failed 2`
+        throw new Error(error)
       }
     } else {
       logInfo('Already connected to websocket')
     }
   }
 
-  send(messageObject: Partial<SpaceObject>) {
+  async send(messageObject: Partial<SpaceObject>) {
     if (!this.ws) {
       if (this.connectInitialized) {
         logWarning(`connectPromise already started!`)

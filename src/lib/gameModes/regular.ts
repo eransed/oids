@@ -2,7 +2,7 @@ import type { Game } from '../game'
 import { setCanvasSizeToClientViewFrame, getScreenRect, getScreenFromCanvas } from '../canvas_util'
 import { ActiveKeyMapStore, arcadeModeKeyController, gameState, initKeyControllers, initTouchControls, spaceObjectKeyController, spaceTouchController } from '../input'
 import { add2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPretty, to_string2, type Vec2, warn, error } from 'mathil'
-import { friction } from '../physics/physics'
+import { friction, updateSpaceObject } from '../physics/physics'
 import { loadingText, renderInfoText } from '../render/render2d'
 import { Every, fpsCounter } from '../time'
 import { GameType, getRenderableObjectCount, type SpaceObject, MessageType, type ServerUpdate, GameMode, type KeyFunctionMap } from '../interface'
@@ -24,6 +24,7 @@ import { renderRemotePlayerInSpaceMode } from '../render/renderRemotePlayers'
 import { initNetworkStats } from './handlers/handleNetStats'
 import { playerUpdate } from './handlers/handlePlayerUpdate'
 import { addAlert, logError, logInfo, logWarning } from '../../components/alert/alertHandler'
+import { updateShots } from '../physics/updateShots'
 //Stores
 
 let activeKeyMap: KeyFunctionMap
@@ -171,15 +172,8 @@ export function initRegularGame(game: Game): void {
 }
 
 const every = new Every(25)
-const every2000 = new Every(200)
 
 export function renderFrame(game: Game, dt: number): void {
-  // Heads up stuff
-
-  // every2000.tick(() => {
-  //   console.log(game.remotePlayers)
-  // })
-
   every.tick(() => {
     game.localPlayer.viewport = getScreenRect(game.ctx)
     setCanvasSizeToClientViewFrame(game.ctx)
@@ -212,7 +206,7 @@ export function renderFrame(game: Game, dt: number): void {
     handleStarBackdrop(game)
 
     handleRemotePlayers(game.remotePlayers, game)
-    renderRemotePlayerInSpaceMode(game.remotePlayers, game, activeKeyMap)
+    renderRemotePlayerInSpaceMode(game, activeKeyMap, dt)
     handleGameBodies(game, activeKeyMap)
     handleLocalPlayer(game, activeKeyMap)
   }
@@ -291,10 +285,6 @@ export function nextFrame(game: Game, dt: number): void {
     byteSpeed = 0
     bitSpeed = 0
   }
-
-  game.remotePlayers = game.remotePlayers.filter((so) => {
-    return so.online || so.isLocal
-  })
 
   const currentSpaceObjects = game.all.concat(game.remotePlayers).concat(game.bodies)
 

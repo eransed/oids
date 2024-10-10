@@ -52,15 +52,15 @@ export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
       renderShip(localPlayer, game.ctx, true, game.style, null)
     }
 
-    if (localPlayer.positionalTrace) {
-      for (let i = localPlayer.positionalTrace.length - 1; i >= 0; i--) {
-        const trace = localPlayer.positionalTrace[i]
-        const tracePos = getRemotePosition(trace, game.localPlayer)
-        if (localPlayer.afterBurner) {
-          renderTrail(localPlayer.positionalTrace[i], game.ctx, true, game.style, tracePos)
-        }
-      }
-    }
+    // if (localPlayer.positionalTrace) {
+    //   for (let i = localPlayer.positionalTrace.length - 1; i >= 0; i--) {
+    //     const trace = localPlayer.positionalTrace[i]
+    //     const tracePos = getRemotePosition(trace, game.localPlayer)
+    //     if (localPlayer.afterBurner) {
+    //       renderTrail(localPlayer.positionalTrace[i], game.ctx, true, game.style, tracePos)
+    //     }
+    //   }
+    // }
   }
 
   //Track other players with beam!
@@ -101,6 +101,7 @@ export function initLocalPlayer(game: Game) {
   game.localPlayer.photonColor = '#f00'
   game.localPlayer.isLocal = true
   game.localPlayer.isDead = false
+  game.localPlayer.isPlaying = true
   game.localPlayer.color = '#db8'
   game.localPlayer.worldSize = worldSize // server sends size of world
   game.localPlayer.cameraPosition = worldStartPosition

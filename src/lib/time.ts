@@ -44,6 +44,9 @@ frameTimes.baseUnit = 'ms'
 frameTimes.label = 'Frame time'
 
 export function getFrameTimeMs(timestamp: number): number {
+  if (prevTimestamp === 0) {
+    prevTimestamp = timestamp
+  }
   // todo: make sure not to return nan
   const frameTime = timestamp - prevTimestamp
   prevTimestamp = timestamp
@@ -56,6 +59,12 @@ export function getFrameTimeMs(timestamp: number): number {
 }
 
 let frameCount = 0
+
+export function getFps(dt: number) {
+  const fps = round2dec(1000 / dt, 0)
+
+  return fps
+}
 
 export function fpsCounter(ops: number, frameTimeMs: number, game: Game, ctx: CanvasRenderingContext2D): void {
   const fps = round2dec(1000 / frameTimeMs, 0)
@@ -119,11 +128,12 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     const oldSo = { ...game.localPlayer }
     frameCount++
     every20.tick(() => localPlayerStore.set(game.localPlayer))
-    every300.tick(() => console.log('remotes:', game.remotePlayers))
+    // every300.tick(() => console.log('remotes:', game.remotePlayers))
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx, game.style)
     renderFrame(game, dt)
     updateSpaceObjects(game.remotePlayers, dt)
+
     updateSpaceObject(game.localPlayer, dt)
     updateSpaceObjects(game.bodies, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
@@ -137,7 +147,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     nextFrame(game, dt)
   }
 
-  update(0)
+  update(performance.now())
 
   async function stopper() {
     try {
