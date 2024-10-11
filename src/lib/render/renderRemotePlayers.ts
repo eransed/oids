@@ -25,9 +25,9 @@ function interpolate(remotePlayer: SpaceObject, currentPos: Vec2, dt: number): V
     previousPositions.set(remotePlayer.name, prevpos)
   }
 
-  // Should be dynamic I guess and its not really working with position based on remote and localplayer
-  const interpolatedPosX = lerp(prevpos.x, currentPos.x, 0.3)
-  const interpolatedPosY = lerp(prevpos.y, currentPos.y, 0.3)
+  // Should be dynamic I guess
+  const interpolatedPosX = lerp(prevpos.x, currentPos.x, 0.1)
+  const interpolatedPosY = lerp(prevpos.y, currentPos.y, 0.1)
   const interpolatedPos = newVec2(interpolatedPosX, interpolatedPosY)
   previousPositions.set(remotePlayer.name, interpolatedPos)
 
@@ -40,19 +40,19 @@ export function renderRemotePlayerInSpaceMode(game: Game, activeKeyMap: KeyFunct
 
     // console.log(remotePlayer.framesSinceLastServerUpdate)
 
-    const currentPos = getRemotePosition(remotePlayer, game.localPlayer)
+    const interpolatedPos = interpolate(remotePlayer, add2(remotePlayer.viewFramePosition, remotePlayer.cameraPosition), remotePlayer.dt)
 
-    const interpolatedPos = interpolate(remotePlayer, currentPos, remotePlayer.dt)
+    const currentPos = getRemotePosition(interpolatedPos, game.localPlayer)
 
     if (remotePlayer.health <= 0) {
       console.log(remotePlayer.name, ' is dead')
       handleDeathExplosion(remotePlayer, explosionDuration)
       if (!remotePlayer.obliterated) {
-        renderExplosionFrame(remotePlayer, game.ctx, interpolatedPos)
+        renderExplosionFrame(remotePlayer, game.ctx, currentPos)
       }
       return
     } else {
-      renderShip(remotePlayer, game.ctx, false, game.style, interpolatedPos)
+      renderShip(remotePlayer, game.ctx, false, game.style, currentPos)
 
       // if (remotePlayer.positionalTrace) {
       //   for (let i = remotePlayer.positionalTrace.length - 1; i >= 0; i--) {

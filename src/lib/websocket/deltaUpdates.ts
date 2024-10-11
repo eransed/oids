@@ -47,7 +47,7 @@ const chosenKeys: Array<keyof SpaceObject> = [
   'moonType',
   'motivatorBroken',
   'obliterated',
-  'online',
+  // 'online',
   'ping',
   'pingId',
   'pingResponse',

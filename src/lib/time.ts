@@ -123,6 +123,8 @@ const every300: Every = new Every(300)
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
   let gameStopped: boolean = false
+  let lastSent = 0
+  const SEND_INTERVAL = 33 //Try to find a magic interval of sending to server
 
   function update(timestamp: number): void {
     const oldSo = { ...game.localPlayer }
@@ -132,16 +134,19 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
     const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx, game.style)
     renderFrame(game, dt)
-    updateSpaceObjects(game.remotePlayers, dt)
 
+    updateSpaceObjects(game.remotePlayers, dt)
     updateSpaceObject(game.localPlayer, dt)
     updateSpaceObjects(game.bodies, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
-      const sendAbleSpaceObject = getSendableSpaceObject(game.localPlayer)
-      const partialSo = getPartialSo(oldSo, sendAbleSpaceObject)
-      // game.websocket.send(partialSo)
-      partialSo.dt = dt
-      game.websocket.send(partialSo)
+      if (timestamp - lastSent >= SEND_INTERVAL) {
+        const sendAbleSpaceObject = getSendableSpaceObject(game.localPlayer)
+        const partialSo = getPartialSo(oldSo, sendAbleSpaceObject)
+        // game.websocket.send(partialSo)
+        partialSo.dt = dt
+        game.websocket.send(partialSo)
+        lastSent = timestamp
+      }
     }
     moveNewShotsToLocalBuffer(game.localPlayer)
     fid = requestAnimationFrame(update)

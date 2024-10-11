@@ -224,9 +224,9 @@ export function getWorldCoordinates(e: (Physical & Bounded) | null): Vec2 {
   return newVec2()
 }
 
-export function getRemotePosition(remoteObject: SpaceObject, localObject: SpaceObject) {
+export function getRemotePosition(remotePos: Vec2, localObject: SpaceObject) {
   // seems to be working for local players also...?
-  const position = sub2(add2(remoteObject.viewFramePosition, remoteObject.cameraPosition), localObject.cameraPosition)
+  const position = sub2(remotePos, localObject.cameraPosition)
   return position
 }
 
