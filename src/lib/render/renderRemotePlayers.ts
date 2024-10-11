@@ -10,7 +10,6 @@ import { renderExplosionFrame } from './renderFx'
 import { renderShip } from './renderShip'
 
 import { renderProgressBar } from './renderUI'
-import { getFps } from '../time'
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t
@@ -27,9 +26,8 @@ function interpolate(remotePlayer: SpaceObject, currentPos: Vec2, dt: number): V
   }
 
   // Should be dynamic I guess and its not really working with position based on remote and localplayer
-  const smoothing = 0.1
-  const interpolatedPosX = lerp(prevpos.x, currentPos.x, smoothing)
-  const interpolatedPosY = lerp(prevpos.y, currentPos.y, smoothing)
+  const interpolatedPosX = lerp(prevpos.x, currentPos.x, 0.3)
+  const interpolatedPosY = lerp(prevpos.y, currentPos.y, 0.3)
   const interpolatedPos = newVec2(interpolatedPosX, interpolatedPosY)
   previousPositions.set(remotePlayer.name, interpolatedPos)
 
@@ -44,7 +42,7 @@ export function renderRemotePlayerInSpaceMode(game: Game, activeKeyMap: KeyFunct
 
     const currentPos = getRemotePosition(remotePlayer, game.localPlayer)
 
-    const interpolatedPos = interpolate(remotePlayer, currentPos, dt)
+    const interpolatedPos = interpolate(remotePlayer, currentPos, remotePlayer.dt)
 
     if (remotePlayer.health <= 0) {
       console.log(remotePlayer.name, ' is dead')

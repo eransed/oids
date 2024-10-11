@@ -144,6 +144,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     characterGlobalPosition: newVec2(500, groundLevel),
     isJumping: false,
     gameMode: GameMode.SPACE_MODE,
+    dt: 0,
   }
 
   spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)

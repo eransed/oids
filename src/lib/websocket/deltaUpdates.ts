@@ -8,7 +8,7 @@ const chosenKeys: Array<keyof SpaceObject> = [
   'killCount',
   'motivationLevel',
   'ticksSinceLastSnapShot',
-  'framesSinceLastServerUpdate',
+  // 'framesSinceLastServerUpdate',
   'framesSinceLastShot',
   'acceleration',
   'afterBurner',

@@ -220,6 +220,11 @@ export interface Jumpable {
 export interface GameModable {
   gameMode: GameMode
 }
+
+export interface NetworkAble {
+  dt: number
+}
+
 export interface SpaceObject
   extends PlayingShip,
     Shapable,
@@ -247,7 +252,8 @@ export interface SpaceObject
     Traceable,
     Landable,
     Jumpable,
-    GameModable {}
+    GameModable,
+    NetworkAble {}
 
 export interface ServerUpdate<T> {
   spaceObjectByteSize: number

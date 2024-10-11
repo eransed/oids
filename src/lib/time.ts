@@ -30,7 +30,7 @@ export class Every {
 const fps_list_max_entries = 12
 let prevTimestamp: number
 const fps_list: number[] = []
-const max_dt = 80
+const max_dt = 16.67
 
 const fpsBuf = newDataStats()
 // fpsBuf.maxSize = 200
@@ -140,6 +140,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
       const sendAbleSpaceObject = getSendableSpaceObject(game.localPlayer)
       const partialSo = getPartialSo(oldSo, sendAbleSpaceObject)
       // game.websocket.send(partialSo)
+      partialSo.dt = dt
       game.websocket.send(partialSo)
     }
     moveNewShotsToLocalBuffer(game.localPlayer)

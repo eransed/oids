@@ -59,6 +59,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   so.velocity = limitVec2_(so.velocity, { x: 100, y: 100 })
   so.angleDegree += so.angularVelocity * deltaTime
   so.ticksSinceLastSnapShot++
+  so.framesSinceLastServerUpdate++
   // if (so.positionalTrace && so.ticksSinceLastSnapShot > ticksBetweenSnapshots) {
   //   so.ticksSinceLastSnapShot = 0
   //   const trace = createSpaceObject()
