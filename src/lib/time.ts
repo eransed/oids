@@ -124,7 +124,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
   let fid: number
   let gameStopped: boolean = false
   let lastSent = 0
-  const SEND_INTERVAL = 33 //Try to find a magic interval of sending to server
+  const SEND_INTERVAL = 0 //Try to find a magic interval of sending to server
 
   function update(timestamp: number): void {
     const oldSo = { ...game.localPlayer }

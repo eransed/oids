@@ -66,7 +66,7 @@ export function renderRemotePlayerInSpaceMode(game: Game, activeKeyMap: KeyFunct
 
       if (activeKeyMap.systemGraphs.keyStatus) {
         // renderViewport(game.ctx, remotePlayer)
-        renderHitRadius(remotePlayer, game.ctx)
+        renderHitRadius(remotePlayer, currentPos, game.ctx)
       }
       if (remotePlayer.health < remotePlayer.startHealth) {
         const theme = getCurrentTheme()

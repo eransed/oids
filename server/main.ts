@@ -519,6 +519,7 @@ export function getActivePlayersFromSession(sessionId: string): SpaceObject[] {
 
 export function getSessions(): Session[] {
   const sessions: Session[] = []
+  console.log(serverSessionHandler.getSessions())
 
   try {
     for (let i = 0; game_handlers.length > i; i++) {

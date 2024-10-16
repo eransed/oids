@@ -94,10 +94,8 @@ export function renderHitBox(so: SpaceObject, ctx: CanvasRenderingContext2D): vo
   ctx.restore()
 }
 
-export function renderHitRadius(so: SpaceObject, ctx: CanvasRenderingContext2D): void {
+export function renderHitRadius(so: SpaceObject, renderPos: Vec2, ctx: CanvasRenderingContext2D): void {
   ctx.save()
-
-  const renderPos = getRemotePosition(so, game.localPlayer)
 
   ctx.translate(renderPos.x, renderPos.y)
   ctx.strokeStyle = '#447'
