@@ -1,21 +1,25 @@
-import type { PhotonLaser, SpaceObject, Vec2d } from "./types"
-import { SpaceShape } from "./types"
-import { rndf, rndi, round, round2dec } from "./math"
-import { maxRandomDefaultSpaceObjectVelocity as maxVel } from "./constants"
-import type { Button90Config } from "../components/interface"
-import type { Physical } from "./traits/Physical"
+import type { PhotonLaser, SpaceObject } from './interface'
+import { MessageType, SpaceShape } from './interface'
+import { newVec2, rndf, rndi, type Vec2 } from 'mathil'
+import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
+// import type { Ship } from '@prisma/client'
+import type { Ship } from './interface'
+import { Towns } from './worlds/worldInterface'
+import { groundLevel } from './physics/physics'
+import { GameMode } from './interface'
 
 export function newPhotonLaser(): PhotonLaser {
-  const shot = {
+  const shot: PhotonLaser = {
     acceleration: { x: 0, y: 0 },
     angleDegree: -90,
     angularVelocity: 0,
-    armedDelay: 6,
-    color: "#90d",
+    armedDelay: 50,
+    color: '#90d',
     damage: 5,
     deadFrameCount: 0,
     didHit: false,
     health: 100,
+    startHealth: 100,
     isDead: false,
     mass: 1,
     obliterated: false,
@@ -23,36 +27,48 @@ export function newPhotonLaser(): PhotonLaser {
     shotBlowFrame: 16,
     size: { x: 100, y: 100 },
     velocity: { x: 0, y: 0 },
+    ownerName: '',
+    lastDamagedByName: '',
+    killedByName: '',
+    viewFramePosition: newVec2(),
+    age: 0,
   }
 
   return shot
 }
 
-export function createSpaceObject(name = "SpaceObject"): SpaceObject {
-  const initVel: Vec2d = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
-  const initPos: Vec2d = {
+export function currentTimeDate(): string {
+  return new Date().toLocaleString('sv-SE')
+}
+
+export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GAME_UPDATE): SpaceObject {
+  const initVel: Vec2 = { x: rndf(-maxVel, maxVel), y: rndf(-maxVel, maxVel) }
+  const initPos: Vec2 = {
     x: rndi(0, 100),
     y: rndi(0, 100),
   }
 
   const spaceObject: SpaceObject = {
+    afterBurner: false,
+    messageType: msgType,
     viewport: { x: 0, y: 0 },
-    sessionId: undefined,
+    viewportScale: 1,
+    sessionId: '',
     acceleration: { x: 0, y: 0 },
     ammo: 1000,
     angleDegree: -90,
     angularVelocity: 0,
-    armedDelay: 6,
+    armedDelay: 500,
     batteryLevel: 500,
+    batteryCapacity: 500,
     booster: 2,
     bounceCount: 0,
     canonCoolDown: 0,
     canonCoolDownSpeed: 1.4,
     canonHeatAddedPerShot: 1.7,
     canonOverHeat: false,
-    colliding: false,
     collidingWith: [],
-    color: "#90d",
+    color: '#db8',
     damage: 5,
     deadFrameCount: 0,
     didHit: false,
@@ -60,130 +76,94 @@ export function createSpaceObject(name = "SpaceObject"): SpaceObject {
     framesSinceLastServerUpdate: 0,
     framesSinceLastShot: 0,
     health: 100,
+    startHealth: 100,
     hitRadius: 60,
     inverseFireRate: 6,
     isDead: false,
     isLocal: false,
     isPlaying: false,
+    killedByName: '',
+    kills: [],
     killCount: 0,
     mass: 1,
-    missileDamage: 2,
+    missileDamage: 10,
     missileSpeed: 20,
     motivationLevel: 100,
     motivatorBroken: false,
     name: name,
+    id: rndi(1, 500000).toString(),
     obliterated: false,
-    online: false,
-    photonColor: "#0f0",
+    online: true,
+    photonColor: '#f00',
     position: initPos,
-    serverVersion: "",
+    // positionalTrace: [],
+    serverVersion: '',
     shape: SpaceShape.SmallShip,
     shotBlowFrame: 16,
     shotsInFlight: [],
-    shotsInFlightValues: [],
+    shotsInFlightNew: [],
     shotsFiredThisFrame: false,
     shotsPerFrame: 1,
-    size: { x: 100, y: 100 },
-    steer: function (direction: number, deltaTime: number): void {
-      throw new Error("Steer not implemented.")
-    },
+    size: { x: 50, y: 50 },
+    // steer: function (direction: number, deltaTime: number): void {
+    //  throw new Error('Steer not implemented.')
+    // },
     steeringPower: 1.2,
     velocity: initVel,
+    ownerName: '',
+    lastDamagedByName: '',
+    joinedGame: currentTimeDate(),
+    lastMessage: '',
+    // dateTimeClient: undefined,
+    // dateTimeServer: undefined,
+    ping: false,
+    pingResponse: false,
+    pingId: '',
+    hops: 0,
+    ttl: 0,
+    rtt: 0,
+    worldSize: newVec2(),
+    cameraPosition: newVec2(),
+    cameraVelocity: newVec2(),
+    viewFramePosition: newVec2(),
+    thrustFlames: [],
+    ship: {
+      id: name,
+      level: 0,
+      name: name,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+      experience: 0,
+      userId: '',
+      variant: 1,
+      played: 0,
+    },
+    moonType: 0,
+    hometown: Towns.Coruscant,
+    ticksSinceLastSnapShot: 0,
+    characterGlobalPosition: newVec2(500, groundLevel),
+    isJumping: false,
+    gameMode: GameMode.SPACE_MODE,
+    dt: 0,
   }
+
+  spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)
 
   return spaceObject
 }
 
-export function createButton90Config(
-  buttonText = "Button90",
-  clickCallback = () => {
-    console.log(`${buttonText} selected`)
-  },
-  selected = false
-): Button90Config {
-  return {
-    buttonText: buttonText,
-    clickCallback: clickCallback,
-    selected: selected,
+export function createShip(userId: string): Ship {
+  const ship: Ship = {
+    id: '', //No need of creating an unique id since API endpoint makes this
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    variant: 0,
+    name: '',
+    userId: userId,
+    level: 1,
+    experience: 1,
+    played: 0,
   }
-}
 
-export function reduceSoSize(so: SpaceObject): SpaceObject {
-  const dec = 2
-
-  so.canonCoolDown = round2dec(so.canonCoolDown, dec)
-  so.acceleration = round(so.acceleration, dec)
-  so.velocity = round(so.velocity, dec)
-  so.position = round(so.position, dec)
-
-  return so
-}
-
-export function reduceShotSize(photonLaser: PhotonLaser): PhotonLaser {
-  const dec = 2
-
-  photonLaser.acceleration = round(photonLaser.acceleration, dec)
-  photonLaser.velocity = round(photonLaser.velocity, dec)
-  photonLaser.position = round(photonLaser.position, dec)
-
-  return photonLaser
-}
-
-//Incoming messages
-export function soFromValueArray(value: []): SpaceObject {
-  let so = createSpaceObject()
-  Object.keys(so).forEach((v, i) => {
-    if ((v as keyof SpaceObject) === "shotsInFlightValues") {
-      // if ((value[i] as any[]).length > 0) {
-      //   debugger
-      // }
-      ;(value[i] as any[]).forEach((shot) => {
-        so.shotsInFlight.push(photonLaserFromValueArray(shot))
-      })
-    } else {
-      so[v as keyof SpaceObject] = value[i]
-    }
-  })
-  so.shotsInFlightValues = []
-  return so
-}
-
-//Creates one shot from valuearray
-export function photonLaserFromValueArray(values: []): PhotonLaser {
-  let pl = newPhotonLaser()
-
-  Object.keys(pl).forEach((v, i) => {
-    pl[v as keyof PhotonLaser] = values[i]
-  })
-
-  return pl
-}
-
-//Outgoing messages
-export function soToValueArray(so: SpaceObject): any[] {
-  const soValues = Object.values(so)
-
-  Object.keys(so).forEach((key, i) => {
-    if (key === "shotsInFlightValues" && so.shotsFiredThisFrame) {
-      soValues[i] = soShotsInFlightValueArray(so)
-    }
-    if (key === "shotsInFlight") {
-      soValues[i] = []
-    }
-  })
-
-  // if (so.shotsInFlight.length > 0) debugger
-
-  return soValues
-}
-
-//Creates an value array from shotsInFlight on space object
-export function soShotsInFlightValueArray(so: SpaceObject): any[] {
-  const shotList: any[] = []
-
-  so.shotsInFlight.forEach((shot) => {
-    shotList.push(Object.values(shot))
-  })
-
-  return shotList
+  return ship
 }

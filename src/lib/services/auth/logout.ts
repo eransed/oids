@@ -1,1 +1,1 @@
-export const logout = "";
+export const logout = ''

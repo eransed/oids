@@ -1,7 +1,8 @@
 import type { Positionable, Sizeable } from './Physical'
-import type { Damager, Vec2d } from '../types'
+import type { Damager } from '../interface'
 import type { Steerable } from './Steerable'
 import { steerImpl } from './Steerable'
+import { newVec2, type Vec2 } from 'mathil'
 
 export interface Renderable extends Positionable, Sizeable {
   color: string
@@ -54,22 +55,24 @@ export interface Renderable extends Positionable, Sizeable {
 // }
 
 export class PhotonMissile implements Renderable, Steerable, Damager {
-  position: Vec2d = { x: 0, y: 0 }
+  position: Vec2 = { x: 0, y: 0 }
   steeringPower = 1
   angleDegree = 120
   angularVelocity = 0
   color = '#fff'
-  size: Vec2d = { x: 10, y: 10 }
+  size: Vec2 = { x: 10, y: 10 }
   damage = 1
   armedDelay = 20
   didHit = false
   shotBlowFrame = 0
+  viewFramePosition: Vec2 = newVec2()
 
   readonly ctx: CanvasRenderingContext2D
 
   constructor(cc: CanvasRenderingContext2D) {
     this.ctx = cc
   }
+  ownerName = ''
 
   steer(direction: number, deltaTime: number): void {
     steerImpl(this, direction, deltaTime)

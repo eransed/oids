@@ -1,27 +1,54 @@
-import axios, { Axios, type AxiosResponse } from "axios"
-import { user } from "../../stores"
+import axios, { type AxiosResponse } from 'axios'
 
-import type { Profile } from "../../../components/interface"
+//Svelte store
+import { localPlayerStore, userStore } from '../../../stores/stores'
 
-const getProfile = async (): Promise<Profile | null> => {
-  const token = localStorage.getItem("accessToken")
+//Interface
+// import type { User } from '../../../interfaces/user'
+// import type { Prisma, User } from '@prisma/client'
+import { setCssFromSettings } from '../../../style/defaultColors'
+import { getLocationURL } from '../../../utils/utils'
+import type { Ship, User } from '../../interface'
+import { getAccessTokenFromLocalStorage } from '../utils/Token'
+
+export const getProfile = async (update = true): Promise<AxiosResponse<User>> => {
+  let token = ''
+
+  const savedToken = getAccessTokenFromLocalStorage()
+  if (savedToken) {
+    token = savedToken
+  } else {
+    throw new Error('No token')
+  }
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   }
 
-  const response: Profile | null = await axios
-    .get(`http://${location.hostname}:6060/api/v1/users/profile`, config)
-    .then((response: AxiosResponse<Profile>) => {
-      user.set(response.data.user)
-      return response.data
+  const response: AxiosResponse<User> = await axios
+    .get(`http://${getLocationURL()}:6060/api/v1/users/profile`, config)
+    .then((response: AxiosResponse<User>) => {
+      if (update) {
+        updateUser(response.data)
+      }
+
+      return response
     })
     .catch((err) => {
-      console.error(err)
-      return null
+      throw new Error(err)
     })
 
   return response
 }
 
-export default getProfile
+export function updateUser(userData: User) {
+  userStore.set(userData)
+
+  const defaultShip = userData.ships[0]
+
+  localPlayerStore.update((v) => ({ ...v, id: userData.id, ship: defaultShip }))
+
+  console.log('Welcome: ', userData.name, userData)
+
+  setCssFromSettings(userData.theme)
+}

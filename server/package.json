@@ -1,12 +1,12 @@
 {
   "name": "oids-server",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Object broadcast server",
-  "main": "main.js",
+  "main": "main.cjs",
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "prisma": "^4.10.1"
+    "prisma": "^5.19.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13"

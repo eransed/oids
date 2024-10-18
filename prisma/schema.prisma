@@ -13,12 +13,24 @@ datasource db {
 model User {
   id            String         @id @unique @default(uuid())
   email         String         @unique
-  password      String
-  name          String         @unique
+  name          String
   refreshTokens RefreshToken[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   gameHistory   Game[]
+  role          String         @default("player")
+  theme         Int            @default(0)
+  ships         Ship[]
+  image         String         @default("/src/assets/avatars/astronautDog.svg")
+  played        Int            @default(0)
+  password      Password? // One-to-one relation to Password model
+}
+
+model Password {
+  id          String @id @unique @default(uuid())
+  hashedValue String
+  userId      String @unique
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model RefreshToken {
@@ -32,8 +44,32 @@ model RefreshToken {
 }
 
 model Game {
-  id     String  @id @unique @default(uuid())
-  win    Boolean
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
+  id        Int      @id @unique @default(autoincrement())
+  sessionId String
+  win       Boolean
+  played    DateTime @default(now())
+  players   Player[]
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model Player {
+  id            Int    @id @unique @default(autoincrement())
+  name          String
+  Game          Game?  @relation(fields: [gameId], references: [id])
+  gameId        Int?
+  gameSessionId String
+}
+
+model Ship {
+  id         String   @id @unique @default(uuid())
+  level      Int      @default(1)
+  name       String   @unique
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  experience Int      @default(0)
+  owner      User     @relation(fields: [userId], references: [id])
+  userId     String
+  variant    Int      @default(0)
+  played     Int      @default(0)
 }

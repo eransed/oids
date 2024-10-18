@@ -28,11 +28,10 @@ export interface Testable {
 
 export function testModule(testModule: TestModule): TestModuleResults {
   const mfr: TestFunctionResult[] = []
-  console.log('\nTesting module "' + testModule.name + '"')
+
   for (const tf of testModule.moduleTestFunctions) {
     const result = tf.func() === true
-    console.log('   Test "' + tf.func.name + '" ' + (result ? 'Passed' : 'Failed'))
-    console.log('      (' + tf.desc + ')\n')
+
     mfr.push({
       desc: tf.desc,
       func: tf.func,

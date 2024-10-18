@@ -1,53 +1,66 @@
 //On mount -> validate refreshtoken and make a new auth token.
 
-import axios, { Axios } from "axios"
-import type { AxiosResponse } from "axios"
-import getProfile from "../user/profile"
+import axios from 'axios'
+import type { AxiosError, AxiosResponse } from 'axios'
+import { getProfile } from '../user/profile'
 
-import { isLoggedIn, user, userLoading } from "../../stores"
+import { userLoadingStore } from '../../../stores/stores'
 
-import type { Profile } from "../../../components/interface"
+import type { Tokens } from '../../interface'
+import { setCssFromSettings } from '../../../style/defaultColors'
+import { getLocationURL } from '../../../utils/utils'
 
 //Check if token is valid and renew
 export const validateToken = async () => {
   let accessToken
   let refreshToken
 
-  const storedRefreshToken = localStorage.getItem("refreshToken")
+  const storedRefreshToken = localStorage.getItem('refreshToken')
 
   //If no refreshToken stored in localstorage -> return undefined and user needs to login
   if (!storedRefreshToken) {
-    return
+    throw new Error()
   }
 
   const body = {
     refreshToken: storedRefreshToken,
   }
 
-  userLoading.set(true)
+  userLoadingStore.set(true)
 
-  await axios
-    .post(`http://${location.hostname}:6060/api/v1/auth/refreshToken`, body)
-    .then(async (response: AxiosResponse<any>) => {
+  return await axios
+    .post(`http://${getLocationURL()}:6060/api/v1/auth/refreshToken`, body)
+    .then(async (response: AxiosResponse<Tokens>) => {
       if (response.status === 200) {
         accessToken = response.data.accessToken
         refreshToken = response.data.refreshToken
-        localStorage.setItem("refreshToken", refreshToken)
-        localStorage.setItem("accessToken", accessToken)
+        localStorage.setItem('refreshToken', refreshToken)
+        localStorage.setItem('accessToken', accessToken)
 
-        const userProfile: Profile | null = await getProfile()
+        return await getProfile()
+          .then((response) => {
+            const user = response.data
+            userLoadingStore.set(false)
+            setCssFromSettings(user.theme)
 
-        if (userProfile) {
-          user.set(userProfile.user)
-          isLoggedIn.set(true)
-          userLoading.set(false)
-        }
+            return user
+          })
+          .catch((err) => {
+            throw new Error(err)
+          })
       } else {
-        userLoading.set(false)
-        return
+        throw new Error()
       }
     })
-    .catch((err) => {
-      console.error(err)
+    .catch((err: AxiosError) => {
+      console.log(err.response?.data)
+      console.log('Removing tokens')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('accessToken')
     })
+}
+
+export function getAccessTokenFromLocalStorage(): string | null {
+  const accesToken = localStorage.getItem('accessToken')
+  return accesToken
 }

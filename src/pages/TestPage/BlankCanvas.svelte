@@ -1,0 +1,91 @@
+<script lang="ts">
+ import { onDestroy, onMount } from 'svelte'
+ import { error, info, vec2Array, to_string2, log, warn, EveryInterval, type Vec2, type Line, connectPoints, boundingBox } from 'mathil'
+ import { clearScreen, renderLine, renderPoint } from '../../lib/render/render2d'
+  import type { UIStyle } from '../../lib/interface'
+
+ let canvas: HTMLCanvasElement
+
+ onMount(() => {
+  const ctx = <CanvasRenderingContext2D>canvas.getContext('2d')
+  ctx.canvas.width = 300
+  ctx.canvas.height = 300
+  info('mount')
+
+  if (!ctx) {
+   error('Failed to get canvas context')
+   return
+  }
+
+  let points: Vec2[] = []
+  let lines: Line[] | null = []
+  let sqLines: Line[] | null = []
+  function updatePoints(count = 1) {
+   // points = Vec2Array(count, 250, 50)
+   points = points.concat(vec2Array(1, 280, 20))
+   lines = connectPoints(points)
+   sqLines = connectPoints(boundingBox(points), true)
+   if (points.length > 3) points.splice(0, 1)
+  }
+
+  updatePoints()
+
+  const every = new EveryInterval(10)
+  points.forEach((p) => {
+   log(to_string2(p))
+  })
+
+  let frame = requestAnimationFrame(loop)
+
+  let count = 1
+
+  function loop(t: number) {
+   frame = requestAnimationFrame(loop)
+
+   const s: UIStyle = {
+     armedShotColor: '',
+     unarmedShotColor: '',
+     shipColor: '',
+     spaceColor: '#fff',
+     starColor: ''
+   }
+   clearScreen(ctx, s)
+
+   points.forEach((p) => {
+    renderPoint(ctx, p, '#000', 3)
+   })
+
+   if (lines) {
+    lines.forEach((l) => {
+     renderLine(ctx, l, '#ccc', 1)
+    })
+   }
+
+   if (sqLines) {
+    sqLines.forEach((l) => {
+     renderLine(ctx, l, '#00f', 1)
+    })
+   }
+
+   every.tick(() => {
+    updatePoints(count++)
+    if (count > 1000) {
+     count = 1
+     points = []
+    }
+   })
+  }
+
+  info('mount done')
+
+  return () => {
+   cancelAnimationFrame(frame)
+  }
+ })
+
+ onDestroy(() => {
+  warn('destroy')
+ })
+</script>
+
+<canvas bind:this={canvas} />

@@ -1,14 +1,16 @@
-import { GameType, type SpaceObject } from "./types"
-
-import { getContext } from "./canvas_util"
-
-import { LightSource, LineSegment } from "./shapes"
-import { renderLoop } from "./time"
-import * as WelcomeScreen from "./gameModes/welcomeScreen"
-import * as Regular from "./gameModes/regular"
+import { GameType, type SpaceObject } from './interface'
+import { getContext } from './canvas_util'
+import { LightSource, LineSegment } from './shapes'
+import { renderLoop } from './time'
+// import * as WelcomeScreen from './gameModes/welcomeScreen'
+import { initRegularGame, nextFrame, renderFrame } from './gameModes/regular'
+import type { OidsSocket } from './websocket/ws'
+import { getCurrentStyle, syncThemeWithCss } from '../style/defaultColors'
+import type { Star, UIStyle } from './interface'
 
 export class Game {
-  private running = false
+  websocket: OidsSocket
+  running = false
   type: GameType = GameType.SinglePlayer
   ctx: CanvasRenderingContext2D
   canvas: HTMLCanvasElement
@@ -23,12 +25,17 @@ export class Game {
   hasCalledCallback = false
   OnDeadLocalPlayerCallBack: () => void
   stopper: (() => Promise<number>) | null = null
+  serverVersion = '_unknown_server_version_'
+  style: UIStyle = getCurrentStyle()
+  stars: Star[] = []
 
-  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _OnDeadLocalPlayerCallBack: () => void) {
+  constructor(_canvas: HTMLCanvasElement, _localPlayer: SpaceObject, _websocket: OidsSocket, _OnDeadLocalPlayerCallBack: () => void) {
     this.canvas = _canvas
     this.localPlayer = _localPlayer
+    this.websocket = _websocket
     this.OnDeadLocalPlayerCallBack = _OnDeadLocalPlayerCallBack
     this.ctx = getContext(this.canvas)
+    syncThemeWithCss()
   }
 
   isRunning(): boolean {
@@ -40,24 +47,19 @@ export class Game {
   }
 
   stopGame = async (): Promise<void> => {
-    console.log('todo: build a better logger...')
+    this.localPlayer.isPlaying = false
     this.running = false
     this.shouldSendToServer = false
     this.localPlayer.isPlaying = false
     if (this.stopper) {
       await this.stopper()
     } else {
-      console.error("stopper not init")
+      console.error('stopper not init')
     }
   }
 
   startSingleplayer(): void {
-    console.log("starts single")
-  }
-
-  startWelcomeScreen(): void {
-    WelcomeScreen.initWelcomeScreen(this)
-    this.stopper = renderLoop(this, WelcomeScreen.renderFrame, WelcomeScreen.nextFrame)
+    console.log('starts single')
   }
 
   clearBodies(): void {
@@ -77,6 +79,7 @@ export class Game {
     this.localPlayer.isDead = false
     this.localPlayer.obliterated = false
     this.localPlayer.deadFrameCount = 0
+
     this.clearBodies()
   }
 
@@ -84,11 +87,22 @@ export class Game {
     // init a regular game
     this.shouldSendToServer = true
     this.localPlayer.isPlaying = true
-    Regular.initRegularGame(this)
+    initRegularGame(this)
 
     this.running = true
 
     // start the animation loop
-    this.stopper = renderLoop(this, Regular.renderFrame, Regular.nextFrame)
+    this.stopper = renderLoop(this, renderFrame, nextFrame)
+  }
+
+  startGame(initFn: (g: Game) => void, renderFn: (game: Game, dt: number) => void, nextFn: (game: Game, dt: number) => void): void {
+    this.shouldSendToServer = true
+    this.localPlayer.isPlaying = true
+    initFn(this)
+
+    this.running = true
+
+    // start the animation loop
+    this.stopper = renderLoop(this, renderFn, nextFn)
   }
 }
