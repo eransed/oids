@@ -7,7 +7,15 @@ import { screenScale } from '../constants'
 import { renderShot, renderVector } from './render2d'
 import { getShipBundleCache } from '../../style/ships'
 
-export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle, renderPos: Vec2 | null = null, showVectors = false): void {
+export function renderShip(
+  so: SpaceObject,
+  ctx: CanvasRenderingContext2D,
+  renderAsLocalPlayer = false,
+  style: UIStyle,
+  renderPos: Vec2 | null = null,
+  showVectors = false,
+  extraInfoText: string = '',
+): void {
   const shipSize: Vec2 = { x: 60, y: 100 }
   so.size = shipSize
 
@@ -25,8 +33,15 @@ export function renderShip(so: SpaceObject, ctx: CanvasRenderingContext2D, rende
     // renderVec2(`world: ${to_string2(so.position)}`, so.viewFramePosition, ctx)
   } else {
     ctx.translate(renderPos.x, renderPos.y)
+
     // shipTranslation = renderPos
     // renderVec2(`world: ${to_string2(renderPos)}`, renderPos, ctx)
+  }
+
+  if (extraInfoText) {
+    ctx.font = `bold ${60}px courier`
+    ctx.fillStyle = '#fff'
+    ctx.fillText(extraInfoText, (0.5 * so.size.x) / 2, 100)
   }
 
   ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)

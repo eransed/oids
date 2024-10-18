@@ -90,7 +90,7 @@ export class GameHandler {
           this.nextAsteroidToSendIndex = 0
         }
       } else {
-        warn('oh shit')
+        // warn('oh shit')
         // console.log("nextAsteroidToSendIndex", this.nextAsteroidToSendIndex, this.asteroids)
       }
 

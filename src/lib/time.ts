@@ -66,20 +66,20 @@ export function getFps(dt: number) {
   return fps
 }
 
-export function fpsCounter(ops: number, frameTimeMs: number, game: Game, ctx: CanvasRenderingContext2D): void {
-  const fps = round2dec(1000 / frameTimeMs, 0)
+export function fpsCounter(ops: number, dt: number, game: Game, ctx: CanvasRenderingContext2D): void {
+  const fps = getFps(dt)
   addDataPoint(fpsBuf, fps)
-  addDataPoint(frameTimes, frameTimeMs)
+  addDataPoint(frameTimes, dt)
   // renderGraph(fpsBuf, {x: 350, y: 100}, {x: 300, y: 70}, ctx)
   // renderGraph(frameTimes, {x: 350, y: 200}, {x: 300, y: 70}, ctx)
-  const dt = round2dec(frameTimeMs, 0)
+  const dtRounded = round2dec(dt, 1)
   fps_list.push(fps)
   if (fps_list.length >= fps_list_max_entries) {
     const afps: number = round2dec(fps_list.reduce((prev, cur) => prev + cur, 0) / fps_list_max_entries, 0)
-    renderFrameInfo(ops, afps, dt, frameCount, game, ctx)
+    renderFrameInfo(ops, afps, dtRounded, frameCount, game, ctx)
     fps_list.shift()
   } else {
-    renderFrameInfo(ops, fps, dt, frameCount, game, ctx)
+    renderFrameInfo(ops, fps, dtRounded, frameCount, game, ctx)
   }
 }
 
@@ -120,6 +120,8 @@ export function getSendableSpaceObject(so: SpaceObject): SpaceObject {
 const every20: Every = new Every(20)
 const every300: Every = new Every(300)
 
+const partialEnabled = true
+
 export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
   let gameStopped: boolean = false
@@ -142,9 +144,12 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
       if (timestamp - lastSent >= SEND_INTERVAL) {
         const sendAbleSpaceObject = getSendableSpaceObject(game.localPlayer)
         const partialSo = getPartialSo(oldSo, sendAbleSpaceObject)
-        // game.websocket.send(partialSo)
         partialSo.dt = dt
-        game.websocket.send(partialSo)
+        if (partialEnabled) {
+          game.websocket.send(partialSo)
+        } else {
+          game.websocket.send(sendAbleSpaceObject)
+        }
         lastSent = timestamp
       }
     }

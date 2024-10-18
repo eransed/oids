@@ -1,3 +1,4 @@
+import { logError } from '../../../components/alert/alertHandler'
 import { handleIncomingChatMessage } from '../../../pages/GameLobby/handlers/handleChatMessages'
 import type { Game } from '../../game'
 import { type ServerUpdate, type SpaceObject, MessageType } from '../../interface'
@@ -16,10 +17,14 @@ export function playerUpdate(serverUpdate: ServerUpdate<SpaceObject>, game: Game
     case MessageType.CHAT_MESSAGE:
       handleIncomingChatMessage(serverUpdate.dataObject, game.localPlayer.name)
       break
+
+    // case MessageType.GAME_UPDATE || MessageType.SESSION_UPDATE || MessageType.LEFT_SESSION:
     default:
       if (serverUpdate.dataObject) {
         handleGameUpdate(serverUpdate, game)
       }
-      break
+    // default:
+    //   logError(`Wrong messagetype from server: ${MessageType[serverUpdate.dataObject.messageType]}`)
+    //   break
   }
 }
