@@ -22,33 +22,28 @@ export interface SpaceTown {
   buildings: SpaceObject[]
 }
 
-export function createWorldOne(): GameMap {
+export function createWorldOne(sessionId: string): GameMap {
   return {
-    towns: [createMainTown()],
+    towns: [createMainTown(sessionId)],
   }
 }
 
-export function createMainTown(): SpaceTown {
+export function createMainTown(sessionId: string): SpaceTown {
   const pos = newVec2(2342340, 4564560)
   return {
     name: Towns[Towns.Coruscant],
     downtownWorldsPosition: pos,
-    buildings: [createBasicBuilding(add2(pos, newVec2(0, 500)))],
+    buildings: [createBasicBuilding(add2(pos, newVec2(0, 500)), sessionId)],
   }
 }
 
-export function createBasicBuilding(buildingPosition: Vec2): SpaceObject {
-  const basicBuilding = createSpaceObject(
-    `Building-${rndi(1000, 1000000)}`,
-    MessageType.SERVER_GAME_UPDATE
-  )
+export function createBasicBuilding(buildingPosition: Vec2, sessionId: string): SpaceObject {
+  const basicBuilding = createSpaceObject(`Building-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
   basicBuilding.ammo = 5000
   basicBuilding.cameraPosition = buildingPosition
   basicBuilding.size = smul2(basicBuilding.size, 3)
   basicBuilding.velocity = rndfVec2(0, 0)
-  basicBuilding.hitRadius = Math.sqrt(
-    basicBuilding.size.x ** 2 + basicBuilding.size.y ** 2
-  )
+  basicBuilding.hitRadius = Math.sqrt(basicBuilding.size.x ** 2 + basicBuilding.size.y ** 2)
   basicBuilding.mass = 50
   basicBuilding.health = 5000
   basicBuilding.startHealth = basicBuilding.health
@@ -56,6 +51,7 @@ export function createBasicBuilding(buildingPosition: Vec2): SpaceObject {
   basicBuilding.inverseFireRate = 15
   basicBuilding.angularVelocity = 0
   basicBuilding.angleDegree = 90
+  basicBuilding.sessionId = sessionId
 
   return basicBuilding
 }

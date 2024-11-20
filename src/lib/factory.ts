@@ -135,7 +135,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
       createdAt: new Date(),
       experience: 0,
       userId: '',
-      variant: 1,
+      variant: 0,
       played: 0,
     },
     moonType: 0,

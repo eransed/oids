@@ -5,6 +5,7 @@ import express from 'express'
 import { getPlayersFromSessionId, getSessions } from '../../main.js'
 import { ApiError } from '../utils/apiError.js'
 import { StatusCodes } from 'http-status-codes'
+import { Session } from '../../../src/lib/interface.js'
 
 export const game = express.Router()
 
@@ -28,7 +29,13 @@ game.post('/players', async (req: Request, res: Response, next: NextFunction) =>
 
 game.get('/sessions', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const sessions = getSessions()
+    const sessionMap: Map<string, Session> = getSessions()
+
+    let sessions: Session[] = []
+
+    sessionMap.forEach((v) => {
+      sessions.push(v)
+    })
 
     res.json(sessions)
   } catch (err) {

@@ -15,7 +15,7 @@ export class GameHandler {
   asteroids: SpaceObject[] = []
   game_interval: NodeJS.Timeout | undefined = undefined
   start_time_us: number = usNow()
-  tied_session_id: string | null = null
+  tied_session_id: string
 
   // private readonly tickRate = 30
   private readonly fps = 30
@@ -26,13 +26,14 @@ export class GameHandler {
   // private every = new EveryInterval(this.tickRate)
   // private asteroidTicker = new EveryInterval(this.tickRate)
   private nextAsteroidToSendIndex = 0
-  private gameMap: GameMap = createWorldOne()
+  private gameMap: GameMap | undefined = undefined
   private sentOnce = false // only used during dev...
 
   broadcaster: (clients: Client[], data: SpaceObject, sessionId: string | null) => void
 
-  constructor(bc: (clients: Client[], data: SpaceObject, sessionId: string | null) => void) {
+  constructor(bc: (clients: Client[], data: SpaceObject, sessionId: string | null) => void, sessionId: string) {
     this.broadcaster = bc
+    this.tied_session_id = sessionId
   }
 
   quit_game(): void {
@@ -42,9 +43,10 @@ export class GameHandler {
     clearInterval(this.game_interval)
   }
 
-  game_session_start(sessionId: string) {
-    info(`Starting game ${sessionId} and creating asteroids...`)
-    this.tied_session_id = sessionId
+  game_session_start() {
+    this.gameMap = createWorldOne(this.tied_session_id)
+
+    info(`Starting game ${this.tied_session_id} and creating asteroids...`)
     this.game_started = true
     this.spawnAsteroids()
 
@@ -84,7 +86,7 @@ export class GameHandler {
       if (obj) {
         this.asteroids[this.nextAsteroidToSendIndex] = this.prepareSoToSend(obj)
         this.asteroids[this.nextAsteroidToSendIndex].collidingWith = []
-        this.broadcaster(globalConnectedClients, this.asteroids[this.nextAsteroidToSendIndex], sessionId)
+        this.broadcaster(globalConnectedClients, this.asteroids[this.nextAsteroidToSendIndex], this.tied_session_id)
         this.nextAsteroidToSendIndex++
         if (this.nextAsteroidToSendIndex >= this.asteroids.length) {
           this.nextAsteroidToSendIndex = 0
@@ -103,17 +105,23 @@ export class GameHandler {
   // server main loop end
 
   updateTownsIfApplicable() {
-    if (this.sentOnce === true) return
-    this.sentOnce = true
+    if (!this.gameMap) {
+      warn('No gameMap initialiazed')
+      return
+    }
+    // if (!force) {
+    //   if (this.sentOnce === true) return
+    //   this.sentOnce = true
+    // }
 
-    info(`Broadcasting town...`)
+    // info(`Broadcasting town...`)
 
     for (let i = 0; i < this.gameMap.towns.length; i++) {
       for (let j = 0; j < this.gameMap.towns[i].buildings.length; j++) {
         const building = this.gameMap.towns[i].buildings[j]
-        info(`Broadcasting building: ${building.name}`)
-        info(`Broadcasting building speedx: ${building.velocity.x}`)
-        info(`Broadcasting building speedy: ${building.velocity.y}`)
+        // info(`Broadcasting building: ${building.name}`)
+        // info(`Broadcasting building speedx: ${building.velocity.x}`)
+        // info(`Broadcasting building speedy: ${building.velocity.y}`)
         this.broadcaster(globalConnectedClients, building, this.tied_session_id)
       }
     }
@@ -136,6 +144,7 @@ export class GameHandler {
     info(`Creating ${num} asteroids`)
     for (let i = 0; i < num; i++) {
       const npc = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
+      npc.sessionId = this.tied_session_id
       npc.ammo = 5000
       npc.cameraPosition = rndfVec2(worldStartPosition.x - 2000, worldStartPosition.y + 5000)
       npc.size = smul2(npc.size, 3)
@@ -154,6 +163,7 @@ export class GameHandler {
   }
 
   handleSpaceObjectUpdate(so: SpaceObject) {
+    // console.log('update from: ', so.name)
     for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
       this.remoteSpaceObjects[i] = spaceObjectUpdateAndShotReciverOptimizer(so, this.remoteSpaceObjects[i])
     }
@@ -171,6 +181,7 @@ export class GameHandler {
       }
     }
     good(`Adding ${so.name} in remote list`)
+
     this.remoteSpaceObjects.push(so)
   }
 

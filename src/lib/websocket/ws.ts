@@ -6,6 +6,7 @@ import { decode, encode } from '@msgpack/msgpack'
 import { getPartialSo } from './deltaUpdates'
 import { localPlayerStore } from '../../stores/stores'
 import { handleAxiosError } from '../services/utils/errorHandler'
+import { Every } from '../time'
 
 export function getWsUrl(port = OIDS_WS_PORT): URL {
   if (typeof window !== 'undefined') {

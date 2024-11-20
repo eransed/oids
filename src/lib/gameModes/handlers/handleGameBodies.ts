@@ -12,7 +12,8 @@ import { renderVec2, renderProgressBar } from '../../render/renderUI'
 
 export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): SpaceObject[] {
   game.bodies.forEach((body) => {
-    const bodyPos = getRemotePosition(body, game.localPlayer)
+    const actualPos = add2(body.viewFramePosition, body.cameraPosition)
+    const bodyPos = getRemotePosition(actualPos, game.localPlayer)
 
     if (body.health <= 0) {
       handleDeathExplosion(body, explosionDuration)
@@ -23,7 +24,7 @@ export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): Spac
       renderMoon(body, bodyPos, game.ctx, game.style)
       if (activeKeyMap.systemGraphs.keyStatus) {
         renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
-        renderHitRadius(body, game.ctx)
+        renderHitRadius(body, bodyPos, game.ctx)
       }
 
       if (body.health < body.startHealth) {

@@ -152,6 +152,7 @@ export function initRegularGame(game: Game): void {
   }
 
   function handleNpcUpdate(npcUpdate: ServerUpdate<SpaceObject>) {
+    // console.log(npcUpdate)
     // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
     if (!exists(npcUpdate.dataObject, game.bodies)) {
       // info(`Adding ${su.dataObject.name}`)
@@ -168,12 +169,19 @@ export function initRegularGame(game: Game): void {
     playerUpdate(su, game)
   }
 
-  game.websocket.addListener((su) => handlePlayerUpdate(su), handleNpcUpdate)
+  game.websocket.addListener(
+    (su) => handlePlayerUpdate(su),
+    (su) => handleNpcUpdate(su),
+  )
 }
 
 const every = new Every(25)
+const every500 = new Every(500)
 
 export function renderFrame(game: Game, dt: number): void {
+  every500.tick(() => {
+    console.log(game.bodies)
+  })
   every.tick(() => {
     game.localPlayer.viewport = getScreenRect(game.ctx)
     setCanvasSizeToClientViewFrame(game.ctx)

@@ -39,37 +39,10 @@ const server: WebSocketServer = new WebSocketServer({
 
 export let globalConnectedClients: Client[] = []
 
-const game_handlers: GameHandler[] = []
-const serverSessionHandler = sessionHandler(game_handlers, globalConnectedClients)
+let game_handlers: GameHandler[] = []
+const serverSessionHandler = sessionHandler()
 
-serverSessionHandler.startSessions()
-
-export function createGame(sessionId: string) {
-  const gameHandler = new GameHandler((clients: Client[], data: SpaceObject, sessionId: string | null) => {
-    // info(`Sending to session: ${sessionId}`)
-    const sendCount = serverBroadcast<SpaceObject>(data, clients, sessionId)
-    // info (`SendCount: ${sendCount}`)
-    if (sendCount > 0 && sessionId) {
-      const sessionClients = getClientsFromSessionId(sessionId)
-      // info(`Num: ${sessionClients.length}`)
-      let somePlays = false
-      for (let i = 0; i < sessionClients.length; i++) {
-        // info(`Playing ${sessionClients[i].lastDataObject?.isPlaying}`)
-        if (sessionClients[i].lastDataObject?.isPlaying) {
-          somePlays = true
-        }
-      }
-
-      if (somePlays === false) {
-        gameHandler.quit_game()
-      }
-    }
-  })
-
-  gameHandler.game_session_start(sessionId)
-
-  return gameHandler
-}
+game_handlers = serverSessionHandler.startSessions()
 
 interface clientUpdated {
   id: string
@@ -192,12 +165,7 @@ export class Client {
             info('No clients connected')
           }
         } else {
-          if (serverGameEnabled) {
-            handleGameLogic(this.lastDataObject)
-
-            startGameOnRequest(this.lastDataObject)
-            removeStoppedGames()
-          }
+          handleGameLogic(this.lastDataObject)
 
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
             // this.lastDataObject.isPlaying = false
@@ -260,30 +228,6 @@ function handleGameLogic(so: SpaceObject) {
         // info(`handle game logic for ${so.sessionId}`)
         // do logic for the correct game...
         game_handlers[i].handleSpaceObjectUpdate(soCopy)
-      }
-    }
-  }
-}
-
-function startGameOnRequest(so: SpaceObject) {
-  if (so.messageType === MessageType.START_GAME) {
-    for (let i = 0; i < game_handlers.length; i++) {
-      if (game_handlers[i].tied_session_id === so.sessionId) {
-        warn(`Game with session ${so.sessionId} is already created!`)
-        return
-      }
-    }
-    info(`Calling create game with ${so.sessionId}`)
-    game_handlers.push(createGame(so.sessionId))
-  }
-}
-
-function removeStoppedGames() {
-  for (let i = 0; i < game_handlers.length; i++) {
-    if (game_handlers[i].game_started === false) {
-      const s = game_handlers.splice(i)
-      if (s[0]) {
-        info(`Removed game ${s[0].tied_session_id}`)
       }
     }
   }
@@ -385,9 +329,18 @@ class Every {
     }
   }
 }
-// broadcastToAllClients
 
-const every300 = new Every(300)
+export function createGame(sessionId: string) {
+  const gameHandler = new GameHandler((clients: Client[], data: SpaceObject, sessionId: string | null) => {
+    serverBroadcast<SpaceObject>(data, clients, sessionId)
+  }, sessionId)
+
+  gameHandler.tied_session_id = sessionId
+
+  gameHandler.game_session_start()
+
+  return gameHandler
+}
 
 function broadcastToLobbyClients(sendingClient: Client, connectedClients: Client[], data: Partial<SpaceObject>): void {
   // info(`Sending:`)
@@ -440,27 +393,14 @@ function shouldSendToClientInGame(sendingClient: Client, recieveClient: Client):
   } else return false
 }
 
-function serverBroadcast<T extends SpaceObject>(data: T, connectedClients: Client[], sessionId: string | null = null): number {
-  let sendCount = 0
-  if (sessionId === null) {
-    for (const client of connectedClients) {
+function serverBroadcast<T extends SpaceObject>(data: T, connectedClients: Client[], sessionId: string | null = null): void {
+  for (const client of connectedClients) {
+    if (client.sessionId === sessionId) {
+      // info(`Sending to ${client.name} with session ${sessionId}`)
       // client.ws.send(JSON.stringify(data))
       client.ws.send(encode(data, { forceFloat32: true }))
-
-      sendCount++
-    }
-  } else {
-    for (const client of connectedClients) {
-      if (client.sessionId === sessionId) {
-        // info(`Sending to ${client.name} with session ${sessionId}`)
-        // client.ws.send(JSON.stringify(data))
-        client.ws.send(encode(data, { forceFloat32: true }))
-
-        sendCount++
-      }
     }
   }
-  return sendCount
 }
 
 export function getClientsFromSessionId(sessionId: string): Client[] {
@@ -499,27 +439,8 @@ export function getActivePlayersFromSession(sessionId: string): SpaceObject[] {
   return playerList
 }
 
-//Todo: createSessionId() should make unique sessionId's
-//Then we can be certain sessionId's wont collide = breaking the game.
-// export function getActivePlayerSessions() {
-//   const sessionsSet: Set<Client["sessionId"]> = new Set()
-
-//   const sessionList: string[] = []
-
-//   for (const client of globalConnectedClients) {
-//     sessionsSet.add(client.sessionId)
-//   }
-
-//   sessionsSet.forEach((v) => {
-//     v && sessionList.push(v)
-//   })
-
-//   return sessionList
-// }
-
-export function getSessions(): Session[] {
+export function getSessions_(): Session[] {
   const sessions: Session[] = []
-  console.log(serverSessionHandler.getSessions())
 
   try {
     for (let i = 0; game_handlers.length > i; i++) {
@@ -536,6 +457,10 @@ export function getSessions(): Session[] {
   } catch (err) {
     throw new ApiError('Could not get sessions', StatusCodes.INTERNAL_SERVER_ERROR)
   }
+}
+
+export function getSessions() {
+  return serverSessionHandler.updateAndGetSessions(game_handlers)
 }
 
 server.on('connection', function connection(clientConnection: WebSocket, req: IncomingMessage) {

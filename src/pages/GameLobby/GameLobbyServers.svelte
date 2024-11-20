@@ -94,7 +94,8 @@
             }
           },
           (su) => {
-            console.log(su)
+            //serverUpdate in lobby.. do nothing!
+            // console.log(su)
           },
         )
         .then(() => {

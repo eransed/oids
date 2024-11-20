@@ -1,4 +1,4 @@
-import { rndfVec2 } from 'mathil'
+import { add2, rndfVec2 } from 'mathil'
 import { explosionDuration, worldSize, worldStartPosition } from '../../constants'
 import type { Game } from '../../game'
 import type { KeyFunctionMap } from '../../interface'
@@ -68,10 +68,12 @@ export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
     for (let i = 0; i < game.remotePlayers.length; i++) {
       const remotePlayer = game.remotePlayers[i]
 
+      const actualPos = add2(remotePlayer.viewFramePosition, remotePlayer.cameraPosition)
+
       renderLine(
         game.ctx,
         {
-          p1: getRemotePosition(remotePlayer, game.localPlayer),
+          p1: getRemotePosition(actualPos, game.localPlayer),
           p2: game.localPlayer.viewFramePosition,
         },
         game.style.starColor,
