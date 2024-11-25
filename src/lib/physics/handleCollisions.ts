@@ -1,6 +1,6 @@
-import { type Vec2, sub2, scalarMultiply2, add2 } from 'mathil'
+import { type Vec2, sub2, scalarMultiply2, add2, smul2, linearTransform, lintra } from 'mathil'
 import { missileDamageVelocityTransferFactor } from '../constants'
-import type { SpaceObject } from '../interface'
+import { SpaceObjectType, type SpaceObject } from '../interface'
 import { handleHittingShot } from '../mechanics'
 import { renderHitExplosion } from '../render/renderFx'
 import { resetCollisions, isWithinRadiusWorld, getWorldCoordinates, isWithinRadius, headingFromangle2 } from './physics'
@@ -44,6 +44,10 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
             // bad(`${shot.ownerName} did hit ${npc1.name}, hp: ${npc1.health}`)
             const heading: Vec2 = scalarMultiply2(headingFromangle2(shot.angleDegree), (1 / npc1.mass) * shot.damage * missileDamageVelocityTransferFactor)
             npc1.health -= shot.damage
+            if (npc1.spaceObjectType === SpaceObjectType.ASTEROID) {
+              npc1.size = smul2(npc1.size, lintra(npc1.health, 0, 1, -0.5, -0.99))
+              npc1.hitRadius = Math.sqrt(npc1.size.x ** 2 + npc1.size.y ** 2)
+            }
             npc1.velocity = add2(npc1.velocity, heading)
             npc1.lastDamagedByName = shot.ownerName
             shot.didHit = true

@@ -155,9 +155,10 @@ export function initRegularGame(game: Game): void {
     // console.log(npcUpdate)
     // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
     if (!exists(npcUpdate.dataObject, game.bodies)) {
-      // info(`Adding ${su.dataObject.name}`)
+      info(`Adding ${npcUpdate.dataObject.name}`)
       game.bodies.push(npcUpdate.dataObject)
     } else {
+      console.log('handling: ', game.bodies)
       game.bodies.forEach((b, i) => {
         game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(npcUpdate.dataObject, game.bodies[i])
       })

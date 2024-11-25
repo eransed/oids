@@ -16,9 +16,6 @@ export function renderShip(
   showVectors = false,
   extraInfoText: string = '',
 ): void {
-  const shipSize: Vec2 = { x: 60, y: 100 }
-  so.size = shipSize
-
   // Render hit box of ship after contex restore
   //renderHitRadius(so, ctx)
 

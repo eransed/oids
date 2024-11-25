@@ -113,12 +113,17 @@ export class Client {
     this.ws.addEventListener('close', () => {
       // globalConnectedClients = removeClientIfExisting(globalConnectedClients, this)
       info(`${this.toString()} has been disconnected, sending goodbye message to ${globalConnectedClients.length} other players...`)
-      const offlineMessage: SpaceObject | null = this.lastDataObject
-      if (offlineMessage) {
-        offlineMessage.online = false
-        offlineMessage.isPlaying = false
-        broadcastToAllClients(this, globalConnectedClients, offlineMessage)
+
+      if (this.lastDataObject) {
+        this.lastDataObject.online = false
+        this.lastDataObject.isPlaying = false
+        broadcastToAllClients(this, globalConnectedClients, this.lastDataObject)
         globalConnectedClients = removeDisconnectedClients(globalConnectedClients)
+        game_handlers.forEach((game) => {
+          if (game.tied_session_id === this.lastDataObject.sessionId) {
+            game.removeSpaceObject(this.lastDataObject)
+          }
+        })
         if (globalConnectedClients.length === 0) {
           info('No clients connected :(')
         }
@@ -361,9 +366,11 @@ function broadCastToInGameClients(sendingClient: Client, connectedClients: Clien
     if (sendingClient !== client && sendingClient.name !== client.name) {
       if (sendingClient.sessionId === client.sessionId) {
         if (data.messageType === MessageType.GAME_UPDATE && client.lastDataObject.isPlaying) {
-          if (shouldSendToClientInGame(sendingClient, client)) {
-            client.ws.send(encode(data, { forceFloat32: true }))
-          }
+          // if (shouldSendToClientInGame(sendingClient, client)) {
+          //   client.ws.send(encode(data, { forceFloat32: true }))
+          // }
+
+          client.ws.send(encode(data, { forceFloat32: true }))
         }
       }
     }

@@ -10,7 +10,8 @@ interface SessionHandler {
   addSession: (Session: Session) => void
 }
 
-const serverNames: string[] = ['Kessel', 'Bespin', 'Lothal', 'Dagobah', 'Taris']
+// const serverNames: string[] = ['Kessel', 'Bespin', 'Lothal', 'Dagobah', 'Taris']
+const serverNames: string[] = ['Kessel']
 
 export function sessionHandler(): SessionHandler {
   let sessions: Map<string, Session> = new Map()

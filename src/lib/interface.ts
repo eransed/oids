@@ -190,6 +190,7 @@ export interface Chatable {
 export interface Typable {
   // readonly messageType: MessageType
   messageType: MessageType
+  spaceObjectType: SpaceObjectType
 }
 
 export enum MessageType {
@@ -223,6 +224,17 @@ export interface GameModable {
 
 export interface NetworkAble {
   dt: number
+}
+
+export interface Ageable {
+  age: number
+}
+
+export enum SpaceObjectType {
+  PLAYER,
+  ASTEROID,
+  BUILDING,
+  PLANET,
 }
 
 export interface SpaceObject
@@ -260,10 +272,6 @@ export interface ServerUpdate<T> {
   unparsedDataLength: number
   numberOfSpaceObjectKeys: number
   dataObject: T
-}
-
-export interface Ageable {
-  age: number
 }
 
 export interface PhotonLaser extends Damager, Physical, Damageable, Rotatable, Colorable, Ageable {}

@@ -1,5 +1,5 @@
 import type { PhotonLaser, SpaceObject } from './interface'
-import { MessageType, SpaceShape } from './interface'
+import { MessageType, SpaceObjectType, SpaceShape } from './interface'
 import { newVec2, rndf, rndi, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
 // import type { Ship } from '@prisma/client'
@@ -145,6 +145,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     isJumping: false,
     gameMode: GameMode.SPACE_MODE,
     dt: 0,
+    spaceObjectType: SpaceObjectType.PLAYER,
   }
 
   spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)
