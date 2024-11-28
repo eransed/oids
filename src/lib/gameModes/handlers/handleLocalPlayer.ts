@@ -65,10 +65,10 @@ export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
 
   //Track other players with beam!
   if (activeKeyMap.tractorBeam.keyStatus) {
-    for (let i = 0; i < game.remotePlayers.length; i++) {
-      const remotePlayer = game.remotePlayers[i]
+    for (let i = 0; i < game.bodies.length; i++) {
+      const body = game.bodies[i]
 
-      const actualPos = add2(remotePlayer.viewFramePosition, remotePlayer.cameraPosition)
+      const actualPos = add2(body.viewFramePosition, body.cameraPosition)
 
       renderLine(
         game.ctx,

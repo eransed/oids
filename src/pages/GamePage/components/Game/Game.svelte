@@ -32,9 +32,13 @@
   import { getShipBundleCache } from '../../../../style/ships'
   import Page from '../../../../components/page/page.svelte'
   import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
-  import { fly } from 'svelte/transition'
+  import { fade, fly } from 'svelte/transition'
   import { logError, logInfo } from '../../../../components/alert/alertHandler'
   import { initLocalPlayer } from '../../../../lib/gameModes/handlers/handleLocalPlayer'
+  import Button90 from '../../../../components/menu/Button90.svelte'
+  import { createMoon, createSpaceObject } from '../../../../lib/factory'
+  import { rndi } from 'mathil'
+  import { Icons } from '../../../../style/icons'
 
   let game: Game
 
@@ -131,12 +135,24 @@
     game.stopGame()
     window.removeEventListener('resize', handleResize)
   })
+
+  function spawnAMoon() {
+    const moon = createMoon(game.localPlayer.sessionId, game.localPlayer.cameraPosition)
+
+    game.bodies.push(moon)
+  }
 </script>
 
 {#if loadingGame}
   <div in:fly={{ duration: 400 }} style="z-index: 1000;">
     <CircularSpinner ship text={loadingText} />
   </div>
+{/if}
+
+{#if $ActiveKeyMapStore.createMenu.keyStatus}
+  <InGameInfo title={'Create Menu'} showModal={$ActiveKeyMapStore.createMenu.keyStatus}>
+    <Button90 icon={Icons.Moon} addInfo="Create Moon" buttonConfig={{ buttonText: 'Create Moon', clickCallback: () => spawnAMoon(), selected: false }} />
+  </InGameInfo>
 {/if}
 
 {#if $ActiveKeyMapStore.healthBar.keyStatus}

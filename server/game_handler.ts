@@ -4,7 +4,7 @@ import { MessageType, SpaceObject, SpaceObjectType } from '../src/lib/interface'
 import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
-import { createSpaceObject } from '../src/lib/factory'
+import { createMoon, createSpaceObject } from '../src/lib/factory'
 import { fire, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
 import { getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
@@ -13,7 +13,7 @@ import { stdout } from 'process'
 
 export class GameHandler {
   game_started = false
-  asteroids: SpaceObject[] = []
+  moons: SpaceObject[] = []
   game_interval: NodeJS.Timeout | undefined = undefined
   start_time_us: number = usNow()
   tied_session_id: string
@@ -26,7 +26,7 @@ export class GameHandler {
   private minTickTimeMs = 1 / this.fps
   // private every = new EveryInterval(this.tickRate)
   // private asteroidTicker = new EveryInterval(this.tickRate)
-  private nextAsteroidToSendIndex = 0
+  private nextMoonToSendIndex = 0
   private gameMap: GameMap | undefined = undefined
   private sentOnce = false // only used during dev...
 
@@ -40,16 +40,16 @@ export class GameHandler {
   quit_game(): void {
     info(`Quitting game ${this.tied_session_id}`)
     this.game_started = false
-    this.asteroids = []
+    this.moons = []
     clearInterval(this.game_interval)
   }
 
   game_session_start() {
     this.gameMap = createWorldOne(this.tied_session_id)
 
-    info(`Starting game ${this.tied_session_id} and creating asteroids...`)
+    info(`Starting game ${this.tied_session_id} and creating moons...`)
     this.game_started = true
-    this.spawnAsteroids()
+    this.spawnMoons()
 
     // Server main loop:
     this.game_interval = setInterval(() => {
@@ -57,7 +57,7 @@ export class GameHandler {
 
       // process.stdout.write(`${this.remoteSpaceObjects.length}`)
 
-      this.asteroids = removeOblitiratedSpaceObjects(this.asteroids)
+      this.moons = removeOblitiratedSpaceObjects(this.moons)
       this.remoteSpaceObjects = removeOblitiratedSpaceObjects(this.remoteSpaceObjects)
 
       for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
@@ -71,40 +71,40 @@ export class GameHandler {
       // })
 
       this.checkHittingShots()
-      // Game logic for asteroids:
-      for (let i = 0; i < this.asteroids.length; i++) {
-        this.asteroids[i] = updateSpaceObject(this.asteroids[i], this.dt)
+      // Game logic for npcs:
+      for (let i = 0; i < this.moons.length; i++) {
+        this.moons[i] = updateSpaceObject(this.moons[i], this.dt)
       }
 
-      for (let i = 0; i < this.asteroids.length; i++) {
+      for (let i = 0; i < this.moons.length; i++) {
         for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
-          if (this.asteroids[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
-            const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.asteroids[i])))
-            this.asteroids[i].angleDegree = rndf(0, 0) + angleToShip
-            if (dist2(getWorldCoordinates(this.asteroids[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
-              // info(`Aster ${this.asteroids[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
+          if (this.moons[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
+            const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.moons[i])))
+            this.moons[i].angleDegree = rndf(0, 0) + angleToShip
+            if (dist2(getWorldCoordinates(this.moons[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
+              // info(`Aster ${this.moons[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
               // info(`ATS: ${angleToShip} deg`)
-              this.asteroids[i].armedDelay = 0
-              fire(this.asteroids[i])
+              this.moons[i].armedDelay = 0
+              fire(this.moons[i])
             } else {
-              this.asteroids[i].lastDamagedByName = ''
+              this.moons[i].lastDamagedByName = ''
             }
           }
         }
       }
 
-      const obj = this.asteroids[this.nextAsteroidToSendIndex]
+      const obj = this.moons[this.nextMoonToSendIndex]
       if (obj) {
-        this.asteroids[this.nextAsteroidToSendIndex] = this.prepareSoToSend(obj)
-        this.asteroids[this.nextAsteroidToSendIndex].collidingWith = []
-        this.broadcaster(globalConnectedClients, this.asteroids[this.nextAsteroidToSendIndex], this.tied_session_id)
-        this.nextAsteroidToSendIndex++
-        if (this.nextAsteroidToSendIndex >= this.asteroids.length) {
-          this.nextAsteroidToSendIndex = 0
+        this.moons[this.nextMoonToSendIndex] = this.prepareSoToSend(obj)
+        this.moons[this.nextMoonToSendIndex].collidingWith = []
+        this.broadcaster(globalConnectedClients, this.moons[this.nextMoonToSendIndex], this.tied_session_id)
+        this.nextMoonToSendIndex++
+        if (this.nextMoonToSendIndex >= this.moons.length) {
+          this.nextMoonToSendIndex = 0
         }
       } else {
         // warn('oh shit')
-        // console.log("nextAsteroidToSendIndex", this.nextAsteroidToSendIndex, this.asteroids)
+        // console.log("nextAsteroidToSendIndex", this.nextAsteroidToSendIndex, this.moons)
       }
 
       // Send town updates if there are any:
@@ -150,30 +150,14 @@ export class GameHandler {
     return so
   }
 
-  spawnAsteroids(): SpaceObject[] {
+  spawnMoons(): SpaceObject[] {
     const num = 10
-    info(`Creating ${num} asteroids`)
+    info(`Creating ${num} moons`)
     for (let i = 0; i < num; i++) {
-      const npc = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
-      npc.sessionId = this.tied_session_id
-      npc.ammo = 5000
-      npc.cameraPosition = rndfVec2(worldStartPosition.x - 2000, worldStartPosition.y + 5000)
-      npc.size = smul2(npc.size, rndi(3, 15))
-      npc.velocity = rndfVec2(0.1, 0.3)
-      npc.hitRadius = Math.sqrt(npc.size.x ** 2 + npc.size.y ** 2)
-      npc.mass = 50
-      npc.health = 50
-      npc.startHealth = npc.health
-      npc.photonColor = '#f00'
-      npc.inverseFireRate = 15
-      npc.angularVelocity = 0.001
-      npc.angleDegree = 90
-      npc.spaceObjectType = SpaceObjectType.ASTEROID
-      //TODO: Make moontype an enum instead
-      npc.moonType = rndi(0, 3)
-      this.asteroids.push(npc)
+      const moon = createMoon(this.tied_session_id)
+      this.moons.push(moon)
     }
-    return this.asteroids
+    return this.moons
   }
 
   handleSpaceObjectUpdate(so: SpaceObject) {
@@ -202,13 +186,13 @@ export class GameHandler {
 
     this.remoteSpaceObjects.push(so)
     for (let i = 0; i < 0; i++) {
-      this.broadcaster(globalConnectedClients, this.asteroids[i], this.tied_session_id)
+      this.broadcaster(globalConnectedClients, this.moons[i], this.tied_session_id)
     }
   }
 
   // never called this method... gah.
   checkHittingShots() {
-    const spaceObjects = [...this.asteroids, ...this.remoteSpaceObjects]
+    const spaceObjects = [...this.moons, ...this.remoteSpaceObjects]
     handleCollisions(newVec2(), spaceObjects)
   }
 }

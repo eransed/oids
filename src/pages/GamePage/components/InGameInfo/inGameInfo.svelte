@@ -1,6 +1,6 @@
 <script lang="ts">
   //Svelte
-  import { slide } from 'svelte/transition'
+  import { fly, slide } from 'svelte/transition'
 
   //Component
   import Modal from '../../../../components/modal/Modal.svelte'
@@ -11,14 +11,24 @@
   export let title: string
 </script>
 
-<Modal position="relative" {title} {showModal} {closedCallback} backDrop={false} closeBtn={false}>
-  <div in:slide={{ duration: 500 }} out:slide>
+<div out:slide>
+  <Modal position="relative" {title} {showModal} {closedCallback} backDrop={false} closeBtn={false}>
     <slot />
-  </div>
-</Modal>
+  </Modal>
+</div>
 
 <style>
   div {
-    /* overflow: auto; */
+    z-index: 10;
+    animation: easeIn ease-in-out;
+    animation-duration: 250ms;
+  }
+  @keyframes easeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
   }
 </style>

@@ -5,7 +5,7 @@ import { angularFriction, explosionDuration, linearFriction, timeScale } from '.
 import type { Shape } from '../shapes/Shape'
 import { updateShots } from './updateShots'
 import { createSpaceObject } from '../factory'
-import { GameMode } from '../interface'
+import { GameMode, SpaceObjectType } from '../interface'
 // import { game } from '../../pages/GamePage/components/Game/Utils/mainGame'
 
 const traceLength = 1
@@ -41,6 +41,12 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
     so.characterGlobalPosition = add2(so.characterGlobalPosition, v)
     floorGravity(so)
     applyFriction(so, 0.9)
+  }
+
+  //Moon stuff
+  if (so.spaceObjectType === SpaceObjectType.MOON) {
+    // if (so.health / so.startHealth < 0.1) {
+    // }
   }
 
   function limit(n: number, max: number): number {

@@ -1,7 +1,7 @@
 import type { PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceObjectType, SpaceShape } from './interface'
-import { newVec2, rndf, rndi, type Vec2 } from 'mathil'
-import { maxRandomDefaultSpaceObjectVelocity as maxVel } from './constants'
+import { newVec2, rndf, rndfVec2, rndi, smul2, type Vec2 } from 'mathil'
+import { maxRandomDefaultSpaceObjectVelocity as maxVel, worldStartPosition } from './constants'
 // import type { Ship } from '@prisma/client'
 import type { Ship } from './interface'
 import { Towns } from './worlds/worldInterface'
@@ -39,6 +39,32 @@ export function newPhotonLaser(): PhotonLaser {
 
 export function currentTimeDate(): string {
   return new Date().toLocaleString('sv-SE')
+}
+
+export function createMoon(sessionId: string, pos?: Vec2) {
+  const moon = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
+  moon.sessionId = sessionId
+  moon.ammo = 5000
+  if (pos) {
+    moon.cameraPosition = rndfVec2(pos.x - 500, pos.y + 1750)
+  } else {
+    moon.cameraPosition = rndfVec2(worldStartPosition.x - 2000, worldStartPosition.y + 5000)
+  }
+  moon.size = smul2(moon.size, rndi(3, 15))
+  moon.velocity = rndfVec2(0.1, 0.3)
+  moon.hitRadius = Math.sqrt(moon.size.x ** 2 + moon.size.y ** 2)
+  moon.mass = 50
+  moon.health = 50
+  moon.startHealth = moon.health
+  moon.photonColor = '#f00'
+  moon.inverseFireRate = 15
+  moon.angularVelocity = 0.001
+  moon.angleDegree = 90
+  moon.spaceObjectType = SpaceObjectType.MOON
+  //TODO: Make moontype an enum instead
+  moon.moonType = rndi(0, 3)
+
+  return moon
 }
 
 export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GAME_UPDATE): SpaceObject {

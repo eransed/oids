@@ -83,5 +83,11 @@ export const DefaultArcadeModeKeyMap: KeyFunctionMap = {
     toggle: true,
     displayText: 'Healthbar',
   },
+  createMenu: {
+    activators: ['1'],
+    keyStatus: false,
+    toggle: true,
+    displayText: 'Create Moon',
+  },
   name: 'Arcade',
 }

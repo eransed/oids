@@ -158,7 +158,6 @@ export function initRegularGame(game: Game): void {
       info(`Adding ${npcUpdate.dataObject.name}`)
       game.bodies.push(npcUpdate.dataObject)
     } else {
-      console.log('handling: ', game.bodies)
       game.bodies.forEach((b, i) => {
         game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(npcUpdate.dataObject, game.bodies[i])
       })

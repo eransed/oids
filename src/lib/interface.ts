@@ -232,7 +232,7 @@ export interface Ageable {
 
 export enum SpaceObjectType {
   PLAYER,
-  ASTEROID,
+  MOON,
   BUILDING,
   PLANET,
 }
@@ -321,6 +321,7 @@ export interface KeyFunctionMap {
   changeMode: KeyFunctionStore
   tractorBeam: KeyFunctionStore
   healthBar: KeyFunctionStore
+  createMenu: KeyFunction
 }
 
 export interface TouchFunctionMap {

@@ -25,6 +25,7 @@ import Last from '../assets/icons/last.svg'
 import Login from '../assets/icons/login.svg'
 import Logout from '../assets/icons/logout.svg'
 import Code from '../assets/icons/code.svg'
+import Moon from '../assets/icons/moon.svg'
 
 export const Icons = {
   Admin,
@@ -54,6 +55,7 @@ export const Icons = {
   Login,
   Code,
   Logout,
+  Moon,
 }
 
 export const IconColor = '#D2B48C'

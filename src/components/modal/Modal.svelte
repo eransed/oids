@@ -44,11 +44,7 @@
       const modalEndY = modalStartY + modalFrame.y
 
       modalPosition = { startX: modalStartX, endX: modalEndX, startY: modalStartY, endY: modalEndY }
-      shipInsideModal =
-        shipLocation.x > modalPosition.startX &&
-        shipLocation.x < modalPosition.endX &&
-        shipLocation.y < modalPosition.endY &&
-        shipLocation.y > modalPosition.startY
+      shipInsideModal = shipLocation.x > modalPosition.startX && shipLocation.x < modalPosition.endX && shipLocation.y < modalPosition.endY && shipLocation.y > modalPosition.startY
     }
   }
 
@@ -58,14 +54,7 @@
 </script>
 
 {#if showModal}
-  <div
-    class="modal"
-    id={title}
-    style="--width: {width}; --height: {height}; position: {position}; opacity: {shipInsideModal ? '0.2' : ''}"
-    contenteditable={isEditable}
-    in:fade={{ delay: 50 }}
-    out:fade
-  >
+  <div class="modal" id={title} style="--width: {width}; --height: {height}; position: {position};" contenteditable={isEditable} in:fade={{ delay: 50 }} out:fade>
     <div id="modalContent" style="--left: {m.x}; --top: {m.y}; ">
       <div id="header">
         <div id="headerTitle"><h3>{title}</h3></div>
@@ -100,7 +89,7 @@
     transition: all;
     transition-duration: 0.5s;
     background: var(--main-card-color);
-    opacity: 0.95;
+    opacity: 0.9;
     border-radius: 0.5em;
   }
 

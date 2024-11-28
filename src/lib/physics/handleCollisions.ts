@@ -44,7 +44,7 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
             // bad(`${shot.ownerName} did hit ${npc1.name}, hp: ${npc1.health}`)
             const heading: Vec2 = scalarMultiply2(headingFromangle2(shot.angleDegree), (1 / npc1.mass) * shot.damage * missileDamageVelocityTransferFactor)
             npc1.health -= shot.damage
-            if (npc1.spaceObjectType === SpaceObjectType.ASTEROID) {
+            if (npc1.spaceObjectType === SpaceObjectType.MOON) {
               npc1.size = smul2(npc1.size, lintra(npc1.health, 0, 1, -0.5, -0.99))
               npc1.hitRadius = Math.sqrt(npc1.size.x ** 2 + npc1.size.y ** 2)
             }
