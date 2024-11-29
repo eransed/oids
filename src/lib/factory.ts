@@ -5,7 +5,7 @@ import { maxRandomDefaultSpaceObjectVelocity as maxVel, worldStartPosition } fro
 // import type { Ship } from '@prisma/client'
 import type { Ship } from './interface'
 import { Towns } from './worlds/worldInterface'
-import { groundLevel } from './physics/physics'
+import { calculateMass, calculateRadius, groundLevel } from './physics/physics'
 import { GameMode } from './interface'
 
 export function newPhotonLaser(): PhotonLaser {
@@ -41,6 +41,30 @@ export function currentTimeDate(): string {
   return new Date().toLocaleString('sv-SE')
 }
 
+export function createPlanet(sessionId: string, pos: Vec2, size: Vec2, name?: string) {
+  const randomName = rndi(1, 100000)
+
+  const planet = createSpaceObject(`Planet-${name ?? randomName}`, MessageType.SERVER_GAME_UPDATE)
+  planet.sessionId = sessionId
+  // planet.ammo = 5000
+
+  // planet.cameraPosition = rndfVec2(pos.x, pos.y)
+  planet.cameraPosition = pos
+  planet.size = size
+  // planet.velocity = rndfVec2(0.1, 0.3)
+  planet.hitRadius = calculateRadius(planet.size)
+  planet.mass = calculateMass(planet.size)
+  planet.health = 50
+  planet.startHealth = planet.health
+  planet.photonColor = '#f00'
+  planet.inverseFireRate = 15
+  // planet.angularVelocity = 0.001
+  planet.angleDegree = 90
+  planet.spaceObjectType = SpaceObjectType.PLANET
+
+  return planet
+}
+
 export function createMoon(sessionId: string, pos?: Vec2) {
   const moon = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
   moon.sessionId = sessionId
@@ -48,12 +72,12 @@ export function createMoon(sessionId: string, pos?: Vec2) {
   if (pos) {
     moon.cameraPosition = rndfVec2(pos.x - 500, pos.y + 1750)
   } else {
-    moon.cameraPosition = rndfVec2(worldStartPosition.x - 2000, worldStartPosition.y + 5000)
+    moon.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
   }
   moon.size = smul2(moon.size, rndi(3, 15))
   moon.velocity = rndfVec2(0.1, 0.3)
   moon.hitRadius = Math.sqrt(moon.size.x ** 2 + moon.size.y ** 2)
-  moon.mass = 50
+  moon.mass = calculateMass(moon.size)
   moon.health = 50
   moon.startHealth = moon.health
   moon.photonColor = '#f00'
@@ -165,7 +189,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
       played: 0,
     },
     moonType: 0,
-    hometown: Towns.Coruscant,
+    hometown: Towns.Oidstown,
     ticksSinceLastSnapShot: 0,
     characterGlobalPosition: newVec2(500, groundLevel),
     isJumping: false,

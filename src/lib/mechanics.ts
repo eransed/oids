@@ -159,7 +159,7 @@ export function handleDeathExplosion(so: SpaceObject, maximumIncrement: number):
 export function removeOblitiratedSpaceObjects(spaceObjects: SpaceObject[]) {
   spaceObjects = spaceObjects.filter((so) => {
     if (so.obliterated) {
-      console.log(`Player ${so.name} is removed due to dead`)
+      console.log(`Object with name ${so.name} is removed due to dead`)
     }
     return !so.obliterated
   })

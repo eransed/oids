@@ -241,3 +241,14 @@ export function resetCollisions(spaceObjects: Collidable[]) {
     npc.collidingWith = []
   }
 }
+
+export function calculateMass(size: Vec2, density: number = 1): number {
+  const radius = calculateRadius(size)
+
+  const volume = (4 / 3) * Math.PI * Math.pow(radius, 3)
+  return density * volume
+}
+
+export function calculateRadius(size: Vec2): number {
+  return Math.sqrt(size.x ** 2 + size.y ** 2)
+}

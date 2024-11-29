@@ -8,12 +8,12 @@ import { createMoon, createSpaceObject } from '../src/lib/factory'
 import { fire, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
 import { getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
-import { GameMap, createWorldOne } from '../src/lib/worlds/worldInterface'
-import { stdout } from 'process'
+import { GameMap } from '../src/lib/worlds/worldInterface'
+import { createWorldOne } from '../src/lib/worlds/worldFactory'
 
 export class GameHandler {
   game_started = false
-  moons: SpaceObject[] = []
+  worldSpaceObjects: SpaceObject[] = []
   game_interval: NodeJS.Timeout | undefined = undefined
   start_time_us: number = usNow()
   tied_session_id: string
@@ -26,7 +26,7 @@ export class GameHandler {
   private minTickTimeMs = 1 / this.fps
   // private every = new EveryInterval(this.tickRate)
   // private asteroidTicker = new EveryInterval(this.tickRate)
-  private nextMoonToSendIndex = 0
+  private nextWorldObjectToSendIndex = 0
   private gameMap: GameMap | undefined = undefined
   private sentOnce = false // only used during dev...
 
@@ -40,16 +40,17 @@ export class GameHandler {
   quit_game(): void {
     info(`Quitting game ${this.tied_session_id}`)
     this.game_started = false
-    this.moons = []
+    this.worldSpaceObjects = []
     clearInterval(this.game_interval)
   }
 
   game_session_start() {
     this.gameMap = createWorldOne(this.tied_session_id)
 
-    info(`Starting game ${this.tied_session_id} and creating moons...`)
+    info(`Starting game ${this.tied_session_id} and creating world...`)
     this.game_started = true
-    this.spawnMoons()
+
+    this.setWorldSpaceObjects()
 
     // Server main loop:
     this.game_interval = setInterval(() => {
@@ -57,7 +58,7 @@ export class GameHandler {
 
       // process.stdout.write(`${this.remoteSpaceObjects.length}`)
 
-      this.moons = removeOblitiratedSpaceObjects(this.moons)
+      this.worldSpaceObjects = removeOblitiratedSpaceObjects(this.worldSpaceObjects)
       this.remoteSpaceObjects = removeOblitiratedSpaceObjects(this.remoteSpaceObjects)
 
       for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
@@ -72,35 +73,35 @@ export class GameHandler {
 
       this.checkHittingShots()
       // Game logic for npcs:
-      for (let i = 0; i < this.moons.length; i++) {
-        this.moons[i] = updateSpaceObject(this.moons[i], this.dt)
+      for (let i = 0; i < this.worldSpaceObjects.length; i++) {
+        this.worldSpaceObjects[i] = updateSpaceObject(this.worldSpaceObjects[i], this.dt)
       }
 
-      for (let i = 0; i < this.moons.length; i++) {
+      for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
-          if (this.moons[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
-            const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.moons[i])))
-            this.moons[i].angleDegree = rndf(0, 0) + angleToShip
-            if (dist2(getWorldCoordinates(this.moons[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
+          if (this.worldSpaceObjects[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
+            const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.worldSpaceObjects[i])))
+            this.worldSpaceObjects[i].angleDegree = rndf(0, 0) + angleToShip
+            if (dist2(getWorldCoordinates(this.worldSpaceObjects[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
               // info(`Aster ${this.moons[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
               // info(`ATS: ${angleToShip} deg`)
-              this.moons[i].armedDelay = 0
-              fire(this.moons[i])
+              this.worldSpaceObjects[i].armedDelay = 0
+              fire(this.worldSpaceObjects[i])
             } else {
-              this.moons[i].lastDamagedByName = ''
+              this.worldSpaceObjects[i].lastDamagedByName = ''
             }
           }
         }
       }
 
-      const obj = this.moons[this.nextMoonToSendIndex]
+      const obj = this.worldSpaceObjects[this.nextWorldObjectToSendIndex]
       if (obj) {
-        this.moons[this.nextMoonToSendIndex] = this.prepareSoToSend(obj)
-        this.moons[this.nextMoonToSendIndex].collidingWith = []
-        this.broadcaster(globalConnectedClients, this.moons[this.nextMoonToSendIndex], this.tied_session_id)
-        this.nextMoonToSendIndex++
-        if (this.nextMoonToSendIndex >= this.moons.length) {
-          this.nextMoonToSendIndex = 0
+        this.worldSpaceObjects[this.nextWorldObjectToSendIndex] = this.prepareSoToSend(obj)
+        this.worldSpaceObjects[this.nextWorldObjectToSendIndex].collidingWith = []
+        this.broadcaster(globalConnectedClients, this.worldSpaceObjects[this.nextWorldObjectToSendIndex], this.tied_session_id)
+        this.nextWorldObjectToSendIndex++
+        if (this.nextWorldObjectToSendIndex >= this.worldSpaceObjects.length) {
+          this.nextWorldObjectToSendIndex = 0
         }
       } else {
         // warn('oh shit')
@@ -108,36 +109,63 @@ export class GameHandler {
       }
 
       // Send town updates if there are any:
-      this.updateTownsIfApplicable()
+      // this.updateTownsIfApplicable()
 
       this.lastTime = performance.now()
     }, this.minTickTimeMs)
   }
   // server main loop end
 
+  /**
+   * Getting the objects from the defined world
+   */
+  setWorldSpaceObjects() {
+    console.log('Getting worldspaceobjects')
+    if (!this.gameMap) {
+      warn('No gameMap initialiazed')
+      return
+    }
+
+    //Planets
+    for (let i = 0; i < this.gameMap.planets.length; i++) {
+      const planet = this.gameMap.planets[i]
+      this.worldSpaceObjects.push(planet)
+    }
+
+    //Moons
+    for (let i = 0; i < this.gameMap.moons.length; i++) {
+      this.worldSpaceObjects.push(this.gameMap.moons[i])
+    }
+
+    //SpaceTowns and its buildings
+    for (let i = 0; i < this.gameMap.towns.length; i++) {
+      const spaceTowns = this.gameMap.towns[i]
+
+      //Adding SpaceTowns buildings to worldSpaceObjects
+      for (let j = 0; j < spaceTowns.buildings.length; j++) {
+        this.worldSpaceObjects.push(spaceTowns.buildings[j])
+      }
+    }
+  }
+
   updateTownsIfApplicable() {
     if (!this.gameMap) {
       warn('No gameMap initialiazed')
       return
     }
-    // if (!force) {
-    //   if (this.sentOnce === true) return
-    //   this.sentOnce = true
-    // }
 
-    // info(`Broadcasting town...`)
+    for (let i = 0; i < this.gameMap.planets.length; i++) {
+      const planet = this.gameMap.planets[i]
+
+      this.broadcaster(globalConnectedClients, planet, this.tied_session_id)
+    }
 
     for (let i = 0; i < this.gameMap.towns.length; i++) {
       for (let j = 0; j < this.gameMap.towns[i].buildings.length; j++) {
         const building = this.gameMap.towns[i].buildings[j]
-        // info(`Broadcasting building: ${building.name}`)
-        // info(`Broadcasting building speedx: ${building.velocity.x}`)
-        // info(`Broadcasting building speedy: ${building.velocity.y}`)
         this.broadcaster(globalConnectedClients, building, this.tied_session_id)
       }
     }
-
-    // broadcast world:
   }
 
   prepareSoToSend(so: SpaceObject): SpaceObject {
@@ -148,16 +176,6 @@ export class GameHandler {
     }
     so.shotsInFlightNew = []
     return so
-  }
-
-  spawnMoons(): SpaceObject[] {
-    const num = 10
-    info(`Creating ${num} moons`)
-    for (let i = 0; i < num; i++) {
-      const moon = createMoon(this.tied_session_id)
-      this.moons.push(moon)
-    }
-    return this.moons
   }
 
   handleSpaceObjectUpdate(so: SpaceObject) {
@@ -186,13 +204,13 @@ export class GameHandler {
 
     this.remoteSpaceObjects.push(so)
     for (let i = 0; i < 0; i++) {
-      this.broadcaster(globalConnectedClients, this.moons[i], this.tied_session_id)
+      this.broadcaster(globalConnectedClients, this.worldSpaceObjects[i], this.tied_session_id)
     }
   }
 
   // never called this method... gah.
   checkHittingShots() {
-    const spaceObjects = [...this.moons, ...this.remoteSpaceObjects]
+    const spaceObjects = [...this.worldSpaceObjects, ...this.remoteSpaceObjects]
     handleCollisions(newVec2(), spaceObjects)
   }
 }
