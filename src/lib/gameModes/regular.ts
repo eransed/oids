@@ -159,7 +159,9 @@ export function initRegularGame(game: Game): void {
       game.bodies.push(npcUpdate.dataObject)
     } else {
       game.bodies.forEach((b, i) => {
-        game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(npcUpdate.dataObject, game.bodies[i])
+        if (game.bodies[i].name === npcUpdate.dataObject.name) {
+          game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(npcUpdate.dataObject, game.bodies[i])
+        }
       })
     }
   }
