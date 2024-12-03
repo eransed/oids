@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .env
 *.sqlite
+prisma/dev.sqlite-journal
 build
 
 # Editor directories and files
