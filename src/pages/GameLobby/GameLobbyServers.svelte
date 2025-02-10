@@ -47,7 +47,7 @@
     return msg
   }
 
-  let pingTimer: ReturnType<typeof setInterval>
+  let pingTimer: ReturnType<typeof setInterval> | null = null
   let chosenShip: Ship
   let loadingSessions = true
 

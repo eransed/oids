@@ -80,7 +80,6 @@
     initLocalPlayer(game)
 
     try {
-      await $socketStore.connect()
       await $socketStore.send(game.localPlayer)
     } catch (err) {
       navigate('/play')
@@ -93,19 +92,17 @@
       const playerList = await getPlayersInSession(sessionId)
 
       if (playerList) {
-        console.log(playerList)
+        console.log('Players: ', playerList)
         playerList.players.forEach((player) => {
-          if (player.name !== $localPlayerStore.name) {
+          if (player.id !== $localPlayerStore.id) {
             game.remotePlayers.push(player)
           }
         })
-        if (!$userStore || chosenShip) {
-          game.startGame(initRegularGame, renderFrame, nextFrame)
-          resetStars(game)
-        }
       }
 
       loadingGame = false
+      game.startGame(initRegularGame, renderFrame, nextFrame)
+      resetStars(game)
     } catch (err: any) {
       loadingGame = false
       logError('Error on loading game...')

@@ -141,7 +141,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     motivationLevel: 100,
     motivatorBroken: false,
     name: name,
-    id: rndi(1, 500000).toString(),
+    id: rndi(1, 5000000).toString(),
     obliterated: false,
     online: true,
     photonColor: '#f00',

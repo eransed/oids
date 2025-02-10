@@ -170,12 +170,12 @@ export class Client {
             info('No clients connected')
           }
         } else {
-          handleGameLogic(this.lastDataObject)
-
           if (so.messageType === MessageType.SESSION_UPDATE || so.messageType === MessageType.LEFT_SESSION) {
             // this.lastDataObject.isPlaying = false
             broadcastToAllClients(this, globalConnectedClients, this.lastDataObject)
           } else if (so.messageType === MessageType.GAME_UPDATE) {
+            handleGameLogic(this.lastDataObject)
+
             broadCastToInGameClients(this, globalConnectedClients, so)
             //  info(`${this.name} with ${this.sessionId} broadcasts game info to possible ${globalConnectedClients.length}`)
           } else {
