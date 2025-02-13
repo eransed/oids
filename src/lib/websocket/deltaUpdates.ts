@@ -57,7 +57,7 @@ const chosenKeys: Array<keyof SpaceObject> = [
   'shape',
   'ship',
   'shotBlowFrame',
-  'shotsFiredThisFrame',
+  //'shotsFiredThisFrame',
   'shotsPerFrame',
   'size',
   'startHealth',

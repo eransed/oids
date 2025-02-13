@@ -248,7 +248,7 @@ function handleGameLogic(so: SpaceObject) {
 export function handleIncomingEnemyShipRequest(sessionId: string) {
   for (let i = 0; i < game_handlers.length; i++) {
     if (game_handlers[i].tied_session_id === sessionId) {
-      game_handlers[i].createEnemyShip()
+      game_handlers[i].createEnemy()
     }
   }
 }

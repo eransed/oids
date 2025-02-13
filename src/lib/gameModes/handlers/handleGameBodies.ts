@@ -2,13 +2,15 @@ import { to_string2, add2, newVec2 } from 'mathil'
 import { getCurrentTheme } from '../../../style/defaultColors'
 import { explosionDuration } from '../../constants'
 import type { Game } from '../../game'
-import type { KeyFunctionMap, SpaceObject } from '../../interface'
+import { SpaceObjectType, type KeyFunctionMap, type SpaceObject } from '../../interface'
 import { handleDeathExplosion } from '../../mechanics'
 import { getRemotePosition } from '../../physics/physics'
 import { renderHitRadius } from '../../render/render2d'
 import { renderExplosionFrame } from '../../render/renderFx'
 import { renderMoon } from '../../render/renderMoon'
 import { renderVec2, renderProgressBar } from '../../render/renderUI'
+import { renderShip } from '../../render/renderShip'
+import { renderRemotePlayerInSpaceMode } from '../../render/renderRemotePlayers'
 
 export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): SpaceObject[] {
   game.bodies.forEach((body) => {
@@ -21,7 +23,19 @@ export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): Spac
         renderExplosionFrame(body, game.ctx, bodyPos)
       }
     } else {
-      renderMoon(body, bodyPos, game.ctx, game.style)
+      if (body.spaceObjectType === SpaceObjectType.MOON) {
+        renderMoon(body, bodyPos, game.ctx, game.style)
+      }
+
+      if (body.spaceObjectType === SpaceObjectType.PLANET) {
+        //Should be renderPlanet.. but we don't have that function
+        renderMoon(body, bodyPos, game.ctx, game.style)
+      }
+
+      if (body.spaceObjectType === SpaceObjectType.SHIP) {
+        renderShip(body, game.ctx, false, game.style, bodyPos)
+      }
+
       if (activeKeyMap.systemGraphs.keyStatus) {
         renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
         renderHitRadius(body, bodyPos, game.ctx)

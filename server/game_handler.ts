@@ -4,7 +4,7 @@ import { MessageType, SpaceObject, SpaceObjectType } from '../src/lib/interface'
 import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
-import { createMoon, createSpaceObject } from '../src/lib/factory'
+import { createEnemyShip, createMoon, createSpaceObject } from '../src/lib/factory'
 import { fire, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
 import { getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
@@ -219,10 +219,8 @@ export class GameHandler {
     }
   }
 
-  createEnemyShip() {
-    const enemyShip = createSpaceObject(`enemy-${rndi(1, 10000)}`, MessageType.SERVER_GAME_UPDATE)
-    enemyShip.spaceObjectType = SpaceObjectType.SHIP
-    enemyShip.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
+  createEnemy() {
+    const enemyShip = createEnemyShip(this.tied_session_id)
 
     this.worldSpaceObjects.push(enemyShip)
   }

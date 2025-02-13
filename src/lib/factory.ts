@@ -65,6 +65,33 @@ export function createPlanet(sessionId: string, pos: Vec2, size: Vec2, name?: st
   return planet
 }
 
+export function createEnemyShip(sessionId: string, pos?: Vec2) {
+  const enemyShip = createSpaceObject(`enemy-${rndi(1, 10000)}`, MessageType.SERVER_GAME_UPDATE)
+  enemyShip.sessionId = sessionId
+  enemyShip.ammo = 5000
+
+  // enemyShip.size = smul2(enemyShip.size, rndi(3, 15))
+  enemyShip.velocity = rndfVec2(0.1, 0.3)
+  enemyShip.hitRadius = Math.sqrt(enemyShip.size.x ** 2 + enemyShip.size.y ** 2)
+  // enemyShip.mass = calculateMass(enemyShip.size)
+  enemyShip.health = 50
+  enemyShip.startHealth = enemyShip.health
+  enemyShip.photonColor = '#f00'
+  enemyShip.inverseFireRate = 15
+  enemyShip.angularVelocity = 0.001
+  enemyShip.angleDegree = 90
+  enemyShip.spaceObjectType = SpaceObjectType.SHIP
+  enemyShip.ship.variant = 3
+
+  if (pos) {
+    enemyShip.cameraPosition = rndfVec2(pos.x - 500, pos.y + 1750)
+  } else {
+    enemyShip.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
+  }
+
+  return enemyShip
+}
+
 export function createMoon(sessionId: string, pos?: Vec2) {
   const moon = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
   moon.sessionId = sessionId
