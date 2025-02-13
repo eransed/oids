@@ -6,8 +6,8 @@ import { getLocalIp, ipport } from './net'
 
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
-import { Collidable, MessageType, PhotonLaser, Session, Ship, SpaceObject, ThrustFlameAtom } from '../src/lib/interface'
-import { dist2, error, info, Vec2, warn } from 'mathil'
+import { Collidable, MessageType, PhotonLaser, Session, Ship, SpaceObject, SpaceObjectType, ThrustFlameAtom } from '../src/lib/interface'
+import { dist2, error, info, rndi, Vec2, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
 
@@ -17,6 +17,7 @@ import { sessionHandler } from './sessions'
 import { ApiError } from './api/utils/apiError'
 import { StatusCodes } from 'http-status-codes'
 import { decode, encode } from '@msgpack/msgpack'
+import { fire } from '../src/lib/mechanics'
 
 dotenv.config()
 
@@ -67,11 +68,11 @@ export class Client {
   lastDataObject: SpaceObject
   sessionId: string | null = null
   sendClientHistory: clientUpdated[] = []
-  userId: string
+  userId: number
 
   private nameHasBeenUpdated = false
 
-  constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded: Date, _userId: string) {
+  constructor(_ws: WebSocket, _req: IncomingMessage, _name: string, _dateAdded: Date, _userId: number) {
     this.ws = _ws
     this.req = _req
     this.name = _name
@@ -96,8 +97,8 @@ export class Client {
     }
   }
 
-  updateIdOnce(newId: string) {
-    const oldId: string = this.userId
+  updateIdOnce(newId: number) {
+    const oldId: number = this.userId
     this.userId = newId
     info(`Updated userId: ${oldId} -> ${this.userId}`)
   }
@@ -144,6 +145,12 @@ export class Client {
 
         // debugData(so)
         so.serverVersion = name_ver
+
+        if (so.spaceObjectType !== SpaceObjectType.PLAYER) {
+          error(`Invalid spaceObjectType: ${so.spaceObjectType}`)
+
+          return
+        }
 
         for (const key in so) {
           this.lastDataObject[key as keyof SpaceObject] = so[key as keyof unknown]
@@ -234,6 +241,14 @@ function handleGameLogic(so: SpaceObject) {
         // do logic for the correct game...
         game_handlers[i].handleSpaceObjectUpdate(soCopy)
       }
+    }
+  }
+}
+
+export function handleIncomingEnemyShipRequest(sessionId: string) {
+  for (let i = 0; i < game_handlers.length; i++) {
+    if (game_handlers[i].tied_session_id === sessionId) {
+      game_handlers[i].createEnemyShip()
     }
   }
 }

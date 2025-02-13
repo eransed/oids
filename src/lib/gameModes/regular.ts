@@ -5,7 +5,7 @@ import { add2, info, log, magnitude2, newVec2, rndfVec2, rndi, round2dec, siPret
 import { friction, updateSpaceObject } from '../physics/physics'
 import { loadingText, renderInfoText } from '../render/render2d'
 import { Every, fpsCounter } from '../time'
-import { GameType, getRenderableObjectCount, type SpaceObject, MessageType, type ServerUpdate, GameMode, type KeyFunctionMap } from '../interface'
+import { GameType, getRenderableObjectCount, type SpaceObject, MessageType, type ServerUpdate, GameMode, type KeyFunctionMap, SpaceObjectType } from '../interface'
 import { test } from '../test'
 import { addDataPoint, getLatestValue, GRAPHS, newDataStats, renderGraph } from '../stats'
 import { newPhotonLaser } from '../factory'
@@ -25,6 +25,7 @@ import { initNetworkStats } from './handlers/handleNetStats'
 import { playerUpdate } from './handlers/handlePlayerUpdate'
 import { addAlert, logError, logInfo, logWarning } from '../../components/alert/alertHandler'
 import { updateShots } from '../physics/updateShots'
+import { arrayGroupBy } from '../../utils/utils'
 //Stores
 
 let activeKeyMap: KeyFunctionMap
@@ -182,7 +183,7 @@ const every500 = new Every(500)
 
 export function renderFrame(game: Game, dt: number): void {
   every500.tick(() => {
-    console.log(game.bodies)
+    console.log(arrayGroupBy(game.all.concat(game.remotePlayers).concat(game.bodies), 'name'))
   })
   every.tick(() => {
     game.localPlayer.viewport = getScreenRect(game.ctx)

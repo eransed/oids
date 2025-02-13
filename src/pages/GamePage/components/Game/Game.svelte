@@ -1,7 +1,7 @@
 <script lang="ts">
   //Interfaces
   import { navigate } from 'svelte-routing'
-  import { GameMode, MessageType, type Session, type Ship } from '../../../../lib/interface'
+  import { GameMode, MessageType, SpaceObjectType, type Session, type Ship } from '../../../../lib/interface'
 
   //Svelte
   import { onDestroy, onMount } from 'svelte'
@@ -39,6 +39,7 @@
   import { createMoon, createSpaceObject } from '../../../../lib/factory'
   import { rndi } from 'mathil'
   import { Icons } from '../../../../style/icons'
+  import { requestEnemyShip } from '../../../../lib/services/game/gameRequest'
 
   let game: Game
 
@@ -133,10 +134,8 @@
     window.removeEventListener('resize', handleResize)
   })
 
-  function spawnAMoon() {
-    const moon = createMoon(game.localPlayer.sessionId, game.localPlayer.cameraPosition)
-
-    game.bodies.push(moon)
+  async function spawnAMoon() {
+    await requestEnemyShip(game.localPlayer.sessionId)
   }
 </script>
 

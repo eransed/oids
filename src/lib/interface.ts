@@ -235,6 +235,7 @@ export enum SpaceObjectType {
   MOON,
   BUILDING,
   PLANET,
+  SHIP,
 }
 
 export interface SpaceObject
@@ -369,7 +370,7 @@ export interface Nameable {
 }
 
 export interface Unique {
-  id: string
+  id: number
 }
 
 export interface Session {

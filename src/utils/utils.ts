@@ -52,3 +52,16 @@ export const gUser: User = {
   ships: [],
   gameHistory: [],
 }
+
+export function arrayGroupBy<T extends Record<string, any>>(array: T[], key: string): Record<string, T[]> {
+  return array.reduce(
+    (rv, x) => {
+      const v = x[key]
+      const el = rv[v] || []
+      el.push(x)
+      rv[v] = el
+      return rv
+    },
+    {} as Record<string, T[]>,
+  )
+}

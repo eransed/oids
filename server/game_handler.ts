@@ -195,6 +195,17 @@ export class GameHandler {
       return
     }
 
+    if (so.spaceObjectType !== SpaceObjectType.PLAYER) {
+      for (let i = 0; i < this.worldSpaceObjects.length; i++) {
+        if (this.worldSpaceObjects[i].name === so.name) {
+          return
+        }
+      }
+      good(`Adding ${so.name} in world list`)
+      this.worldSpaceObjects.push(so)
+      return
+    }
+
     for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
       if (this.remoteSpaceObjects[i].name === so.name) {
         return
@@ -208,6 +219,21 @@ export class GameHandler {
     }
   }
 
+  createEnemyShip() {
+    const enemyShip = createSpaceObject(`enemy-${rndi(1, 10000)}`, MessageType.SERVER_GAME_UPDATE)
+    enemyShip.spaceObjectType = SpaceObjectType.SHIP
+    enemyShip.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
+
+    this.worldSpaceObjects.push(enemyShip)
+  }
+
+  createAndAddNewSpaceObject(so: SpaceObject) {
+    if (so.isDead) {
+      return
+    } else {
+      this.worldSpaceObjects.push(so)
+    }
+  }
   // never called this method... gah.
   checkHittingShots() {
     const spaceObjects = [...this.worldSpaceObjects, ...this.remoteSpaceObjects]
