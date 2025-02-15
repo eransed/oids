@@ -46,12 +46,17 @@ game.get('/sessions', async (req: Request, res: Response, next: NextFunction) =>
 game.get('/request/enemyship', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const sessionId = req.query.sessionId
+    const clientName = req.query.clientId
+
+    if (!clientName) {
+      throw new ApiError('You must provide a ClientId.', StatusCodes.BAD_REQUEST)
+    }
 
     if (!sessionId) {
       throw new ApiError('You must provide a sessionId.', StatusCodes.BAD_REQUEST)
     }
 
-    handleIncomingEnemyShipRequest(sessionId.toString())
+    handleIncomingEnemyShipRequest(sessionId.toString(), clientName.toString())
 
     res.status(StatusCodes.OK).send('Enemy ship requested.')
   } catch (err) {

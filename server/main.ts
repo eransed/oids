@@ -245,12 +245,14 @@ function handleGameLogic(so: SpaceObject) {
   }
 }
 
-export function handleIncomingEnemyShipRequest(sessionId: string) {
+export function handleIncomingEnemyShipRequest(sessionId: string, clientName: string) {
   for (let i = 0; i < game_handlers.length; i++) {
     if (game_handlers[i].tied_session_id === sessionId) {
-      game_handlers[i].createEnemy()
+      game_handlers[i].createEnemyAtPlayerPosition(clientName)
+      return
     }
   }
+  warn(`Could not find a clint named '${clientName}'`)
 }
 
 function getReadyStateText(ws: WebSocket): string {

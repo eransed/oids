@@ -219,8 +219,15 @@ export class GameHandler {
     }
   }
 
-  createEnemy() {
-    const enemyShip = createEnemyShip(this.tied_session_id)
+  createEnemyAtPlayerPosition(clientName: string) {
+    const foundPlayer = this.remoteSpaceObjects.find((so) => so.name === clientName)
+
+    if (!foundPlayer) {
+      warn(`No player found while creating request from ${clientName}`)
+      return
+    }
+
+    const enemyShip = createEnemyShip(this.tied_session_id, foundPlayer.cameraPosition)
 
     this.worldSpaceObjects.push(enemyShip)
   }

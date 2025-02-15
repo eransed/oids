@@ -134,8 +134,8 @@
     window.removeEventListener('resize', handleResize)
   })
 
-  async function spawnAMoon() {
-    await requestEnemyShip(game.localPlayer.sessionId)
+  async function spawnEnemy() {
+    await requestEnemyShip(game.localPlayer.sessionId, game.localPlayer.name)
   }
 </script>
 
@@ -147,7 +147,7 @@
 
 {#if $ActiveKeyMapStore.createMenu.keyStatus}
   <InGameInfo title={'Create Menu'} showModal={$ActiveKeyMapStore.createMenu.keyStatus}>
-    <Button90 icon={Icons.Moon} addInfo="Create Moon" buttonConfig={{ buttonText: 'Create Moon', clickCallback: () => spawnAMoon(), selected: false }} />
+    <Button90 icon={Icons.Moon} addInfo="Create Moon" buttonConfig={{ buttonText: 'Create Moon', clickCallback: () => spawnEnemy(), selected: false }} />
   </InGameInfo>
 {/if}
 
