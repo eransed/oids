@@ -28,20 +28,41 @@ export class Every {
 }
 
 const fps_list_max_entries = 12
+let prevTimestamp: number
 const fps_list: number[] = []
+const max_dt = 16.67
+
 const fpsBuf = newDataStats()
+// fpsBuf.maxSize = 200
 fpsBuf.accUnit = ' frames'
 fpsBuf.baseUnit = 'fps'
 fpsBuf.label = 'FPS'
 
 const frameTimes = newDataStats()
 frameTimes.baseUnit = 'ms'
+// frameTimes.maxSize = 500
 frameTimes.label = 'Frame time'
+
+export function getFrameTimeMs(timestamp: number): number {
+  if (prevTimestamp === 0) {
+    prevTimestamp = timestamp
+  }
+  // todo: make sure not to return nan
+  const frameTime = timestamp - prevTimestamp
+  prevTimestamp = timestamp
+
+  if (frameTime < max_dt) {
+    return frameTime
+  } else {
+    return max_dt
+  }
+}
 
 let frameCount = 0
 
 export function getFps(dt: number) {
   const fps = round2dec(1000 / dt, 0)
+
   return fps
 }
 
@@ -49,6 +70,8 @@ export function fpsCounter(ops: number, dt: number, game: Game, ctx: CanvasRende
   const fps = getFps(dt)
   addDataPoint(fpsBuf, fps)
   addDataPoint(frameTimes, dt)
+  // renderGraph(fpsBuf, {x: 350, y: 100}, {x: 300, y: 70}, ctx)
+  // renderGraph(frameTimes, {x: 350, y: 200}, {x: 300, y: 70}, ctx)
   const dtRounded = round2dec(dt, 1)
   fps_list.push(fps)
   if (fps_list.length >= fps_list_max_entries) {
@@ -61,6 +84,7 @@ export function fpsCounter(ops: number, dt: number, game: Game, ctx: CanvasRende
 }
 
 function moveNewShotsToLocalBuffer(so: SpaceObject): void {
+  // console.log(so.shotsInFlight)
   so.shotsInFlight = [...so.shotsInFlight, ...so.shotsInFlightNew]
   so.shotsInFlightNew = []
 }
@@ -98,58 +122,29 @@ const every300: Every = new Every(300)
 
 const partialEnabled = true
 
-/**
- * Fixed Timestep Render Loop:
- * - Uses a constant FIXED_DT for physics updates.
- * - Accumulates elapsed time to determine how many fixed updates to run.
- * - Renders once per frame.
- */
-export function renderLoop(game: Game, renderFrame: (game: Game, interpolation: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
+export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => void, nextFrame: (game: Game, dt: number) => void): () => Promise<number> {
   let fid: number
   let gameStopped: boolean = false
   let lastSent = 0
-  const SEND_INTERVAL = 0 // Magic interval for sending updates to the server
-  const FIXED_DT = 16.67 // Fixed timestep in milliseconds (~60 updates per second)
-  let accumulator = 0
-  let lastTime = performance.now()
+  const SEND_INTERVAL = 0 //Try to find a magic interval of sending to server
 
   function update(timestamp: number): void {
-    // Calculate elapsed time since the last frame
-    let frameTime = timestamp - lastTime
-    // Cap frameTime to avoid spiral of death
-    const MAX_FRAME_TIME = 100
-    if (frameTime > MAX_FRAME_TIME) {
-      frameTime = MAX_FRAME_TIME
-    }
-    lastTime = timestamp
-    accumulator += frameTime
-
-    // Process fixed-timestep physics updates
-    while (accumulator >= FIXED_DT) {
-      // Update physics and input handling with a fixed dt
-      updateSpaceObjects(game.remotePlayers, FIXED_DT)
-      updateSpaceObject(game.localPlayer, FIXED_DT)
-      updateSpaceObjects(game.bodies, FIXED_DT)
-      nextFrame(game, FIXED_DT)
-      accumulator -= FIXED_DT
-      frameCount++
-      every20.tick(() => localPlayerStore.set(game.localPlayer))
-    }
-
-    // Calculate interpolation factor for rendering
-    const interpolation = accumulator / FIXED_DT
-
-    // Clear and render the frame (you can choose to use interpolation for smooth rendering)
+    const oldSo = { ...game.localPlayer }
+    frameCount++
+    every20.tick(() => localPlayerStore.set(game.localPlayer))
+    // every300.tick(() => console.log('remotes:', game.remotePlayers))
+    const dt: number = getFrameTimeMs(timestamp)
     clearScreen(game.ctx, game.style)
-    renderFrame(game, FIXED_DT)
+    renderFrame(game, dt)
 
-    // Network: send updated local player state if connected
+    updateSpaceObjects(game.remotePlayers, dt)
+    updateSpaceObject(game.localPlayer, dt)
+    updateSpaceObjects(game.bodies, dt)
     if (game.websocket.isConnected() && game.shouldSendToServer) {
       if (timestamp - lastSent >= SEND_INTERVAL) {
         const sendAbleSpaceObject = getSendableSpaceObject(game.localPlayer)
-        // Attach the fixed dt (or you could attach interpolation if needed)
-        sendAbleSpaceObject.dt = FIXED_DT
-        const partialSo = getPartialSo(game.localPlayer, sendAbleSpaceObject)
+        const partialSo = getPartialSo(oldSo, sendAbleSpaceObject)
+        partialSo.dt = dt
         if (partialEnabled) {
           game.websocket.send(partialSo)
         } else {
@@ -158,9 +153,9 @@ export function renderLoop(game: Game, renderFrame: (game: Game, interpolation: 
         lastSent = timestamp
       }
     }
-
     moveNewShotsToLocalBuffer(game.localPlayer)
     fid = requestAnimationFrame(update)
+    nextFrame(game, dt)
   }
 
   update(performance.now())
@@ -168,7 +163,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, interpolation: 
   async function stopper() {
     try {
       game.localPlayer.isPlaying = false
-      // Inform peers that the player is stopping
+      // Game updates goes only to session peers
       game.localPlayer.messageType = MessageType.GAME_UPDATE
       if (!gameStopped) {
         console.log('stopping game')
@@ -176,6 +171,8 @@ export function renderLoop(game: Game, renderFrame: (game: Game, interpolation: 
         game.localPlayer.messageType = MessageType.SESSION_UPDATE
         game.websocket.send(game.localPlayer)
       }
+      // sendSpaceObjectToBroadcastServer(game.localPlayer)
+
       cancelAnimationFrame(fid)
       gameStopped = true
       localPlayerStore.set(game.localPlayer)

@@ -185,7 +185,6 @@ export class OidsSocket {
           }
 
           if (incomingData.messageType === MessageType.SERVER_GAME_UPDATE) {
-            // console.log('Server game update', incomingData)
             const su = serverUpdateObject<SpaceObject>(incomingData as SpaceObject)
             callbackNpc(su)
           } else {

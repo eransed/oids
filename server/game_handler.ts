@@ -18,11 +18,14 @@ export class GameHandler {
   start_time_us: number = usNow()
   tied_session_id: string
 
-  // Using fixed dt instead of a variable dt
-  private readonly FIXED_DT = 16.67 // milliseconds per update (~60 updates per second)
+  // private readonly tickRate = 30
+  private readonly fps = 60
   private remoteSpaceObjects: SpaceObject[] = []
   private lastTime = performance.now()
-  private accumulator = 0
+  private dt = performance.now()
+  private minTickTimeMs = 1 / this.fps
+  // private every = new EveryInterval(this.tickRate)
+  // private asteroidTicker = new EveryInterval(this.tickRate)
   private nextWorldObjectToSendIndex = 0
   private gameMap: GameMap | undefined = undefined
   private sentOnce = false // only used during dev...
@@ -43,62 +46,54 @@ export class GameHandler {
 
   game_session_start() {
     this.gameMap = createWorldOne(this.tied_session_id)
+
     info(`Starting game ${this.tied_session_id} and creating world...`)
     this.game_started = true
+
     this.setWorldSpaceObjects()
 
-    // Initialize timing for the fixed timestep loop
-    this.lastTime = performance.now()
-    this.accumulator = 0
-
-    // Server main loop using fixed timestep
+    // Server main loop:
     this.game_interval = setInterval(() => {
-      const now = performance.now()
-      let frameTime = now - this.lastTime
-      const MAX_FRAME_TIME = 100 // cap to avoid spiral of death on lag spikes
-      if (frameTime > MAX_FRAME_TIME) frameTime = MAX_FRAME_TIME
-      this.lastTime = now
-      this.accumulator += frameTime
+      this.dt = performance.now() - this.lastTime
 
-      // Run fixed-timestep physics updates
-      while (this.accumulator >= this.FIXED_DT) {
-        // Remove outdated objects from both lists
-        this.worldSpaceObjects = removeOblitiratedSpaceObjects(this.worldSpaceObjects)
-        this.remoteSpaceObjects = removeOblitiratedSpaceObjects(this.remoteSpaceObjects)
+      // process.stdout.write(`${this.remoteSpaceObjects.length}`)
 
-        // Update remote space objects with fixed dt
-        for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
-          this.remoteSpaceObjects[i] = updateSpaceObject(this.remoteSpaceObjects[i], this.FIXED_DT)
-        }
+      this.worldSpaceObjects = removeOblitiratedSpaceObjects(this.worldSpaceObjects)
+      this.remoteSpaceObjects = removeOblitiratedSpaceObjects(this.remoteSpaceObjects)
 
-        // Process collisions and shots
-        this.checkHittingShots()
+      for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
+        this.remoteSpaceObjects[i] = updateSpaceObject(this.remoteSpaceObjects[i], this.dt)
+      }
 
-        // Update world space objects (NPCs, moons, etc.) with fixed dt
-        for (let i = 0; i < this.worldSpaceObjects.length; i++) {
-          this.worldSpaceObjects[i] = updateSpaceObject(this.worldSpaceObjects[i], this.FIXED_DT)
-        }
+      // this.remoteSpaceObjects.forEach((so) => {
+      //   if (so.shotsInFlight.length > 0) {
+      //     console.log('Shots in flight!', so.shotsInFlight)
+      //   }
+      // })
 
-        // Process NPC logic for attacking players
-        for (let i = 0; i < this.worldSpaceObjects.length; i++) {
-          for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
-            if (this.worldSpaceObjects[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
-              const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.worldSpaceObjects[i])))
-              this.worldSpaceObjects[i].angleDegree = rndf(0, 0) + angleToShip
-              if (dist2(getWorldCoordinates(this.worldSpaceObjects[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
-                this.worldSpaceObjects[i].armedDelay = 0
-                fire(this.worldSpaceObjects[i])
-              } else {
-                this.worldSpaceObjects[i].lastDamagedByName = ''
-              }
+      this.checkHittingShots()
+      // Game logic for npcs:
+      for (let i = 0; i < this.worldSpaceObjects.length; i++) {
+        this.worldSpaceObjects[i] = updateSpaceObject(this.worldSpaceObjects[i], this.dt)
+      }
+
+      for (let i = 0; i < this.worldSpaceObjects.length; i++) {
+        for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
+          if (this.worldSpaceObjects[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
+            const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.worldSpaceObjects[i])))
+            this.worldSpaceObjects[i].angleDegree = rndf(0, 0) + angleToShip
+            if (dist2(getWorldCoordinates(this.worldSpaceObjects[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
+              // info(`Aster ${this.moons[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
+              // info(`ATS: ${angleToShip} deg`)
+              this.worldSpaceObjects[i].armedDelay = 0
+              fire(this.worldSpaceObjects[i])
+            } else {
+              this.worldSpaceObjects[i].lastDamagedByName = ''
             }
           }
         }
-
-        this.accumulator -= this.FIXED_DT
       }
 
-      // Broadcast an update for one world object per tick (round-robin)
       const obj = this.worldSpaceObjects[this.nextWorldObjectToSendIndex]
       if (obj) {
         this.worldSpaceObjects[this.nextWorldObjectToSendIndex] = this.prepareSoToSend(obj)
@@ -108,9 +103,16 @@ export class GameHandler {
         if (this.nextWorldObjectToSendIndex >= this.worldSpaceObjects.length) {
           this.nextWorldObjectToSendIndex = 0
         }
+      } else {
+        // warn('oh shit')
+        // console.log("nextAsteroidToSendIndex", this.nextAsteroidToSendIndex, this.moons)
       }
-      // Optionally, send additional updates (e.g. town updates) here if needed
-    }, this.FIXED_DT)
+
+      // Send town updates if there are any:
+      // this.updateTownsIfApplicable()
+
+      this.lastTime = performance.now()
+    }, this.minTickTimeMs)
   }
   // server main loop end
 
@@ -124,20 +126,22 @@ export class GameHandler {
       return
     }
 
-    // Planets
+    //Planets
     for (let i = 0; i < this.gameMap.planets.length; i++) {
       const planet = this.gameMap.planets[i]
       this.worldSpaceObjects.push(planet)
     }
 
-    // Moons
+    //Moons
     for (let i = 0; i < this.gameMap.moons.length; i++) {
       this.worldSpaceObjects.push(this.gameMap.moons[i])
     }
 
-    // SpaceTowns and its buildings
+    //SpaceTowns and its buildings
     for (let i = 0; i < this.gameMap.towns.length; i++) {
       const spaceTowns = this.gameMap.towns[i]
+
+      //Adding SpaceTowns buildings to worldSpaceObjects
       for (let j = 0; j < spaceTowns.buildings.length; j++) {
         this.worldSpaceObjects.push(spaceTowns.buildings[j])
       }
@@ -152,6 +156,7 @@ export class GameHandler {
 
     for (let i = 0; i < this.gameMap.planets.length; i++) {
       const planet = this.gameMap.planets[i]
+
       this.broadcaster(globalConnectedClients, planet, this.tied_session_id)
     }
 
@@ -174,6 +179,7 @@ export class GameHandler {
   }
 
   handleSpaceObjectUpdate(so: SpaceObject) {
+    // console.log('update from: ', so.name)
     for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
       this.remoteSpaceObjects[i] = spaceObjectUpdateAndShotReciverOptimizer(so, this.remoteSpaceObjects[i])
     }
@@ -206,12 +212,16 @@ export class GameHandler {
       }
     }
     good(`Adding ${so.name} in remote list`)
+
     this.remoteSpaceObjects.push(so)
-    // (Optional: broadcast immediately if needed)
+    for (let i = 0; i < 0; i++) {
+      this.broadcaster(globalConnectedClients, this.worldSpaceObjects[i], this.tied_session_id)
+    }
   }
 
   createEnemy() {
     const enemyShip = createEnemyShip(this.tied_session_id)
+
     this.worldSpaceObjects.push(enemyShip)
   }
 
@@ -222,8 +232,7 @@ export class GameHandler {
       this.worldSpaceObjects.push(so)
     }
   }
-
-  // Processes collisions between objects
+  // never called this method... gah.
   checkHittingShots() {
     const spaceObjects = [...this.worldSpaceObjects, ...this.remoteSpaceObjects]
     handleCollisions(newVec2(), spaceObjects)

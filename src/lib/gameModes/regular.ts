@@ -15,7 +15,7 @@ import { localPlayerStore } from '../../stores/stores'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../websocket/shotOptimizer'
 import { handleCollisions } from '../physics/handleCollisions'
 import { renderCharacter } from '../render/renderCharacter'
-import { exists, npcUpdate } from './handlers/incomingDataHandlers/handleNpcUpdate'
+import { exists } from './handlers/incomingDataHandlers/handleNpcUpdate'
 import { handleStarBackdrop } from './handlers/handleStarBackDrop'
 import { handleLocalPlayer, initLocalPlayer } from './handlers/handleLocalPlayer'
 import { handleGameBodies } from './handlers/handleGameBodies'
@@ -152,9 +152,19 @@ export function initRegularGame(game: Game): void {
     }
   }
 
-  function handleNpcUpdate(su: ServerUpdate<SpaceObject>) {
+  function handleNpcUpdate(npcUpdate: ServerUpdate<SpaceObject>) {
+    // console.log(npcUpdate)
     // this is the handler for non spaceobjects (npc) ex asteroids created on the server.
-    npcUpdate(su, game)
+    if (!exists(npcUpdate.dataObject, game.bodies)) {
+      info(`Adding ${npcUpdate.dataObject.name}`)
+      game.bodies.push(npcUpdate.dataObject)
+    } else {
+      game.bodies.forEach((b, i) => {
+        if (game.bodies[i].name === npcUpdate.dataObject.name) {
+          game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(npcUpdate.dataObject, game.bodies[i])
+        }
+      })
+    }
   }
 
   function handlePlayerUpdate(su: ServerUpdate<SpaceObject>) {
