@@ -1,4 +1,4 @@
-import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf, warn } from 'mathil'
+import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf, warn, add2 } from 'mathil'
 import { MessageType, SpaceObject, SpaceObjectType } from '../src/lib/interface'
 
 import { Client, globalConnectedClients } from './main'
@@ -79,19 +79,19 @@ export class GameHandler {
 
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
+          const remoteSpaceObjectPos = getWorldCoordinates(this.remoteSpaceObjects[j])
+          const worldSpaceObjectPos = this.worldSpaceObjects[i].cameraPosition
+
           if (this.worldSpaceObjects[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
-            console.log(`Fire loop from server ${this.remoteSpaceObjects[j].name}`)
             const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.worldSpaceObjects[i])))
             this.worldSpaceObjects[i].angleDegree = rndf(0, 0) + angleToShip
-            console.log(sub2(getWorldCoordinates(this.worldSpaceObjects[i]), getWorldCoordinates(this.remoteSpaceObjects[j])))
-
-            if (dist2(this.remoteSpaceObjects[j].cameraPosition, this.worldSpaceObjects[i].cameraPosition) < 2000) {
-              console.log(`In range to shoot at: ${this.remoteSpaceObjects[j].name}`)
-              info(`Aster ${this.worldSpaceObjects[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
+            if (dist2(worldSpaceObjectPos, remoteSpaceObjectPos) < 2000) {
               // info(`ATS: ${angleToShip} deg`)
-              this.worldSpaceObjects[i].armedDelay = 0
+              this.worldSpaceObjects[i].armedDelay = 2000
+              this.worldSpaceObjects[i].canonOverHeat = false
+              this.worldSpaceObjects[i].ammo = 500
+              // this.worldSpaceObjects[i].framesSinceLastShot = 1
               fire(this.worldSpaceObjects[i])
-              console.log('fire!')
             } else {
               this.worldSpaceObjects[i].lastDamagedByName = ''
             }
@@ -184,6 +184,7 @@ export class GameHandler {
 
   handleSpaceObjectUpdate(so: SpaceObject) {
     // console.log('update from: ', so.name)
+
     for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
       this.remoteSpaceObjects[i] = spaceObjectUpdateAndShotReciverOptimizer(so, this.remoteSpaceObjects[i])
     }

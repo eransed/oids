@@ -121,6 +121,7 @@ export function fire(so: SpaceObject): void {
   }
 
   so.ammo -= shotLeftToFire
+  console.log(`${so.name} is shooting!`)
 }
 
 export function handleHittingShot(cameraPosition: Vec2, shot: PhotonLaser, ctx: CanvasRenderingContext2D): void {

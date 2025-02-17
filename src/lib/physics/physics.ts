@@ -223,7 +223,7 @@ export function isWithinRadius(p0: Physical, p1: Physical & Bounded, radius: num
   return false
 }
 
-export function getWorldCoordinates(e: (Physical & Bounded) | null): Vec2 {
+export function getWorldCoordinates(e: Physical & Bounded): Vec2 {
   if (e) {
     return add2(e.viewFramePosition, e.cameraPosition)
   }

@@ -15,7 +15,7 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
       if (npc1.isDead) continue
 
       if (isWithinRadiusWorld(npc0, npc1, npc1.hitRadius) && npc0.name !== npc1.name) {
-        // good(`collision!`)
+        // console.log(`collision!`)
         npc0.collidingWith.push(npc1)
         npc1.collidingWith.push(npc0)
         npc0.health -= 0.01

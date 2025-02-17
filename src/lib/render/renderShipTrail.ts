@@ -9,49 +9,35 @@ import { getShipBundleCache, ShipVariant } from '../../style/ships'
 import { getWorldCoordinates } from '../physics/physics'
 import { randomAnyColor, randomAnyLightColor, randomColor, randomRed } from '../color'
 
-export function renderTrail(
-  so: SpaceObject,
-  ctx: CanvasRenderingContext2D,
-  renderAsLocalPlayer = false,
-  style: UIStyle,
-  renderPos: Vec2 | null = null,
-  showVectors = false
-): void {
+export function renderTrail(so: SpaceObject, ctx: CanvasRenderingContext2D, renderAsLocalPlayer = false, style: UIStyle, renderPos: Vec2 | null = null, showVectors = false): void {
+  ctx.save()
 
-
-    ctx.save()
-
-    if (!renderPos) {
+  if (!renderPos) {
     ctx.translate(so.viewFramePosition.x, so.viewFramePosition.y)
     // shipTranslation = so.viewFramePosition
-    } else {
+  } else {
     ctx.translate(renderPos.x, renderPos.y)
     // shipTranslation = renderPos
-    }
+  }
 
-    ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
+  ctx.rotate((round2dec(90 + so.angleDegree, 1) * Math.PI) / 180)
 
+  for (let i = 0; i < 100; i++) {
+    // ctx.fillStyle = randomColor('bcdef', '789abc', 'de')
+    ctx.fillStyle = randomColor('def', 'ab', '0')
+    ctx.fillRect(45 + rndi(-5, 5), 85 + rndi(0, 50), rndi(10, 15), rndi(5, 10))
+    ctx.fillRect(-60 + rndi(-5, 5), 85 + rndi(0, 50), rndi(10, 15), rndi(5, 10))
+  }
 
-    for (let i = 0; i < 100; i++) {
-        // ctx.fillStyle = randomColor('bcdef', '789abc', 'de')
-        ctx.fillStyle = randomColor('def', 'ab', '0')
-        ctx.fillRect(45+rndi(-5, 5), 85 + rndi(0, 50), rndi(10, 15), rndi(5, 10))
-        ctx.fillRect(-60+rndi(-5, 5), 85 + rndi(0, 50), rndi(10, 15), rndi(5, 10))
-    }
+  ctx.restore()
 
-
-    ctx.restore()
-
-    //   if (renderPos) {
-    //       renderVector(
-    //           smul2(direction2(so.angleDegree), 10),
-    //           renderPos,
-    //           ctx,
-    //           50,
-    //           '#fff'
-    //         )
-    //     }
-
+  //   if (renderPos) {
+  //       renderVector(
+  //           smul2(direction2(so.angleDegree), 10),
+  //           renderPos,
+  //           ctx,
+  //           50,
+  //           '#fff'
+  //         )
+  //     }
 }
-
-

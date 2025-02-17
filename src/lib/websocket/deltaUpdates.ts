@@ -20,7 +20,7 @@ const chosenKeys: Array<keyof SpaceObject> = [
   'batteryLevel',
   'booster',
   'bounceCount',
-  'cameraVelocity',
+  // 'cameraVelocity',
   'canonCoolDown',
   'canonCoolDownSpeed',
   'canonHeatAddedPerShot',
@@ -63,10 +63,10 @@ const chosenKeys: Array<keyof SpaceObject> = [
   'startHealth',
   'steeringPower',
   'ttl',
-  'velocity',
+  // 'velocity',
   'viewportScale',
   'worldSize',
-  'viewFramePosition',
+  // 'viewFramePosition',
   'viewport',
 ]
 
