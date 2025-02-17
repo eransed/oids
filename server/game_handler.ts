@@ -74,19 +74,24 @@ export class GameHandler {
       this.checkHittingShots()
       // Game logic for npcs:
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
-        this.worldSpaceObjects[i] = updateSpaceObject(this.worldSpaceObjects[i], this.dt)
+        updateSpaceObject(this.worldSpaceObjects[i], this.dt)
       }
 
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
           if (this.worldSpaceObjects[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
+            console.log(`Fire loop from server ${this.remoteSpaceObjects[j].name}`)
             const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.worldSpaceObjects[i])))
             this.worldSpaceObjects[i].angleDegree = rndf(0, 0) + angleToShip
-            if (dist2(getWorldCoordinates(this.worldSpaceObjects[i]), getWorldCoordinates(this.remoteSpaceObjects[j])) < 1200) {
-              // info(`Aster ${this.moons[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
+            console.log(sub2(getWorldCoordinates(this.worldSpaceObjects[i]), getWorldCoordinates(this.remoteSpaceObjects[j])))
+
+            if (dist2(this.remoteSpaceObjects[j].cameraPosition, this.worldSpaceObjects[i].cameraPosition) < 2000) {
+              console.log(`In range to shoot at: ${this.remoteSpaceObjects[j].name}`)
+              info(`Aster ${this.worldSpaceObjects[i].name} shots at ${this.remoteSpaceObjects[j].name}`)
               // info(`ATS: ${angleToShip} deg`)
               this.worldSpaceObjects[i].armedDelay = 0
               fire(this.worldSpaceObjects[i])
+              console.log('fire!')
             } else {
               this.worldSpaceObjects[i].lastDamagedByName = ''
             }
@@ -94,9 +99,8 @@ export class GameHandler {
         }
       }
 
-      const obj = this.worldSpaceObjects[this.nextWorldObjectToSendIndex]
-      if (obj) {
-        this.worldSpaceObjects[this.nextWorldObjectToSendIndex] = this.prepareSoToSend(obj)
+      if (this.worldSpaceObjects[this.nextWorldObjectToSendIndex]) {
+        this.prepareSoToSend(this.worldSpaceObjects[this.nextWorldObjectToSendIndex])
         this.worldSpaceObjects[this.nextWorldObjectToSendIndex].collidingWith = []
         this.broadcaster(globalConnectedClients, this.worldSpaceObjects[this.nextWorldObjectToSendIndex], this.tied_session_id)
         this.nextWorldObjectToSendIndex++
@@ -241,7 +245,15 @@ export class GameHandler {
   }
   // never called this method... gah.
   checkHittingShots() {
-    const spaceObjects = [...this.worldSpaceObjects, ...this.remoteSpaceObjects]
+    // console.log('checking shots')
+    const spaceObjects = this.worldSpaceObjects.concat(this.remoteSpaceObjects)
     handleCollisions(newVec2(), spaceObjects)
+  }
+
+  sendChatMsg(so: SpaceObject, refSoName?: string) {
+    so.lastMessage = `Stop shooting at me ${refSoName ? refSoName : 'player!'}`
+    so.messageType = MessageType.CHAT_MESSAGE
+
+    this.broadcaster(globalConnectedClients, so, this.tied_session_id)
   }
 }

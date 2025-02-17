@@ -51,6 +51,9 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
             npc1.velocity = add2(npc1.velocity, heading)
             npc1.lastDamagedByName = shot.ownerName
             shot.didHit = true
+            if (shot.didHit) {
+              console.log(npc1.name + ' got hit by ' + npc1.lastDamagedByName)
+            }
             circleBounce(shot, npc1, 10, false)
             if (npc1.health < 1) {
               if (addIfNotExists(npc1.name, npc0.kills) === true) {
