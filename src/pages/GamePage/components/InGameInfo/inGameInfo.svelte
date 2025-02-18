@@ -12,7 +12,7 @@
 </script>
 
 <div out:slide>
-  <Modal position="relative" {title} {showModal} {closedCallback} backDrop={false} closeBtn={false}>
+  <Modal position="relative" {title} {showModal} {closedCallback} backDrop={false} closeBtn={true}>
     <slot />
   </Modal>
 </div>

@@ -8,12 +8,10 @@ export function spaceObjectUpdateAndShotReciverOptimizer(possibleNewShots: Space
     // the new shots
     const newShotsThisUpdate = possibleNewShots.shotsInFlight
 
+    storedSpaceObject = possibleNewShots
+
     // concat the old and the new shots
     storedSpaceObject.shotsInFlight = [...cachePhotonLasers, ...newShotsThisUpdate]
-
-    storedSpaceObject.cameraPosition = possibleNewShots.cameraPosition
-    storedSpaceObject.viewFramePosition = possibleNewShots.viewFramePosition
-    storedSpaceObject.angleDegree = possibleNewShots.angleDegree
   }
 
   return storedSpaceObject

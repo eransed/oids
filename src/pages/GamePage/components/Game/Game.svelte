@@ -39,7 +39,7 @@
   import { createMoon, createSpaceObject } from '../../../../lib/factory'
   import { rndi } from 'mathil'
   import { Icons } from '../../../../style/icons'
-  import { requestEnemyShip } from '../../../../lib/services/game/gameRequest'
+  import { requestCompanionShip, requestEnemyShip } from '../../../../lib/services/game/gameRequest'
 
   let game: Game
 
@@ -134,8 +134,12 @@
     window.removeEventListener('resize', handleResize)
   })
 
-  async function spawnEnemy() {
+  async function spawnEnemyShip() {
     await requestEnemyShip(game.localPlayer.sessionId, game.localPlayer.name)
+  }
+
+  async function spawnCompanionShip() {
+    await requestCompanionShip(game.localPlayer.sessionId, game.localPlayer.name)
   }
 </script>
 
@@ -146,8 +150,9 @@
 {/if}
 
 {#if $ActiveKeyMapStore.createMenu.keyStatus}
-  <InGameInfo title={'Create Menu'} showModal={$ActiveKeyMapStore.createMenu.keyStatus}>
-    <Button90 icon={Icons.Moon} addInfo="Create Moon" buttonConfig={{ buttonText: 'Create Moon', clickCallback: () => spawnEnemy(), selected: false }} />
+  <InGameInfo title={'Create Menu'} showModal={$ActiveKeyMapStore.createMenu.keyStatus} closedCallback={() => ($ActiveKeyMapStore.createMenu.keyStatus = false)}>
+    <Button90 icon={Icons.MoonLanding} addInfo="Create Enemy" buttonConfig={{ buttonText: 'Create Enemy', clickCallback: () => spawnEnemyShip(), selected: false }} />
+    <Button90 icon={Icons.PlanetLamp} addInfo="Create Companion" buttonConfig={{ buttonText: 'Create Companion', clickCallback: () => spawnCompanionShip(), selected: false }} />
   </InGameInfo>
 {/if}
 

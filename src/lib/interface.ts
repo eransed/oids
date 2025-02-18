@@ -191,6 +191,7 @@ export interface Typable {
   // readonly messageType: MessageType
   messageType: MessageType
   spaceObjectType: SpaceObjectType
+  relation: SpaceRelation
 }
 
 export enum MessageType {
@@ -212,6 +213,7 @@ export interface PlayingShip {
 
 export interface Belonging {
   hometown: Towns
+  owner: string
 }
 
 export interface Jumpable {
@@ -236,6 +238,12 @@ export enum SpaceObjectType {
   BUILDING,
   PLANET,
   SHIP,
+}
+
+export enum SpaceRelation {
+  FRIENDLY,
+  ENEMY,
+  COMPANION,
 }
 
 export interface SpaceObject

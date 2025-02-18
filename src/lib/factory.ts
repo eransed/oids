@@ -1,5 +1,5 @@
 import type { PhotonLaser, SpaceObject } from './interface'
-import { MessageType, SpaceObjectType, SpaceShape } from './interface'
+import { MessageType, SpaceObjectType, SpaceRelation, SpaceShape } from './interface'
 import { newVec2, rndf, rndfVec2, rndi, smul2, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel, worldStartPosition } from './constants'
 // import type { Ship } from '@prisma/client'
@@ -65,10 +65,42 @@ export function createPlanet(sessionId: string, pos: Vec2, size: Vec2, name?: st
   return planet
 }
 
+export function createCompanionShip(sessionId: string, clientName: string, pos?: Vec2) {
+  const companionShip = createSpaceObject(`companion-${rndi(1, 10000)}`, MessageType.SERVER_GAME_UPDATE)
+  companionShip.sessionId = sessionId
+  companionShip.ammo = 5000
+  companionShip.spaceObjectType = SpaceObjectType.SHIP
+  companionShip.relation = SpaceRelation.COMPANION
+  companionShip.owner = clientName
+
+  // enemyShip.size = smul2(enemyShip.size, rndi(3, 15))
+  companionShip.velocity = rndfVec2(0.1, 0.3)
+  companionShip.hitRadius = Math.sqrt(companionShip.size.x ** 2 + companionShip.size.y ** 2)
+  // enemyShip.mass = calculateMass(enemyShip.size)
+  companionShip.health = 50
+  companionShip.startHealth = companionShip.health
+  companionShip.photonColor = '#f00'
+  companionShip.inverseFireRate = 15
+  companionShip.angularVelocity = 0.001
+  companionShip.angleDegree = 90
+  companionShip.ship.variant = 2
+  companionShip.armedDelay = 10
+
+  if (pos) {
+    companionShip.cameraPosition = rndfVec2(pos.x, pos.y)
+  } else {
+    companionShip.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
+  }
+
+  return companionShip
+}
+
 export function createEnemyShip(sessionId: string, pos?: Vec2) {
   const enemyShip = createSpaceObject(`enemy-${rndi(1, 10000)}`, MessageType.SERVER_GAME_UPDATE)
   enemyShip.sessionId = sessionId
   enemyShip.ammo = 5000
+  enemyShip.spaceObjectType = SpaceObjectType.SHIP
+  enemyShip.relation = SpaceRelation.ENEMY
 
   // enemyShip.size = smul2(enemyShip.size, rndi(3, 15))
   enemyShip.velocity = rndfVec2(0.1, 0.3)
@@ -80,12 +112,11 @@ export function createEnemyShip(sessionId: string, pos?: Vec2) {
   enemyShip.inverseFireRate = 15
   enemyShip.angularVelocity = 0.001
   enemyShip.angleDegree = 90
-  enemyShip.spaceObjectType = SpaceObjectType.SHIP
   enemyShip.ship.variant = 3
   enemyShip.armedDelay = 10
 
   if (pos) {
-    enemyShip.cameraPosition = rndfVec2(pos.x - 500, pos.y + 1750)
+    enemyShip.cameraPosition = rndfVec2(pos.x + 25, pos.y + 25)
   } else {
     enemyShip.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
   }
@@ -224,6 +255,8 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     gameMode: GameMode.SPACE_MODE,
     dt: 0,
     spaceObjectType: SpaceObjectType.PLAYER,
+    relation: SpaceRelation.FRIENDLY,
+    owner: '',
   }
 
   spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)

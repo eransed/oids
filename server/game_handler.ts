@@ -1,10 +1,10 @@
 import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf, warn, add2 } from 'mathil'
-import { MessageType, SpaceObject, SpaceObjectType } from '../src/lib/interface'
+import { MessageType, SpaceObject, SpaceObjectType, SpaceRelation } from '../src/lib/interface'
 
 import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
-import { createEnemyShip, createMoon, createSpaceObject } from '../src/lib/factory'
+import { createCompanionShip, createEnemyShip, createMoon, createSpaceObject } from '../src/lib/factory'
 import { fire, generateMissileFrom, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
 import { getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
@@ -56,8 +56,6 @@ export class GameHandler {
     this.game_interval = setInterval(() => {
       this.dt = performance.now() - this.lastTime
 
-      // process.stdout.write(`${this.remoteSpaceObjects.length}`)
-
       this.worldSpaceObjects = removeOblitiratedSpaceObjects(this.worldSpaceObjects)
       this.remoteSpaceObjects = removeOblitiratedSpaceObjects(this.remoteSpaceObjects)
 
@@ -65,32 +63,19 @@ export class GameHandler {
         this.remoteSpaceObjects[i] = updateSpaceObject(this.remoteSpaceObjects[i], this.dt)
       }
 
-      // this.remoteSpaceObjects.forEach((so) => {
-      //   if (so.shotsInFlight.length > 0) {
-      //     console.log('Shots in flight!', so.shotsInFlight)
-      //   }
-      // })
-
       this.checkHittingShots()
-      // Game logic for npcs:
+
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         updateSpaceObject(this.worldSpaceObjects[i], this.dt)
       }
 
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
-          const remoteSpaceObjectPos = getWorldCoordinates(this.remoteSpaceObjects[j])
-          const worldSpaceObjectPos = this.worldSpaceObjects[i].cameraPosition
-
-          if (this.worldSpaceObjects[i].lastDamagedByName === this.remoteSpaceObjects[j].name) {
-            const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.worldSpaceObjects[i])))
-            this.worldSpaceObjects[i].angleDegree = rndf(0, 0) + angleToShip
-            if (dist2(worldSpaceObjectPos, remoteSpaceObjectPos) < 2000) {
-              // console.log(`${this.worldSpaceObjects[i].name} is shooting from distance: ${dist2(worldSpaceObjectPos, remoteSpaceObjectPos)}`)
-
-              fire(this.worldSpaceObjects[i])
-            } else {
-              this.worldSpaceObjects[i].lastDamagedByName = ''
+          if (this.worldSpaceObjects[i].spaceObjectType === SpaceObjectType.SHIP) {
+            if (this.worldSpaceObjects[i].relation === SpaceRelation.ENEMY) {
+              this.handleEnemies(this.worldSpaceObjects[i], this.remoteSpaceObjects[j])
+            } else if (this.worldSpaceObjects[i].relation === SpaceRelation.COMPANION) {
+              this.handleCompanions(this.worldSpaceObjects[i], this.remoteSpaceObjects[j])
             }
           }
         }
@@ -116,6 +101,33 @@ export class GameHandler {
     }, this.minTickTimeMs)
   }
   // server main loop end
+
+  handleCompanions(worldSpaceObject: SpaceObject, remoteSpaceObject: SpaceObject) {
+    const remoteSpaceObjectPos = getWorldCoordinates(worldSpaceObject)
+    const worldSpaceObjectPos = remoteSpaceObject.cameraPosition
+
+    if (worldSpaceObject.owner === remoteSpaceObject.name) {
+      const angleToShip = angle2(sub2(getWorldCoordinates(remoteSpaceObject), getWorldCoordinates(worldSpaceObject)))
+      worldSpaceObject.angleDegree = rndf(0, 0) + angleToShip
+    }
+  }
+
+  handleEnemies(worldSpaceObject: SpaceObject, remoteSpaceObject: SpaceObject) {
+    const remoteSpaceObjectPos = getWorldCoordinates(worldSpaceObject)
+    const worldSpaceObjectPos = remoteSpaceObject.cameraPosition
+
+    if (worldSpaceObject.lastDamagedByName === remoteSpaceObject.name) {
+      const angleToShip = angle2(sub2(getWorldCoordinates(remoteSpaceObject), getWorldCoordinates(worldSpaceObject)))
+      worldSpaceObject.angleDegree = rndf(0, 0) + angleToShip
+      if (dist2(worldSpaceObjectPos, remoteSpaceObjectPos) < 2000) {
+        // console.log(`${this.worldSpaceObjects[i].name} is shooting from distance: ${dist2(worldSpaceObjectPos, remoteSpaceObjectPos)}`)
+
+        fire(worldSpaceObject)
+      } else {
+        worldSpaceObject.lastDamagedByName = ''
+      }
+    }
+  }
 
   /**
    * Getting the objects from the defined world
@@ -193,7 +205,7 @@ export class GameHandler {
   }
 
   addNewSpaceObjects(so: SpaceObject) {
-    if (so.isDead) {
+    if (so.isDead || so.deadFrameCount > 0) {
       return
     }
 
@@ -221,7 +233,7 @@ export class GameHandler {
     }
   }
 
-  createEnemyAtPlayerPosition(clientName: string) {
+  createObjectAtPlayerPosition(clientName: string, type: SpaceObjectType, relation: SpaceRelation) {
     const foundPlayer = this.remoteSpaceObjects.find((so) => so.name === clientName)
 
     if (!foundPlayer) {
@@ -229,9 +241,21 @@ export class GameHandler {
       return
     }
 
-    const enemyShip = createEnemyShip(this.tied_session_id, foundPlayer.cameraPosition)
+    switch (type) {
+      case SpaceObjectType.SHIP:
+        if (relation === SpaceRelation.ENEMY) {
+          const enemyShip = createEnemyShip(this.tied_session_id, add2(foundPlayer.cameraPosition, foundPlayer.viewFramePosition))
+          this.worldSpaceObjects.push(enemyShip)
+        } else if (relation === SpaceRelation.COMPANION) {
+          const companionShip = createCompanionShip(this.tied_session_id, clientName, add2(foundPlayer.cameraPosition, foundPlayer.viewFramePosition))
+          this.worldSpaceObjects.push(companionShip)
+        }
+        break
 
-    this.worldSpaceObjects.push(enemyShip)
+      default:
+        warn(`Unknown space object type: ${type}`)
+        break
+    }
   }
 
   createAndAddNewSpaceObject(so: SpaceObject) {

@@ -6,7 +6,7 @@ import { getLocalIp, ipport } from './net'
 
 import { apiServer } from './apiServer'
 import { start_host_server } from './host_server'
-import { Collidable, MessageType, PhotonLaser, Session, Ship, SpaceObject, SpaceObjectType, ThrustFlameAtom } from '../src/lib/interface'
+import { Collidable, MessageType, PhotonLaser, Session, Ship, SpaceObject, SpaceObjectType, SpaceRelation, ThrustFlameAtom } from '../src/lib/interface'
 import { dist2, error, info, rndi, Vec2, warn } from 'mathil'
 import { createSpaceObject } from '../src/lib/factory'
 import { GameHandler } from './game_handler'
@@ -245,10 +245,10 @@ function handleGameLogic(so: SpaceObject) {
   }
 }
 
-export function handleIncomingEnemyShipRequest(sessionId: string, clientName: string) {
+export function handleIncomingCreateShipRequest(sessionId: string, clientName: string, type: SpaceObjectType, relation: SpaceRelation) {
   for (let i = 0; i < game_handlers.length; i++) {
     if (game_handlers[i].tied_session_id === sessionId) {
-      game_handlers[i].createEnemyAtPlayerPosition(clientName)
+      game_handlers[i].createObjectAtPlayerPosition(clientName, type, relation)
       return
     }
   }
