@@ -6,7 +6,7 @@ import { renderHitExplosion } from '../render/renderFx'
 import { resetCollisions, isWithinRadiusWorld, getWorldCoordinates, isWithinRadius, headingFromangle2 } from './physics'
 import { circleBounce } from './CircleBounce'
 
-export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D | null = null): void {
+export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D | null = null, hpChangeCallback?: (so: SpaceObject, shotDmg: number) => void): void {
   resetCollisions(spaceObjects)
   for (const npc0 of spaceObjects) {
     if (npc0.isDead) continue
@@ -43,6 +43,9 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
           if (isWithinRadius(shot, npc1, npc1.hitRadius) && shot.didHit === false) {
             // bad(`${shot.ownerName} did hit ${npc1.name}, hp: ${npc1.health}`)
             const heading: Vec2 = scalarMultiply2(headingFromangle2(shot.angleDegree), (1 / npc1.mass) * shot.damage * missileDamageVelocityTransferFactor)
+            if (hpChangeCallback) {
+              hpChangeCallback(npc1, shot.damage)
+            }
             npc1.health -= shot.damage
             if (npc1.spaceObjectType === SpaceObjectType.MOON) {
               npc1.size = smul2(npc1.size, lintra(npc1.health, 0, 1, -0.5, -0.99))
@@ -52,7 +55,7 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
             npc1.lastDamagedByName = shot.ownerName
             shot.didHit = true
             if (shot.didHit) {
-              console.log(npc1.name + ' got hit by ' + npc1.lastDamagedByName)
+              // console.log(npc1.name + ' got hit by ' + npc1.lastDamagedByName)
             }
             circleBounce(shot, npc1, 10, false)
             if (npc1.health < 1) {

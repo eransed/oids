@@ -246,6 +246,10 @@ export enum SpaceRelation {
   COMPANION,
 }
 
+export interface Splittable {
+  splittedNrOfTimes: number
+}
+
 export interface SpaceObject
   extends PlayingShip,
     Shapable,
@@ -274,6 +278,7 @@ export interface SpaceObject
     Landable,
     Jumpable,
     GameModable,
+    Splittable,
     NetworkAble {}
 
 export interface ServerUpdate<T> {

@@ -116,7 +116,7 @@ export function createEnemyShip(sessionId: string, pos?: Vec2) {
   enemyShip.armedDelay = 10
 
   if (pos) {
-    enemyShip.cameraPosition = rndfVec2(pos.x + 25, pos.y + 25)
+    enemyShip.cameraPosition = rndfVec2(pos.x - 15, pos.y + 15)
   } else {
     enemyShip.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
   }
@@ -218,6 +218,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     //  throw new Error('Steer not implemented.')
     // },
     steeringPower: 1.2,
+    splittedNrOfTimes: 0,
     velocity: initVel,
     ownerName: '',
     lastDamagedByName: '',

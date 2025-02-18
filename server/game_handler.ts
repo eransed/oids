@@ -1,12 +1,12 @@
-import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf, warn, add2 } from 'mathil'
+import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf, warn, add2, lintra } from 'mathil'
 import { MessageType, SpaceObject, SpaceObjectType, SpaceRelation } from '../src/lib/interface'
 
 import { Client, globalConnectedClients } from './main'
-import { worldStartPosition } from '../src/lib/constants'
+import { maxNrOfSplits, worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 import { createCompanionShip, createEnemyShip, createMoon, createSpaceObject } from '../src/lib/factory'
 import { fire, generateMissileFrom, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
-import { getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
+import { calculateMass, calculateRadius, getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
 import { GameMap } from '../src/lib/worlds/worldInterface'
 import { createWorldOne } from '../src/lib/worlds/worldFactory'
@@ -70,12 +70,15 @@ export class GameHandler {
       }
 
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
+        this.handleAsteroid(this.worldSpaceObjects[i])
+
+        //For loop to check all the relations and logic between worldSpaceObjects and RemoteObjects (player ships)
         for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
           if (this.worldSpaceObjects[i].spaceObjectType === SpaceObjectType.SHIP) {
             if (this.worldSpaceObjects[i].relation === SpaceRelation.ENEMY) {
-              this.handleEnemies(this.worldSpaceObjects[i], this.remoteSpaceObjects[j])
+              this.handleEnemy(this.worldSpaceObjects[i], this.remoteSpaceObjects[j])
             } else if (this.worldSpaceObjects[i].relation === SpaceRelation.COMPANION) {
-              this.handleCompanions(this.worldSpaceObjects[i], this.remoteSpaceObjects[j])
+              this.handleCompanion(this.worldSpaceObjects[i], this.remoteSpaceObjects[j])
             }
           }
         }
@@ -102,7 +105,9 @@ export class GameHandler {
   }
   // server main loop end
 
-  handleCompanions(worldSpaceObject: SpaceObject, remoteSpaceObject: SpaceObject) {
+  handleAsteroid(asteroid: SpaceObject) {}
+
+  handleCompanion(worldSpaceObject: SpaceObject, remoteSpaceObject: SpaceObject) {
     const remoteSpaceObjectPos = getWorldCoordinates(worldSpaceObject)
     const worldSpaceObjectPos = remoteSpaceObject.cameraPosition
 
@@ -112,15 +117,16 @@ export class GameHandler {
     }
   }
 
-  handleEnemies(worldSpaceObject: SpaceObject, remoteSpaceObject: SpaceObject) {
-    const remoteSpaceObjectPos = getWorldCoordinates(worldSpaceObject)
-    const worldSpaceObjectPos = remoteSpaceObject.cameraPosition
+  handleEnemy(worldSpaceObject: SpaceObject, remoteSpaceObject: SpaceObject) {
+    const remoteSpaceObjectPos = getWorldCoordinates(remoteSpaceObject)
+    const worldSpaceObjectPos = worldSpaceObject.cameraPosition
 
     if (worldSpaceObject.lastDamagedByName === remoteSpaceObject.name) {
       const angleToShip = angle2(sub2(getWorldCoordinates(remoteSpaceObject), getWorldCoordinates(worldSpaceObject)))
       worldSpaceObject.angleDegree = rndf(0, 0) + angleToShip
+      // console.log(`${worldSpaceObject} is shooting from distance: ${dist2(worldSpaceObjectPos, remoteSpaceObjectPos)}`)
       if (dist2(worldSpaceObjectPos, remoteSpaceObjectPos) < 2000) {
-        // console.log(`${this.worldSpaceObjects[i].name} is shooting from distance: ${dist2(worldSpaceObjectPos, remoteSpaceObjectPos)}`)
+        // console.log(`${worldSpaceObject} is shooting from distance: ${dist2(worldSpaceObjectPos, remoteSpaceObjectPos)}`)
 
         fire(worldSpaceObject)
       } else {
@@ -245,6 +251,7 @@ export class GameHandler {
       case SpaceObjectType.SHIP:
         if (relation === SpaceRelation.ENEMY) {
           const enemyShip = createEnemyShip(this.tied_session_id, add2(foundPlayer.cameraPosition, foundPlayer.viewFramePosition))
+          enemyShip.lastDamagedByName = foundPlayer.name
           this.worldSpaceObjects.push(enemyShip)
         } else if (relation === SpaceRelation.COMPANION) {
           const companionShip = createCompanionShip(this.tied_session_id, clientName, add2(foundPlayer.cameraPosition, foundPlayer.viewFramePosition))
@@ -269,7 +276,52 @@ export class GameHandler {
   checkHittingShots() {
     // console.log('checking shots')
     const spaceObjects = this.worldSpaceObjects.concat(this.remoteSpaceObjects)
-    handleCollisions(newVec2(), spaceObjects)
+    handleCollisions(newVec2(), spaceObjects, null, (so, shotDmg) => this.handleHpChangeOnShot(so, shotDmg))
+  }
+
+  //Used as a callback when handleCollisions is returning an SO that has a change in HP-value
+  handleHpChangeOnShot(so: SpaceObject, shotDmg: number): void {
+    if (so.spaceObjectType === SpaceObjectType.MOON) {
+      this.handleSplittingMoon(so, shotDmg)
+    }
+  }
+
+  handleSplittingMoon(so: SpaceObject, shotDmg: number) {
+    if ((so.health - shotDmg) / so.startHealth < 0.3) {
+      if (so.splittedNrOfTimes >= maxNrOfSplits) {
+        return
+      }
+      so.splittedNrOfTimes += 1
+
+      for (let i = 1; i < 5; i++) {
+        const splittedMoon = createMoon(so.sessionId)
+        splittedMoon.position = so.position
+
+        const splitDistance = 150
+
+        //Instead of this, make an explosion or something that actually resembles the moon to split
+        splittedMoon.cameraPosition = add2(so.cameraPosition, newVec2(rndf(-i * splitDistance, i * splitDistance), rndf(-i * splitDistance, i * splitDistance)))
+
+        splittedMoon.owner = so.name
+        splittedMoon.velocity = rndfVec2(-0.5, 0.5)
+        splittedMoon.size = smul2(so.size, rndf(0.5, 0.8))
+        splittedMoon.hitRadius = calculateRadius(splittedMoon.size)
+        splittedMoon.mass = calculateMass(splittedMoon.size)
+
+        splittedMoon.startHealth = so.health
+        splittedMoon.health = so.health
+        splittedMoon.splittedNrOfTimes = so.splittedNrOfTimes + 1
+
+        //Just for some effect...
+        setTimeout(() => {
+          this.addNewSpaceObjects(splittedMoon)
+
+          //For fun to create defenders of a moon - Rebel defenders are attacking you!
+        }, 50 * i)
+      }
+      this.createObjectAtPlayerPosition(so.lastDamagedByName, SpaceObjectType.SHIP, SpaceRelation.ENEMY)
+      so.health = 0
+    }
   }
 
   sendChatMsg(so: SpaceObject, refSoName?: string) {
