@@ -20,9 +20,8 @@ export function npcUpdate(npcUpdate: { dataObject: SpaceObject }, game: { bodies
     game.bodies.push(npcUpdate.dataObject)
   } else {
     game.bodies.forEach((b, i) => {
-      if (game.bodies[i].id === npcUpdate.dataObject.id) {
-        // game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(npcUpdate.dataObject, game.bodies[i])
-        game.bodies[i] = npcUpdate.dataObject
+      if (game.bodies[i].name === npcUpdate.dataObject.name) {
+        game.bodies[i] = spaceObjectUpdateAndShotReciverOptimizer(npcUpdate.dataObject, game.bodies[i])
       }
     })
   }

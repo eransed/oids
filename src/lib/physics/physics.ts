@@ -1,6 +1,6 @@
 import type { Bounded, Collidable, Physical, Rotatable, SpaceObject } from '../interface'
 import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, rndfVec2 } from 'mathil'
-import { handleDeathExplosion } from '../mechanics'
+import { coolDown, handleDeathExplosion } from '../mechanics'
 import { angularFriction, explosionDuration, linearFriction, timeScale } from '../constants'
 import type { Shape } from '../shapes/Shape'
 import { updateShots } from './updateShots'
@@ -66,6 +66,8 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   so.angleDegree += so.angularVelocity * deltaTime
   so.ticksSinceLastSnapShot++
   so.framesSinceLastServerUpdate++
+  coolDown(so)
+
   // if (so.positionalTrace && so.ticksSinceLastSnapShot > ticksBetweenSnapshots) {
   //   so.ticksSinceLastSnapShot = 0
   //   const trace = createSpaceObject()
@@ -101,6 +103,7 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   // if (npc.angleDegree < 0) npc.angleDegree = 360
   // if (npc.angleDegree > 360) npc.angleDegree = 0
 
+  // coolDown(so)
   return so
 }
 

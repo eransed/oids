@@ -12,7 +12,6 @@ export function updateShots(so: SpaceObject, dts: number): void {
 
   decayDeadShots(so)
 
-  coolDown(so)
   if (so.framesSinceLastShot > 0) {
     so.framesSinceLastShot--
   }

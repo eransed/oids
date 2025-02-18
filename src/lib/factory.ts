@@ -82,6 +82,7 @@ export function createEnemyShip(sessionId: string, pos?: Vec2) {
   enemyShip.angleDegree = 90
   enemyShip.spaceObjectType = SpaceObjectType.SHIP
   enemyShip.ship.variant = 3
+  enemyShip.armedDelay = 10
 
   if (pos) {
     enemyShip.cameraPosition = rndfVec2(pos.x - 500, pos.y + 1750)
@@ -132,16 +133,16 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     viewportScale: 1,
     sessionId: '',
     acceleration: { x: 0, y: 0 },
-    ammo: 1000,
+    ammo: 10000,
     angleDegree: -90,
     angularVelocity: 0,
-    armedDelay: 5000,
+    armedDelay: 10,
     batteryLevel: 500,
     batteryCapacity: 500,
     booster: 2,
     bounceCount: 0,
     canonCoolDown: 0,
-    canonCoolDownSpeed: 1.4,
+    canonCoolDownSpeed: 10,
     canonHeatAddedPerShot: 1.7,
     canonOverHeat: false,
     collidingWith: [],

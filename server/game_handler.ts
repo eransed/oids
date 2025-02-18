@@ -5,7 +5,7 @@ import { Client, globalConnectedClients } from './main'
 import { worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 import { createEnemyShip, createMoon, createSpaceObject } from '../src/lib/factory'
-import { fire, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
+import { fire, generateMissileFrom, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
 import { getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
 import { GameMap } from '../src/lib/worlds/worldInterface'
@@ -86,11 +86,8 @@ export class GameHandler {
             const angleToShip = angle2(sub2(getWorldCoordinates(this.remoteSpaceObjects[j]), getWorldCoordinates(this.worldSpaceObjects[i])))
             this.worldSpaceObjects[i].angleDegree = rndf(0, 0) + angleToShip
             if (dist2(worldSpaceObjectPos, remoteSpaceObjectPos) < 2000) {
-              // info(`ATS: ${angleToShip} deg`)
-              this.worldSpaceObjects[i].armedDelay = 2000
-              this.worldSpaceObjects[i].canonOverHeat = false
-              this.worldSpaceObjects[i].ammo = 500
-              // this.worldSpaceObjects[i].framesSinceLastShot = 1
+              // console.log(`${this.worldSpaceObjects[i].name} is shooting from distance: ${dist2(worldSpaceObjectPos, remoteSpaceObjectPos)}`)
+
               fire(this.worldSpaceObjects[i])
             } else {
               this.worldSpaceObjects[i].lastDamagedByName = ''

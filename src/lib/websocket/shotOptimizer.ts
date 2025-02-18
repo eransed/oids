@@ -13,6 +13,7 @@ export function spaceObjectUpdateAndShotReciverOptimizer(possibleNewShots: Space
 
     storedSpaceObject.cameraPosition = possibleNewShots.cameraPosition
     storedSpaceObject.viewFramePosition = possibleNewShots.viewFramePosition
+    storedSpaceObject.angleDegree = possibleNewShots.angleDegree
   }
 
   return storedSpaceObject

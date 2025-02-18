@@ -98,16 +98,22 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
 
 export function fire(so: SpaceObject): void {
   if (so.ammo < 1) {
+    // console.log(`${so.name} requested to shoot, but have no ammo`)
     return
   }
   if (so.canonOverHeat) {
+    // console.log(`${so.name} requested to shoot, is overheated`)
     return
   }
   if (so.framesSinceLastShot > 0) {
+    // console.log(`${so.name} requested to shoot, but frames... ${so.framesSinceLastShot}`)
+    so.framesSinceLastShot = 0
     return
   }
   so.canonCoolDown += so.canonHeatAddedPerShot * so.inverseFireRate
   if (so.canonCoolDown > maxHeat) {
+    // coolDown(so)
+    // console.log(`${so.name} requested to shoot, but is on cooldown`)
     return
   }
 
@@ -116,12 +122,15 @@ export function fire(so: SpaceObject): void {
   so.framesSinceLastShot += so.inverseFireRate
 
   const shotLeftToFire = so.ammo - so.shotsPerFrame < 0 ? so.shotsPerFrame - so.ammo : so.shotsPerFrame
+
+  // console.log(`${so.name} - shotLeftToFire: ${shotLeftToFire}`)
+
   for (let i = 0; i < shotLeftToFire; i++) {
     so.shotsInFlightNew.push(generateMissileFrom(so))
   }
 
   so.ammo -= shotLeftToFire
-  console.log(`${so.name} is shooting!`)
+  // console.log(`${so.name} is shooting!`)
 }
 
 export function handleHittingShot(cameraPosition: Vec2, shot: PhotonLaser, ctx: CanvasRenderingContext2D): void {
