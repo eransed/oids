@@ -90,7 +90,6 @@ function moveNewShotsToLocalBuffer(so: SpaceObject): void {
 }
 
 export function shotHandler(so: SpaceObject): SpaceObject {
-  so.shotsFiredThisFrame = false
   so.shotsInFlight = []
   if (so.shotsInFlightNew.length > 0) {
     so.shotsInFlight = so.shotsInFlightNew
@@ -147,6 +146,7 @@ export function renderLoop(game: Game, renderFrame: (game: Game, dt: number) => 
         partialSo.dt = dt
         if (partialEnabled) {
           game.websocket.send(partialSo)
+          game.localPlayer.shotsFiredThisFrame = false
         } else {
           game.websocket.send(sendAbleSpaceObject)
         }

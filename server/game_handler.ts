@@ -5,7 +5,7 @@ import { Client, globalConnectedClients } from './main'
 import { maxNrOfSplits, worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 import { createCompanionShip, createEnemyShip, createMoon, createSpaceObject } from '../src/lib/factory'
-import { fire, generateMissileFrom, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
+import { angleTo, fire, followSpaceObject, generateMissileFrom, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
 import { calculateMass, calculateRadius, getWorldCoordinates, updateSpaceObject, updateSpaceObjects } from '../src/lib/physics/physics'
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
 import { GameMap } from '../src/lib/worlds/worldInterface'
@@ -112,8 +112,13 @@ export class GameHandler {
     const worldSpaceObjectPos = remoteSpaceObject.cameraPosition
 
     if (worldSpaceObject.owner === remoteSpaceObject.name) {
-      const angleToShip = angle2(sub2(getWorldCoordinates(remoteSpaceObject), getWorldCoordinates(worldSpaceObject)))
-      worldSpaceObject.angleDegree = rndf(0, 0) + angleToShip
+      angleTo(worldSpaceObject, remoteSpaceObject)
+      followSpaceObject(worldSpaceObject, remoteSpaceObject)
+
+      if (remoteSpaceObject.shotsFiredThisFrame) {
+        // console.log('remote shooting', remoteSpaceObject.shotsFiredThisFrame)
+        fire(worldSpaceObject)
+      }
     }
   }
 
@@ -315,10 +320,9 @@ export class GameHandler {
         //Just for some effect...
         setTimeout(() => {
           this.addNewSpaceObjects(splittedMoon)
-
-          //For fun to create defenders of a moon - Rebel defenders are attacking you!
         }, 50 * i)
       }
+      //For fun to create defenders of a moon - Rebel defenders are attacking you!
       this.createObjectAtPlayerPosition(so.lastDamagedByName, SpaceObjectType.SHIP, SpaceRelation.ENEMY)
       so.health = 0
     }
