@@ -116,7 +116,7 @@ export function createEnemyShip(sessionId: string, pos?: Vec2) {
   enemyShip.armedDelay = 10
 
   if (pos) {
-    enemyShip.cameraPosition = rndfVec2(pos.x - 15, pos.y + 15)
+    enemyShip.cameraPosition = rndfVec2(pos.x - 5000, pos.y + 5000)
   } else {
     enemyShip.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
   }

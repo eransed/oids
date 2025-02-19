@@ -1,5 +1,5 @@
 import type { Bounded, Collidable, Physical, Rotatable, SpaceObject } from '../interface'
-import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, rndfVec2 } from 'mathil'
+import { add2, degToRad, magnitude2, radToDeg, scalarMultiply2, smul2, sub2, type Vec2, newVec2, limitVec2, rndfVec2, dist2 } from 'mathil'
 import { coolDown, handleDeathExplosion } from '../mechanics'
 import { angularFriction, explosionDuration, linearFriction, timeScale } from '../constants'
 import type { Shape } from '../shapes/Shape'
@@ -254,4 +254,8 @@ export function calculateMass(size: Vec2, density: number = 1): number {
 
 export function calculateRadius(size: Vec2): number {
   return Math.sqrt(size.x ** 2 + size.y ** 2)
+}
+
+export function getDistance(fromWorldObject: SpaceObject, toPlayerObject: SpaceObject): number {
+  return dist2(fromWorldObject.cameraPosition, getWorldCoordinates(toPlayerObject))
 }

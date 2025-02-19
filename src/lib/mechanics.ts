@@ -1,11 +1,11 @@
 import type { Boostable, Damageable, PhotonLaser, Positionable, SpaceObject, Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
-import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2, mag2, newVec2, angle2, dist2 } from 'mathil'
+import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2, mag2, newVec2, angle2, dist2, lintra } from 'mathil'
 import { basicPhotonLaserSpeedScaleFactor, maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
-import { getHeading, getWorldCoordinates } from './physics/physics'
+import { getDistance, getHeading, getWorldCoordinates } from './physics/physics'
 
 export function applyEngine(so: Thrustable & Boostable, boost = false): number {
   const consumption: number = so.enginePower * (boost ? so.booster : 1)
@@ -34,8 +34,12 @@ export function getThrustVector(so: Thrustable & Steerable & Boostable, dirAng: 
   }
 }
 
-export function applyEngineThrust(so: Thrustable & Steerable & Boostable, directionDeg: number, boost = false): void {
-  so.velocity = add2(so.velocity, getThrustVector(so, directionDeg, boost))
+export function applyEngineThrust(so: Thrustable & Steerable & Boostable, directionDeg: number, boost = false, smul?: number): void {
+  if (smul) {
+    so.velocity = add2(so.velocity, smul2(getThrustVector(so, directionDeg, boost), smul))
+  } else {
+    so.velocity = add2(so.velocity, getThrustVector(so, directionDeg, boost))
+  }
   // so.acceleration = add2(so.acceleration, getThrustVector(so, directionDeg))
 }
 
@@ -225,4 +229,25 @@ export function followSpaceObject(follower: SpaceObject, soToFollow: SpaceObject
 export function angleTo(from: SpaceObject, to: SpaceObject) {
   const angleToShip = angle2(sub2(getWorldCoordinates(to), getWorldCoordinates(from)))
   from.angleDegree = rndf(0, 0) + angleToShip
+}
+
+export function flyToSpaceObject(so: SpaceObject, flyToObject: SpaceObject, dist: number = 1000) {
+  const soPos = so.cameraPosition
+  const flyToObjectPos = getWorldCoordinates(flyToObject)
+
+  const distanceBetween = getDistance(so, flyToObject)
+
+  const smulFactorForward = lintra(distanceBetween, dist, 2000, 0.01, 0.3)
+
+  // console.log(smulFactor)
+
+  if (distanceBetween > dist) {
+    applyEngineThrust(so, 0, false, smulFactorForward)
+  }
+
+  if (distanceBetween <= dist) {
+    so.velocity = smul2(so.velocity, 0.99)
+  }
+
+  // angleTo(so, flyToObject)
 }
