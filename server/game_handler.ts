@@ -1,4 +1,4 @@
-import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf, warn, add2, lintra } from 'mathil'
+import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2, rndf, warn, add2, lintra, EveryInterval } from 'mathil'
 import { MessageType, SpaceObject, SpaceObjectType, SpaceRelation } from '../src/lib/interface'
 
 import { Client, globalConnectedClients } from './main'
@@ -29,6 +29,11 @@ export class GameHandler {
   private nextWorldObjectToSendIndex = 0
   private gameMap: GameMap | undefined = undefined
   private sentOnce = false // only used during dev...
+  private every25 = new EveryInterval(25)
+  private every50 = new EveryInterval(50)
+  private every100 = new EveryInterval(100)
+  private every200 = new EveryInterval(200)
+  private every300 = new EveryInterval(300)
 
   broadcaster: (clients: Client[], data: SpaceObject, sessionId: string | null) => void
 
@@ -134,9 +139,14 @@ export class GameHandler {
 
       if (dist2(worldSpaceObjectPos, remoteSpaceObjectPos) < 2000) {
         // console.log(`${worldSpaceObject} is shooting from distance: ${dist2(worldSpaceObjectPos, remoteSpaceObjectPos)}`)
-        setTimeout(() => {
+
+        this.every50.tick(() => {
           fire(worldSpaceObject)
-        }, 1000)
+        })
+
+        this.every200.tick(() => {
+          fire(worldSpaceObject, newVec2(100, 100))
+        })
       }
     }
   }

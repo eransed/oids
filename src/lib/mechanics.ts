@@ -65,14 +65,16 @@ export function coolDown(so: SpaceObject) {
   }
 }
 
-export function generateMissileFrom(so: SpaceObject): PhotonLaser {
+export function generateMissileFrom(so: SpaceObject, size: Vec2 = newVec2(rndi(4, 6), rndi(20, 30))): PhotonLaser {
   // what is the type of the shot?
   const shot: PhotonLaser = newPhotonLaser()
   shot.armedDelay = so.armedDelay
   shot.mass = 1
   // shot.angularVelocity = rndi(-70, 70)
-  shot.damage = so.missileDamage
-  shot.size = { x: rndi(4, 6), y: rndi(20, 30) }
+
+  shot.damage = so.missileDamage * lintra(mag2(size), 25, 100, 1, 5)
+
+  shot.size = size
 
   // shot.color = randomLightGreen()
   shot.color = so.photonColor
@@ -100,7 +102,7 @@ export function generateMissileFrom(so: SpaceObject): PhotonLaser {
   return shot
 }
 
-export function fire(so: SpaceObject): void {
+export function fire(so: SpaceObject, size?: Vec2): void {
   if (so.ammo < 1) {
     // console.log(`${so.name} requested to shoot, but have no ammo`)
     return
@@ -130,7 +132,7 @@ export function fire(so: SpaceObject): void {
   // console.log(`${so.name} - shotLeftToFire: ${shotLeftToFire}`)
 
   for (let i = 0; i < shotLeftToFire; i++) {
-    so.shotsInFlightNew.push(generateMissileFrom(so))
+    so.shotsInFlightNew.push(generateMissileFrom(so, size))
   }
 
   so.ammo -= shotLeftToFire
