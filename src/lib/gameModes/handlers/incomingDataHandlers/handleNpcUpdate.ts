@@ -1,4 +1,4 @@
-import { info } from 'mathil'
+import { EveryInterval, info } from 'mathil'
 import type { SpaceObject } from '../../../interface'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../../../websocket/shotOptimizer'
 
@@ -14,7 +14,12 @@ export function exists(so: SpaceObject, spaceObjectsReferences: SpaceObject[]): 
   return false
 }
 
+const evry500 = new EveryInterval(500)
+
 export function npcUpdate(npcUpdate: { dataObject: SpaceObject }, game: { bodies: SpaceObject[] }): void {
+  evry500.tick(() => {
+    console.log('npc update recieved', npcUpdate.dataObject)
+  })
   if (!exists(npcUpdate.dataObject, game.bodies)) {
     info(`Adding ${npcUpdate.dataObject.name}`)
     game.bodies.push(npcUpdate.dataObject)

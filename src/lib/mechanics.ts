@@ -218,7 +218,7 @@ export function followSpaceObject(follower: SpaceObject, soToFollow: SpaceObject
 
   // console.log(distanceBetween)
 
-  if (distanceBetween > 300) {
+  if (distanceBetween > 1000) {
     angleTo(follower, soToFollow)
     // console.log('Im too far away', distanceBetween)
     follower.velocity = add2(follower.velocity, getThrustVector(follower, 0, false))

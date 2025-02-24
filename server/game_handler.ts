@@ -61,7 +61,11 @@ export class GameHandler {
     this.game_interval = setInterval(() => {
       this.dt = performance.now() - this.lastTime
 
+      const initialLength = this.worldSpaceObjects.length
       this.worldSpaceObjects = removeOblitiratedSpaceObjects(this.worldSpaceObjects)
+      if (this.worldSpaceObjects.length < initialLength) {
+        this.nextWorldObjectToSendIndex = Math.max(0, this.nextWorldObjectToSendIndex - 1)
+      }
       this.remoteSpaceObjects = removeOblitiratedSpaceObjects(this.remoteSpaceObjects)
 
       for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
@@ -70,6 +74,9 @@ export class GameHandler {
 
       this.checkHittingShots()
 
+      this.every300.tick(() => {
+        console.log(this.worldSpaceObjects.length)
+      })
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         updateSpaceObject(this.worldSpaceObjects[i], this.dt)
       }
@@ -89,7 +96,7 @@ export class GameHandler {
         }
       }
 
-      if (this.worldSpaceObjects[this.nextWorldObjectToSendIndex]) {
+      if (this.nextWorldObjectToSendIndex >= 0 && this.nextWorldObjectToSendIndex < this.worldSpaceObjects.length) {
         this.prepareSoToSend(this.worldSpaceObjects[this.nextWorldObjectToSendIndex])
         this.worldSpaceObjects[this.nextWorldObjectToSendIndex].collidingWith = []
         this.broadcaster(globalConnectedClients, this.worldSpaceObjects[this.nextWorldObjectToSendIndex], this.tied_session_id)
@@ -117,7 +124,7 @@ export class GameHandler {
     const worldSpaceObjectPos = remoteSpaceObject.cameraPosition
 
     if (worldSpaceObject.owner === remoteSpaceObject.name) {
-      angleTo(worldSpaceObject, remoteSpaceObject)
+      // angleTo(worldSpaceObject, remoteSpaceObject)
       followSpaceObject(worldSpaceObject, remoteSpaceObject)
 
       if (remoteSpaceObject.shotsFiredThisFrame) {
@@ -270,7 +277,12 @@ export class GameHandler {
           enemyShip.lastDamagedByName = foundPlayer.name
           this.worldSpaceObjects.push(enemyShip)
         } else if (relation === SpaceRelation.COMPANION) {
-          const companionShip = createCompanionShip(this.tied_session_id, clientName, add2(foundPlayer.cameraPosition, foundPlayer.viewFramePosition))
+          const companionShip = createCompanionShip(
+            this.tied_session_id,
+            clientName,
+            foundPlayer,
+            add2(foundPlayer.cameraPosition, foundPlayer.viewFramePosition),
+          )
           this.worldSpaceObjects.push(companionShip)
         }
         break

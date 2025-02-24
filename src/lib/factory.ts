@@ -1,11 +1,11 @@
 import type { PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceObjectType, SpaceRelation, SpaceShape } from './interface'
-import { newVec2, rndf, rndfVec2, rndi, smul2, type Vec2 } from 'mathil'
+import { add2, newVec2, rndf, rndfVec2, rndi, smul2, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel, worldStartPosition } from './constants'
 // import type { Ship } from '@prisma/client'
 import type { Ship } from './interface'
 import { Towns } from './worlds/worldInterface'
-import { calculateMass, calculateRadius, groundLevel } from './physics/physics'
+import { calculateMass, calculateRadius, getRemotePosition, getWorldCoordinates, groundLevel } from './physics/physics'
 import { GameMode } from './interface'
 
 export function newPhotonLaser(): PhotonLaser {
@@ -65,7 +65,7 @@ export function createPlanet(sessionId: string, pos: Vec2, size: Vec2, name?: st
   return planet
 }
 
-export function createCompanionShip(sessionId: string, clientName: string, pos?: Vec2) {
+export function createCompanionShip(sessionId: string, clientName: string, createrSo: SpaceObject, pos?: Vec2) {
   const companionShip = createSpaceObject(`companion-${rndi(1, 10000)}`, MessageType.SERVER_GAME_UPDATE)
   companionShip.sessionId = sessionId
   companionShip.ammo = 5000
@@ -74,7 +74,7 @@ export function createCompanionShip(sessionId: string, clientName: string, pos?:
   companionShip.owner = clientName
 
   // enemyShip.size = smul2(enemyShip.size, rndi(3, 15))
-  companionShip.velocity = rndfVec2(0.1, 0.3)
+  companionShip.velocity = createrSo.velocity
   companionShip.hitRadius = Math.sqrt(companionShip.size.x ** 2 + companionShip.size.y ** 2)
   // enemyShip.mass = calculateMass(enemyShip.size)
   companionShip.health = 50
@@ -82,15 +82,11 @@ export function createCompanionShip(sessionId: string, clientName: string, pos?:
   companionShip.photonColor = '#f00'
   companionShip.inverseFireRate = 15
   companionShip.angularVelocity = 0.001
-  companionShip.angleDegree = 90
+  companionShip.angleDegree = createrSo.angleDegree
   companionShip.ship.variant = 2
   companionShip.armedDelay = 10
 
-  if (pos) {
-    companionShip.cameraPosition = rndfVec2(pos.x, pos.y)
-  } else {
-    companionShip.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
-  }
+  companionShip.cameraPosition = add2(getWorldCoordinates(createrSo), newVec2(0, 500))
 
   return companionShip
 }

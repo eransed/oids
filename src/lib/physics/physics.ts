@@ -210,7 +210,7 @@ export function alignHeadingToVelocity(p: Physical & Rotatable): void {
 //   p.velocity = scalarMultiply2(headingFromangle2(p.angleDegree), magnitude2(p.velocity))
 // }
 
-export function isWithinRadiusWorld(p0: Physical & Bounded, p1: Physical & Bounded, radius: number): boolean {
+export function isWithinRadiusWorld(p0: SpaceObject, p1: SpaceObject, radius: number): boolean {
   const d: number = magnitude2(sub2(getWorldCoordinates(p0), getWorldCoordinates(p1)))
   if (d < radius) {
     return true
@@ -218,7 +218,7 @@ export function isWithinRadiusWorld(p0: Physical & Bounded, p1: Physical & Bound
   return false
 }
 
-export function isWithinRadius(p0: Physical, p1: Physical & Bounded, radius: number): boolean {
+export function isWithinRadius(p0: Physical, p1: SpaceObject, radius: number): boolean {
   const d: number = magnitude2(sub2(p0.position, getWorldCoordinates(p1)))
   if (d <= radius) {
     return true
@@ -226,11 +226,12 @@ export function isWithinRadius(p0: Physical, p1: Physical & Bounded, radius: num
   return false
 }
 
-export function getWorldCoordinates(e: Physical & Bounded): Vec2 {
-  if (e) {
-    return add2(e.viewFramePosition, e.cameraPosition)
+export function getWorldCoordinates(so: SpaceObject): Vec2 {
+  if (so.spaceObjectType === SpaceObjectType.PLAYER) {
+    return add2(so.viewFramePosition, so.cameraPosition)
+  } else {
+    return so.cameraPosition
   }
-  return newVec2()
 }
 
 export function getRemotePosition(remotePos: Vec2, localObject: SpaceObject) {

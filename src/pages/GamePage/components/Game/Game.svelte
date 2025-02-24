@@ -20,7 +20,7 @@
 
   // Game variants
   import { initRegularGame, nextFrame, renderFrame, resetStars } from '../../../../lib/gameModes/regular'
-  import { localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp } from '../../../../stores/stores'
+  import { localPlayerStore, socketStore, userStore, shouldCelebrateLevelUp, chatMsgHistoryStore } from '../../../../stores/stores'
   import { gameRef } from './Utils/mainGame'
   import { getPlayersInSession } from '../../../../lib/services/game/playersInSession'
   import ModalSimple from '../../../../components/modal/ModalSimple.svelte'
@@ -242,6 +242,11 @@
 <style>
   :root {
     --height: '';
+  }
+
+  .message {
+    position: fixed;
+    z-index: 1;
   }
 
   .shipWrapper {
