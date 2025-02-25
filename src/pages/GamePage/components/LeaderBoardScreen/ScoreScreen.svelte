@@ -25,21 +25,25 @@
       </tbody>
     {/if}
 
-    {#each remotePlayers as remotePlayer}
-      <tbody>
-        <tr>
-          <ScoreRow player={remotePlayer} />
-        </tr>
-      </tbody>
-    {/each}
+    {#if remotePlayers.length > 0}
+      {#each remotePlayers as remotePlayer}
+        <tbody>
+          <tr>
+            <ScoreRow player={remotePlayer} />
+          </tr>
+        </tbody>
+      {/each}
+    {/if}
 
-    {#each serverStuff as srvStuff}
-      <tbody>
-        <tr>
-          <ScoreRow serverObj={srvStuff} />
-        </tr>
-      </tbody>
-    {/each}
+    {#if serverStuff.length > 0}
+      {#each serverStuff as srvStuff}
+        <tbody>
+          <tr>
+            <ScoreRow serverObj={srvStuff} />
+          </tr>
+        </tbody>
+      {/each}
+    {/if}
   </table>
 </div>
 

@@ -2,7 +2,7 @@ import { info, usNow, rndfVec2, good, newVec2, rndi, smul2, dist2, angle2, sub2,
 import { MessageType, SpaceObject, SpaceObjectType, SpaceRelation } from '../src/lib/interface'
 
 import { Client, globalConnectedClients } from './main'
-import { maxNrOfSplits, worldStartPosition } from '../src/lib/constants'
+import { maxNrOfSplits, orbitingScale, worldStartPosition } from '../src/lib/constants'
 import { spaceObjectUpdateAndShotReciverOptimizer } from '../src/lib/websocket/shotOptimizer'
 import { createCompanionShip, createEnemyShip, createMoon, createSpaceObject } from '../src/lib/factory'
 import { angleTo, fire, flyToSpaceObject, followSpaceObject, generateMissileFrom, removeOblitiratedSpaceObjects } from '../src/lib/mechanics'
@@ -331,6 +331,7 @@ export class GameHandler {
         splittedMoon.velocity = rndfVec2(-0.5, 0.5)
         splittedMoon.size = smul2(so.size, rndf(0.5, 0.8))
         splittedMoon.hitRadius = calculateRadius(splittedMoon.size)
+        splittedMoon.orbitingAltitude = splittedMoon.hitRadius * orbitingScale
         splittedMoon.mass = calculateMass(splittedMoon.size)
 
         splittedMoon.startHealth = so.health

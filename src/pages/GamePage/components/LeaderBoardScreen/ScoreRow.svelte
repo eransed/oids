@@ -1,14 +1,6 @@
 <script lang="ts">
   import type { SpaceObject } from '../../../../lib/interface'
-  import {
-    add2,
-    newVec2,
-    rndfVec2,
-    round2,
-    round2dec,
-    smul2,
-    sub2,
-  } from 'mathil'
+  import { add2, newVec2, rndfVec2, round2, round2dec, smul2, sub2 } from 'mathil'
   import { localPlayerStore } from '../../../../stores/stores'
   import { worldStartPosition } from '../../../../lib/constants'
   import { resetStars } from '../../../../lib/gameModes/regular'
@@ -27,7 +19,7 @@
   $: pos = round2(getCameraPos(theObj), 0)
   export let theLocalPlayer = false
   export let header = false
-  const teleOffset = 0
+  const teleOffset = 2000
 </script>
 
 {#if header}
@@ -47,14 +39,10 @@
       class="clickable"
       title="Teleport to world start position"
       on:click={() => {
-        $localPlayerStore.cameraPosition = add2(
-          worldStartPosition,
-          rndfVec2(-teleOffset, teleOffset)
-        )
+        $localPlayerStore.cameraPosition = add2(worldStartPosition, rndfVec2(-teleOffset, teleOffset))
         resetStars(getGame())
       }}
-      style="color: {theObj.color}; font-weight: bold; font-style: italic"
-      >{theObj.name}</td
+      style="color: {theObj.color}; font-weight: bold; font-style: italic">{theObj.name}</td
     >
   {:else}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -66,10 +54,7 @@
           $localPlayerStore.cameraPosition = player.cameraPosition
           resetStars(getGame())
         } else if (serverObj) {
-          $localPlayerStore.cameraPosition = sub2(
-            add2(serverObj.cameraPosition, rndfVec2(-teleOffset, teleOffset)),
-            $localPlayerStore.viewFramePosition
-          )
+          $localPlayerStore.cameraPosition = sub2(add2(serverObj.cameraPosition, rndfVec2(-teleOffset, teleOffset)), $localPlayerStore.viewFramePosition)
         }
         resetStars(getGame())
       }}

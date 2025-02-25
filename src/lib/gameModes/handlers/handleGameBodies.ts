@@ -27,7 +27,7 @@ export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): Spac
     if (body.health <= 0) {
       handleDeathExplosion(body, explosionDuration)
       if (!body.obliterated) {
-        renderExplosionFrame(body, game.ctx, bodyPos)
+        renderExplosionFrame(body, game.ctx, currentPos)
       }
     } else {
       if (body.spaceObjectType === SpaceObjectType.MOON) {
@@ -45,14 +45,14 @@ export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): Spac
       }
 
       if (activeKeyMap.systemGraphs.keyStatus) {
-        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(bodyPos, newVec2(-100, -100)), game.ctx, game.style)
-        renderHitRadius(body, bodyPos, game.ctx)
+        renderVec2(`camera: ${to_string2(body.cameraPosition)}`, add2(currentPos, newVec2(-100, -100)), game.ctx, game.style)
+        renderHitRadius(body, currentPos, game.ctx)
       }
 
       if (body.health < body.startHealth) {
         const theme = getCurrentTheme()
         renderProgressBar(
-          add2(bodyPos, newVec2(-body.hitRadius / 1.5, -body.hitRadius / 0.8)),
+          add2(currentPos, newVec2(-body.hitRadius / 1.5, -body.hitRadius / 0.8)),
           'Hp',
           body.health,
           body.startHealth,

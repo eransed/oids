@@ -248,7 +248,6 @@ export function resetCollisions(spaceObjects: Collidable[]) {
 
 export function calculateMass(size: Vec2, density: number = 1): number {
   const radius = calculateRadius(size)
-
   const volume = (4 / 3) * Math.PI * Math.pow(radius, 3)
   return density * volume
 }
@@ -258,5 +257,17 @@ export function calculateRadius(size: Vec2): number {
 }
 
 export function getDistance(fromWorldObject: SpaceObject, toPlayerObject: SpaceObject): number {
-  return dist2(fromWorldObject.cameraPosition, getWorldCoordinates(toPlayerObject))
+  const fromRadius = calculateRadius(fromWorldObject.size)
+  const toRadius = calculateRadius(toPlayerObject.size)
+  const distance = dist2(getWorldCoordinates(fromWorldObject), getWorldCoordinates(toPlayerObject))
+  return Math.max(0, distance - fromRadius - toRadius)
+}
+
+export function calculateThrustVector(so: SpaceObject, dirAng: number, boost = false): Vec2 {
+  const angleRadians: number = degToRad(so.angleDegree + dirAng)
+  const enginePower: number = so.enginePower * (boost ? so.booster : 1)
+  return {
+    x: enginePower * Math.cos(angleRadians),
+    y: enginePower * Math.sin(angleRadians),
+  }
 }

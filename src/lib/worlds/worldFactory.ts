@@ -15,7 +15,7 @@ export function createWorldOne(sessionId: string): GameMap {
 export function createMainMoons(sessionId: string) {
   let moons = []
 
-  const num = 10
+  const num = 20
   for (let i = 0; i < num; i++) {
     const moon = createMoon(sessionId)
     moons.push(moon)

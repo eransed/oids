@@ -47,6 +47,8 @@ export const maxShotAge = 70000
 
 export const basicPhotonLaserSpeedScaleFactor = 0.6
 
+export const orbitingScale = 3
+
 export const maxNrOfSplits = 3
 
 interface xpRequirements {

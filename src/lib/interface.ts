@@ -115,6 +115,7 @@ export interface Physical extends Positionable {
   size: Vec2
   velocity: Vec2
   acceleration: Vec2
+  orbitingAltitude: number
 }
 
 export interface Rotatable extends Positionable {

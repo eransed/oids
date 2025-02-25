@@ -1,7 +1,7 @@
 import type { PhotonLaser, SpaceObject } from './interface'
 import { MessageType, SpaceObjectType, SpaceRelation, SpaceShape } from './interface'
 import { add2, newVec2, rndf, rndfVec2, rndi, smul2, type Vec2 } from 'mathil'
-import { maxRandomDefaultSpaceObjectVelocity as maxVel, worldStartPosition } from './constants'
+import { maxRandomDefaultSpaceObjectVelocity as maxVel, orbitingScale, worldStartPosition } from './constants'
 // import type { Ship } from '@prisma/client'
 import type { Ship } from './interface'
 import { Towns } from './worlds/worldInterface'
@@ -32,6 +32,7 @@ export function newPhotonLaser(): PhotonLaser {
     killedByName: '',
     viewFramePosition: newVec2(),
     age: 0,
+    orbitingAltitude: 0,
   }
 
   return shot
@@ -53,6 +54,7 @@ export function createPlanet(sessionId: string, pos: Vec2, size: Vec2, name?: st
   planet.size = size
   // planet.velocity = rndfVec2(0.1, 0.3)
   planet.hitRadius = calculateRadius(planet.size)
+  planet.orbitingAltitude = orbitingScale * planet.hitRadius
   planet.mass = calculateMass(planet.size)
   planet.health = 50
   planet.startHealth = planet.health
@@ -127,11 +129,12 @@ export function createMoon(sessionId: string, pos?: Vec2) {
   if (pos) {
     moon.cameraPosition = rndfVec2(pos.x - 500, pos.y + 1750)
   } else {
-    moon.cameraPosition = rndfVec2(worldStartPosition.x - 10000, worldStartPosition.y + 10000)
+    moon.cameraPosition = rndfVec2(worldStartPosition.x - 20000, worldStartPosition.y + 20000)
   }
   moon.size = smul2(moon.size, rndi(3, 15))
   moon.velocity = rndfVec2(0.1, 0.3)
   moon.hitRadius = Math.sqrt(moon.size.x ** 2 + moon.size.y ** 2)
+  moon.orbitingAltitude = orbitingScale * moon.hitRadius
   moon.mass = calculateMass(moon.size)
   moon.health = 50
   moon.startHealth = moon.health
@@ -254,6 +257,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     spaceObjectType: SpaceObjectType.PLAYER,
     relation: SpaceRelation.FRIENDLY,
     owner: '',
+    orbitingAltitude: 0,
   }
 
   spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)

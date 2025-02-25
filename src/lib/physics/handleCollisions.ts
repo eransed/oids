@@ -1,9 +1,9 @@
 import { type Vec2, sub2, scalarMultiply2, add2, smul2, linearTransform, lintra } from 'mathil'
-import { missileDamageVelocityTransferFactor } from '../constants'
+import { missileDamageVelocityTransferFactor, orbitingScale } from '../constants'
 import { SpaceObjectType, type SpaceObject } from '../interface'
 import { handleHittingShot } from '../mechanics'
 import { renderHitExplosion } from '../render/renderFx'
-import { resetCollisions, isWithinRadiusWorld, getWorldCoordinates, isWithinRadius, headingFromangle2 } from './physics'
+import { resetCollisions, isWithinRadiusWorld, getWorldCoordinates, isWithinRadius, headingFromangle2, calculateRadius } from './physics'
 import { circleBounce } from './CircleBounce'
 
 export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject[], ctx: CanvasRenderingContext2D | null = null, hpChangeCallback?: (so: SpaceObject, shotDmg: number) => void): void {
@@ -49,7 +49,8 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
             npc1.health -= shot.damage
             if (npc1.splittedNrOfTimes < 1 && npc1.spaceObjectType === SpaceObjectType.MOON) {
               npc1.size = smul2(npc1.size, lintra(npc1.health, 0, 1, -0.5, -0.99))
-              npc1.hitRadius = Math.sqrt(npc1.size.x ** 2 + npc1.size.y ** 2)
+              npc1.hitRadius = calculateRadius(npc1.size)
+              npc1.orbitingAltitude = npc1.hitRadius * orbitingScale
             }
             npc1.velocity = add2(npc1.velocity, heading)
             npc1.lastDamagedByName = shot.ownerName

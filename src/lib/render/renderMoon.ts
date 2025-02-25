@@ -2,6 +2,7 @@ import { round2dec, type Vec2 } from 'mathil'
 import type { Crater, SpaceObject } from '../interface'
 import { renderShot } from './render2d'
 import type { UIStyle } from '../interface'
+import { orbitingScale } from '../constants'
 
 export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingContext2D, style: UIStyle): void {
   const moon = getMoon(npc.moonType)
@@ -21,7 +22,6 @@ export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingCont
   if (npc.lastDamagedByName.length > 0) {
     ctx.fillStyle = '#FFCCCC'
   }
-  // ctx.fillRect(0, 0, npc.size.x, npc.size.y)
   ctx.fill()
   ctx.closePath()
 
@@ -34,7 +34,6 @@ export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingCont
 
   // Draw moon details, like mare and terminator
   ctx.beginPath()
-  //   ctx.arc(0, 0, moonRadius - 10, 0, Math.PI * 2)
   ctx.shadowBlur = 20
   ctx.shadowColor = '#888888'
   ctx.strokeStyle = moon.color
@@ -43,15 +42,18 @@ export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingCont
   ctx.shadowBlur = 0
   ctx.closePath()
 
+  // Draw orbit circle
+  ctx.beginPath()
+  ctx.arc(0, 0, npc.hitRadius + npc.orbitingAltitude, 0, Math.PI * 2)
+  ctx.strokeStyle = '#AAAAAA'
+  ctx.lineWidth = 1
+  ctx.stroke()
+  ctx.closePath()
+
   ctx.restore()
 
   // Draw shots
   renderShot(npc, ctx, style)
-
-  //   // Label the moon
-  //   ctx.font = 'bold 20px Arial'
-  //   ctx.fillStyle = '#000000'
-  //   ctx.fillText(moonName, -40, moonRadius - 30)
 }
 
 function drawCrater(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string): void {
