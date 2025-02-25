@@ -1,5 +1,5 @@
 import type { PhotonLaser, SpaceObject } from './interface'
-import { MessageType, SpaceObjectType, SpaceRelation, SpaceShape } from './interface'
+import { MessageType, PlanetType, SpaceObjectType, SpaceRelation, SpaceShape } from './interface'
 import { add2, newVec2, rndf, rndfVec2, rndi, smul2, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel, orbitingScale, worldStartPosition } from './constants'
 // import type { Ship } from '@prisma/client'
@@ -258,6 +258,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     relation: SpaceRelation.FRIENDLY,
     owner: '',
     orbitingAltitude: 0,
+    planetType: PlanetType.ICE,
   }
 
   spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)

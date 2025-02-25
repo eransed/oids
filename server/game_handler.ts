@@ -10,6 +10,7 @@ import { calculateMass, calculateRadius, getWorldCoordinates, updateSpaceObject,
 import { handleCollisions } from '../src/lib/physics/handleCollisions'
 import { GameMap } from '../src/lib/worlds/worldInterface'
 import { createWorldOne } from '../src/lib/worlds/worldFactory'
+import { handleOrbit } from '../src/lib/physics/handleOrbit'
 
 export class GameHandler {
   game_started = false
@@ -77,6 +78,8 @@ export class GameHandler {
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         updateSpaceObject(this.worldSpaceObjects[i], this.dt)
       }
+
+      handleOrbit(this.worldSpaceObjects)
 
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         this.handleAsteroid(this.worldSpaceObjects[i])

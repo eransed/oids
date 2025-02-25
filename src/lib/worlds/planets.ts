@@ -1,10 +1,11 @@
 import { newVec2 } from 'mathil'
 import { createPlanet } from '../factory'
-import { type SpaceObject } from '../interface'
+import { PlanetType, type SpaceObject } from '../interface'
 
 //Creating a planet
 function Tattooine(sessionId: string): SpaceObject {
   const tattooine = createPlanet(sessionId, newVec2(1000, 1000), newVec2(500, 500), 'Tattooine')
+  tattooine.planetType = PlanetType.DESERT
 
   console.log('Creating tattooine at: ', tattooine.cameraPosition)
 
@@ -14,6 +15,7 @@ function Tattooine(sessionId: string): SpaceObject {
 //Creating a planet
 function Mayja(sessionId: string): SpaceObject {
   const mayja = createPlanet(sessionId, newVec2(-25000, -25000), newVec2(500, 500), 'Mayja')
+  mayja.planetType = PlanetType.JUNGLE
 
   return mayja
 }

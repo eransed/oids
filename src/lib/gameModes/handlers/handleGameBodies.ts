@@ -12,6 +12,7 @@ import { renderVec2, renderProgressBar } from '../../render/renderUI'
 import { renderShip } from '../../render/renderShip'
 import { renderRemotePlayerInSpaceMode } from '../../render/renderRemotePlayers'
 import { interpolate } from '../../render/interpolate'
+import { renderPlanet } from '../../render/renderPlanet'
 
 let previousPositions: Map<string, Vec2> = new Map()
 
@@ -36,7 +37,7 @@ export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): Spac
 
       if (body.spaceObjectType === SpaceObjectType.PLANET) {
         //Should be renderPlanet.. but we don't have that function
-        renderMoon(body, currentPos, game.ctx, game.style)
+        renderPlanet(body, currentPos, game.ctx, game.style)
       }
 
       if (body.spaceObjectType === SpaceObjectType.SHIP) {

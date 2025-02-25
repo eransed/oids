@@ -42,7 +42,14 @@ export enum SpaceShape {
 }
 
 export interface MoonType {
-  moonType: number
+  moonType?: number
+}
+
+export enum PlanetType {
+  LAVA,
+  ICE,
+  JUNGLE,
+  DESERT,
 }
 
 export interface Shapable {
@@ -193,6 +200,7 @@ export interface Typable {
   messageType: MessageType
   spaceObjectType: SpaceObjectType
   relation: SpaceRelation
+  planetType: PlanetType
 }
 
 export enum MessageType {
