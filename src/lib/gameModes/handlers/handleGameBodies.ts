@@ -1,4 +1,4 @@
-import { to_string2, add2, newVec2 } from 'mathil'
+import { to_string2, add2, newVec2, lintra, mag2, type Vec2 } from 'mathil'
 import { getCurrentTheme } from '../../../style/defaultColors'
 import { explosionDuration } from '../../constants'
 import type { Game } from '../../game'
@@ -11,11 +11,18 @@ import { renderMoon } from '../../render/renderMoon'
 import { renderVec2, renderProgressBar } from '../../render/renderUI'
 import { renderShip } from '../../render/renderShip'
 import { renderRemotePlayerInSpaceMode } from '../../render/renderRemotePlayers'
+import { interpolate } from '../../render/interpolate'
+
+let previousPositions: Map<string, Vec2> = new Map()
 
 export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): SpaceObject[] {
   game.bodies.forEach((body) => {
     const actualPos = add2(body.viewFramePosition, body.cameraPosition)
     const bodyPos = getRemotePosition(actualPos, game.localPlayer)
+
+    const interpolatedPos = interpolate(body, actualPos, previousPositions)
+
+    const currentPos = getRemotePosition(interpolatedPos.interpolatedPos, game.localPlayer)
 
     if (body.health <= 0) {
       handleDeathExplosion(body, explosionDuration)
@@ -24,16 +31,17 @@ export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): Spac
       }
     } else {
       if (body.spaceObjectType === SpaceObjectType.MOON) {
-        renderMoon(body, bodyPos, game.ctx, game.style)
+        renderMoon(body, currentPos, game.ctx, game.style)
       }
 
       if (body.spaceObjectType === SpaceObjectType.PLANET) {
         //Should be renderPlanet.. but we don't have that function
-        renderMoon(body, bodyPos, game.ctx, game.style)
+        renderMoon(body, currentPos, game.ctx, game.style)
       }
 
       if (body.spaceObjectType === SpaceObjectType.SHIP) {
-        renderShip(body, game.ctx, false, game.style, bodyPos)
+        renderShip(body, game.ctx, false, game.style, currentPos)
+        // renderShip(body, game.ctx, false, game.style, bodyPos)
       }
 
       if (activeKeyMap.systemGraphs.keyStatus) {

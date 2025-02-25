@@ -74,9 +74,6 @@ export class GameHandler {
 
       this.checkHittingShots()
 
-      this.every300.tick(() => {
-        console.log(this.worldSpaceObjects.length)
-      })
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         updateSpaceObject(this.worldSpaceObjects[i], this.dt)
       }

@@ -17,9 +17,9 @@ export function exists(so: SpaceObject, spaceObjectsReferences: SpaceObject[]): 
 const evry500 = new EveryInterval(500)
 
 export function npcUpdate(npcUpdate: { dataObject: SpaceObject }, game: { bodies: SpaceObject[] }): void {
-  evry500.tick(() => {
-    console.log('npc update recieved', npcUpdate.dataObject)
-  })
+  // evry500.tick(() => {
+  //   console.log('npc update recieved', npcUpdate.dataObject)
+  // })
   if (!exists(npcUpdate.dataObject, game.bodies)) {
     info(`Adding ${npcUpdate.dataObject.name}`)
     game.bodies.push(npcUpdate.dataObject)
