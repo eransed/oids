@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "build-server": "npx tsc --build server/tsconfig.json --verbose",
-    "server": "npx prisma migrate dev && npm run build-server && node server/build/server/main.js",
+    "server": "rm -rf server/build && npx prisma migrate dev && npm run build-server && node server/build/server/main.js",
     "all": "npm run build && npm run server",
     "test": "vitest --ui"
   },
