@@ -1,7 +1,7 @@
 import type { Boostable, Damageable, PhotonLaser, Positionable, SpaceObject, Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
-import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2, mag2, newVec2, angle2, dist2, lintra, EveryInterval, limitVec2 } from 'mathil'
+import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2, mag2, newVec2, angle2, dist2, lintra, EveryInterval, limitVec2, magnitude2 } from 'mathil'
 import { basicPhotonLaserSpeedScaleFactor, maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
@@ -210,7 +210,8 @@ export function bounceSpaceObject(so: SpaceObject, screen: Vec2, energyFactor = 
   }
 }
 
-const every25 = new EveryInterval(25)
+const every300 = new EveryInterval(300)
+const every50 = new EveryInterval(50)
 
 export function orbitSpaceObject(orbiter: SpaceObject, targetSo: SpaceObject) {
   let orbiting = false
@@ -219,6 +220,7 @@ export function orbitSpaceObject(orbiter: SpaceObject, targetSo: SpaceObject) {
   const distanceBetween = getDistance(orbiter, targetSo)
 
   if (distanceBetween < targetSo.orbitingAltitude) {
+    every300.tick(() => console.log(`${orbiter.name} is orbiting ${targetSo.name}`))
     // every50.tick(() => console.log(distanceBetween))
 
     orbiting = true
@@ -229,19 +231,27 @@ export function orbitSpaceObject(orbiter: SpaceObject, targetSo: SpaceObject) {
   }
 
   if (orbiting) {
-    //Instead of angleTo - Make it calculate which deg to thrust to.
+    // Making spaceObject facing the target
     angleTo(orbiter, targetSo)
+
+    //If orbiter is about to leave the targets orbitingAltitude
     if (distanceBetween > targetSo.orbitingAltitude * 0.95 && distanceBetween < targetSo.orbitingAltitude) {
       // flyToSpaceObject(orbiter, targetSo)
 
       orbiter.velocity = add2(orbiter.velocity, calculateThrustVector(orbiter, 0))
     }
-    every25.tick(() => {
+
+    //Every tick the orbiter is starting to orbit the targetso (spinning around it)
+    every300.tick(() => {
       // console.log('applying')
       orbiter.velocity = add2(orbiter.velocity, calculateThrustVector(orbiter, 90))
     })
+
+    //If the orbiter gets too close to the targetSo it reverses
     if (distanceBetween < targetSo.orbitingAltitude * 0.2) {
-      orbiter.velocity = add2(orbiter.velocity, calculateThrustVector(orbiter, -180))
+      every50.tick(() => {
+        orbiter.velocity = add2(orbiter.velocity, calculateThrustVector(orbiter, -180))
+      })
     }
   }
 }

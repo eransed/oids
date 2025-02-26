@@ -3,21 +3,37 @@ import { MessageType, SpaceObjectType, type SpaceObject } from '../interface'
 import { createMoon, createSpaceObject } from '../factory'
 import { Towns, type GameMap, type SpaceTown } from './worldInterface'
 import { getPlanets } from './planets'
+import { getWorldCoordinates } from '../physics/physics'
 
 export function createWorldOne(sessionId: string): GameMap {
+  const town = createMainTown(sessionId)
+  const planets = createMainPlanets(sessionId)
+  let moons = [] as SpaceObject[]
+
+  for (const planet of planets) {
+    const createdMoons = createMainMoons(planet.sessionId, getWorldCoordinates(planet), 2, planet.name, planet.size)
+
+    createdMoons.forEach((moon) => {
+      moons.push(moon)
+    })
+  }
+
   return {
-    towns: [createMainTown(sessionId)],
+    towns: [town],
     planets: createMainPlanets(sessionId),
-    moons: createMainMoons(sessionId),
+    moons: moons,
   }
 }
 
-export function createMainMoons(sessionId: string) {
+export function createMainMoons(sessionId: string, startPos: Vec2, amount: number, owner?: string, planetSize?: Vec2) {
   let moons = []
 
-  const num = 20
+  const num = amount
   for (let i = 0; i < num; i++) {
-    const moon = createMoon(sessionId)
+    const moon = createMoon(sessionId, startPos, planetSize)
+    if (owner) {
+      moon.owner = owner
+    }
     moons.push(moon)
   }
 

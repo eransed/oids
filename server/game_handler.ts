@@ -82,8 +82,6 @@ export class GameHandler {
       handleOrbit(this.worldSpaceObjects)
 
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
-        this.handleAsteroid(this.worldSpaceObjects[i])
-
         //For loop to check all the relations and logic between worldSpaceObjects and RemoteObjects (player ships)
         for (let j = 0; j < this.remoteSpaceObjects.length; j++) {
           if (this.worldSpaceObjects[i].spaceObjectType === SpaceObjectType.SHIP) {
@@ -116,8 +114,6 @@ export class GameHandler {
     }, this.minTickTimeMs)
   }
   // server main loop end
-
-  handleAsteroid(asteroid: SpaceObject) {}
 
   handleCompanion(worldSpaceObject: SpaceObject, remoteSpaceObject: SpaceObject) {
     const remoteSpaceObjectPos = getWorldCoordinates(worldSpaceObject)

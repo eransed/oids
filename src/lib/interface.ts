@@ -41,8 +41,11 @@ export enum SpaceShape {
   SpaceStation,
 }
 
-export interface MoonType {
-  moonType?: number
+export enum MoonType {
+  EARTHMOON,
+  EUROPA,
+  TITAN,
+  TRITON,
 }
 
 export enum PlanetType {
@@ -201,6 +204,7 @@ export interface Typable {
   spaceObjectType: SpaceObjectType
   relation: SpaceRelation
   planetType: PlanetType
+  moonType: MoonType
 }
 
 export enum MessageType {
@@ -281,7 +285,6 @@ export interface SpaceObject
     Chatable,
     Typable,
     Bounded,
-    MoonType,
     Belonging,
     Traceable,
     Landable,

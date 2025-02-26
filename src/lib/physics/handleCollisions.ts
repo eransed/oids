@@ -15,24 +15,26 @@ export function handleCollisions(cameraPosition: Vec2, spaceObjects: SpaceObject
       if (npc1.isDead) continue
 
       if (isWithinRadiusWorld(npc0, npc1, npc1.hitRadius) && npc0.name !== npc1.name) {
-        // console.log(`collision!`)
-        npc0.collidingWith.push(npc1)
-        npc1.collidingWith.push(npc0)
-        npc0.health -= 0.01
-        npc1.health -= 0.01
+        if (npc0.owner !== npc1.owner) {
+          // console.log(`collision!`)
+          npc0.collidingWith.push(npc1)
+          npc1.collidingWith.push(npc0)
+          npc0.health -= 0.01
+          npc1.health -= 0.01
 
-        circleBounce(npc0, npc1)
+          circleBounce(npc0, npc1)
 
-        if (ctx) {
-          const relative0 = sub2(getWorldCoordinates(npc0), cameraPosition)
-          const relative1 = sub2(getWorldCoordinates(npc1), cameraPosition)
-          renderHitExplosion(relative0, ctx)
-          renderHitExplosion(relative1, ctx)
+          if (ctx) {
+            const relative0 = sub2(getWorldCoordinates(npc0), cameraPosition)
+            const relative1 = sub2(getWorldCoordinates(npc1), cameraPosition)
+            renderHitExplosion(relative0, ctx)
+            renderHitExplosion(relative1, ctx)
+          }
+
+          // const f = -0.005
+          // npc0.velocity = smul2(npc0.velocity, f * npc1.mass)
+          // npc1.velocity = smul2(npc0.velocity, -f * npc0.mass)
         }
-
-        // const f = -0.005
-        // npc0.velocity = smul2(npc0.velocity, f * npc1.mass)
-        // npc1.velocity = smul2(npc0.velocity, -f * npc0.mass)
       }
 
       for (const shot of npc0.shotsInFlight) {

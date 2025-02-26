@@ -1,5 +1,5 @@
 import { round2dec, type Vec2 } from 'mathil'
-import type { Crater, SpaceObject } from '../interface'
+import type { Crater, MoonType, SpaceObject } from '../interface'
 import { renderShot } from './render2d'
 import type { UIStyle } from '../interface'
 import { orbitingScale } from '../constants'
@@ -68,17 +68,18 @@ function drawCrater(ctx: CanvasRenderingContext2D, x: number, y: number, radius:
   ctx.closePath()
 }
 
-export function getMoon(type: number) {
+export function getMoon(type: MoonType) {
   interface Moon {
+    name: string
     craters: Crater[]
     color: string
   }
 
   const moonList: Moon[] = [
-    { craters: earthMoonCraters, color: earthMoonColor },
-    { craters: europaCraters, color: europaColor },
-    { craters: titanCraters, color: titanColor },
-    { craters: tritonCraters, color: tritonColor },
+    { name: 'earthMoon', craters: earthMoonCraters, color: earthMoonColor },
+    { name: 'europa', craters: europaCraters, color: europaColor },
+    { name: 'titan', craters: titanCraters, color: titanColor },
+    { name: 'triton', craters: tritonCraters, color: tritonColor },
   ]
 
   return moonList[type]

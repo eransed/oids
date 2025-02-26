@@ -256,10 +256,10 @@ export function calculateRadius(size: Vec2): number {
   return Math.sqrt(size.x ** 2 + size.y ** 2)
 }
 
-export function getDistance(fromWorldObject: SpaceObject, toPlayerObject: SpaceObject): number {
+export function getDistance(fromWorldObject: SpaceObject, toWorldObject: SpaceObject): number {
   const fromRadius = calculateRadius(fromWorldObject.size)
-  const toRadius = calculateRadius(toPlayerObject.size)
-  const distance = dist2(getWorldCoordinates(fromWorldObject), getWorldCoordinates(toPlayerObject))
+  const toRadius = calculateRadius(toWorldObject.size)
+  const distance = dist2(getWorldCoordinates(fromWorldObject), getWorldCoordinates(toWorldObject))
   return Math.max(0, distance - fromRadius - toRadius)
 }
 

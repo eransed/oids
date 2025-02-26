@@ -1,6 +1,6 @@
 import type { PhotonLaser, SpaceObject } from './interface'
-import { MessageType, PlanetType, SpaceObjectType, SpaceRelation, SpaceShape } from './interface'
-import { add2, newVec2, rndf, rndfVec2, rndi, smul2, type Vec2 } from 'mathil'
+import { MessageType, MoonType, PlanetType, SpaceObjectType, SpaceRelation, SpaceShape } from './interface'
+import { add2, newVec2, rndf, rndfVec2, rndi, sdiv2, smul2, sub2, type Vec2 } from 'mathil'
 import { maxRandomDefaultSpaceObjectVelocity as maxVel, orbitingScale, worldStartPosition } from './constants'
 // import type { Ship } from '@prisma/client'
 import type { Ship } from './interface'
@@ -122,17 +122,21 @@ export function createEnemyShip(sessionId: string, pos?: Vec2) {
   return enemyShip
 }
 
-export function createMoon(sessionId: string, pos?: Vec2) {
-  const moon = createSpaceObject(`A-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
+export function createMoon(sessionId: string, pos?: Vec2, planetSize?: Vec2) {
+  const moon = createSpaceObject(`M-${rndi(1000, 1000000)}`, MessageType.SERVER_GAME_UPDATE)
   moon.sessionId = sessionId
   moon.ammo = 5000
   if (pos) {
-    moon.cameraPosition = rndfVec2(pos.x - 500, pos.y + 1750)
+    moon.cameraPosition = rndfVec2(pos.x - 3000, pos.y + 3000)
   } else {
     moon.cameraPosition = rndfVec2(worldStartPosition.x - 20000, worldStartPosition.y + 20000)
   }
-  moon.size = smul2(moon.size, rndi(3, 15))
-  moon.velocity = rndfVec2(0.1, 0.3)
+  if (planetSize) {
+    moon.size = sdiv2(planetSize, 2)
+  } else {
+    moon.size = smul2(moon.size, rndi(2, 12))
+  }
+  moon.velocity = rndfVec2(0.08, 0.08)
   moon.hitRadius = Math.sqrt(moon.size.x ** 2 + moon.size.y ** 2)
   moon.orbitingAltitude = orbitingScale * moon.hitRadius
   moon.mass = calculateMass(moon.size)
@@ -144,7 +148,7 @@ export function createMoon(sessionId: string, pos?: Vec2) {
   moon.angleDegree = 90
   moon.spaceObjectType = SpaceObjectType.MOON
   //TODO: Make moontype an enum instead
-  moon.moonType = rndi(0, 3)
+  moon.moonType = rndi(0, Object.values(MoonType).filter((v) => isNaN(Number(v))).length - 1)
 
   return moon
 }
