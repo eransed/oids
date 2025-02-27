@@ -24,13 +24,13 @@ export class GameHandler {
   private remoteSpaceObjects: SpaceObject[] = []
   private lastTime = performance.now()
   private dt = performance.now()
-  private minTickTimeMs = 1 / this.fps
+  private minTickTimeMs = 1000 / this.fps
   // private every = new EveryInterval(this.tickRate)
   // private asteroidTicker = new EveryInterval(this.tickRate)
   private nextWorldObjectToSendIndex = 0
   private gameMap: GameMap | undefined = undefined
   private sentOnce = false // only used during dev...
-  private every25 = new EveryInterval(25)
+  private every10 = new EveryInterval(10)
   private every50 = new EveryInterval(50)
   private every100 = new EveryInterval(100)
   private every200 = new EveryInterval(200)
@@ -62,11 +62,11 @@ export class GameHandler {
     this.game_interval = setInterval(() => {
       this.dt = performance.now() - this.lastTime
 
-      const initialLength = this.worldSpaceObjects.length
+      // const initialLength = this.worldSpaceObjects.length
       this.worldSpaceObjects = removeOblitiratedSpaceObjects(this.worldSpaceObjects)
-      if (this.worldSpaceObjects.length < initialLength) {
-        this.nextWorldObjectToSendIndex = Math.max(0, this.nextWorldObjectToSendIndex - 1)
-      }
+      // if (this.worldSpaceObjects.length < initialLength) {
+      //   this.nextWorldObjectToSendIndex = Math.max(0, this.nextWorldObjectToSendIndex - 1)
+      // }
       this.remoteSpaceObjects = removeOblitiratedSpaceObjects(this.remoteSpaceObjects)
 
       for (let i = 0; i < this.remoteSpaceObjects.length; i++) {
@@ -94,17 +94,10 @@ export class GameHandler {
         }
       }
 
-      if (this.nextWorldObjectToSendIndex >= 0 && this.nextWorldObjectToSendIndex < this.worldSpaceObjects.length) {
-        this.prepareSoToSend(this.worldSpaceObjects[this.nextWorldObjectToSendIndex])
-        this.worldSpaceObjects[this.nextWorldObjectToSendIndex].collidingWith = []
-        this.broadcaster(globalConnectedClients, this.worldSpaceObjects[this.nextWorldObjectToSendIndex], this.tied_session_id)
-        this.nextWorldObjectToSendIndex++
-        if (this.nextWorldObjectToSendIndex >= this.worldSpaceObjects.length) {
-          this.nextWorldObjectToSendIndex = 0
-        }
-      } else {
-        // warn('oh shit')
-        // console.log("nextAsteroidToSendIndex", this.nextAsteroidToSendIndex, this.moons)
+      for (let i = 0; i < this.worldSpaceObjects.length; i++) {
+        this.prepareSoToSend(this.worldSpaceObjects[i])
+        this.worldSpaceObjects[i].collidingWith = []
+        this.broadcaster(globalConnectedClients, this.worldSpaceObjects[i], this.tied_session_id)
       }
 
       // Send town updates if there are any:
@@ -143,11 +136,11 @@ export class GameHandler {
       if (dist2(worldSpaceObjectPos, remoteSpaceObjectPos) < 2000) {
         // console.log(`${worldSpaceObject} is shooting from distance: ${dist2(worldSpaceObjectPos, remoteSpaceObjectPos)}`)
 
-        this.every50.tick(() => {
+        this.every10.tick(() => {
           fire(worldSpaceObject)
         })
 
-        this.every200.tick(() => {
+        this.every50.tick(() => {
           fire(worldSpaceObject, newVec2(100, 100))
         })
       }

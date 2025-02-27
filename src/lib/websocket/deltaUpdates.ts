@@ -1,11 +1,12 @@
 import { type SpaceObject } from '../interface'
 
+// Not commented is sent when changed.
 const chosenKeys: Array<keyof SpaceObject> = [
   // 'sessionId',
   // 'messageType',
   // 'gameMode',
-  //'ownerName',
-  //'owner',
+  // 'ownerName',
+  // 'owner',
   'killCount',
   'motivationLevel',
   'ticksSinceLastSnapShot',
@@ -29,7 +30,7 @@ const chosenKeys: Array<keyof SpaceObject> = [
   'characterGlobalPosition',
   'color',
   'damage',
-  'deadFrameCount',
+  // 'deadFrameCount',
   'didHit',
   'enginePower',
   'health',
@@ -37,7 +38,7 @@ const chosenKeys: Array<keyof SpaceObject> = [
   'hometown',
   'hops',
   'inverseFireRate',
-  'isDead',
+  // 'isDead',
   'isJumping',
   'isLocal',
   'isPlaying',
@@ -47,7 +48,7 @@ const chosenKeys: Array<keyof SpaceObject> = [
   'missileSpeed',
   'moonType',
   'motivatorBroken',
-  'obliterated',
+  // 'obliterated',
   // 'online',
   'ping',
   'pingId',

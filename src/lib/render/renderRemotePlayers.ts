@@ -28,7 +28,7 @@ export function renderRemotePlayerInSpaceMode(game: Game, activeKeyMap: KeyFunct
 
     const currentPos = getRemotePosition(interpolatedPos.interpolatedPos, game.localPlayer)
 
-    if (remotePlayer.health <= 0) {
+    if (remotePlayer.isDead) {
       console.log(remotePlayer.name, ' is dead')
       handleDeathExplosion(remotePlayer, explosionDuration)
       if (!remotePlayer.obliterated) {

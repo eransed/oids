@@ -31,6 +31,8 @@
   import CircularSpinner from '../../components/loaders/circularSpinner.svelte'
   import SessionList from './components/SessionList/SessionList.svelte'
   import SessionListRow from './components/SessionList/SessionListRow.svelte'
+  import { initALocalPlayer, initLocalPlayer } from '../../lib/gameModes/handlers/handleLocalPlayer'
+  import { game } from '../GamePage/components/Game/Utils/mainGame'
 
   pageHasHeaderStore.set(true)
 
@@ -200,8 +202,11 @@
     if (offlineGameId) {
       $localPlayerStore.sessionId = offlineGameId
     }
+
+    initALocalPlayer($localPlayerStore)
+
     $localPlayerStore.messageType = MessageType.SESSION_UPDATE
-    $localPlayerStore.isPlaying = true
+
     $socketStore.send($localPlayerStore)
 
     navigate(`/play/${$localPlayerStore.sessionId}`)

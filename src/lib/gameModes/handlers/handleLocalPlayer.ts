@@ -96,27 +96,32 @@ export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
 export function initLocalPlayer(game: Game) {
   logWarning(`Resets local player position`)
   game.reset()
-  game.localPlayer.mass = 1
-  game.localPlayer.missileDamage = 1
-  game.localPlayer.missileSpeed = 19
-  game.localPlayer.armedDelay = 10
-  game.localPlayer.shotsPerFrame = 1
-  game.localPlayer.ammo = 1000000
-  game.localPlayer.angleDegree = -120
-  game.localPlayer.health = 350
-  game.localPlayer.startHealth = game.localPlayer.health
-  game.localPlayer.batteryLevel = 5000
-  game.localPlayer.batteryCapacity = 5000
-  game.localPlayer.steeringPower = 1.5
-  game.localPlayer.enginePower = 0.25
-  game.localPlayer.photonColor = '#f00'
-  game.localPlayer.isLocal = true
-  game.localPlayer.isDead = false
-  game.localPlayer.isPlaying = true
-  game.localPlayer.color = '#db8'
-  game.localPlayer.worldSize = worldSize // server sends size of world
-  game.localPlayer.cameraPosition = worldStartPosition
-  game.localPlayer.viewFramePosition = rndfVec2(0, 0)
-  game.localPlayer.position = rndfVec2(0, 0)
+  initALocalPlayer(game.localPlayer)
   localPlayerStore.set(game.localPlayer)
+}
+
+export function initALocalPlayer(localPlayer: SpaceObject) {
+  logWarning(`Resets local player`)
+  localPlayer.mass = 1
+  localPlayer.missileDamage = 1
+  localPlayer.missileSpeed = 19
+  localPlayer.armedDelay = 10
+  localPlayer.shotsPerFrame = 1
+  localPlayer.ammo = 1000000
+  localPlayer.angleDegree = -120
+  localPlayer.health = 350
+  localPlayer.startHealth = localPlayer.health
+  localPlayer.batteryLevel = 5000
+  localPlayer.batteryCapacity = 5000
+  localPlayer.steeringPower = 1.5
+  localPlayer.enginePower = 0.25
+  localPlayer.photonColor = '#f00'
+  localPlayer.isLocal = true
+  localPlayer.isDead = false
+  localPlayer.isPlaying = true
+  localPlayer.color = '#db8'
+  localPlayer.worldSize = worldSize // server sends size of world
+  localPlayer.cameraPosition = worldStartPosition
+  localPlayer.viewFramePosition = rndfVec2(0, 0)
+  localPlayer.position = rndfVec2(0, 0)
 }
