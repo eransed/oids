@@ -5,9 +5,6 @@ import type { UIStyle } from '../interface'
 import { orbitingScale } from '../constants'
 
 export function renderMoon(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingContext2D, style: UIStyle): void {
-  if (!npc.moonType) {
-    return
-  }
   const moon = getMoon(npc.moonType)
 
   const craterDetails = moon.craters

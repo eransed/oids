@@ -1,9 +1,10 @@
-import { newVec2 } from 'mathil'
+import { add2, newVec2 } from 'mathil'
 import { createPlanet } from '../factory'
 import { PlanetType, type SpaceObject } from '../interface'
+import { worldStartPosition } from '../constants'
 
 function AresPrime(sessionId: string): SpaceObject {
-  const aresPrime = createPlanet(sessionId, newVec2(1000, 1000), newVec2(500, 500), 'Tattooine')
+  const aresPrime = createPlanet(sessionId, add2(worldStartPosition, newVec2(-10000, 10000)), newVec2(500, 500), 'Tattooine')
   aresPrime.planetType = PlanetType.ARESPRIME
 
   console.log('Creating tattooine at: ', aresPrime.cameraPosition)
@@ -12,21 +13,21 @@ function AresPrime(sessionId: string): SpaceObject {
 }
 
 function Neptara(sessionId: string): SpaceObject {
-  const neptara = createPlanet(sessionId, newVec2(-25000, -25000), newVec2(500, 500), 'Neptara')
+  const neptara = createPlanet(sessionId, add2(worldStartPosition, newVec2(-2500, 2500)), newVec2(500, 500), 'Neptara')
   neptara.planetType = PlanetType.NEPTARA
 
   return neptara
 }
 
 function TerraNova(sessionId: string): SpaceObject {
-  const terraNova = createPlanet(sessionId, newVec2(-5000, -5000), newVec2(500, 500), 'TerraNova')
+  const terraNova = createPlanet(sessionId, add2(worldStartPosition, newVec2(-25000, 25000)), newVec2(500, 500), 'TerraNova')
   terraNova.planetType = PlanetType.TERRANOVA
 
   return terraNova
 }
 
 function Venara(sessionId: string): SpaceObject {
-  const venara = createPlanet(sessionId, newVec2(5000, 5000), newVec2(500, 500), 'Venara')
+  const venara = createPlanet(sessionId, add2(worldStartPosition, newVec2(-5000, 5000)), newVec2(500, 500), 'Venara')
   venara.planetType = PlanetType.VENARA
 
   return venara

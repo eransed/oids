@@ -47,6 +47,8 @@ export function createPlanet(sessionId: string, pos: Vec2, size: Vec2, name?: st
   const randomName = rndi(1, 100000)
 
   const planet = createSpaceObject(`Planet-${name ?? randomName}`, MessageType.SERVER_GAME_UPDATE)
+  const startingMaxVelocity = 0.2
+  planet.spaceObjectType = SpaceObjectType.PLANET
   planet.sessionId = sessionId
   // planet.ammo = 5000
 
@@ -63,7 +65,7 @@ export function createPlanet(sessionId: string, pos: Vec2, size: Vec2, name?: st
   planet.inverseFireRate = 15
   // planet.angularVelocity = 0.001
   planet.angleDegree = 90
-  planet.spaceObjectType = SpaceObjectType.PLANET
+  planet.velocity = { x: rndf(-startingMaxVelocity, startingMaxVelocity), y: rndf(-startingMaxVelocity, startingMaxVelocity) }
 
   return planet
 }
