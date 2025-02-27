@@ -20,6 +20,7 @@ export function newPhotonLaser(): PhotonLaser {
     didHit: false,
     health: 100,
     startHealth: 100,
+    inOrbitName: '',
     isDead: false,
     mass: 1,
     obliterated: false,
@@ -204,6 +205,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     motivatorBroken: false,
     name: name,
     id: rndi(1, 5000000),
+    inOrbitName: '',
     obliterated: false,
     online: true,
     photonColor: '#f00',
@@ -262,7 +264,7 @@ export function createSpaceObject(name = 'SpaceObject', msgType = MessageType.GA
     relation: SpaceRelation.FRIENDLY,
     owner: '',
     orbitingAltitude: 0,
-    planetType: PlanetType.ICE,
+    planetType: PlanetType.TERRANOVA,
   }
 
   spaceObject.hitRadius = Math.sqrt(spaceObject.size.x ** 2 + spaceObject.size.y ** 2)

@@ -1,13 +1,17 @@
 import { round2dec, type Vec2 } from 'mathil'
-import type { Crater, PlanetType, SpaceObject } from '../interface'
+import { type SpaceObject } from '../interface'
 import { renderShot } from './render2d'
-import type { UIStyle } from '../interface'
+import type { PlanetType, UIStyle } from '../interface'
 import { orbitingScale } from '../constants'
 
+interface SurfaceFeature {
+  x: number
+  y: number
+  size: number
+  color: string
+}
+
 export function renderPlanet(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingContext2D, style: UIStyle): void {
-  if (!npc.planetType) {
-    return
-  }
   const planet = getPlanet(npc.planetType)
   const surfaceDetails = planet.features
 
@@ -28,17 +32,14 @@ export function renderPlanet(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingCo
   ctx.fill()
   ctx.closePath()
 
-  // Draw planetary features
+  // Draw surface details (lakes, mountains, craters, and ridges)
   for (const feature of surfaceDetails) {
-    const scaledX = feature.x * (planetRadius / 150) // Adjust based on planet size
-    const scaledY = feature.y * (planetRadius / 150)
-    drawFeature(ctx, scaledX, scaledY, feature.radius, feature.color)
+    drawFeature(ctx, feature, planetRadius)
   }
 
-  // Add a shadow effect for depth
-  ctx.beginPath()
-  ctx.shadowBlur = 20
-  ctx.shadowColor = '#555555'
+  // Add depth effect
+  ctx.shadowBlur = 15
+  ctx.shadowColor = '#777777'
   ctx.strokeStyle = planet.color
   ctx.lineWidth = 5
   ctx.stroke()
@@ -59,62 +60,60 @@ export function renderPlanet(npc: SpaceObject, pos: Vec2, ctx: CanvasRenderingCo
   renderShot(npc, ctx, style)
 }
 
-function drawFeature(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string): void {
+function drawFeature(ctx: CanvasRenderingContext2D, feature: SurfaceFeature, planetRadius: number): void {
+  const scaledX = feature.x * (planetRadius / 150)
+  const scaledY = feature.y * (planetRadius / 150)
   ctx.beginPath()
-  ctx.arc(x, y, radius, 0, Math.PI * 2)
-  ctx.fillStyle = color
+  ctx.arc(scaledX, scaledY, feature.size, 0, Math.PI * 2)
+  ctx.fillStyle = feature.color
   ctx.fill()
   ctx.closePath()
 }
 
 export function getPlanet(type: PlanetType) {
   interface Planet {
-    features: Crater[] // Reusing Crater structure for surface features
+    features: SurfaceFeature[]
     color: string
   }
 
   const planetList: Planet[] = [
-    { features: lavaPlanetFeatures, color: lavaPlanetColor },
-    { features: icePlanetFeatures, color: icePlanetColor },
-    { features: junglePlanetFeatures, color: junglePlanetColor },
-    { features: desertPlanetFeatures, color: desertPlanetColor },
+    { features: TerraNovaFeatures, color: pastelEarthColor },
+    { features: AresPrimeFeatures, color: pastelMarsColor },
+    { features: NeptaraFeatures, color: pastelNeptuneColor },
+    { features: VenaraFeatures, color: pastelVenusColor },
   ]
 
   return planetList[type]
 }
 
-// Planet 1 - Lava Planet
-export const lavaPlanetFeatures: Crater[] = [
-  { x: -50, y: -30, radius: 40, color: '#FF4500' }, // Lava pool
-  { x: 80, y: 40, radius: 25, color: '#D2691E' }, // Magma cracks
-  { x: -30, y: 80, radius: 20, color: '#8B0000' }, // Volcanic ridge
+// Pastel Earth details
+export const TerraNovaFeatures: SurfaceFeature[] = [
+  { x: -50, y: -30, size: 40, color: '#A0D8B3' }, // Lake
+  { x: 70, y: 50, size: 35, color: '#B0E0E6' }, // Ocean
+  { x: -30, y: 80, size: 25, color: '#C2B280' }, // Mountain
 ]
-export const lavaPlanetColor = '#662200'
+export const pastelEarthColor = '#C5E1A5'
 
-// Planet 2 - Ice Planet
-export const icePlanetFeatures: Crater[] = [
-  { x: -20, y: -10, radius: 30, color: '#E0FFFF' }, // Frozen lake
-  { x: 30, y: 40, radius: 20, color: '#ADD8E6' }, // Ice cliffs
-  { x: -10, y: 50, radius: 15, color: '#B0E0E6' }, // Glacial valley
+// Pastel Mars details
+export const AresPrimeFeatures: SurfaceFeature[] = [
+  { x: -20, y: -10, size: 25, color: '#E57373' }, // Crater
+  { x: 30, y: 40, size: 30, color: '#D7CCC8' }, // Ridge
+  { x: -10, y: 50, size: 20, color: '#A1887F' }, // Canyon
 ]
-export const icePlanetColor = '#A9D0F5'
+export const pastelMarsColor = '#EF9A9A'
 
-// Planet 3 - Jungle Planet
-export const junglePlanetFeatures: Crater[] = [
-  { x: 30, y: -20, radius: 35, color: '#228B22' }, // Dense forest
-  { x: -50, y: 30, radius: 28, color: '#006400' }, // Thick vegetation
-  { x: 20, y: 60, radius: 22, color: '#32CD32' }, // Alien flora
-  { x: 10, y: -70, radius: 18, color: '#008000' }, // Jungle valley
-  { x: -80, y: -30, radius: 26, color: '#2E8B57' }, // Mossy swamp
+// Pastel Neptune details
+export const NeptaraFeatures: SurfaceFeature[] = [
+  { x: 30, y: -20, size: 35, color: '#90CAF9' }, // Ice patch
+  { x: -50, y: 30, size: 30, color: '#64B5F6' }, // Storm
+  { x: 20, y: 60, size: 25, color: '#42A5F5' }, // Swirl
 ]
-export const junglePlanetColor = '#556B2F'
+export const pastelNeptuneColor = '#BBDEFB'
 
-// Planet 4 - Desert Planet
-export const desertPlanetFeatures: Crater[] = [
-  { x: -40, y: 10, radius: 25, color: '#C2B280' }, // Sand dunes
-  { x: 60, y: 50, radius: 20, color: '#FFD700' }, // Golden sands
-  { x: -30, y: -40, radius: 18, color: '#DAA520' }, // Oasis
-  { x: 20, y: -20, radius: 22, color: '#DEB887' }, // Rocky outcrop
-  { x: 40, y: -50, radius: 30, color: '#F4A460' }, // Dried riverbed
+// Pastel Venus details
+export const VenaraFeatures: SurfaceFeature[] = [
+  { x: -40, y: 10, size: 30, color: '#FFCC80' }, // Lava Flow
+  { x: 60, y: 50, size: 28, color: '#FFB74D' }, // Volcano
+  { x: -30, y: -40, size: 26, color: '#FFA726' }, // Mountain Range
 ]
-export const desertPlanetColor = '#D2B48C'
+export const pastelVenusColor = '#FFECB3'

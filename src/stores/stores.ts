@@ -33,3 +33,10 @@ export const settingsStore: Writable<Settings> = writable({
 })
 
 export const shouldCelebrateLevelUp: Writable<boolean> = writable(false)
+
+interface WelcomeToPlanet {
+  showInfo: boolean
+  planet: SpaceObject
+}
+
+// export const welcomeToPlanet: Writable<WelcomeToPlanet | undefined> = writable(undefined)

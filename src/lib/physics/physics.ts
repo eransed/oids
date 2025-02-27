@@ -27,6 +27,14 @@ export function updateShapes(shapes: Shape[], frameTimeMs: number): void {
   })
 }
 
+export function limit(n: number, max: number): number {
+  return Math.abs(n) >= Math.abs(max) ? (n < 0 ? -max : max) : n
+}
+
+export function limitVec2_(v: Vec2, max: Vec2): Vec2 {
+  return { x: limit(v.x, max.x), y: limit(v.y, max.y) }
+}
+
 const ticksBetweenSnapshots = 0
 
 export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
@@ -47,14 +55,6 @@ export function updateSpaceObject(so: SpaceObject, dt: number): SpaceObject {
   if (so.spaceObjectType === SpaceObjectType.MOON) {
     // if (so.health / so.startHealth < 0.1) {
     // }
-  }
-
-  function limit(n: number, max: number): number {
-    return Math.abs(n) >= Math.abs(max) ? (n < 0 ? -max : max) : n
-  }
-
-  function limitVec2_(v: Vec2, max: Vec2): Vec2 {
-    return { x: limit(v.x, max.x), y: limit(v.y, max.y) }
   }
 
   so.velocity = add2(so.velocity, a)

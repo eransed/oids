@@ -1,7 +1,7 @@
-import { add2, rndfVec2 } from 'mathil'
+import { add2, newVec2, rndfVec2 } from 'mathil'
 import { explosionDuration, worldSize, worldStartPosition } from '../../constants'
 import type { Game } from '../../game'
-import type { KeyFunctionMap } from '../../interface'
+import type { KeyFunctionMap, SpaceObject } from '../../interface'
 import { handleDeathExplosion } from '../../mechanics'
 import { getRemotePosition } from '../../physics/physics'
 import { renderLine } from '../../render/render2d'
@@ -11,6 +11,15 @@ import { renderTrail } from '../../render/renderShipTrail'
 import { handleMoveView } from './handleMoveView'
 import { logWarning } from '../../../components/alert/alertHandler'
 import { localPlayerStore } from '../../../stores/stores'
+import { getCurrentTheme } from '../../../style/defaultColors'
+import { renderProgressBar } from '../../render/renderUI'
+
+interface WelcomeToPlanet {
+  showInfo: boolean
+  planet: SpaceObject
+}
+
+let welcomePlanet: WelcomeToPlanet | undefined
 
 export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
   const localPlayer = game.localPlayer
@@ -33,7 +42,7 @@ export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
     // if (localPlayer.health < localPlayer.startHealth) {
     //   const theme = getCurrentTheme()
     //   renderProgressBar(
-    //     add2(localPlayer.viewFramePosition, newVec2(-localPlayer.hitRadius / 0.5, localPlayer.hitRadius / 0.65)),
+    //     add2(localPlayer.viewFramePosition, newVec2(-localPlayer.hitRadius / 0.42, -localPlayer.hitRadius * 1.65)),
     //     'Hp',
     //     localPlayer.health,
     //     localPlayer.startHealth,
@@ -43,7 +52,7 @@ export function handleLocalPlayer(game: Game, activeKeyMap: KeyFunctionMap) {
     //     '#fff',
     //     theme.accent,
     //     theme.text,
-    //     localPlayer.hitRadius / 100
+    //     localPlayer.hitRadius / 100,
     //   )
     // }
     if (activeKeyMap.systemGraphs.keyStatus) {

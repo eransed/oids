@@ -49,10 +49,17 @@ export enum MoonType {
 }
 
 export enum PlanetType {
-  LAVA,
-  ICE,
-  JUNGLE,
-  DESERT,
+  /** Terra Nova - A lush, Earth-like planet with vast oceans, green landscapes, and a balanced atmosphere. Ideal for life. */
+  TERRANOVA,
+
+  /** Ares Prime - A dry, red desert world with towering dust storms, deep canyons, and traces of ancient water. */
+  ARESPRIME,
+
+  /** Neptara - A deep blue gas giant with turbulent storms, icy rings, and a mysterious, stormy atmosphere. */
+  NEPTARA,
+
+  /** Venara - A scorching, golden-hued world with thick toxic clouds, volcanic activity, and an intense greenhouse effect. */
+  VENARA,
 }
 
 export interface Shapable {
@@ -126,6 +133,7 @@ export interface Physical extends Positionable {
   velocity: Vec2
   acceleration: Vec2
   orbitingAltitude: number
+  inOrbitName: string
 }
 
 export interface Rotatable extends Positionable {

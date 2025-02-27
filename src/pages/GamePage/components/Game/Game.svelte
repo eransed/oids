@@ -28,7 +28,7 @@
   import Chat from '../../../../components/chat/chat.svelte'
   import ProgressBar from '../../../../components/progress/progressBar.svelte'
   import { getShipXpRequirement } from '../../../../lib/services/utils/shipLevels'
-  import Celebration from '../../../../components/celebration/celebration.svelte'
+  import Announcement from '../../../../components/announcements/announcement.svelte'
   import { getShipBundleCache } from '../../../../style/ships'
   import Page from '../../../../components/page/page.svelte'
   import CircularSpinner from '../../../../components/loaders/circularSpinner.svelte'
@@ -141,6 +141,10 @@
   async function spawnCompanionShip() {
     await requestCompanionShip(game.localPlayer.sessionId, game.localPlayer.name)
   }
+
+  $: if ($localPlayerStore.health < $localPlayerStore.startHealth * 0.3) {
+    $ActiveKeyMapStore.healthBar.keyStatus = true
+  }
 </script>
 
 {#if loadingGame}
@@ -232,7 +236,7 @@
 {/if}
 
 {#if $shouldCelebrateLevelUp}
-  <Celebration celebrationText={`You've reached level ${$localPlayerStore.ship.level}`} celebrationTimeoutCallback={() => ($shouldCelebrateLevelUp = false)} />
+  <Announcement header="Congratulations!" text={`You've reached level ${$localPlayerStore.ship.level}`} timeOutCallBack={() => ($shouldCelebrateLevelUp = false)} />
 {/if}
 
 <!-- <canvas oncontextmenu="return false;" class="game_canvas" id="noContextMenu" bind:this={canvas} /> -->

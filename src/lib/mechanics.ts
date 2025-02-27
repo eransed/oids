@@ -1,11 +1,11 @@
-import type { Boostable, Damageable, PhotonLaser, Positionable, SpaceObject, Thrustable } from './interface'
+import { SpaceObjectType, type Boostable, type Damageable, type PhotonLaser, type Positionable, type SpaceObject, type Thrustable } from './interface'
 import type { Steerable } from './traits/Steerable'
 
 import { scalarMultiply2, wrap, rndf, add2, rndi, copy2, degToRad, type Vec2, sub2, smul2, mag2, newVec2, angle2, dist2, lintra, EveryInterval, limitVec2, magnitude2 } from 'mathil'
 import { basicPhotonLaserSpeedScaleFactor, maxHeat, shotHitReversFactor, thrustSteer, thrustSteerPowerFactor } from './constants'
 import { renderHitExplosion } from './render/renderFx'
 import { newPhotonLaser } from './factory'
-import { calculateThrustVector, getDistance, getHeading, getWorldCoordinates } from './physics/physics'
+import { calculateThrustVector, getDistance, getHeading, getWorldCoordinates, limitVec2_ } from './physics/physics'
 
 export function applyEngine(so: Thrustable & Boostable, boost = false): number {
   const consumption: number = so.enginePower * (boost ? so.booster : 1)
@@ -214,7 +214,6 @@ const every300 = new EveryInterval(300)
 const every50 = new EveryInterval(50)
 
 export function orbitSpaceObject(orbiter: SpaceObject, targetSo: SpaceObject) {
-  let orbiting = false
   // angleTo(orbiter, targetSo)
 
   const distanceBetween = getDistance(orbiter, targetSo)
@@ -223,14 +222,16 @@ export function orbitSpaceObject(orbiter: SpaceObject, targetSo: SpaceObject) {
     every300.tick(() => console.log(`${orbiter.name} is orbiting ${targetSo.name}`))
     // every50.tick(() => console.log(distanceBetween))
 
-    orbiting = true
-
+    orbiter.inOrbitName = targetSo.name
+    if (orbiter.spaceObjectType === SpaceObjectType.PLAYER) {
+      console.log(targetSo.name)
+    }
     // angleTo(orbiter, targetSo)
   } else {
-    orbiting = false
+    orbiter.inOrbitName = ''
   }
 
-  if (orbiting) {
+  if (orbiter.inOrbitName) {
     // Making spaceObject facing the target
     angleTo(orbiter, targetSo)
 
@@ -253,6 +254,7 @@ export function orbitSpaceObject(orbiter: SpaceObject, targetSo: SpaceObject) {
         orbiter.velocity = add2(orbiter.velocity, calculateThrustVector(orbiter, -180))
       })
     }
+    orbiter.velocity = limitVec2_(orbiter.velocity, { x: 2, y: 2 })
   }
 }
 
