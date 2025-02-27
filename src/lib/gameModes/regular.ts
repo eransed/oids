@@ -217,7 +217,7 @@ export function renderFrame(game: Game, dt: number): void {
 
     handleRemotePlayers(game)
 
-    renderRemotePlayerInSpaceMode(game, activeKeyMap, dt)
+    renderRemotePlayerInSpaceMode(game, activeKeyMap, dt, activeKeyMap.systemGraphs.keyStatus)
     handleGameBodies(game, activeKeyMap)
     handleLocalPlayer(game, activeKeyMap)
   }

@@ -14,9 +14,7 @@ import { interpolate } from './interpolate'
 
 let previousPositions: Map<string, Vec2> = new Map()
 
-const renderActualPos = true
-
-export function renderRemotePlayerInSpaceMode(game: Game, activeKeyMap: KeyFunctionMap, dt: number): void {
+export function renderRemotePlayerInSpaceMode(game: Game, activeKeyMap: KeyFunctionMap, dt: number, renderActualPos = false): void {
   for (let i = 0; i < game.remotePlayers.length; i++) {
     const remotePlayer = game.remotePlayers[i]
 
