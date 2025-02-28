@@ -16,15 +16,21 @@ export class GameHandler {
   game_started = false
   worldSpaceObjects: SpaceObject[] = []
   game_interval: NodeJS.Timeout | undefined = undefined
+  network_interval: NodeJS.Timeout | undefined = undefined
   start_time_us: number = usNow()
   tied_session_id: string
 
   // private readonly tickRate = 30
-  private readonly fps = 60
   private remoteSpaceObjects: SpaceObject[] = []
   private lastTime = performance.now()
   private dt = performance.now()
-  private minTickTimeMs = 1000 / this.fps
+
+  //120fps
+  private gameTickTime = 1000 / 120
+
+  //20fps
+  private networktickTime = 1000 / 20
+
   // private every = new EveryInterval(this.tickRate)
   // private asteroidTicker = new EveryInterval(this.tickRate)
   private nextWorldObjectToSendIndex = 0
@@ -43,11 +49,17 @@ export class GameHandler {
     this.tied_session_id = sessionId
   }
 
-  quit_game(): void {
+  quit_game() {
     info(`Quitting game ${this.tied_session_id}`)
     this.game_started = false
-    this.worldSpaceObjects = []
     clearInterval(this.game_interval)
+    clearInterval(this.network_interval)
+  }
+
+  restart_game() {
+    this.quit_game()
+    info(`Restarting game ${this.tied_session_id}`)
+    this.game_session_start()
   }
 
   game_session_start() {
@@ -94,17 +106,19 @@ export class GameHandler {
         }
       }
 
+      // Send town updates if there are any:
+      // this.updateTownsIfApplicable()
+
+      this.lastTime = performance.now()
+    }, this.gameTickTime)
+
+    this.network_interval = setInterval(() => {
       for (let i = 0; i < this.worldSpaceObjects.length; i++) {
         this.prepareSoToSend(this.worldSpaceObjects[i])
         this.worldSpaceObjects[i].collidingWith = []
         this.broadcaster(globalConnectedClients, this.worldSpaceObjects[i], this.tied_session_id)
       }
-
-      // Send town updates if there are any:
-      // this.updateTownsIfApplicable()
-
-      this.lastTime = performance.now()
-    }, this.minTickTimeMs)
+    }, this.networktickTime)
   }
   // server main loop end
 

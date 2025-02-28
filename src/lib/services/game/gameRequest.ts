@@ -22,3 +22,13 @@ export const requestCompanionShip = async (sessionId: string, name: string): Pro
     throw new Error(err)
   }
 }
+
+export const requestGameServerRestart = async (sessionId: string, name: string): Promise<string> => {
+  try {
+    const response: AxiosResponse<string> = await axios.get(`http://${getLocationURL()}:6060/api/v1/game/request/restart?sessionId=${sessionId}&clientId=${name}`)
+    return response.data
+  } catch (err: any) {
+    handleAxiosError(err)
+    throw new Error(err)
+  }
+}

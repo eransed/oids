@@ -255,6 +255,16 @@ export function handleIncomingCreateShipRequest(sessionId: string, clientName: s
   warn(`Could not find a clint named '${clientName}'`)
 }
 
+export function handleIncomingRestartGameRequest(sessionId: string, clientName: string, type: SpaceObjectType, relation: SpaceRelation) {
+  for (let i = 0; i < game_handlers.length; i++) {
+    if (game_handlers[i].tied_session_id === sessionId) {
+      game_handlers[i].restart_game()
+      return
+    }
+  }
+  warn(`Could not find a clint named '${clientName}'`)
+}
+
 function getReadyStateText(ws: WebSocket): string {
   const s: number = ws.readyState
   switch (s) {

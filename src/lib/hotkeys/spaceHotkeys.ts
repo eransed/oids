@@ -78,8 +78,8 @@ export const DefaultSpaceModeKeyMap: KeyFunctionMap = {
   },
   healthBar: {
     activators: ['l'],
-    keyStatus: false,
-    store: false,
+    keyStatus: true,
+    store: true,
     toggle: true,
     displayText: 'Healthbar',
   },

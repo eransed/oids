@@ -16,6 +16,8 @@ import { renderPlanet } from '../../render/renderPlanet'
 
 let previousPositions: Map<string, Vec2> = new Map()
 
+const renderActualPos = true
+
 export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): SpaceObject[] {
   game.bodies.forEach((body) => {
     const actualPos = add2(body.viewFramePosition, body.cameraPosition)
@@ -38,11 +40,17 @@ export function handleGameBodies(game: Game, activeKeyMap: KeyFunctionMap): Spac
       if (body.spaceObjectType === SpaceObjectType.PLANET) {
         //Should be renderPlanet.. but we don't have that function
         renderPlanet(body, currentPos, game.ctx, game.style)
+        if (renderActualPos) {
+          renderPlanet(body, bodyPos, game.ctx, game.style)
+        }
       }
 
       if (body.spaceObjectType === SpaceObjectType.SHIP) {
         renderShip(body, game.ctx, false, game.style, currentPos)
-        // renderShip(body, game.ctx, false, game.style, bodyPos)
+
+        if (renderActualPos) {
+          renderShip(body, game.ctx, false, game.style, bodyPos)
+        }
       }
 
       if (activeKeyMap.systemGraphs.keyStatus) {

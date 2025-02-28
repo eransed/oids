@@ -39,7 +39,7 @@
   import { createMoon, createSpaceObject } from '../../../../lib/factory'
   import { rndi } from 'mathil'
   import { Icons } from '../../../../style/icons'
-  import { requestCompanionShip, requestEnemyShip } from '../../../../lib/services/game/gameRequest'
+  import { requestCompanionShip, requestEnemyShip, requestGameServerRestart } from '../../../../lib/services/game/gameRequest'
 
   let game: Game
 
@@ -142,6 +142,10 @@
     await requestCompanionShip(game.localPlayer.sessionId, game.localPlayer.name)
   }
 
+  async function restartGameOnServer() {
+    await requestGameServerRestart(game.localPlayer.sessionId, game.localPlayer.name)
+  }
+
   $: if ($localPlayerStore.health < $localPlayerStore.startHealth * 0.3) {
     $ActiveKeyMapStore.healthBar.keyStatus = true
   }
@@ -157,6 +161,7 @@
   <InGameInfo title={'Create Menu'} showModal={$ActiveKeyMapStore.createMenu.keyStatus} closedCallback={() => ($ActiveKeyMapStore.createMenu.keyStatus = false)}>
     <Button90 icon={Icons.MoonLanding} addInfo="Create Enemy" buttonConfig={{ buttonText: 'Create Enemy', clickCallback: () => spawnEnemyShip(), selected: false }} />
     <Button90 icon={Icons.PlanetLamp} addInfo="Create Companion" buttonConfig={{ buttonText: 'Create Companion', clickCallback: () => spawnCompanionShip(), selected: false }} />
+    <Button90 icon={Icons.StartGame} addInfo="Restart Game" buttonConfig={{ buttonText: 'Restart Game', clickCallback: () => restartGameOnServer(), selected: false }} />
   </InGameInfo>
 {/if}
 
